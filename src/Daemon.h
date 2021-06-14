@@ -64,25 +64,23 @@ namespace uCentral {
         void InitializeSubSystemServers();
         void StartSubSystemServers();
         void StopSubSystemServers();
-        static std::string Version();
-        const Poco::SharedPtr<Poco::Crypto::RSAKey> & Key() { return AppKey_; }
         void Exit(int Reason);
-        [[nodiscard]] inline const std::string & DataDir() { return DataDir_; }
-        std::string CreateUUID();
-        bool Debug() const { return DebugMode_; }
-        uint64_t ID() const { return ID_; }
         bool SetSubsystemLogLevel(const std::string & SubSystem, const std::string & Level);
+        [[nodiscard]] static std::string Version();
+        [[nodiscard]] const Poco::SharedPtr<Poco::Crypto::RSAKey> & Key() { return AppKey_; }
+        [[nodiscard]] inline const std::string & DataDir() { return DataDir_; }
+        [[nodiscard]] std::string CreateUUID();
+        [[nodiscard]] bool Debug() const { return DebugMode_; }
+        [[nodiscard]] uint64_t ID() const { return ID_; }
         [[nodiscard]] Types::StringVec GetSubSystems() const;
         [[nodiscard]] Types::StringPairVec GetLogLevels() const;
         [[nodiscard]] const Types::StringVec & GetLogLevelNames() const;
-
-        uint64_t ConfigGetInt(const std::string &Key,uint64_t Default);
-        uint64_t ConfigGetInt(const std::string &Key);
-        std::string ConfigGetString(const std::string &Key,const std::string & Default);
-        std::string ConfigGetString(const std::string &Key);
-        uint64_t ConfigGetBool(const std::string &Key,bool Default);
-        uint64_t ConfigGetBool(const std::string &Key);
-
+        [[nodiscard]] std::string ConfigGetString(const std::string &Key,const std::string & Default);
+        [[nodiscard]] std::string ConfigGetString(const std::string &Key);
+        [[nodiscard]] uint64_t ConfigGetInt(const std::string &Key,uint64_t Default);
+        [[nodiscard]] uint64_t ConfigGetInt(const std::string &Key);
+        [[nodiscard]] uint64_t ConfigGetBool(const std::string &Key,bool Default);
+        [[nodiscard]] uint64_t ConfigGetBool(const std::string &Key);
 
     private:
         static Daemon 				*instance_;
