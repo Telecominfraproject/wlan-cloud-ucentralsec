@@ -58,6 +58,7 @@ add_executable( ucentralsec
                 src/RESTAPI_handler.h src/RESTAPI_handler.cpp
                 src/RESTAPI_server.cpp src/RESTAPI_server.h
                 src/RESTAPI_objects.cpp src/RESTAPI_objects.h
+                src/RESTAPI_system_command.h src/RESTAPI_system_command.cpp
                 src/RESTAPI_protocol.h
                 src/AuthService.h src/AuthService.cpp
                 src/KafkaManager.h src/KafkaManager.cpp
@@ -65,7 +66,7 @@ add_executable( ucentralsec
                 src/storage_identity.cpp
                 src/Utils.cpp src/Utils.h
                 src/storage_sqlite.cpp src/storage_odbc.cpp src/storage_sqlite.cpp src/storage_pgql.cpp src/storage_mysql.cpp
-        src/storage_tables.cpp)
+                src/storage_tables.cpp)
 
 target_link_libraries(ucentralsec PUBLIC
         ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES} CppKafka::cppkafka )
