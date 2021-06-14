@@ -6,8 +6,8 @@
 //	Arilia Wireless Inc.
 //
 
-#ifndef UCENTRALGW_UUTILS_H
-#define UCENTRALGW_UUTILS_H
+#ifndef UCENTRALGW_UTILS_H
+#define UCENTRALGW_UTILS_H
 
 #include <vector>
 #include <string>
@@ -36,5 +36,6 @@ namespace uCentral::Utils {
 	bool CompareTime( int H1, int H2, int M1, int M2, int S1, int S2);
 
 	[[nodiscard]] bool ValidSerialNumber(const std::string &Serial);
+	[[nodiscard]] std::string LogLevelToString(int Level);
 }
-#endif // UCENTRALGW_UUTILS_H
+#endif // UCENTRALGW_UTILS_H

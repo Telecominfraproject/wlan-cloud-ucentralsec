@@ -22,7 +22,7 @@
 #include "RESTAPI_objects.h"
 #include "AuthService.h"
 
-namespace uCentral::RESTAPI {
+namespace uCentral {
 
 	struct QueryBlock {
 		uint64_t StartDate = 0 , EndDate = 0 , Offset = 0 , Limit = 0, LogType = 0 ;

@@ -18,39 +18,35 @@
 #include "Poco/Net/NetException.h"
 
 
-namespace uCentral::RESTAPI {
-    int Start();
-    void Stop();
+namespace uCentral {
 
-    class Service : public SubSystemServer {
+    class RESTAPI_Server : public SubSystemServer {
 
     public:
-        Service() noexcept;
+        RESTAPI_Server() noexcept;
 
-        friend int Start();
-        friend void Stop();
-
-        static Service *instance() {
+        static RESTAPI_Server *instance() {
             if (instance_ == nullptr) {
-                instance_ = new Service;
+                instance_ = new RESTAPI_Server;
             }
             return instance_;
         }
 
-    private:
-		static Service *instance_;
-
         int Start() override;
         void Stop() override;
 
+    private:
+		static RESTAPI_Server *instance_;
         std::vector<std::unique_ptr<Poco::Net::HTTPServer>>   RESTServers_;
 		Poco::ThreadPool	Pool_;
     };
 
+    inline RESTAPI_Server * RESTAPI_Server() { return RESTAPI_Server::instance(); };
+
 class RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
     public:
         RequestHandlerFactory() :
-            Logger_(Service::instance()->Logger()){}
+            Logger_(RESTAPI_Server()->Logger()){}
 
         Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
     private:

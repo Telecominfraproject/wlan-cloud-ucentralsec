@@ -11,16 +11,18 @@
 
 #include "RESTAPI_handler.h"
 
-class RESTAPI_oauth2Handler: public uCentral::RESTAPI::RESTAPIHandler
-{
-public:
-    RESTAPI_oauth2Handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L)
-        : RESTAPIHandler(bindings,L,
-                         std::vector<std::string>
-                                 {  Poco::Net::HTTPRequest::HTTP_POST,
-                                    Poco::Net::HTTPRequest::HTTP_DELETE,
-                                    Poco::Net::HTTPRequest::HTTP_OPTIONS}) {}
-    void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
-};
+namespace uCentral {
+    class RESTAPI_oauth2Handler : public uCentral::RESTAPIHandler {
+    public:
+        RESTAPI_oauth2Handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L)
+                : RESTAPIHandler(bindings, L,
+                                 std::vector<std::string>
+                                         {Poco::Net::HTTPRequest::HTTP_POST,
+                                          Poco::Net::HTTPRequest::HTTP_DELETE,
+                                          Poco::Net::HTTPRequest::HTTP_OPTIONS}) {}
+
+        void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+    };
+}
 
 #endif //UCENTRAL_RESTAPI_OAUTH2HANDLER_H

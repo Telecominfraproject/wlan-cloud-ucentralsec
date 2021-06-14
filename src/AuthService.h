@@ -19,46 +19,38 @@
 
 #include "RESTAPI_objects.h"
 
-namespace uCentral::Auth {
+namespace uCentral{
 
-	enum ACCESS_TYPE {
-		USERNAME,
-		SERVER,
-		CUSTOM
-	};
-
-	ACCESS_TYPE IntToAccessType(int C);
-	int AccessTypeToInt(ACCESS_TYPE T);
-
-    int Start();
-    void Stop();
-    bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, struct uCentral::Objects::WebToken & UserInfo );
-    bool Authorize( const std::string & UserName, const std::string & Password, uCentral::Objects::WebToken & ResultToken );
-    void Logout(const std::string &token);
-
-    class Service : public SubSystemServer {
+    class AuthService : public SubSystemServer {
     public:
 
-        Service() noexcept;
+        enum ACCESS_TYPE {
+            USERNAME,
+            SERVER,
+            CUSTOM
+        };
 
-        friend int Start();
-        friend void Stop();
+        static ACCESS_TYPE IntToAccessType(int C);
+        static int AccessTypeToInt(ACCESS_TYPE T);
 
-        static Service *instance() {
+        static AuthService *instance() {
             if (instance_ == nullptr) {
-                instance_ = new Service;
+                instance_ = new AuthService;
             }
             return instance_;
         }
 
-        friend bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, struct uCentral::Objects::WebToken & UserInfo );
-        friend bool Authorize( const std::string & UserName, const std::string & Password, uCentral::Objects::WebToken & ResultToken );
+        int Start() override;
+        void Stop() override;
+        bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, struct uCentral::Objects::WebToken & UserInfo );
+        void CreateToken(const std::string & UserName, uCentral::Objects::WebToken & ResultToken, uCentral::Objects::AclTemplate & ACL);
+        bool Authorize( const std::string & UserName, const std::string & Password, uCentral::Objects::WebToken & ResultToken );
+        void Logout(const std::string &token);
         [[nodiscard]] std::string GenerateToken(const std::string & UserName, ACCESS_TYPE Type, int NumberOfDays);
-		[[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, struct uCentral::Objects::WebToken & UserInfo  );
-        friend void Logout(const std::string &token);
+        [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, struct uCentral::Objects::WebToken & UserInfo  );
 
     private:
-		static Service *instance_;
+		static AuthService *instance_;
 		std::map<std::string,uCentral::Objects::WebToken>   Tokens_;
 		bool    			Secure_ = false ;
 		std::string     	DefaultUserName_;
@@ -67,14 +59,10 @@ namespace uCentral::Auth {
 		bool            	AutoProvisioning_ = false ;
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
-
-        int Start() override;
-        void Stop() override;
-        bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, struct uCentral::Objects::WebToken & UserInfo );
-        void CreateToken(const std::string & UserName, uCentral::Objects::WebToken & ResultToken, uCentral::Objects::AclTemplate & ACL);
-        bool Authorize( const std::string & UserName, const std::string & Password, uCentral::Objects::WebToken & ResultToken );
-        void Logout(const std::string &token);
+        AuthService() noexcept;
     };
+
+    inline AuthService * AuthService() { return AuthService::instance(); }
 
 } // end of namespace
 

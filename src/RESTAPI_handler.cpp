@@ -20,11 +20,11 @@
 #include "RESTAPI_handler.h"
 #include "AuthService.h"
 #include "RESTAPI_protocol.h"
-#include "uUtils.h"
+#include "Utils.h"
 
 #define DBG		std::cout << __LINE__ << "   " __FILE__ << std::endl;
 
-namespace uCentral::RESTAPI {
+namespace uCentral {
 	bool RESTAPIHandler::ParseBindings(const std::string & Request, const std::string & Path, BindingMap &bindings) {
 		std::string Param, Value;
 
@@ -242,7 +242,7 @@ namespace uCentral::RESTAPI {
 
 	bool RESTAPIHandler::IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 									  Poco::Net::HTTPServerResponse &Response) {
-		if (uCentral::Auth::IsAuthorized(Request, SessionToken_, UserInfo_)) {
+		if (AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 			return true;
 		} else {
 			UnAuthorized(Request, Response);
@@ -253,7 +253,7 @@ namespace uCentral::RESTAPI {
 	bool RESTAPIHandler::IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 									  Poco::Net::HTTPServerResponse &Response, std::string &UserName) {
 
-		if (uCentral::Auth::IsAuthorized(Request, SessionToken_, UserInfo_)) {
+		if (AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 			UserName = UserInfo_.username_;
 			return true;
 		} else {

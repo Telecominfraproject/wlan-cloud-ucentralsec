@@ -12,25 +12,17 @@
 #include "RESTAPI_oauth2Handler.h"
 #include "RESTAPI_unknownRequestHandler.h"
 
-#include "uUtils.h"
+#include "Utils.h"
 
-namespace uCentral::RESTAPI {
+namespace uCentral {
 
-    Service *Service::instance_ = nullptr;
+    class RESTAPI_Server *RESTAPI_Server::instance_ = nullptr;
 
-    int Start() {
-        return Service::instance()->Start();
-    }
-
-    void Stop() {
-        Service::instance()->Stop();
-    }
-
-    Service::Service() noexcept: SubSystemServer("RESTAPIServer", "RESTAPIServer", "ucentral.restapi")
+    RESTAPI_Server::RESTAPI_Server() noexcept: SubSystemServer("RESTAPIServer", "RESTAPIServer", "ucentral.restapi")
     {
     }
 
-    int Service::Start() {
+    int RESTAPI_Server::Start() {
         Logger_.information("Starting.");
 
         for(const auto & Svr: ConfigServersList_) {
@@ -38,8 +30,6 @@ namespace uCentral::RESTAPI {
 											 Svr.KeyFile(),Svr.CertFile()));
 
             auto Sock{Svr.CreateSecureSocket(Logger_)};
-
-//			Sock.setReceiveTimeout(Poco::Timespan(10,0));
 
 			Svr.LogCert(Logger_);
 			if(!Svr.RootCA().empty())
@@ -49,10 +39,6 @@ namespace uCentral::RESTAPI {
             Params->setMaxThreads(50);
             Params->setMaxQueued(200);
 			Params->setKeepAlive(true);
-//			uint64_t T = 45000;
-//			Params->setKeepAliveTimeout(T);
-//			Params->setMaxKeepAliveRequests(200);
-//			Params->setTimeout();
 
             auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory, Pool_, Sock, Params);
             NewServer->start();
@@ -80,7 +66,7 @@ namespace uCentral::RESTAPI {
         return new RESTAPI_UnknownRequestHandler(bindings,Logger_);
     }
 
-    void Service::Stop() {
+    void RESTAPI_Server::Stop() {
         Logger_.information("Stopping ");
         for( const auto & svr : RESTServers_ )
             svr->stop();

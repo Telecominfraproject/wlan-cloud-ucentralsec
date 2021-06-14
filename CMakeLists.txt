@@ -49,7 +49,8 @@ find_package(Poco REQUIRED COMPONENTS Crypto JWT Net Util NetSSL Data DataSQLite
 
 include_directories(/usr/local/include  /usr/local/opt/openssl/include src include/kafka)
 
-add_executable( ucentralsec build
+add_executable( ucentralsec
+                build
                 src/Daemon.h src/Daemon.cpp
                 src/SubSystemServer.cpp src/SubSystemServer.h
                 src/RESTAPI_unknownRequestHandler.h src/RESTAPI_unknownRequestHandler.cpp
@@ -59,7 +60,12 @@ add_executable( ucentralsec build
                 src/RESTAPI_objects.cpp src/RESTAPI_objects.h
                 src/RESTAPI_protocol.h
                 src/AuthService.h src/AuthService.cpp
-        )
+                src/KafkaManager.h src/KafkaManager.cpp
+                src/StorageService.cpp src/StorageService.h
+                src/storage_identity.cpp
+                src/Utils.cpp src/Utils.h
+                src/storage_sqlite.cpp src/storage_odbc.cpp src/storage_sqlite.cpp src/storage_pgql.cpp src/storage_mysql.cpp
+        src/storage_tables.cpp)
 
 target_link_libraries(ucentralsec PUBLIC
         ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES} CppKafka::cppkafka )
