@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+#include "Poco/Net/NetworkInterface.h"
+
 namespace uCentral::Utils {
 
 	[[nodiscard]] std::vector<std::string> Split(const std::string &List, char Delimiter=',');
@@ -37,5 +39,12 @@ namespace uCentral::Utils {
 
 	[[nodiscard]] bool ValidSerialNumber(const std::string &Serial);
 	[[nodiscard]] std::string LogLevelToString(int Level);
+
+	[[nodiscard]] bool SerialNumberMatch(const std::string &S1, const std::string &S2, int extrabits=2);
+	[[nodiscard]] uint64_t SerialNumberToInt(const std::string & S);
+	[[nodiscard]] uint64_t SerialNumberToOUI(const std::string & S);
+
+	[[nodiscard]] uint64_t GetDefaultMacAsInt64();
+	[[nodiscard]] uint64_t GetSystemId();
 }
 #endif // UCENTRALGW_UTILS_H

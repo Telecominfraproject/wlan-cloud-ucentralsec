@@ -6,6 +6,8 @@
 //	Arilia Wireless Inc.
 //
 #include <stdexcept>
+#include <fstream>
+#include <cstdlib>
 
 #include "Utils.h"
 
@@ -17,8 +19,10 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Logger.h"
 #include "Poco/Message.h"
+#include "Poco/File.h"
 
 #include "uCentralProtocol.h"
+#include "Daemon.h"
 
 namespace uCentral::Utils {
 
@@ -276,6 +280,112 @@ namespace uCentral::Utils {
 			case Poco::Message::PRIO_ERROR: return "error";
 			case Poco::Message::PRIO_TRACE: return "trace";
 			default: return "none";
+		}
+	}
+
+	bool SerialNumberMatch(const std::string &S1, const std::string &S2, int Bits) {
+		auto S1_i = SerialNumberToInt(S1);
+		auto S2_i = SerialNumberToInt(S2);
+		return ((S1_i>>Bits)==(S2_i>>Bits));
+	}
+
+	uint64_t SerialNumberToInt(const std::string & S) {
+		uint64_t R=0;
+
+		for(const auto &i:S)
+			if(i>='0' && i<='9') {
+				R <<= 4;
+				R += (i-'0');
+			} else if(i>='a' && i<='f') {
+				R <<= 4;
+				R += (i-'a') + 10 ;
+			} else if(i>='A' && i<='F') {
+				R <<= 4;
+				R += (i-'A') + 10 ;
+			}
+		return R;
+	}
+
+	uint64_t SerialNumberToOUI(const std::string & S) {
+		uint64_t Result = 0 ;
+		int Digits=0;
+
+		for(const auto &i:S) {
+			if(std::isxdigit(i)) {
+				if(i>='0' && i<='9') {
+					Result <<=4;
+					Result += i-'0';
+				} else if(i>='A' && i<='F') {
+					Result <<=4;
+					Result += i-'A'+10;
+				} else if(i>='a' && i<='f') {
+					Result <<=4;
+					Result += i-'a'+10;
+				}
+				Digits++;
+				if(Digits==6)
+					break;
+			}
+		}
+		return Result;
+	}
+
+	uint64_t GetDefaultMacAsInt64() {
+		uint64_t Result=0;
+		auto IFaceList = Poco::Net::NetworkInterface::list();
+
+		for(const auto &iface:IFaceList) {
+			if(iface.isRunning() && !iface.isLoopback()) {
+				auto MAC = iface.macAddress();
+				for (auto const &i : MAC) {
+					Result <<= 8;
+					Result += (uint8_t)i;
+				}
+				if (Result != 0)
+					break;
+			}
+		}
+		return Result;
+	}
+
+	void SaveSystemId(uint64_t Id) {
+		try {
+			std::ofstream O;
+			O.open(Daemon()->DataDir() + "/system.id",std::ios::binary | std::ios::trunc);
+			O << Id;
+			O.close();
+		} catch (...)
+		{
+			std::cout << "Could not save system ID" << std::endl;
+		}
+	}
+
+    uint64_t InitializeSystemId() {
+        uint64_t R = ~ std::rand();
+        auto S = GetDefaultMacAsInt64() ^ R;
+        SaveSystemId(S);
+        return S;
+    }
+
+	uint64_t GetSystemId() {
+		uint64_t ID=0;
+
+		// if the system ID file exists, open and read it.
+		Poco::File	SID( Daemon()->DataDir() + "/system.id");
+		try {
+			if (SID.exists()) {
+				std::ifstream I;
+				I.open(SID.path());
+				I >> ID;
+				I.close();
+				if (ID == 0)
+					return InitializeSystemId();
+				return ID;
+			} else {
+				return InitializeSystemId();
+			}
+		} catch (...) {
+			return InitializeSystemId();
 		}
 	}
 

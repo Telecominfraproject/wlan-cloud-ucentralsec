@@ -52,6 +52,7 @@ include_directories(/usr/local/include  /usr/local/opt/openssl/include src inclu
 add_executable( ucentralsec
                 build
                 src/Daemon.h src/Daemon.cpp
+                src/MicroService.cpp src/MicroService.h
                 src/SubSystemServer.cpp src/SubSystemServer.h
                 src/RESTAPI_unknownRequestHandler.h src/RESTAPI_unknownRequestHandler.cpp
                 src/RESTAPI_oauth2Handler.h src/RESTAPI_oauth2Handler.cpp
@@ -66,7 +67,10 @@ add_executable( ucentralsec
                 src/storage_identity.cpp
                 src/Utils.cpp src/Utils.h
                 src/storage_sqlite.cpp src/storage_odbc.cpp src/storage_sqlite.cpp src/storage_pgql.cpp src/storage_mysql.cpp
-                src/storage_tables.cpp)
+                src/storage_tables.cpp src/SMTPMailerService.cpp src/SMTPMailerService.h
+                src/RESTAPI_users_handler.cpp src/RESTAPI_users_handler.h
+                src/RESTAPI_user_handler.cpp src/RESTAPI_user_handler.h
+                src/RESTAPI_action_links.cpp src/RESTAPI_action_links.h)
 
 target_link_libraries(ucentralsec PUBLIC
         ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES} CppKafka::cppkafka )

@@ -40,11 +40,6 @@ namespace uCentral {
 		return 1;	// some compilers complain...
 	}
 
-    AuthService::AuthService() noexcept: SubSystemServer("Authentication", "AUTH-SVR", "authentication")
-    {
-		std::string E{"SHA512"};
-    }
-
     int AuthService::Start() {
 		Signer_.setRSAKey(Daemon()->Key());
 		Signer_.addAllAlgorithms();
@@ -193,23 +188,28 @@ namespace uCentral {
 
 		if(Mechanism_=="internal")
         {
-            if(((UserName == DefaultUserName_) && (Password == DefaultPassword_)) || !Secure_)
+            if(((UserName == DefaultUserName_) && (DefaultPassword_== ComputePasswordHash(UserName,Password))) || !Secure_)
             {
-				ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
+                ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
                 CreateToken(UserName, ResultToken, ACL);
                 return true;
             }
         } else if (Mechanism_=="db") {
-			SHA2_.update(Password + UserName);
-			auto EncryptedPassword = uCentral::Utils::ToHex(SHA2_.digest());
+			auto PasswordHash = ComputePasswordHash(UserName, Password);
 
 			std::string TUser{UserName};
-			if(Storage()->GetIdentity(TUser,EncryptedPassword,USERNAME,ACL)) {
+			if(Storage()->GetIdentity(TUser,PasswordHash,USERNAME,ACL)) {
 				CreateToken(UserName, ResultToken, ACL);
 				return true;
 			}
 		}
         return false;
+    }
+
+    std::string AuthService::ComputePasswordHash(const std::string &UserName, const std::string &Password) {
+        std::string UName = Poco::trim(Poco::toLower(UserName));
+        SHA2_.update(Password + UName);
+        return uCentral::Utils::ToHex(SHA2_.digest());
     }
 
 }  // end of namespace

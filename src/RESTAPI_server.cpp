@@ -12,6 +12,9 @@
 #include "RESTAPI_oauth2Handler.h"
 #include "RESTAPI_unknownRequestHandler.h"
 #include "RESTAPI_system_command.h"
+#include "RESTAPI_user_handler.h"
+#include "RESTAPI_users_handler.h"
+#include "RESTAPI_action_links.h"
 
 #include "Utils.h"
 
@@ -61,8 +64,14 @@ namespace uCentral {
             return new RESTAPI_oauth2Handler(bindings, Logger_);
         } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/oauth2", bindings)) {
             return new RESTAPI_oauth2Handler(bindings, Logger_);
+        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/users", bindings)) {
+            return new RESTAPI_users_handler(bindings, Logger_);
+        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/user", bindings)) {
+            return new RESTAPI_user_handler(bindings, Logger_);
         } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/system", bindings)) {
             return new RESTAPI_system_command(bindings, Logger_);
+        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/actions", bindings)) {
+            return new RESTAPI_action_links(bindings, Logger_);
         }
 
         Logger_.error(Poco::format("INVALID-API-ENDPOINT: %s",Path));

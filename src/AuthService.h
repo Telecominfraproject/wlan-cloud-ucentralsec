@@ -24,6 +24,7 @@ namespace uCentral{
     class AuthService : public SubSystemServer {
     public:
 
+        typedef std::map<std::string,uCentral::Objects::WebToken>   WebTokenMap;
         enum ACCESS_TYPE {
             USERNAME,
             SERVER,
@@ -48,18 +49,23 @@ namespace uCentral{
         void Logout(const std::string &token);
         [[nodiscard]] std::string GenerateToken(const std::string & UserName, ACCESS_TYPE Type, int NumberOfDays);
         [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, struct uCentral::Objects::WebToken & UserInfo  );
-
+        [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
+        [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
+        [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
     private:
 		static AuthService *instance_;
-		std::map<std::string,uCentral::Objects::WebToken>   Tokens_;
+		WebTokenMap         Tokens_;
 		bool    			Secure_ = false ;
 		std::string     	DefaultUserName_;
 		std::string			DefaultPassword_;
 		std::string     	Mechanism_;
-		bool            	AutoProvisioning_ = false ;
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
-        AuthService() noexcept;
+
+        AuthService() noexcept:
+            SubSystemServer("Authentication", "AUTH-SVR", "authentication")
+        {
+        }
     };
 
     inline AuthService * AuthService() { return AuthService::instance(); }

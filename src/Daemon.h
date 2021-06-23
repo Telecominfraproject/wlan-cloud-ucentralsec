@@ -17,85 +17,36 @@
 #include "Poco/UUIDGenerator.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Crypto/RSAKey.h"
+#include "Poco/Crypto/CipherFactory.h"
+#include "Poco/Crypto/Cipher.h"
 
-#include "SubSystemServer.h"
+
 #include "uCentralTypes.h"
-
-using Poco::Util::ServerApplication;
+#include "MicroService.h"
 
 namespace uCentral {
 
-    static const char * DAEMON_PROPERTIES_FILENAME = "ucentralsec.properties";
-    static const char * DAEMON_ROOT_ENV_VAR = "UCENTRALSEC_ROOT";
-    static const char * DAEMON_CONFIG_ENV_VAR = "UCENTRALSEC_CONFIG";
-    static const char * DAEMON_APP_NAME = "uCentralSec";
-
-    class MyErrorHandler : public Poco::ErrorHandler {
+    static const char * vDAEMON_PROPERTIES_FILENAME = "ucentralsec.properties";
+    static const char * vDAEMON_ROOT_ENV_VAR = "UCENTRALSEC_ROOT";
+    static const char * vDAEMON_CONFIG_ENV_VAR = "UCENTRALSEC_CONFIG";
+    static const char * vDAEMON_APP_NAME = "uCentralSec";
+    class Daemon : public MicroService {
     public:
-        void exception(const Poco::Exception & E) override;
-        void exception(const std::exception & E) override;
-        void exception() override;
-    private:
+        explicit Daemon(std::string PropFile,
+                        std::string RootEnv,
+                        std::string ConfigEnv,
+                        std::string AppName,
+                        Types::SubSystemVec SubSystems) :
+                MicroService( PropFile, RootEnv, ConfigEnv, AppName, SubSystems) {};
 
-    };
-
-    class Daemon : public ServerApplication {
-
-    public:
-        int main(const ArgVec &args) override;
-        void initialize(Application &self) override;
-        void uninitialize() override;
-        void reinitialize(Application &self) override;
-        void defineOptions(Poco::Util::OptionSet &options) override;
-        void handleHelp(const std::string &name, const std::string &value);
-        void handleVersion(const std::string &name, const std::string &value);
-        void handleDebug(const std::string &name, const std::string &value);
-        void handleLogs(const std::string &name, const std::string &value);
-        void handleConfig(const std::string &name, const std::string &value);
-        void displayHelp();
-
-        static Daemon *instance() {
-            if (instance_ == nullptr) {
-                instance_ = new Daemon;
-            }
-            return instance_;
-        }
-
-        void InitializeSubSystemServers();
-        void StartSubSystemServers();
-        void StopSubSystemServers();
-        void Exit(int Reason);
-        bool SetSubsystemLogLevel(const std::string & SubSystem, const std::string & Level);
-        [[nodiscard]] static std::string Version();
-        [[nodiscard]] const Poco::SharedPtr<Poco::Crypto::RSAKey> & Key() { return AppKey_; }
-        [[nodiscard]] inline const std::string & DataDir() { return DataDir_; }
-        [[nodiscard]] std::string CreateUUID();
-        [[nodiscard]] bool Debug() const { return DebugMode_; }
-        [[nodiscard]] uint64_t ID() const { return ID_; }
-        [[nodiscard]] Types::StringVec GetSubSystems() const;
-        [[nodiscard]] Types::StringPairVec GetLogLevels() const;
-        [[nodiscard]] const Types::StringVec & GetLogLevelNames() const;
-        [[nodiscard]] std::string ConfigGetString(const std::string &Key,const std::string & Default);
-        [[nodiscard]] std::string ConfigGetString(const std::string &Key);
-        [[nodiscard]] std::string ConfigPath(const std::string &Key,const std::string & Default);
-        [[nodiscard]] std::string ConfigPath(const std::string &Key);
-        [[nodiscard]] uint64_t ConfigGetInt(const std::string &Key,uint64_t Default);
-        [[nodiscard]] uint64_t ConfigGetInt(const std::string &Key);
-        [[nodiscard]] uint64_t ConfigGetBool(const std::string &Key,bool Default);
-        [[nodiscard]] uint64_t ConfigGetBool(const std::string &Key);
-
+        bool AutoProvisioning() const { return AutoProvisioning_ ; }
+        [[nodiscard]] std::string IdentifyDevice(const std::string & Compatible) const;
+        void initialize(Poco::Util::Application &self);
+        static Daemon *instance();
     private:
         static Daemon 				*instance_;
-        bool                        HelpRequested_ = false;
-        std::string                 LogDir_;
-        std::string                 ConfigFileName_;
-        Poco::UUIDGenerator         UUIDGenerator_;
-        MyErrorHandler              AppErrorHandler_;
-        uint64_t                    ID_ = 1;
-        Poco::SharedPtr<Poco::Crypto::RSAKey>	AppKey_ = nullptr;
-        bool                        DebugMode_ = false;
-        std::string 				DataDir_;
-        Types::SubSystemVec			SubSystems_;
+        bool                        AutoProvisioning_ = false;
+        Types::StringMapStringSet   DeviceTypeIdentifications_;
     };
 
     inline Daemon * Daemon() { return Daemon::instance(); }

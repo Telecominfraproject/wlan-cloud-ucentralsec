@@ -36,10 +36,13 @@ namespace uCentral {
             odbc
         };
 
-        enum CommandExecutionType {
-            COMMAND_PENDING,
-            COMMAND_EXECUTED,
-            COMMAND_COMPLETED
+        enum AUTH_ERROR {
+            SUCCESS,
+            PASSWORD_CHANGE_REQUIRED,
+            PASSWORD_DOES_NOT_MATCH,
+            PASSWORD_ALREADY_USED,
+            USERNAME_PENDING_VERIFICATION,
+            PASSWORD_INVALID
         };
 
         static Storage *instance() {
@@ -51,6 +54,10 @@ namespace uCentral {
 
         int 	Start() override;
         void 	Stop() override;
+
+        int CreateUser(const std::string & Admin, const std::string &UserName, const std::string &Password);
+        bool DeleteUser(const std::string & Admin, const std::string &UserName);
+        bool ChangePassword(const std::string & Admin, const std::string &UserName, const std::string &OldPassword, const std::string &NewPassword);
 
         bool IdentityExists(std::string & Identity, AuthService::ACCESS_TYPE Type);
         bool AddIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL);
@@ -86,6 +93,8 @@ namespace uCentral {
 #endif
 
         int Create_Tables();
+        int Create_UserTable();
+        int Create_APIKeyTable();
 
         int 	Setup_SQLite();
 		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
