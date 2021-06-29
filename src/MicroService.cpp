@@ -17,9 +17,21 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/String.h"
+#include "Poco/JSON/Object.h"
+#include "Poco/JSON/Parser.h"
+#include "Poco/JSON/Stringifier.h"
+
+#include "ALBHealthCheckServer.h"
+#ifndef SMALL_BUILD
+#include "KafkaManager.h"
+#endif
+#include "Kafka_topics.h"
 
 #include "MicroService.h"
 #include "Utils.h"
+
+#undef DBGLINE
+#define DBGLINE
 
 namespace uCentral {
 
@@ -43,7 +55,84 @@ namespace uCentral {
 		std::exit(Reason);
 	}
 
+	void MicroService::BusMessageReceived(std::string Key, std::string Message) {
+		SubMutexGuard G(InfraMutex_);
+		// std::cout << "Message arrived:" << Key << " ," << Message << std::endl;
+		try {
+			Poco::JSON::Parser	P;
+			auto Object = P.parse(Message).extract<Poco::JSON::Object::Ptr>();
+			if(Object->has("id")) {
+				uint64_t ID = Object->get("id");
+				if(ID!=ID_) {
+					if(	Object->has("event") &&
+						Object->has("type") &&
+						Object->has("publicEndPoint") &&
+						Object->has("privateEndPoint") &&
+						Object->has("version") &&
+						Object->has("key")) {
+						auto Event = Object->get("event").toString();
+
+						if(Event == "keep-alive" && Services_.find(ID)!=Services_.end()) {
+							std::cout << "Keep-alive from " << ID << std::endl;
+							Services_[ID].LastUpdate = std::time(nullptr);
+						} else if (Event=="leave") {
+							Services_.erase(ID);
+							std::cout << "Leave from " << ID << std::endl;
+						} else if (Event== "join" || Event=="keep_alive") {
+							std::cout << "Join from " << ID << std::endl;
+							Services_[ID] = MicroServiceMeta{
+								.Id = ID,
+								.Type = Poco::toLower(Object->get("type").toString()),
+								.PrivateEndPoint = Object->get("privateEndPoint").toString(),
+								.PublicEndPoint = Object->get("publicEndPoint").toString(),
+								.AccessKey = Object->get("key").toString(),
+								.Version = Object->get("version").toString(),
+								.LastUpdate = (uint64_t )std::time(nullptr) };
+							for(const auto &[Id,Svc]:Services_)
+								std::cout << "ID:" << Id << " Type:" << Svc.Type << " EndPoint:" << Svc.PublicEndPoint << std::endl;
+						} else {
+							std::cout << "Bad packet 2 ..." << std::endl;
+							logger().error(Poco::format("Malformed event from device %Lu, event=%s", ID, Event));
+						}
+					} else {
+						std::cout << "Bad packet 1 ..." << std::endl;
+						logger().error(Poco::format("Malformed event from device %Lu", ID));
+					}
+
+				} else {
+					std::cout << "Ignoring my own messages..." << std::endl;
+				}
+			}
+		} catch (const Poco::Exception &E) {
+			DBGLINE
+			logger().log(E);
+			DBGLINE
+		}
+		DBGLINE
+	}
+
+	MicroServiceMetaVec MicroService::GetServices(const std::string & Type) {
+		SubMutexGuard G(InfraMutex_);
+
+		auto T = Poco::toLower(Type);
+		MicroServiceMetaVec	Res;
+		for(const auto &[Id,ServiceRec]:Services_) {
+			if(ServiceRec.Type==T)
+				Res.push_back(ServiceRec);
+		}
+		return Res;
+	}
+
 	void MicroService::initialize(Poco::Util::Application &self) {
+
+		std::string V{APP_VERSION};
+		std::string B{BUILD_NUMBER};
+		Version_ =  V + "(" + B +  ")";
+
+		// add the default services
+		SubSystems_.push_back(KafkaManager());
+		SubSystems_.push_back(ALBHealthCheckServer());
+
 		Poco::Net::initializeSSL();
 		Poco::Net::HTTPStreamFactory::registerFactory();
 		Poco::Net::HTTPSStreamFactory::registerFactory();
@@ -87,9 +176,14 @@ namespace uCentral {
 		ID_ = Utils::GetSystemId();
 		if(!DebugMode_)
 			DebugMode_ = ConfigGetBool("ucentral.system.debug",false);
-
+		MyPrivateEndPoint_ = ConfigGetString("ucentral.system.uri.private");
+		MyPublicEndPoint_ = ConfigGetString("ucentral.system.uri.public");
+		MyHash_ = CreateHash(MyPrivateEndPoint_);
 		InitializeSubSystemServers();
 		ServerApplication::initialize(self);
+
+		Types::TopicNotifyFunction F = [this](std::string s1,std::string s2) { this->BusMessageReceived(s1,s2); };
+		KafkaManager()->RegisterTopicWatcher(KafkaTopics::SERVICE_EVENTS, F);
 	}
 
 	void MicroService::uninitialize() {
@@ -139,12 +233,6 @@ namespace uCentral {
 
 	}
 
-	std::string MicroService::Version() {
-		std::string V = APP_VERSION;
-		std::string B = BUILD_NUMBER;
-		return V + "(" + B +  ")";
-	}
-
 	void MicroService::handleHelp(const std::string &name, const std::string &value) {
 		HelpRequested_ = true;
 		displayHelp();
@@ -186,9 +274,11 @@ namespace uCentral {
 	void MicroService::StartSubSystemServers() {
 		for(auto i:SubSystems_)
 			i->Start();
+		BusEventManager_.Start();
 	}
 
 	void MicroService::StopSubSystemServers() {
+		BusEventManager_.Stop();
 		for(auto i=SubSystems_.rbegin(); i!=SubSystems_.rend(); ++i)
 			(*i)->Stop();
 	}
@@ -286,6 +376,58 @@ namespace uCentral {
 		return Cipher_->decryptString(S, Poco::Crypto::Cipher::Cipher::ENC_BASE64);;
 	}
 
+	std::string MicroService::CreateHash(const std::string &S) {
+		SHA2_.update(S);
+		return Utils::ToHex(SHA2_.digest());
+	}
+
+	std::string MicroService::MakeSystemEventMessage( const std::string & Type ) const {
+		Poco::JSON::Object	Obj;
+		Obj.set("event",Type);
+		Obj.set("id",ID_);
+		Obj.set("type",Poco::toLower(DAEMON_APP_NAME));
+		Obj.set("publicEndPoint",MyPublicEndPoint_);
+		Obj.set("privateEndPoint",MyPrivateEndPoint_);
+		Obj.set("key",MyHash_);
+		Obj.set("version",Version_);
+		std::stringstream ResultText;
+		Poco::JSON::Stringifier::stringify(Obj, ResultText);
+		return ResultText.str();
+	}
+
+	void BusEventManager::run() {
+
+		Running_ = true;
+
+		auto Msg = Daemon()->MakeSystemEventMessage("join");
+		KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS,Daemon()->PrivateEndPoint(),Msg, false);
+
+		while(Running_) {
+			Poco::Thread::trySleep(60000);
+			if(!Running_)
+				break;
+			auto Msg = Daemon()->MakeSystemEventMessage("keep-alive");
+			KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS,Daemon()->PrivateEndPoint(),Msg, false);
+		}
+
+		Msg = Daemon()->MakeSystemEventMessage("leave");
+		KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS,Daemon()->PrivateEndPoint(),Msg, false);
+	};
+
+	void BusEventManager::Start() {
+		if(KafkaManager()->Enabled()) {
+			Thread_.start(*this);
+		}
+	}
+
+	void BusEventManager::Stop() {
+		if(KafkaManager()->Enabled()) {
+			Running_ = false;
+			Thread_.wakeUp();
+			Thread_.join();
+		}
+	}
+
 	int MicroService::main(const ArgVec &args) {
 
 		MyErrorHandler	ErrorHandler(*this);
@@ -313,7 +455,4 @@ namespace uCentral {
 
 		return Application::EXIT_OK;
 	}
-
-
-
 }

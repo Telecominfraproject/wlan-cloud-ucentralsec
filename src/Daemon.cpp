@@ -38,9 +38,7 @@ namespace uCentral {
                                    Types::SubSystemVec{
                                            Storage(),
                                            RESTAPI_Server(),
-                                           KafkaManager(),
-                                           SMTPMailerService(),
-                                           ALBHealthCheckServer()
+                                           SMTPMailerService()
                                    });
         }
         return instance_;
@@ -49,7 +47,6 @@ namespace uCentral {
     void Daemon::initialize(Poco::Util::Application &self) {
         MicroService::initialize(*this);
     }
-
 }
 
 int main(int argc, char **argv) {

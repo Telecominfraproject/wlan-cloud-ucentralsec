@@ -308,6 +308,11 @@ components:
             - instagram
         oauthUserInfo:
           type: string
+        securityPolicy:
+          type: string
+        securityPolicyChange:
+          type: integer
+          format: int64
 
     UserList:
       type: object
@@ -416,6 +421,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SecurityProfile'
+
+    InternalServiceInfo:
+      type: object
+      properties:
+        privateURI:
+          type: string
+        publicURI:
+          type: string
+        auth:
+          type: string
+
+
+    InternalSystemServices:
+      type: object
+      properties:
+        key:
+          type: string
+        version:
+          type: integer
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalServiceInfo'
 
     #########################################################################################
     ##
@@ -740,6 +768,24 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
+
+#########################################################################################
+##  The following calls are restricted to the private system side APIs
+#########################################################################################
+  /systemServices:
+    get:
+      tags:
+        - Security
+      summary: Retrieve the basic system information. This information is used between services only.
+      operationId: getSystemServices
+      responses:
+        200:
+          $ref: '#/components/schemas/InternalSystemServices'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
 
 #########################################################################################
 ##

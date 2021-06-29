@@ -41,7 +41,9 @@ namespace uCentral {
                         "owner varchar, "
                         "suspended int, "
                         "blackListed int, "
-                        "userType varchar, "
+                        "userRole varchar, "
+                        "securityPolicy text, "
+                        "securityPolicyChange bigint, "
                         "userTypeProprietaryInfo text"
                         " ,INDEX emailindex (email ASC)"
                         " ,INDEX nameindex (name ASC))",
@@ -72,7 +74,9 @@ namespace uCentral {
                         "owner varchar, "
                         "suspended int, "
                         "blackListed int, "
-                        "userType varchar, "
+                        "userRole varchar, "
+                        "securityPolicy text, "
+                        "securityPolicyChange bigint, "
                         "userTypeProprietaryInfo text"
                         ")",
                         Poco::Data::Keywords::now;

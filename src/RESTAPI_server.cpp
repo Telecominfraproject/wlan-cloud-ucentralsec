@@ -10,7 +10,6 @@
 
 #include "RESTAPI_server.h"
 #include "RESTAPI_oauth2Handler.h"
-#include "RESTAPI_unknownRequestHandler.h"
 #include "RESTAPI_system_command.h"
 #include "RESTAPI_user_handler.h"
 #include "RESTAPI_users_handler.h"
@@ -58,24 +57,15 @@ namespace uCentral {
 
         Poco::URI uri(Request.getURI());
         const auto & Path = uri.getPath();
-        RESTAPIHandler::BindingMap bindings;
+        RESTAPIHandler::BindingMap Bindings;
 
-        if (RESTAPIHandler::ParseBindings(Path, "/api/v1/oauth2/{token}", bindings)) {
-            return new RESTAPI_oauth2Handler(bindings, Logger_);
-        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/oauth2", bindings)) {
-            return new RESTAPI_oauth2Handler(bindings, Logger_);
-        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/users", bindings)) {
-            return new RESTAPI_users_handler(bindings, Logger_);
-        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/user", bindings)) {
-            return new RESTAPI_user_handler(bindings, Logger_);
-        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/system", bindings)) {
-            return new RESTAPI_system_command(bindings, Logger_);
-        } else if (RESTAPIHandler::ParseBindings(Path, "/api/v1/actions", bindings)) {
-            return new RESTAPI_action_links(bindings, Logger_);
-        }
-
-        Logger_.error(Poco::format("INVALID-API-ENDPOINT: %s",Path));
-        return new RESTAPI_UnknownRequestHandler(bindings,Logger_);
+        return RESTAPI_Router<
+                RESTAPI_oauth2Handler,
+                RESTAPI_users_handler,
+                RESTAPI_user_handler,
+                RESTAPI_system_command,
+                RESTAPI_action_links
+                >(Path,Bindings,Logger_);
     }
 
     void RESTAPI_Server::Stop() {

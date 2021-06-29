@@ -45,6 +45,39 @@ namespace uCentral {
             PASSWORD_INVALID
         };
 
+        enum USER_TYPE {
+            UNKNOWN, ROOT, ADMIN, SUBSCRIBER, CSR, SYSTEM, SPECIAL
+        };
+
+        static USER_TYPE to_userType(const std::string &U) {
+            if (U=="root")
+                return ROOT;
+            else if (U=="admin")
+                return ADMIN;
+            else if (U=="subscriber")
+                return SUBSCRIBER;
+            else if (U=="csr")
+                return CSR;
+            else if (U=="system")
+                return SYSTEM;
+            else if (U=="SPECIAL")
+                return SPECIAL;
+            return UNKNOWN;
+        }
+
+        static const std::string from_userType(USER_TYPE U) {
+            switch(U) {
+                case ROOT: return "root";
+                case ADMIN: return "admin";
+                case SUBSCRIBER: return "subscriber";
+                case CSR: return "csr";
+                case SYSTEM: return "system";
+                case SPECIAL: return "special";
+                case UNKNOWN:
+                default: return "unknown";
+            }
+        }
+
         static Storage *instance() {
             if (instance_ == nullptr) {
                 instance_ = new Storage;
@@ -55,9 +88,25 @@ namespace uCentral {
         int 	Start() override;
         void 	Stop() override;
 
-        int CreateUser(const std::string & Admin, const std::string &UserName, const std::string &Password);
-        bool DeleteUser(const std::string & Admin, const std::string &UserName);
-        bool ChangePassword(const std::string & Admin, const std::string &UserName, const std::string &OldPassword, const std::string &NewPassword);
+        //  all passwords passed here are all plaintext
+        bool CreateUser(const std::string & Admin, uCentral::Objects::UserInfo & NewUser);
+        bool DeleteUser(const std::string & Admin, uint64_t Id);
+        bool SetOwner(const std::string & Admin, uint64_t Id, const std::string &Owner);
+        bool SetLocation(const std::string & Admin, uint64_t Id, const std::string &Location);
+        AUTH_ERROR ChangePassword(const std::string & Admin, uint64_t Id, const std::string &OldPassword, const std::string &NewPassword);
+        bool AddNotes(const std::string & Admin, uint64_t Id, const std::string &Notes);
+        bool SetPolicyChange(const std::string & Admin, const std::string &NewPolicy);
+
+
+
+
+
+
+
+
+
+
+
 
         bool IdentityExists(std::string & Identity, AuthService::ACCESS_TYPE Type);
         bool AddIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL);

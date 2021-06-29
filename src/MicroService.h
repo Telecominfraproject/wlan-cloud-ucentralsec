@@ -20,6 +20,7 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
+#include "Poco/SHA2Engine.h"
 
 #include "uCentralTypes.h"
 #include "SubSystemServer.h"
@@ -35,6 +36,29 @@ namespace uCentral {
 	  private:
 		Poco::Util::Application	&App_;
 	};
+
+	class BusEventManager : public Poco::Runnable {
+	  public:
+		void run() override;
+		void Start();
+		void Stop();
+	  private:
+		std::atomic_bool 	Running_ = false;
+		Poco::Thread		Thread_;
+	};
+
+	struct MicroServiceMeta {
+		uint64_t 		Id=0;
+		std::string 	Type;
+		std::string 	PrivateEndPoint;
+		std::string 	PublicEndPoint;
+		std::string 	AccessKey;
+		std::string		Version;
+		uint64_t 		LastUpdate=0;
+	};
+
+	typedef std::map<uint64_t, MicroServiceMeta>	MicroServiceMetaMap;
+	typedef std::vector<MicroServiceMeta>			MicroServiceMetaVec;
 
 	class MicroService : public Poco::Util::ServerApplication {
 	  public:
@@ -66,7 +90,7 @@ namespace uCentral {
 		void StopSubSystemServers();
 		void Exit(int Reason);
 		bool SetSubsystemLogLevel(const std::string & SubSystem, const std::string & Level);
-		[[nodiscard]] static std::string Version();
+		[[nodiscard]] std::string Version() { return Version_; }
 		[[nodiscard]] const Poco::SharedPtr<Poco::Crypto::RSAKey> & Key() { return AppKey_; }
 		[[nodiscard]] inline const std::string & DataDir() { return DataDir_; }
 		[[nodiscard]] std::string CreateUUID();
@@ -85,6 +109,15 @@ namespace uCentral {
 		[[nodiscard]] uint64_t ConfigGetBool(const std::string &Key);
 		[[nodiscard]] std::string Encrypt(const std::string &S);
 		[[nodiscard]] std::string Decrypt(const std::string &S);
+		[[nodiscard]] std::string CreateHash(const std::string &S);
+		[[nodiscard]] std::string Hash() const { return MyHash_; };
+		[[nodiscard]] std::string ServiceType() const { return DAEMON_APP_NAME; };
+		[[nodiscard]] std::string PrivateEndPoint() const { return MyPrivateEndPoint_; };
+		[[nodiscard]] std::string PublicEndPoint() const { return MyPublicEndPoint_; };
+		[[nodiscard]] std::string MakeSystemEventMessage( const std::string & Type ) const ;
+
+		void BusMessageReceived( std::string Key, std::string Message);
+		[[nodiscard]] MicroServiceMetaVec GetServices(const std::string & type);
 
 	  private:
 		bool                        HelpRequested_ = false;
@@ -98,6 +131,14 @@ namespace uCentral {
 		Types::SubSystemVec			SubSystems_;
 		Poco::Crypto::CipherFactory & CipherFactory_ = Poco::Crypto::CipherFactory::defaultFactory();
 		Poco::Crypto::Cipher        * Cipher_ = nullptr;
+		Poco::SHA2Engine			SHA2_;
+		MicroServiceMetaMap			Services_;
+		std::string 				MyHash_;
+		std::string 				MyPrivateEndPoint_;
+		std::string 				MyPublicEndPoint_;
+		std::string 				Version_;
+		BusEventManager				BusEventManager_;
+		SubMutex 					InfraMutex_;
 
 		std::string DAEMON_PROPERTIES_FILENAME;
 		std::string DAEMON_ROOT_ENV_VAR;

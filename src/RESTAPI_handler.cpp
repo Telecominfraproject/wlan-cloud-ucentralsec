@@ -11,40 +11,46 @@
 #include <iostream>
 #include <iterator>
 #include <future>
-#include <numeric>
 #include <chrono>
 
 #include "Poco/URI.h"
-#include "Poco/DateTimeParser.h"
 
-#include "RESTAPI_handler.h"
 #include "AuthService.h"
+#include "RESTAPI_handler.h"
 #include "RESTAPI_protocol.h"
 #include "Utils.h"
 
 #define DBG		std::cout << __LINE__ << "   " __FILE__ << std::endl;
 
 namespace uCentral {
-	bool RESTAPIHandler::ParseBindings(const std::string & Request, const std::string & Path, BindingMap &bindings) {
+
+	bool RESTAPIHandler::ParseBindings(const std::string & Request, const std::list<const char *> & EndPoints, BindingMap &bindings) {
 		std::string Param, Value;
 
 		bindings.clear();
-		std::vector<std::string>	PathItems = uCentral::Utils::Split(Path,'/');
-		std::vector<std::string>	ParamItems = uCentral::Utils::Split(Request,'/');
+		std::vector<std::string> PathItems = uCentral::Utils::Split(Request, '/');
 
-		if(PathItems.size()!=ParamItems.size())
-			return false;
+		for(const auto &EndPoint:EndPoints) {
+			std::vector<std::string> ParamItems = uCentral::Utils::Split(EndPoint, '/');
+			if (PathItems.size() != ParamItems.size())
+				continue;
 
-		for(auto i=0;i!=PathItems.size();i++) {
-			if (PathItems[i] != ParamItems[i]) {
-				if (PathItems[i][0] == '{') {
-					auto ParamName = PathItems[i].substr(1, PathItems[i].size() - 2);
-					bindings[ParamName] = ParamItems[i];
-				} else
-					return false;
+			bool Matched = true;
+			for (auto i = 0; i != PathItems.size() && Matched; i++) {
+				// std::cout << "PATH:" << PathItems[i] << "  ENDPOINT:" << ParamItems[i] << std::endl;
+				if (PathItems[i] != ParamItems[i]) {
+					if (ParamItems[i][0] == '{') {
+						auto ParamName = ParamItems[i].substr(1, ParamItems[i].size() - 2);
+						bindings[ParamName] = PathItems[i];
+					} else {
+						Matched = false;
+					}
+				}
 			}
+			if(Matched)
+				return true;
 		}
-		return true;
+		return false;
 	}
 
 	void RESTAPIHandler::PrintBindings() {
@@ -242,7 +248,7 @@ namespace uCentral {
 
 	bool RESTAPIHandler::IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 									  Poco::Net::HTTPServerResponse &Response) {
-		if (AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
+		if (uCentral::AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 			return true;
 		} else {
 			UnAuthorized(Request, Response);
@@ -253,7 +259,7 @@ namespace uCentral {
 	bool RESTAPIHandler::IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 									  Poco::Net::HTTPServerResponse &Response, std::string &UserName) {
 
-		if (AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
+		if (uCentral::AuthService()->IsAuthorized(Request, SessionToken_, UserInfo_)) {
 			UserName = UserInfo_.username_;
 			return true;
 		} else {

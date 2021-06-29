@@ -360,12 +360,13 @@ namespace uCentral::Utils {
 		}
 	}
 
-    uint64_t InitializeSystemId() {
-        uint64_t R = ~ std::rand();
-        auto S = GetDefaultMacAsInt64() ^ R;
-        SaveSystemId(S);
-        return S;
-    }
+	uint64_t InitializeSystemId() {
+		std::srand(std::time(nullptr));
+		auto S = GetDefaultMacAsInt64() ^ std::rand();
+		SaveSystemId(S);
+		std::cout << "ID: " << S << std::endl;
+		return S;
+	}
 
 	uint64_t GetSystemId() {
 		uint64_t ID=0;

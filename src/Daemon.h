@@ -39,14 +39,10 @@ namespace uCentral {
                         Types::SubSystemVec SubSystems) :
                 MicroService( PropFile, RootEnv, ConfigEnv, AppName, SubSystems) {};
 
-        bool AutoProvisioning() const { return AutoProvisioning_ ; }
-        [[nodiscard]] std::string IdentifyDevice(const std::string & Compatible) const;
         void initialize(Poco::Util::Application &self);
         static Daemon *instance();
     private:
         static Daemon 				*instance_;
-        bool                        AutoProvisioning_ = false;
-        Types::StringMapStringSet   DeviceTypeIdentifications_;
     };
 
     inline Daemon * Daemon() { return Daemon::instance(); }

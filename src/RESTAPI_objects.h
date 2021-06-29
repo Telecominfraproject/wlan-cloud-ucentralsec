@@ -13,27 +13,61 @@
 
 namespace uCentral::Objects {
 
-	struct AclTemplate {
-		bool Read_ = true ;
-		bool ReadWrite_ = true ;
-		bool ReadWriteCreate_ = true ;
-		bool Delete_ = true ;
-		bool PortalLogin_ = true ;
-		void to_json(Poco::JSON::Object &Obj) const ;
-	};
+    struct AclTemplate {
+        bool Read_ = true;
+        bool ReadWrite_ = true;
+        bool ReadWriteCreate_ = true;
+        bool Delete_ = true;
+        bool PortalLogin_ = true;
 
-	struct WebToken {
-		std::string access_token_;
-		std::string refresh_token_;
-		std::string id_token_;
-		std::string token_type_;
-		std::string username_;
-		unsigned int expires_in_;
-		unsigned int idle_timeout_;
-		AclTemplate acl_template_;
-		uint64_t    created_;
-		void to_json(Poco::JSON::Object &Obj) const ;
-	};
+        void to_json(Poco::JSON::Object &Obj) const;
+    };
+
+    struct WebToken {
+        std::string access_token_;
+        std::string refresh_token_;
+        std::string id_token_;
+        std::string token_type_;
+        std::string username_;
+        unsigned int expires_in_;
+        unsigned int idle_timeout_;
+        AclTemplate acl_template_;
+        uint64_t created_;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+    };
+
+    struct UserInfo {
+        uint64_t Id = 0;
+        std::string name;
+        std::string description;
+        std::string avatar;
+        std::string email;
+        bool validated = false;
+        std::string validationEmail;
+        uint64_t validationDate = 0;
+        uint64_t creationDate = 0;
+        std::string validationURI;
+        bool changePassword = true;
+        uint64_t lastLogin = 0;
+        std::string currentLoginURI;
+        uint64_t lastPasswordChange = 0;
+        uint64_t lastEmailCheck = 0;
+        bool waitingForEmailCheck = false;
+        std::string locale;
+        std::string notes;
+        std::string location;
+        std::string owner;
+        bool suspended = false;
+        bool blackListed = false;
+        std::string userRole;
+        std::string userTypeProprietaryInfo;
+        std::string securityPolicy;
+        uint64_t securityPolicyChange;
+
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(Poco::JSON::Object::Ptr Obj);
+    };
 }
 
 #endif //UCENTRAL_RESTAPI_OBJECTS_H
