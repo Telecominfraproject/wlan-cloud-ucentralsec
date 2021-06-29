@@ -29,7 +29,7 @@ Email templates come in 2 flavors: txt and html. The system replaces the followi
 
 - {{action}} : the link that the user should press. That link should include the payload as above.
 - {{name}} : the name of the user field.
-- {{recipient}} : user email, asi-is
+- {{recipient}} : user email, as-is
 
  
 
