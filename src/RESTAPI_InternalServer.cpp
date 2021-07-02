@@ -64,9 +64,6 @@ namespace uCentral {
         Poco::URI uri(Request.getURI());
         const auto & Path = uri.getPath();
         RESTAPIHandler::BindingMap Bindings;
-
-        std::cout << __LINE__ << std::endl;
-
         return RESTAPI_Router<
                 RESTAPI_users_handler,
                 RESTAPI_user_handler,
