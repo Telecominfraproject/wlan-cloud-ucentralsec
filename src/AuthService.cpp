@@ -17,6 +17,8 @@
 #include "StorageService.h"
 #include "AuthService.h"
 #include "Utils.h"
+#include "KafkaManager.h"
+#include "Kafka_topics.h"
 
 namespace uCentral {
     class AuthService *AuthService::instance_ = nullptr;
@@ -97,6 +99,19 @@ namespace uCentral {
     void AuthService::Logout(const std::string &token) {
 		SubMutexGuard		Guard(Mutex_);
         Tokens_.erase(token);
+
+        try {
+            Poco::JSON::Object Obj;
+            Obj.set("event", "remove-token");
+            Obj.set("id", Daemon()->ID());
+            Obj.set("token", token);
+            std::stringstream ResultText;
+            Poco::JSON::Stringifier::stringify(Obj, ResultText);
+            KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, Daemon()->PrivateEndPoint(), ResultText.str(),
+                                        false);
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
     }
 
     std::string AuthService::GenerateToken(const std::string & Identity, ACCESS_TYPE Type, int NumberOfDays) {
