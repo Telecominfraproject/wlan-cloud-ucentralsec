@@ -24,7 +24,7 @@ namespace uCentral {
                 if (i.first == "token") {
                     //  can we find this token?
                     SecurityObjects::UserInfoAndPolicy SecObj;
-                    if (AuthService()->IsValidToken(i.first, SecObj.WebToken, SecObj.UserInfo)) {
+                    if (AuthService()->IsValidToken(i.first, SecObj.webtoken, SecObj.userinfo)) {
                         Poco::JSON::Object Obj;
                         SecObj.to_json(Obj);
                         ReturnObject(Request, Obj, Response);
