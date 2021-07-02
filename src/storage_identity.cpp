@@ -48,7 +48,7 @@ namespace uCentral {
 		return false;
 	}
 
-	bool Storage::AddIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL) {
+	bool Storage::AddIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL) {
 		try {
 
 		} catch(const Poco::Exception &E )
@@ -58,7 +58,7 @@ namespace uCentral {
 		return false;
 	}
 
-	bool Storage::GetIdentity(std::string & Identity, std::string & Password,AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL) {
+	bool Storage::GetIdentity(std::string & Identity, std::string & Password,AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL) {
 		try {
 
 		} catch(const Poco::Exception &E )
@@ -68,7 +68,7 @@ namespace uCentral {
 		return false;
 	}
 
-	bool Storage::UpdateIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL) {
+	bool Storage::UpdateIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL) {
 		try {
 
 		} catch(const Poco::Exception &E )
@@ -110,7 +110,7 @@ namespace uCentral {
 		return false;
 	}
 
-	bool Storage::GetIdentityRights(std::string &Identity, uCentral::Objects::AclTemplate &ACL) {
+	bool Storage::GetIdentityRights(std::string &Identity, SecurityObjects::AclTemplate &ACL) {
 		try {
 
 		} catch(const Poco::Exception &E )

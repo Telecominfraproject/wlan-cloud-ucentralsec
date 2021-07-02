@@ -31,7 +31,7 @@ namespace uCentral {
 				auto password = GetS(uCentral::RESTAPI::Protocol::PASSWORD, Obj);
 
 				Poco::toLowerInPlace(userId);
-				uCentral::Objects::WebToken Token;
+                SecurityObjects::WebToken Token;
 
 				if (AuthService()->Authorize(userId, password, Token)) {
 					Poco::JSON::Object ReturnObj;

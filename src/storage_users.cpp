@@ -6,7 +6,7 @@
 
 namespace uCentral {
 
-    bool Storage::CreateUser(const std::string & Admin, uCentral::Objects::UserInfo & NewUser) {
+    bool Storage::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser) {
         return true;
     }
 

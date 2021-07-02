@@ -17,14 +17,14 @@
 #include "Poco/JWT/Signer.h"
 #include "Poco/SHA2Engine.h"
 
-#include "RESTAPI_objects.h"
+#include "RESTAPI_SecurityObjects.h"
 
 namespace uCentral{
 
     class AuthService : public SubSystemServer {
     public:
 
-        typedef std::map<std::string,uCentral::Objects::WebToken>   WebTokenMap;
+        typedef std::map<std::string, SecurityObjects::WebToken>   WebTokenMap;
         enum ACCESS_TYPE {
             USERNAME,
             SERVER,
@@ -43,12 +43,14 @@ namespace uCentral{
 
         int Start() override;
         void Stop() override;
-        bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, struct uCentral::Objects::WebToken & UserInfo );
-        void CreateToken(const std::string & UserName, uCentral::Objects::WebToken & ResultToken, uCentral::Objects::AclTemplate & ACL);
-        bool Authorize( const std::string & UserName, const std::string & Password, uCentral::Objects::WebToken & ResultToken );
+        bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::WebToken & UserInfo );
+        void CreateToken(const std::string & UserName, SecurityObjects::WebToken & ResultToken, SecurityObjects::AclTemplate & ACL);
+        bool Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::WebToken & ResultToken );
         void Logout(const std::string &token);
+        [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo);
+        [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
         [[nodiscard]] std::string GenerateToken(const std::string & UserName, ACCESS_TYPE Type, int NumberOfDays);
-        [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, struct uCentral::Objects::WebToken & UserInfo  );
+        [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  );
         [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);

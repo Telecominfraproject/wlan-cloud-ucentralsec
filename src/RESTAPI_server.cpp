@@ -14,6 +14,7 @@
 #include "RESTAPI_user_handler.h"
 #include "RESTAPI_users_handler.h"
 #include "RESTAPI_action_links.h"
+#include "RESTAPI_systemEndpoints_handler.h"
 
 #include "Utils.h"
 
@@ -21,7 +22,7 @@ namespace uCentral {
 
     class RESTAPI_Server *RESTAPI_Server::instance_ = nullptr;
 
-    RESTAPI_Server::RESTAPI_Server() noexcept: SubSystemServer("RESTAPIServer", "RESTAPIServer", "ucentral.restapi")
+    RESTAPI_Server::RESTAPI_Server() noexcept: SubSystemServer("RESTAPIServer", "REST-SRV", "ucentral.restapi")
     {
     }
 
@@ -64,6 +65,7 @@ namespace uCentral {
                 RESTAPI_users_handler,
                 RESTAPI_user_handler,
                 RESTAPI_system_command,
+                RESTAPI_systemEndpoints_handler,
                 RESTAPI_action_links
                 >(Path,Bindings,Logger_);
     }

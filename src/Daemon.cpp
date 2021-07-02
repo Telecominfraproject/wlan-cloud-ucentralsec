@@ -24,7 +24,8 @@
 #include "StorageService.h"
 #include "RESTAPI_server.h"
 #include "SMTPMailerService.h"
-
+#include "RESTAPI_InternalServer.h"
+#include "AuthService.h"
 
 namespace uCentral {
     class Daemon *Daemon::instance_ = nullptr;
@@ -35,10 +36,13 @@ namespace uCentral {
                                    vDAEMON_ROOT_ENV_VAR,
                                    vDAEMON_CONFIG_ENV_VAR,
                                    vDAEMON_APP_NAME,
+                                   vDAEMON_BUS_TIMER,
                                    Types::SubSystemVec{
                                            Storage(),
                                            RESTAPI_Server(),
-                                           SMTPMailerService()
+                                           RESTAPI_InternalServer(),
+                                           SMTPMailerService(),
+                                           AuthService()
                                    });
         }
         return instance_;

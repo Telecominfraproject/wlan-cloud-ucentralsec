@@ -20,7 +20,7 @@
 #endif
 
 #include "AuthService.h"
-#include "RESTAPI_objects.h"
+#include "RESTAPI_SecurityObjects.h"
 #include "SubSystemServer.h"
 
 namespace uCentral {
@@ -89,7 +89,7 @@ namespace uCentral {
         void 	Stop() override;
 
         //  all passwords passed here are all plaintext
-        bool CreateUser(const std::string & Admin, uCentral::Objects::UserInfo & NewUser);
+        bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser);
         bool DeleteUser(const std::string & Admin, uint64_t Id);
         bool SetOwner(const std::string & Admin, uint64_t Id, const std::string &Owner);
         bool SetLocation(const std::string & Admin, uint64_t Id, const std::string &Location);
@@ -109,12 +109,12 @@ namespace uCentral {
 
 
         bool IdentityExists(std::string & Identity, AuthService::ACCESS_TYPE Type);
-        bool AddIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL);
-        bool GetIdentity(std::string & Identity, std::string & Password,AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL);
-        bool UpdateIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, uCentral::Objects::AclTemplate & ACL);
+        bool AddIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL);
+        bool GetIdentity(std::string & Identity, std::string & Password,AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL);
+        bool UpdateIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL);
         bool DeleteIdentity(std::string & Identity, AuthService::ACCESS_TYPE Type);
         bool ListIdentities(uint64_t Offset, uint64_t HowMany, std::vector<std::string> & Identities, AuthService::ACCESS_TYPE Type);
-        bool GetIdentityRights(std::string &Identity, uCentral::Objects::AclTemplate &ACL);
+        bool GetIdentityRights(std::string &Identity, SecurityObjects::AclTemplate &ACL);
 
 
 

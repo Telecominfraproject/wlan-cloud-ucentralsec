@@ -19,8 +19,7 @@
 #include "Poco/File.h"
 #include "Poco/JSON/Object.h"
 
-#include "AuthService.h"
-#include "RESTAPI_objects.h"
+#include "RESTAPI_SecurityObjects.h"
 
 namespace uCentral {
 
@@ -50,15 +49,17 @@ namespace uCentral {
 						bool CloseConnection = false);
 		bool ContinueProcessing(Poco::Net::HTTPServerRequest &Request,
 								Poco::Net::HTTPServerResponse &Response);
+
 		bool IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 						  Poco::Net::HTTPServerResponse &Response);
 		bool IsAuthorized(Poco::Net::HTTPServerRequest &Request,
 						  Poco::Net::HTTPServerResponse &Response, std::string &UserName);
+		bool ValidateAPIKey(Poco::Net::HTTPServerRequest &Request,
+							Poco::Net::HTTPServerResponse &Response);
+
 		uint64_t GetParameter(const std::string &Name, uint64_t Default);
 		std::string GetParameter(const std::string &Name, const std::string &Default);
 		bool GetBoolParameter(const std::string &Name, bool Default);
-		bool ValidateAPIKey(Poco::Net::HTTPServerRequest &Request,
-							Poco::Net::HTTPServerResponse &Response);
 
 		void BadRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);
 		void UnAuthorized(Poco::Net::HTTPServerRequest &Request,
@@ -77,16 +78,6 @@ namespace uCentral {
 		const std::string &GetBinding(const std::string &Name, const std::string &Default);
 		void InitQueryBlock();
 
-		[[nodiscard]] inline bool HasReadAccess() const {
-			return UserInfo_.acl_template_.Read_ || UserInfo_.acl_template_.ReadWrite_ ||
-				   UserInfo_.acl_template_.ReadWriteCreate_;
-		}
-		[[nodiscard]] inline bool HasWriteAccess() const {
-			return UserInfo_.acl_template_.ReadWrite_ || UserInfo_.acl_template_.ReadWriteCreate_;
-		}
-		[[nodiscard]] inline bool HasCreateAccess() const {
-			return UserInfo_.acl_template_.ReadWriteCreate_;
-		}
 		[[nodiscard]] static uint64_t Get(const char *Parameter,const Poco::JSON::Object::Ptr &Obj, uint64_t Default=0);
 		[[nodiscard]] static std::string GetS(const char *Parameter,const Poco::JSON::Object::Ptr &Obj, const std::string & Default="");
 		[[nodiscard]] static bool GetB(const char *Parameter,const Poco::JSON::Object::Ptr &Obj, bool Default=false);
@@ -95,11 +86,11 @@ namespace uCentral {
 	  protected:
 		BindingMap 					Bindings_;
 		Poco::URI::QueryParameters 	Parameters_;
-		Poco::Logger &Logger_;
-		std::string SessionToken_;
-		struct uCentral::Objects::WebToken UserInfo_;
-		std::vector<std::string> Methods_;
-		QueryBlock		QB_;
+		Poco::Logger 				&Logger_;
+		std::string 				SessionToken_;
+		SecurityObjects::WebToken 	UserInfo_;
+		std::vector<std::string> 	Methods_;
+		QueryBlock					QB_;
 	};
 
 	class RESTAPI_UnknownRequestHandler : public RESTAPIHandler {

@@ -44,10 +44,10 @@ namespace uCentral {
 		Signer_.setRSAKey(Daemon()->Key());
 		Signer_.addAllAlgorithms();
 		Logger_.notice("Starting...");
-        Secure_ = Daemon()->ConfigGetBool(SubSystemConfigPrefix_+".enabled",true);
-        DefaultPassword_ = Daemon()->ConfigGetString(SubSystemConfigPrefix_+".default.password","");
-        DefaultUserName_ = Daemon()->ConfigGetString(SubSystemConfigPrefix_+".default.username","");
-        Mechanism_ = Daemon()->ConfigGetString(SubSystemConfigPrefix_+".service.type","internal");
+        Secure_ = Daemon()->ConfigGetBool("authentication.enabled",true);
+        DefaultPassword_ = Daemon()->ConfigGetString("authentication.default.password","");
+        DefaultUserName_ = Daemon()->ConfigGetString("authentication.default.username","");
+        Mechanism_ = Daemon()->ConfigGetString("authentication.service.type","internal");
         return 0;
     }
 
@@ -55,7 +55,7 @@ namespace uCentral {
 		Logger_.notice("Stopping...");
     }
 
-	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, struct uCentral::Objects::WebToken & UserInfo  )
+	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  )
     {
         if(!Secure_)
             return true;
@@ -119,7 +119,7 @@ namespace uCentral {
 		return JWT;
     }
 
-	bool AuthService::ValidateToken(const std::string & Token, std::string & SessionToken, struct uCentral::Objects::WebToken & UserInfo  ) {
+	bool AuthService::ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  ) {
 		SubMutexGuard		Guard(Mutex_);
 		Poco::JWT::Token	DecryptedToken;
 
@@ -161,7 +161,7 @@ namespace uCentral {
 		return false;
 	}
 
-    void AuthService::CreateToken(const std::string & UserName, uCentral::Objects::WebToken & UserInfo, uCentral::Objects::AclTemplate & ACL)
+    void AuthService::CreateToken(const std::string & UserName, SecurityObjects::WebToken & UserInfo, SecurityObjects::AclTemplate & ACL)
     {
 		SubMutexGuard		Guard(Mutex_);
 
@@ -181,10 +181,10 @@ namespace uCentral {
         Tokens_[UserInfo.access_token_] = UserInfo;
     }
 
-    bool AuthService::Authorize( const std::string & UserName, const std::string & Password, uCentral::Objects::WebToken & ResultToken )
+    bool AuthService::Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::WebToken & ResultToken )
     {
 		SubMutexGuard					Guard(Mutex_);
-		uCentral::Objects::AclTemplate	ACL;
+        SecurityObjects::AclTemplate	ACL;
 
 		if(Mechanism_=="internal")
         {
@@ -211,5 +211,11 @@ namespace uCentral {
         SHA2_.update(Password + UName);
         return uCentral::Utils::ToHex(SHA2_.digest());
     }
+
+    bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo) {
+
+        return true;
+    }
+
 
 }  // end of namespace

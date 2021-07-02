@@ -10,13 +10,11 @@
 #define UCENTRAL_UCENTRALRESTAPISERVER_H
 
 #include "SubSystemServer.h"
-
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/NetException.h"
-
 
 namespace uCentral {
 
@@ -43,14 +41,14 @@ namespace uCentral {
 
     inline RESTAPI_Server * RESTAPI_Server() { return RESTAPI_Server::instance(); };
 
-class RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-    public:
-        RequestHandlerFactory() :
-            Logger_(RESTAPI_Server()->Logger()){}
+    class RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+        public:
+            RequestHandlerFactory() :
+                Logger_(RESTAPI_Server()->Logger()){}
 
-        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
-    private:
-        Poco::Logger    & Logger_;
+            Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
+        private:
+            Poco::Logger    & Logger_;
     };
 
 

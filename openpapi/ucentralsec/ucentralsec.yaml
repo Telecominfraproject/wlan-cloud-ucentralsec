@@ -206,7 +206,7 @@ components:
     SystemEndpoint:
       type: object
       properties:
-        name:
+        type:
           type: string
         id:
           type: integer
@@ -251,7 +251,7 @@ components:
         created:
           type: integer
           format: int64
-        valiadationURI:
+        validationURI:
           type: string
         changePassword:
           type: boolean
@@ -429,9 +429,8 @@ components:
           type: string
         publicURI:
           type: string
-        auth:
+        token:
           type: string
-
 
     InternalSystemServices:
       type: object
@@ -445,6 +444,13 @@ components:
           items:
             $ref: '#/components/schemas/InternalServiceInfo'
 
+    TokenValidationResult:
+      type: object
+      properties:
+        userInfo:
+          $ref: '#/components/schemas/UserInfo'
+        tokenInfo:
+          $ref: '#/components/schemas/WebTokenResult'
     #########################################################################################
     ##
     ## End of uCentral system wide values
@@ -511,7 +517,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /systemInfo:
+  /systemEndpoints:
     get:
       tags:
         - Authentication
@@ -769,9 +775,9 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-#########################################################################################
-##  The following calls are restricted to the private system side APIs
-#########################################################################################
+  #########################################################################################
+  ##  The following calls are restricted to the private system side APIs
+  #########################################################################################
   /systemServices:
     get:
       tags:
@@ -781,6 +787,26 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/InternalSystemServices'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /validateToken:
+    get:
+      tags:
+        - Security
+      summary: Allows any microservice to validate a token and get security policy for a specific user.
+      operationId: validateToken
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/TokenValidationResult'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:

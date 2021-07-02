@@ -33,6 +33,7 @@ endif()
 set(BUILD_SHARED_LIBS 1)
 
 add_definitions(-DAPP_VERSION="${CMAKE_PROJECT_VERSION}" -DBUILD_NUMBER="${BUILD_NUM}")
+add_definitions(-DTIP_SECURITY_SERVICE="1")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -57,7 +58,7 @@ add_executable( ucentralsec
                 src/RESTAPI_oauth2Handler.h src/RESTAPI_oauth2Handler.cpp
                 src/RESTAPI_handler.h src/RESTAPI_handler.cpp
                 src/RESTAPI_server.cpp src/RESTAPI_server.h
-                src/RESTAPI_objects.cpp src/RESTAPI_objects.h
+                src/RESTAPI_SecurityObjects.cpp src/RESTAPI_SecurityObjects.h
                 src/RESTAPI_system_command.h src/RESTAPI_system_command.cpp
                 src/RESTAPI_protocol.h
                 src/AuthService.h src/AuthService.cpp
@@ -70,7 +71,9 @@ add_executable( ucentralsec
                 src/RESTAPI_users_handler.cpp src/RESTAPI_users_handler.h
                 src/RESTAPI_user_handler.cpp src/RESTAPI_user_handler.h
                 src/RESTAPI_action_links.cpp src/RESTAPI_action_links.h src/storage_users.cpp
-                src/RESTAPI_systemServices_handler.cpp src/RESTAPI_systemServices_handler.h)
+                src/RESTAPI_InternalServer.cpp src/RESTAPI_InternalServer.h
+                src/RESTAPI_validateToken_handler.cpp src/RESTAPI_validateToken_handler.h
+                src/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI_systemEndpoints_handler.h)
 
 target_link_libraries(ucentralsec PUBLIC
         ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES} CppKafka::cppkafka )

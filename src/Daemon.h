@@ -30,14 +30,17 @@ namespace uCentral {
     static const char * vDAEMON_ROOT_ENV_VAR = "UCENTRALSEC_ROOT";
     static const char * vDAEMON_CONFIG_ENV_VAR = "UCENTRALSEC_CONFIG";
     static const char * vDAEMON_APP_NAME = "uCentralSec";
+    static const uint64_t vDAEMON_BUS_TIMER = 5000;
+
     class Daemon : public MicroService {
     public:
         explicit Daemon(std::string PropFile,
                         std::string RootEnv,
                         std::string ConfigEnv,
                         std::string AppName,
+                        uint64_t BusTimer,
                         Types::SubSystemVec SubSystems) :
-                MicroService( PropFile, RootEnv, ConfigEnv, AppName, SubSystems) {};
+                MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
         void initialize(Poco::Util::Application &self);
         static Daemon *instance();
