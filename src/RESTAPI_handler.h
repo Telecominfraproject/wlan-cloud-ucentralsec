@@ -87,8 +87,8 @@ namespace uCentral {
 		BindingMap 					Bindings_;
 		Poco::URI::QueryParameters 	Parameters_;
 		Poco::Logger 				&Logger_;
-		std::string 				SessionToken_;
-		SecurityObjects::WebToken 	UserInfo_;
+		std::string 				        SessionToken_;
+		SecurityObjects::UserInfoAndPolicy 	UserInfo_;
 		std::vector<std::string> 	Methods_;
 		QueryBlock					QB_;
 	};

@@ -31,11 +31,11 @@ namespace uCentral {
 				auto password = GetS(uCentral::RESTAPI::Protocol::PASSWORD, Obj);
 
 				Poco::toLowerInPlace(userId);
-                SecurityObjects::WebToken Token;
+                SecurityObjects::UserInfoAndPolicy UInfo;
 
-				if (AuthService()->Authorize(userId, password, Token)) {
+				if (AuthService()->Authorize(userId, password, UInfo)) {
 					Poco::JSON::Object ReturnObj;
-					Token.to_json(ReturnObj);
+                    UInfo.webtoken.to_json(ReturnObj);
 					ReturnObject(Request, ReturnObj, Response);
 				} else {
 					UnAuthorized(Request, Response);

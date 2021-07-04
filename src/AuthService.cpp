@@ -57,7 +57,7 @@ namespace uCentral {
 		Logger_.notice("Stopping...");
     }
 
-	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  )
+	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
         if(!Secure_)
             return true;
@@ -81,24 +81,23 @@ namespace uCentral {
 		if(CallToken.empty())
 			return false;
 
-		auto Client = Tokens_.find(CallToken);
+		auto Client = UserCache_.find(CallToken);
 
-		if( Client == Tokens_.end() )
-			return ValidateToken(CallToken, CallToken, UserInfo);
+		if( Client == UserCache_.end() )
+			return ValidateToken(CallToken, CallToken, UInfo);
 
-		if((Client->second.created_ + Client->second.expires_in_) > time(nullptr)) {
+		if((Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr)) {
 			SessionToken = CallToken;
-			UserInfo = Client->second ;
+            UInfo = Client->second ;
 			return true;
 		}
-
-		Tokens_.erase(CallToken);
+		UserCache_.erase(CallToken);
 		return false;
     }
 
     void AuthService::Logout(const std::string &token) {
 		SubMutexGuard		Guard(Mutex_);
-        Tokens_.erase(token);
+        UserCache_.erase(token);
 
         try {
             Poco::JSON::Object Obj;
@@ -134,7 +133,7 @@ namespace uCentral {
 		return JWT;
     }
 
-	bool AuthService::ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  ) {
+	bool AuthService::ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo  ) {
 		SubMutexGuard		Guard(Mutex_);
 		Poco::JWT::Token	DecryptedToken;
 
@@ -146,26 +145,26 @@ namespace uCentral {
 					auto IssuedAt = DecryptedToken.getIssuedAt();
 					auto Subject = DecryptedToken.getSubject();
 
-					UserInfo.access_token_ = Token;
-					UserInfo.refresh_token_= Token;
-					UserInfo.username_ = Identity;
-					UserInfo.id_token_ = Token;
-					UserInfo.token_type_ = "Bearer";
-					UserInfo.created_ = IssuedAt.epochTime();
-					UserInfo.expires_in_ = Expires.epochTime() - IssuedAt.epochTime();
-					UserInfo.idle_timeout_ = 5*60;
+                    UInfo.webtoken.access_token_ = Token;
+                    UInfo.webtoken.refresh_token_= Token;
+                    UInfo.webtoken.username_ = Identity;
+                    UInfo.webtoken.id_token_ = Token;
+                    UInfo.webtoken.token_type_ = "Bearer";
+                    UInfo.webtoken.created_ = IssuedAt.epochTime();
+                    UInfo.webtoken.expires_in_ = Expires.epochTime() - IssuedAt.epochTime();
+                    UInfo.webtoken.idle_timeout_ = 5*60;
 
-					if(Storage()->GetIdentityRights(Identity, UserInfo.acl_template_)) {
+					if(Storage()->GetIdentityRights(Identity, UInfo.webtoken.acl_template_)) {
 					} else {
 						//	we can get in but we have no given rights... something is very wrong
-						UserInfo.acl_template_.Read_ = true ;
-						UserInfo.acl_template_.ReadWriteCreate_ =
-						UserInfo.acl_template_.ReadWrite_ =
-						UserInfo.acl_template_.Delete_ = false;
-						UserInfo.acl_template_.PortalLogin_ = true;
+						UInfo.webtoken.acl_template_.Read_ = true ;
+                        UInfo.webtoken.acl_template_.ReadWriteCreate_ =
+                        UInfo.webtoken.acl_template_.ReadWrite_ =
+                        UInfo.webtoken.acl_template_.Delete_ = false;
+                        UInfo.webtoken.acl_template_.PortalLogin_ = true;
 					}
 
-					Tokens_[UserInfo.access_token_] = UserInfo;
+                    UserCache_[UInfo.webtoken.access_token_] = UInfo;
 
 					return true;
 				}
@@ -176,27 +175,24 @@ namespace uCentral {
 		return false;
 	}
 
-    void AuthService::CreateToken(const std::string & UserName, SecurityObjects::WebToken & UserInfo, SecurityObjects::AclTemplate & ACL)
+    void AuthService::CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo)
     {
 		SubMutexGuard		Guard(Mutex_);
 
 		std::string Token = GenerateToken(UserName,USERNAME,30);
+        UInfo.webtoken.expires_in_ = 30 * 24 * 60 * 60 ;
+        UInfo.webtoken.idle_timeout_ = 5 * 60;
+        UInfo.webtoken.token_type_ = "Bearer";
+        UInfo.webtoken.access_token_ = Token;
+        UInfo.webtoken.id_token_ = Token;
+        UInfo.webtoken.refresh_token_ = Token;
+        UInfo.webtoken.created_ = time(nullptr);
+        UInfo.webtoken.username_ = UserName;
 
-		UserInfo.acl_template_ = ACL;
-
-		UserInfo.expires_in_ = 30 * 24 * 60 * 60 ;
-		UserInfo.idle_timeout_ = 5 * 60;
-		UserInfo.token_type_ = "Bearer";
-		UserInfo.access_token_ = Token;
-		UserInfo.id_token_ = Token;
-		UserInfo.refresh_token_ = Token;
-		UserInfo.created_ = time(nullptr);
-		UserInfo.username_ = UserName;
-
-        Tokens_[UserInfo.access_token_] = UserInfo;
+        UserCache_[Token] = UInfo;
     }
 
-    bool AuthService::Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::WebToken & ResultToken )
+    bool AuthService::Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
 		SubMutexGuard					Guard(Mutex_);
         SecurityObjects::AclTemplate	ACL;
@@ -206,7 +202,11 @@ namespace uCentral {
             if(((UserName == DefaultUserName_) && (DefaultPassword_== ComputePasswordHash(UserName,Password))) || !Secure_)
             {
                 ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
-                CreateToken(UserName, ResultToken, ACL);
+                UInfo.webtoken.acl_template_ = ACL;
+                UInfo.userinfo.email = DefaultUserName_;
+                UInfo.userinfo.currentPassword = DefaultPassword_;
+                UInfo.userinfo.name = DefaultUserName_;
+                CreateToken(UserName, UInfo );
                 return true;
             }
         } else if (Mechanism_=="db") {
@@ -214,7 +214,7 @@ namespace uCentral {
 
 			std::string TUser{UserName};
 			if(Storage()->GetIdentity(TUser,PasswordHash,USERNAME,ACL)) {
-				CreateToken(UserName, ResultToken, ACL);
+				CreateToken(UserName, UInfo);
 				return true;
 			}
 		}

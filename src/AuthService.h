@@ -24,7 +24,6 @@ namespace uCentral{
     class AuthService : public SubSystemServer {
     public:
 
-        typedef std::map<std::string, SecurityObjects::WebToken>   WebTokenMap;
         enum ACCESS_TYPE {
             USERNAME,
             SERVER,
@@ -43,10 +42,14 @@ namespace uCentral{
 
         int Start() override;
         void Stop() override;
-        bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::WebToken & UserInfo );
-        void CreateToken(const std::string & UserName, SecurityObjects::WebToken & ResultToken, SecurityObjects::AclTemplate & ACL);
-        bool Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::WebToken & ResultToken );
+
+        [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo );
+        [[nodiscard]] bool Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::UserInfoAndPolicy & UInfo );
+        void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
+        [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UserInfo  );
+
         void Logout(const std::string &token);
+
         [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo);
         [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
         [[nodiscard]] std::string GenerateToken(const std::string & UserName, ACCESS_TYPE Type, int NumberOfDays);
@@ -54,15 +57,16 @@ namespace uCentral{
         [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
+
     private:
 		static AuthService *instance_;
-		WebTokenMap         Tokens_;
 		bool    			Secure_ = false ;
 		std::string     	DefaultUserName_;
 		std::string			DefaultPassword_;
 		std::string     	Mechanism_;
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
+		SecurityObjects::UserInfoCache UserCache_;
 
         AuthService() noexcept:
             SubSystemServer("Authentication", "AUTH-SVR", "authentication")
