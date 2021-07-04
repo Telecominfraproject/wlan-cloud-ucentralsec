@@ -21,16 +21,22 @@ The entire uCentral systems uses several MicroServices. In order for the whole s
 access
 
 - Security
+  - Properties file: ucentralsec.properties
+  - Ports
     - Public: 16001
     - Private: 17001
     - ALB: 16101
 
 - Gateway:
+  - Properties file: ucentralgw.properties
+  - Ports
     - Public: 16002
     - Private: 17002
     - ALB: 16102
 
 - Firmware:
+  - Properties file: ucentralfms.properties
+  - Ports
     - Public: 16004
     - Private: 17004
     - ALB: 16104
