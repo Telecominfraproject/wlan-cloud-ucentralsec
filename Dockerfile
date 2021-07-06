@@ -6,6 +6,7 @@ RUN apk update && \
     apk add --no-cache bash util-linux coreutils curl && \
     apk add --no-cache make cmake gcc g++ libstdc++ libgcc git zlib-dev && \
     apk add --no-cache openssl-dev boost-dev unixodbc-dev postgresql-dev mariadb-dev && \
+    apk add --no-cache apache2-utils yaml-dev apr-util-dev && \
     apk add --no-cache librdkafka-dev
 
 RUN git clone https://github.com/stephb9959/poco /poco
