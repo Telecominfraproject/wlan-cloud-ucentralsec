@@ -275,7 +275,9 @@ components:
         waitingForEmailCheck:
           type: boolean
         notes:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/NoteInfo'
         location:
           type: string
           format: uuid
@@ -358,6 +360,17 @@ components:
           items:
             $ref: '#/components/schemas/TagValuePair'
 
+    NoteInfo:
+      type: object
+      properties:
+        created:
+          type: integer
+          format: int64
+        createdBy:
+          type: string
+        note:
+          type: string
+
     SystemCommandDetails:
       type: object
       properties:
@@ -412,7 +425,9 @@ components:
         role:
           type: string
         notes:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/NoteInfo'
 
     SecurityProfileList:
       type: object

@@ -39,7 +39,16 @@ namespace uCentral::SecurityObjects {
 		bool from_json(const Poco::JSON::Object::Ptr &Obj);
 	};
 
-	struct UserInfo {
+    struct NoteInfo {
+        uint64_t created = std::time(nullptr);
+        std::string createdBy;
+        std::string note;
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(Poco::JSON::Object::Ptr Obj);
+    };
+    typedef std::vector<NoteInfo>	NoteInfoVec;
+
+    struct UserInfo {
 		uint64_t Id = 0;
 		std::string name;
 		std::string description;
@@ -57,7 +66,7 @@ namespace uCentral::SecurityObjects {
 		uint64_t lastEmailCheck = 0;
 		bool waitingForEmailCheck = false;
 		std::string locale;
-		std::string notes;
+		NoteInfoVec     notes;
 		std::string location;
 		std::string owner;
 		bool suspended = false;
@@ -75,6 +84,15 @@ namespace uCentral::SecurityObjects {
 		void to_json(Poco::JSON::Object &Obj) const;
 		bool from_json(const Poco::JSON::Object::Ptr &Obj);
 	};
+
+    struct UserInfoAndPolicy {
+        WebToken	webtoken;
+        UserInfo	userinfo;
+        void to_json(Poco::JSON::Object &Obj) const;
+        bool from_json(const Poco::JSON::Object::Ptr &Obj);
+    };
+
+    typedef std::map<std::string,SecurityObjects::UserInfoAndPolicy>	UserInfoCache;
 
 	struct InternalServiceInfo {
 		std::string privateURI;
@@ -107,15 +125,6 @@ namespace uCentral::SecurityObjects {
 		void to_json(Poco::JSON::Object &Obj) const;
 		bool from_json(const Poco::JSON::Object::Ptr &Obj);
 	};
-
-	struct UserInfoAndPolicy {
-		WebToken	webtoken;
-		UserInfo	userinfo;
-		void to_json(Poco::JSON::Object &Obj) const;
-		bool from_json(const Poco::JSON::Object::Ptr &Obj);
-	};
-
-	typedef std::map<std::string,SecurityObjects::UserInfoAndPolicy>	UserInfoCache;
 
 }
 
