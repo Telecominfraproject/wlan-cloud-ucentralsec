@@ -194,12 +194,13 @@ namespace uCentral {
 	}
 
 	void RESTAPIHandler::UnAuthorized(Poco::Net::HTTPServerRequest &Request,
-									  Poco::Net::HTTPServerResponse &Response) {
+									  Poco::Net::HTTPServerResponse &Response,
+                                      const std::string & Reason) {
 		PrepareResponse(Request, Response, Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 		Poco::JSON::Object	ErrorObject;
 		ErrorObject.set("ErrorCode",403);
 		ErrorObject.set("ErrorDetails",Request.getMethod());
-		ErrorObject.set("ErrorDescription","You do not have access to this resource.");
+		ErrorObject.set("ErrorDescription",Reason.empty() ? "No access allowed." : Reason) ;
 		std::ostream &Answer = Response.send();
 		Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	}

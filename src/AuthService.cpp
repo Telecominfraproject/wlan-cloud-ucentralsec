@@ -50,6 +50,9 @@ namespace uCentral {
         DefaultPassword_ = Daemon()->ConfigGetString("authentication.default.password","");
         DefaultUserName_ = Daemon()->ConfigGetString("authentication.default.username","");
         Mechanism_ = Daemon()->ConfigGetString("authentication.service.type","internal");
+        PasswordValidation_ = Daemon()->ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        TokenAging_ = (uint64_t) Daemon()->ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
+        HowManyOldPassword_ = Daemon()->ConfigGetInt("authentication.oldpasswords", 5);
         return 0;
     }
 
@@ -93,6 +96,10 @@ namespace uCentral {
 		}
 		UserCache_.erase(CallToken);
 		return false;
+    }
+
+    bool AuthService::ValidatePassword(const std::string &Password) {
+        return std::regex_match(Password, PasswordValidation_);
     }
 
     void AuthService::Logout(const std::string &token) {
@@ -173,7 +180,7 @@ namespace uCentral {
         SecurityObjects::AclTemplate	ACL;
         ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
         UInfo.webtoken.acl_template_ = ACL;
-        UInfo.webtoken.expires_in_ = 30 * 24 * 60 * 60 ;
+        UInfo.webtoken.expires_in_ = TokenAging_ ;
         UInfo.webtoken.idle_timeout_ = 5 * 60;
         UInfo.webtoken.token_type_ = "Bearer";
         UInfo.webtoken.access_token_ = Token;
@@ -184,6 +191,7 @@ namespace uCentral {
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
         UserCache_[Token] = UInfo;
+        Storage()->SetLastLogin(UInfo.userinfo.Id);
     }
 
     bool AuthService::SetPassword(const std::string &NewPassword, SecurityObjects::UserInfo & UInfo) {
@@ -193,15 +201,16 @@ namespace uCentral {
                 return false;
             }
         }
-        if(UInfo.lastPasswords.size()==5) {
+        if(UInfo.lastPasswords.size()==HowManyOldPassword_) {
             UInfo.lastPasswords.erase(UInfo.lastPasswords.begin());
         }
         UInfo.lastPasswords.push_back(NewPasswordHash);
         UInfo.currentPassword = NewPasswordHash;
+        UInfo.changePassword = false;
         return true;
     }
 
-    bool AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
+    AuthService::AUTH_ERROR AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
 		SubMutexGuard					Guard(Mutex_);
         SecurityObjects::AclTemplate	ACL;
@@ -210,19 +219,27 @@ namespace uCentral {
         auto PasswordHash = ComputePasswordHash(UserName, Password);
 
         if(Storage()->GetUserByEmail(UserName,UInfo.userinfo)) {
+            if(UInfo.userinfo.waitingForEmailCheck) {
+                return USERNAME_PENDING_VERIFICATION;
+            }
+
             if(PasswordHash != UInfo.userinfo.currentPassword) {
-                return false;
+                return INVALID_CREDENTIALS;
             }
 
             if(UInfo.userinfo.changePassword && NewPassword.empty()) {
                 UInfo.webtoken.userMustChangePassword = true ;
-                return true;
+                return PASSWORD_CHANGE_REQUIRED;
+            }
+
+            if(!NewPassword.empty() && !ValidatePassword(NewPassword)) {
+                return PASSWORD_INVALID;
             }
 
             if(UInfo.userinfo.changePassword || !NewPassword.empty()) {
                 if(!SetPassword(NewPassword,UInfo.userinfo)) {
                     UInfo.webtoken.errorCode = 1;
-                    return true;
+                    return PASSWORD_ALREADY_USED;
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
@@ -230,8 +247,10 @@ namespace uCentral {
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
+            UInfo.userinfo.lastLogin=std::time(nullptr);
+            Storage()->SetLastLogin(UInfo.userinfo.Id);
             CreateToken(UserName, UInfo );
-            return true;
+            return SUCCESS;
         }
 
         if(((UserName == DefaultUserName_) && (DefaultPassword_== ComputePasswordHash(UserName,Password))) || !Secure_)
@@ -242,9 +261,9 @@ namespace uCentral {
             UInfo.userinfo.currentPassword = DefaultPassword_;
             UInfo.userinfo.name = DefaultUserName_;
             CreateToken(UserName, UInfo );
-            return true;
+            return SUCCESS;
         }
-        return false;
+        return INVALID_CREDENTIALS;
     }
 
     std::string AuthService::ComputePasswordHash(const std::string &UserName, const std::string &Password) {

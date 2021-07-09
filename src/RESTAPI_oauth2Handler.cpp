@@ -33,15 +33,26 @@ namespace uCentral {
 				Poco::toLowerInPlace(userId);
                 SecurityObjects::UserInfoAndPolicy UInfo;
 
-				if (AuthService()->Authorize(userId, password, newPassword, UInfo)) {
+                auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo);
+				if (Code==AuthService::SUCCESS) {
 					Poco::JSON::Object ReturnObj;
                     UInfo.webtoken.to_json(ReturnObj);
 					ReturnObject(Request, ReturnObj, Response);
+					return;
 				} else {
-					UnAuthorized(Request, Response);
+				    switch(Code) {
+				        case AuthService::INVALID_CREDENTIALS: UnAuthorized(Request, Response, "Unrecognized credentials (username/password)."); break;
+                        case AuthService::PASSWORD_INVALID: UnAuthorized(Request, Response, "Invalid password."); break;
+                        case AuthService::PASSWORD_ALREADY_USED: UnAuthorized(Request, Response, "Password already used previously."); break;
+                        case AuthService::USERNAME_PENDING_VERIFICATION: UnAuthorized(Request, Response, "User access pending email verification."); break;
+                        case AuthService::PASSWORD_CHANGE_REQUIRED: UnAuthorized(Request, Response, "Password change expected."); break;
+                        default: UnAuthorized(Request, Response, "Unrecognized credentials (username/password)."); break;
+				    }
+				    return;
 				}
 			} else if (Request.getMethod() == Poco::Net::HTTPServerRequest::HTTP_DELETE) {
 				if (!IsAuthorized(Request, Response)) {
+                    UnAuthorized(Request, Response, "Not authorized.");
 					return;
 				}
 				auto Token = GetBinding(uCentral::RESTAPI::Protocol::TOKEN, "...");
@@ -52,7 +63,7 @@ namespace uCentral {
 					NotFound(Request, Response);
 				}
 			} else {
-				BadRequest(Request, Response);
+				BadRequest(Request, Response, "Unsupported HTTP method.");
 			}
 			return;
 		} catch (const Poco::Exception &E) {

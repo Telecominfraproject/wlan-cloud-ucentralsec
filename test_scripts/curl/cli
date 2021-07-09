@@ -53,6 +53,36 @@ login() {
   echo "${token}" > token.json
 }
 
+testlogin() {
+    payload="{ \"userId\" : \"$1\" , \"password\" : \"$2\" }"
+    curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2" \
+        -H "Content-Type: application/json" \
+        -d "$payload" > ${result_file}
+    userMustChangePassword=$(cat ${result_file} | jq -r '.userMustChangePassword')
+    if [[ ${userMustChangePassword} == "true" ]]
+    then
+        echo "User must change password to login..."
+        if [[ "$3" == "" ]]
+        then
+            echo "Please supply your new password too..."
+            exit 1
+        fi
+        payload="{ \"userId\" : \"$1\" , \"password\" : \"$2\", \"newPassword\" : \"$3\" }"
+        curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2" \
+            -H "Content-Type: application/json" \
+            -d "$payload" > ${result_file}
+        jq < ${result_file}
+    elif [[ "$3" != "" ]]
+    then
+        payload="{ \"userId\" : \"$1\" , \"password\" : \"$2\", \"newPassword\" : \"$3\" }"
+        curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2" \
+                -H "Content-Type: application/json" \
+                -d "$payload" > ${result_file}
+        jq < ${result_file}
+    fi
+    jq < ${result_file}
+}
+
 findbrowser() {
 	if [[ "${browser}" != "" ]]
 	then
@@ -117,7 +147,7 @@ listendpoints() {
 }
 
 createuser() {
-    payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\" }"
+    payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
     curl  ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/user/0" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
@@ -162,6 +192,7 @@ case "$1" in
     "getuser") login; getuser "$2" ; logout;;
     "listusers") login; listusers ; logout ;;
     "listendpoints") login; listendpoints ; logout ;;
+    "testlogin") testlogin "$2" "$3" "$4";;
     "help") login; help  ; logout ;;
     *) help ;;
 esac

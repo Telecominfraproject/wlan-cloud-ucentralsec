@@ -89,6 +89,38 @@ namespace uCentral {
             "oauthType,"
             "oauthUserInfo"};
 
+    static const std::string AllUsersFieldsForUpdate{
+            " Id=?, "
+            "name=?, "
+            "description=?, "
+            "avatar=?, "
+            "email=?, "
+            "validated=?, "
+            "validationEmail=?, "
+            "validationDate=?, "
+            "creationDate=?, "
+            "validationURI=?, "
+            "changePassword=?, "
+            "lastLogin=?, "
+            "currentLoginURI=?, "
+            "lastPasswordChange=?, "
+            "lastEmailCheck=?, "
+            "waitingForEmailCheck=?, "
+            "locale=?, "
+            "notes=?, "
+            "location=?, "
+            "owner=?, "
+            "suspended=?, "
+            "blackListed=?, "
+            "userRole=?, "
+            "userTypeProprietaryInfo=?, "
+            "securityPolicy=?, "
+            "securityPolicyChange=?, "
+            "currentPassword=?, "
+            "lastPasswords=?, "
+            "oauthType=?, "
+            "oauthUserInfo=? "};
+
 
     class Storage : public SubSystemServer {
 
@@ -168,6 +200,7 @@ namespace uCentral {
         bool SetPolicyChange(const std::string & Admin, USER_ID_TYPE & Id, const std::string &NewPolicy);
         bool UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
         bool GetUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
+        bool SetLastLogin(std::string &ID);
 
 	  private:
 		static Storage      							*instance_;

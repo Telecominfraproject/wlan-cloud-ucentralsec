@@ -64,7 +64,7 @@ namespace uCentral {
 
 		void BadRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response, const std::string &Reason = "");
 		void UnAuthorized(Poco::Net::HTTPServerRequest &Request,
-						  Poco::Net::HTTPServerResponse &Response);
+						  Poco::Net::HTTPServerResponse &Response, const std::string &Reason = "");
 		void ReturnObject(Poco::Net::HTTPServerRequest &Request, Poco::JSON::Object &Object,
 						  Poco::Net::HTTPServerResponse &Response);
 		void NotFound(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);

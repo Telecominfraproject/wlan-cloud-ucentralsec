@@ -9,6 +9,8 @@
 #ifndef UCENTRAL_UAUTHSERVICE_H
 #define UCENTRAL_UAUTHSERVICE_H
 
+#include <regex>
+
 #include "SubSystemServer.h"
 
 #include "Poco/JSON/Object.h"
@@ -32,6 +34,16 @@ namespace uCentral{
             CUSTOM
         };
 
+        enum AUTH_ERROR {
+            SUCCESS,
+            PASSWORD_CHANGE_REQUIRED,
+            INVALID_CREDENTIALS,
+            PASSWORD_ALREADY_USED,
+            USERNAME_PENDING_VERIFICATION,
+            PASSWORD_INVALID,
+            INTERNAL_ERROR
+        };
+
         static ACCESS_TYPE IntToAccessType(int C);
         static int AccessTypeToInt(ACCESS_TYPE T);
 
@@ -46,12 +58,14 @@ namespace uCentral{
         void Stop() override;
 
         [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo );
-        [[nodiscard]] bool Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo );
+        [[nodiscard]] AUTH_ERROR Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo );
         void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UserInfo  );
         [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
 
         void Logout(const std::string &token);
+
+        bool ValidatePassword(const std::string &pwd);
 
         [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo);
         [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
@@ -70,7 +84,9 @@ namespace uCentral{
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
 		SecurityObjects::UserInfoCache UserCache_;
-
+		std::regex          PasswordValidation_;
+		uint64_t            TokenAging_ = 30 * 24 * 60 * 60;
+        uint64_t            HowManyOldPassword_=5;
         AuthService() noexcept:
             SubSystemServer("Authentication", "AUTH-SVR", "authentication")
         {

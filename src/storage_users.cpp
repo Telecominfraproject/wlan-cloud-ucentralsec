@@ -282,10 +282,48 @@ namespace uCentral {
     bool Storage::UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo) {
         try {
             Poco::Data::Session Sess = Pool_->get();
-            Poco::Data::Statement Insert(Sess);
+            Poco::Data::Statement Update(Sess);
 
+            std::string St1{"update users set " + AllUsersFieldsForUpdate + " where id=?"};
+            auto Notes = RESTAPI_utils::to_string(UInfo.notes);
+            auto UserType = SecurityObjects::UserTypeToString(UInfo.userRole);
+            auto OldPasswords = RESTAPI_utils::to_string(UInfo.lastPasswords);
+            Update << ConvertParams(St1),
+                    Poco::Data::Keywords::use(UInfo.Id),
+                    Poco::Data::Keywords::use(UInfo.name),
+                    Poco::Data::Keywords::use(UInfo.description),
+                    Poco::Data::Keywords::use(UInfo.avatar),
+                    Poco::Data::Keywords::use(UInfo.email),
+                    Poco::Data::Keywords::use(UInfo.validated),
+                    Poco::Data::Keywords::use(UInfo.validationEmail),
+                    Poco::Data::Keywords::use(UInfo.validationDate),
+                    Poco::Data::Keywords::use(UInfo.creationDate),
+                    Poco::Data::Keywords::use(UInfo.validationURI),
+                    Poco::Data::Keywords::use(UInfo.changePassword),
+                    Poco::Data::Keywords::use(UInfo.lastLogin),
+                    Poco::Data::Keywords::use(UInfo.currentLoginURI),
+                    Poco::Data::Keywords::use(UInfo.lastPasswordChange),
+                    Poco::Data::Keywords::use(UInfo.lastEmailCheck),
+                    Poco::Data::Keywords::use(UInfo.waitingForEmailCheck),
+                    Poco::Data::Keywords::use(UInfo.locale),
+                    Poco::Data::Keywords::use(Notes),
+                    Poco::Data::Keywords::use(UInfo.location),
+                    Poco::Data::Keywords::use(UInfo.owner),
+                    Poco::Data::Keywords::use(UInfo.suspended),
+                    Poco::Data::Keywords::use(UInfo.blackListed),
+                    Poco::Data::Keywords::use(UserType),
+                    Poco::Data::Keywords::use(UInfo.userTypeProprietaryInfo),
+                    Poco::Data::Keywords::use(UInfo.securityPolicy),
+                    Poco::Data::Keywords::use(UInfo.securityPolicyChange),
+                    Poco::Data::Keywords::use(UInfo.currentPassword),
+                    Poco::Data::Keywords::use(OldPasswords),
+                    Poco::Data::Keywords::use(UInfo.oauthType),
+                    Poco::Data::Keywords::use(UInfo.oauthUserInfo),
+                    Poco::Data::Keywords::use(UInfo.Id);
+            Update.execute();
             return true;
         } catch (const Poco::Exception &E) {
+            std::cout << " Exception: " << E.what() << "  name: " << E.name() << std::endl;
             Logger_.log(E);
         }
         return false;
@@ -325,6 +363,24 @@ namespace uCentral {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Insert(Sess);
 
+            return true;
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        return false;
+    }
+
+    bool Storage::SetLastLogin(std::string &Id) {
+        try {
+            Poco::Data::Session Sess = Pool_->get();
+            Poco::Data::Statement Update(Sess);
+
+            std::string     St1{"update users set lastLogin=? where id=?"};
+            uint64_t Now=std::time(nullptr);
+            Update << ConvertParams(St1),
+                    Poco::Data::Keywords::use(Now),
+                    Poco::Data::Keywords::use(Id);
+            Update.execute();
             return true;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);

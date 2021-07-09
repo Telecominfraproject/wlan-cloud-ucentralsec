@@ -92,6 +92,9 @@ namespace uCentral {
                 return;
             }
 
+            if(UInfo.name.empty())
+                UInfo.name = UInfo.email;
+
             if(!Storage()->CreateUser(UserInfo_.userinfo.name,UInfo)) {
                 Logger_.information(Poco::format("Could not add user '%s'.",UInfo.email));
                 BadRequest(Request, Response);
@@ -178,6 +181,6 @@ namespace uCentral {
         } catch( const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest(Request, Response, "Request rejected.");
     }
 }
