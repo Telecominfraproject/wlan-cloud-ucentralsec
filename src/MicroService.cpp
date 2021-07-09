@@ -451,12 +451,25 @@ namespace uCentral {
 		return false;
 	}
 
+	void MicroService::SavePID() {
+		try {
+			std::ofstream O;
+			O.open(Daemon()->DataDir() + "/pidfile",std::ios::binary | std::ios::trunc);
+			O << Poco::Process::id();
+			O.close();
+		} catch (...)
+		{
+			std::cout << "Could not save system ID" << std::endl;
+		}
+	}
+
 	int MicroService::main(const ArgVec &args) {
 
 		MyErrorHandler	ErrorHandler(*this);
 		Poco::ErrorHandler::set(&ErrorHandler);
 
 		if (!HelpRequested_) {
+			SavePID();
 			Poco::Logger &logger = Poco::Logger::get(DAEMON_APP_NAME);
 			logger.notice(Poco::format("Starting %s version %s.",DAEMON_APP_NAME, Version()));
 

@@ -22,6 +22,7 @@
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/SHA2Engine.h"
 #include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Process.h"
 
 #include "uCentralTypes.h"
 #include "SubSystemServer.h"
@@ -128,6 +129,9 @@ namespace uCentral {
 		[[nodiscard]] MicroServiceMetaVec GetServices(const std::string & type);
 		[[nodiscard]] MicroServiceMetaVec GetServices();
 		[[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
+
+		void SavePID();
+		inline uint64_t GetPID() { return Poco::Process::id(); };
 
 	  private:
 		bool                        HelpRequested_ = false;
