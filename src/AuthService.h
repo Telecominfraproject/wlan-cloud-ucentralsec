@@ -69,7 +69,7 @@ namespace uCentral{
 
         [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo);
         [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
-        [[nodiscard]] std::string GenerateToken(const std::string & UserName, ACCESS_TYPE Type, int NumberOfDays);
+        [[nodiscard]] std::string GenerateToken(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  );
         [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);

@@ -120,7 +120,7 @@ namespace uCentral {
         }
     }
 
-    std::string AuthService::GenerateToken(const std::string & Identity, ACCESS_TYPE Type, int NumberOfDays) {
+    std::string AuthService::GenerateToken(const std::string & Identity, ACCESS_TYPE Type) {
 		SubMutexGuard		Guard(Mutex_);
 
 		Poco::JWT::Token	T;
@@ -134,7 +134,7 @@ namespace uCentral {
 
 		T.payload().set("identity", Identity);
 		T.setIssuedAt(Poco::Timestamp());
-		T.setExpiration(Poco::Timestamp() + Poco::Timespan(NumberOfDays,0,0,0,0));
+		T.setExpiration(Poco::Timestamp() + (long long)TokenAging_);
 		std::string JWT = Signer_.sign(T,Poco::JWT::Signer::ALGO_RS256);
 
 		return JWT;
@@ -145,27 +145,33 @@ namespace uCentral {
 		Poco::JWT::Token	DecryptedToken;
 
 		try {
-			if (Signer_.tryVerify(Token, DecryptedToken)) {
-				auto Expires = DecryptedToken.getExpiration();
-				if (Expires > Poco::Timestamp()) {
-					auto Identity = DecryptedToken.payload().get("identity").toString();
-					auto IssuedAt = DecryptedToken.getIssuedAt();
-					auto Subject = DecryptedToken.getSubject();
+            auto E = UserCache_.find(SessionToken);
+            if(E == UserCache_.end()) {
+                if (Signer_.tryVerify(Token, DecryptedToken)) {
+                    auto Expires = DecryptedToken.getExpiration();
+                    if (Expires > Poco::Timestamp()) {
+                        auto Identity = DecryptedToken.payload().get("identity").toString();
+                        if(Storage()->GetUserById(Identity,UInfo.userinfo)) {
+                            auto IssuedAt = DecryptedToken.getIssuedAt();
+                            auto Subject = DecryptedToken.getSubject();
+                            UInfo.webtoken.access_token_ = Token;
+                            UInfo.webtoken.refresh_token_ = Token;
+                            UInfo.webtoken.username_ = Identity;
+                            UInfo.webtoken.id_token_ = Token;
+                            UInfo.webtoken.token_type_ = "Bearer";
+                            UInfo.webtoken.created_ = IssuedAt.epochTime();
+                            UInfo.webtoken.expires_in_ = Expires.epochTime() - IssuedAt.epochTime();
+                            UInfo.webtoken.idle_timeout_ = 5 * 60;
+                            UserCache_[UInfo.webtoken.access_token_] = UInfo;
+                            return true;
+                        }
+                    }
+                }
+            } else {
+                UInfo = E->second;
+                return true;
+            }
 
-                    UInfo.webtoken.access_token_ = Token;
-                    UInfo.webtoken.refresh_token_= Token;
-                    UInfo.webtoken.username_ = Identity;
-                    UInfo.webtoken.id_token_ = Token;
-                    UInfo.webtoken.token_type_ = "Bearer";
-                    UInfo.webtoken.created_ = IssuedAt.epochTime();
-                    UInfo.webtoken.expires_in_ = Expires.epochTime() - IssuedAt.epochTime();
-                    UInfo.webtoken.idle_timeout_ = 5*60;
-
-                    UserCache_[UInfo.webtoken.access_token_] = UInfo;
-
-					return true;
-				}
-			}
 		} catch (const Poco::Exception &E ) {
 			Logger_.log(E);
 		}
@@ -176,7 +182,7 @@ namespace uCentral {
     {
 		SubMutexGuard		Guard(Mutex_);
 
-		std::string Token = GenerateToken(UserName,USERNAME,30);
+		std::string Token = GenerateToken(UInfo.userinfo.Id,USERNAME);
         SecurityObjects::AclTemplate	ACL;
         ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
         UInfo.webtoken.acl_template_ = ACL;
