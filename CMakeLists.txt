@@ -38,17 +38,15 @@ add_definitions(-DTIP_SECURITY_SERVICE="1")
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-
 find_package(Boost REQUIRED system)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
+
 find_package(CppKafka REQUIRED)
 find_package(PostgreSQL REQUIRED)
 find_package(MySQL REQUIRED)
 find_package(ODBC REQUIRED)
 find_package(Poco REQUIRED COMPONENTS JSON Crypto JWT Net Util NetSSL Data DataSQLite DataPostgreSQL DataMySQL DataODBC)
-
-include_directories(/usr/local/include  /usr/local/opt/openssl/include src include/kafka /usr/local/opt/mysql-client/include)
 
 add_executable( ucentralsec
                 build
@@ -74,5 +72,12 @@ add_executable( ucentralsec
                 src/RESTAPI_validateToken_handler.cpp src/RESTAPI_validateToken_handler.h
                 src/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI_systemEndpoints_handler.h)
 
-target_link_libraries(ucentralsec PUBLIC
-        ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${AWSSDK_LINK_LIBRARIES} CppKafka::cppkafka )
+if(NOT SMALL_BUILD)
+    target_link_libraries(ucentralsec PUBLIC
+            ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES} ${ODBC_LIBRARIES} ${ZLIB_LIBRARIES} ${LUA_LIBRARIES}
+            CppKafka::cppkafka
+            )
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(ucentralsec PUBLIC PocoJSON)
+    endif()
+endif()
