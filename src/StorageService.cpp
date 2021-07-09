@@ -48,7 +48,6 @@ namespace uCentral {
 		Logger_.setLevel(Poco::Message::PRIO_NOTICE);
         Logger_.notice("Starting.");
         std::string DBType = Daemon()->ConfigGetString("storage.type");
-
         if (DBType == "sqlite") {
             Setup_SQLite();
         } else if (DBType == "postgresql") {

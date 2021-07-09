@@ -30,6 +30,7 @@ namespace uCentral {
 			std::string SerialNumber, Filter, Select;
 			bool Lifetime=false, LastOnly=false, Newest=false;
 		};
+
 		typedef std::map<std::string, std::string> BindingMap;
 
 		RESTAPIHandler(BindingMap map, Poco::Logger &l, std::vector<std::string> Methods)
@@ -61,7 +62,7 @@ namespace uCentral {
 		std::string GetParameter(const std::string &Name, const std::string &Default);
 		bool GetBoolParameter(const std::string &Name, bool Default);
 
-		void BadRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);
+		void BadRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response, const std::string &Reason = "");
 		void UnAuthorized(Poco::Net::HTTPServerRequest &Request,
 						  Poco::Net::HTTPServerResponse &Response);
 		void ReturnObject(Poco::Net::HTTPServerRequest &Request, Poco::JSON::Object &Object,
@@ -87,7 +88,7 @@ namespace uCentral {
 		BindingMap 					Bindings_;
 		Poco::URI::QueryParameters 	Parameters_;
 		Poco::Logger 				&Logger_;
-		std::string 				        SessionToken_;
+		std::string 				SessionToken_;
 		SecurityObjects::UserInfoAndPolicy 	UserInfo_;
 		std::vector<std::string> 	Methods_;
 		QueryBlock					QB_;

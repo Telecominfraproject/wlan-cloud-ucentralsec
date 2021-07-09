@@ -11,6 +11,7 @@
 #include "AuthService.h"
 #include "RESTAPI_oauth2Handler.h"
 #include "RESTAPI_protocol.h"
+#include "Utils.h"
 
 namespace uCentral {
 	void RESTAPI_oauth2Handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
@@ -21,19 +22,18 @@ namespace uCentral {
 
 		try {
 			if (Request.getMethod() == Poco::Net::HTTPServerRequest::HTTP_POST) {
-
 				// Extract the info for login...
 				Poco::JSON::Parser parser;
-				Poco::JSON::Object::Ptr Obj =
-					parser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+				Poco::JSON::Object::Ptr Obj = parser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
 
 				auto userId = GetS(uCentral::RESTAPI::Protocol::USERID, Obj);
 				auto password = GetS(uCentral::RESTAPI::Protocol::PASSWORD, Obj);
+				auto newPassword = GetS(uCentral::RESTAPI::Protocol::NEWPASSWORD, Obj);
 
 				Poco::toLowerInPlace(userId);
                 SecurityObjects::UserInfoAndPolicy UInfo;
 
-				if (AuthService()->Authorize(userId, password, UInfo)) {
+				if (AuthService()->Authorize(userId, password, newPassword, UInfo)) {
 					Poco::JSON::Object ReturnObj;
                     UInfo.webtoken.to_json(ReturnObj);
 					ReturnObject(Request, ReturnObj, Response);

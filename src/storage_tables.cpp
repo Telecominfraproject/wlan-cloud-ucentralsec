@@ -3,10 +3,12 @@
 //
 
 #include "StorageService.h"
+#include "Utils.h"
 
 namespace uCentral {
 
     int Storage::Create_Tables() {
+        Create_UserTable();
         return 0;
     }
 
@@ -14,70 +16,15 @@ namespace uCentral {
         Poco::Data::Session Sess = Pool_->get();
 
         try {
-
             if (dbType_ == mysql) {
-                Sess << "CREATE TABLE IF NOT EXISTS Users ("
-                        "Id     Id unique primary key, "
-                        "name   varchar, "
-                        "description varchar, "
-                        "avatar varchar, "
-                        "email  varchar, "
-                        "validated int, "
-                        "validationEmail varchar, "
-                        "validationDate bigint, "
-                        "creationDate bigint, "
-                        "validationURI text, "
-                        "changePassword int, "
-                        "lastLogin bigint, "
-                        "currentLoginURI varchar, "
-                        "lastPasswordChange bigint, "
-                        "lastEmailCheck bigint, "
-                        "currentPassword varchar, "
-                        "lastPasswords varchar,"
-                        "waitingForEmailCheck int, "
-                        "locale varchar, "
-                        "notes text, "
-                        "location text, "
-                        "owner varchar, "
-                        "suspended int, "
-                        "blackListed int, "
-                        "userRole varchar, "
-                        "securityPolicy text, "
-                        "securityPolicyChange bigint, "
-                        "userTypeProprietaryInfo text"
+                Sess << "CREATE TABLE IF NOT EXISTS Users (" +
+                        AllUsersFieldsForCreation +
                         " ,INDEX emailindex (email ASC)"
                         " ,INDEX nameindex (name ASC))",
                         Poco::Data::Keywords::now;
             } else {
-                Sess << "CREATE TABLE IF NOT EXISTS Users ("
-                        "Id     Id unique primary key, "
-                        "name   varchar, "
-                        "description varchar, "
-                        "avatar varchar, "
-                        "email  varchar, "
-                        "validated int, "
-                        "validationEmail varchar, "
-                        "validationDate bigint, "
-                        "creationDate bigint, "
-                        "validationURI text, "
-                        "changePassword int, "
-                        "lastLogin bigint, "
-                        "currentLoginURI varchar, "
-                        "lastPasswordChange bigint, "
-                        "lastEmailCheck bigint, "
-                        "currentPassword varchar, "
-                        "lastPasswords varchar,"
-                        "waitingForEmailCheck int, "
-                        "locale varchar, "
-                        "notes text, "
-                        "location text, "
-                        "owner varchar, "
-                        "suspended int, "
-                        "blackListed int, "
-                        "userRole varchar, "
-                        "securityPolicy text, "
-                        "securityPolicyChange bigint, "
-                        "userTypeProprietaryInfo text"
+                Sess << "CREATE TABLE IF NOT EXISTS Users (" +
+                        AllUsersFieldsForCreation +
                         ")",
                         Poco::Data::Keywords::now;
                 Sess << "CREATE INDEX IF NOT EXISTS emailindex ON Users (email ASC)", Poco::Data::Keywords::now;

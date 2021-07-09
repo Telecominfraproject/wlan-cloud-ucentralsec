@@ -154,16 +154,6 @@ namespace uCentral {
                     UInfo.webtoken.expires_in_ = Expires.epochTime() - IssuedAt.epochTime();
                     UInfo.webtoken.idle_timeout_ = 5*60;
 
-					if(Storage()->GetIdentityRights(Identity, UInfo.webtoken.acl_template_)) {
-					} else {
-						//	we can get in but we have no given rights... something is very wrong
-						UInfo.webtoken.acl_template_.Read_ = true ;
-                        UInfo.webtoken.acl_template_.ReadWriteCreate_ =
-                        UInfo.webtoken.acl_template_.ReadWrite_ =
-                        UInfo.webtoken.acl_template_.Delete_ = false;
-                        UInfo.webtoken.acl_template_.PortalLogin_ = true;
-					}
-
                     UserCache_[UInfo.webtoken.access_token_] = UInfo;
 
 					return true;
@@ -180,6 +170,9 @@ namespace uCentral {
 		SubMutexGuard		Guard(Mutex_);
 
 		std::string Token = GenerateToken(UserName,USERNAME,30);
+        SecurityObjects::AclTemplate	ACL;
+        ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
+        UInfo.webtoken.acl_template_ = ACL;
         UInfo.webtoken.expires_in_ = 30 * 24 * 60 * 60 ;
         UInfo.webtoken.idle_timeout_ = 5 * 60;
         UInfo.webtoken.token_type_ = "Bearer";
@@ -188,36 +181,69 @@ namespace uCentral {
         UInfo.webtoken.refresh_token_ = Token;
         UInfo.webtoken.created_ = time(nullptr);
         UInfo.webtoken.username_ = UserName;
-
+        UInfo.webtoken.errorCode = 0;
+        UInfo.webtoken.userMustChangePassword = false;
         UserCache_[Token] = UInfo;
     }
 
-    bool AuthService::Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::UserInfoAndPolicy & UInfo )
+    bool AuthService::SetPassword(const std::string &NewPassword, SecurityObjects::UserInfo & UInfo) {
+        auto NewPasswordHash = ComputePasswordHash(UInfo.email, NewPassword);
+        for (auto const &i:UInfo.lastPasswords) {
+            if (i == NewPasswordHash) {
+                return false;
+            }
+        }
+        if(UInfo.lastPasswords.size()==5) {
+            UInfo.lastPasswords.erase(UInfo.lastPasswords.begin());
+        }
+        UInfo.lastPasswords.push_back(NewPasswordHash);
+        UInfo.currentPassword = NewPasswordHash;
+        return true;
+    }
+
+    bool AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
 		SubMutexGuard					Guard(Mutex_);
         SecurityObjects::AclTemplate	ACL;
 
-		if(Mechanism_=="internal")
-        {
-            if(((UserName == DefaultUserName_) && (DefaultPassword_== ComputePasswordHash(UserName,Password))) || !Secure_)
-            {
-                ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
-                UInfo.webtoken.acl_template_ = ACL;
-                UInfo.userinfo.email = DefaultUserName_;
-                UInfo.userinfo.currentPassword = DefaultPassword_;
-                UInfo.userinfo.name = DefaultUserName_;
-                CreateToken(UserName, UInfo );
+        Poco::toLowerInPlace(UserName);
+        auto PasswordHash = ComputePasswordHash(UserName, Password);
+
+        if(Storage()->GetUserByEmail(UserName,UInfo.userinfo)) {
+            if(PasswordHash != UInfo.userinfo.currentPassword) {
+                return false;
+            }
+
+            if(UInfo.userinfo.changePassword && NewPassword.empty()) {
+                UInfo.webtoken.userMustChangePassword = true ;
                 return true;
             }
-        } else if (Mechanism_=="db") {
-			auto PasswordHash = ComputePasswordHash(UserName, Password);
 
-			std::string TUser{UserName};
-			if(Storage()->GetIdentity(TUser,PasswordHash,USERNAME,ACL)) {
-				CreateToken(UserName, UInfo);
-				return true;
-			}
-		}
+            if(UInfo.userinfo.changePassword || !NewPassword.empty()) {
+                if(!SetPassword(NewPassword,UInfo.userinfo)) {
+                    UInfo.webtoken.errorCode = 1;
+                    return true;
+                }
+                UInfo.userinfo.lastPasswordChange = std::time(nullptr);
+                UInfo.userinfo.changePassword = false;
+                Storage()->UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
+            }
+
+            //  so we have a good password, password up date has taken place if need be, now generate the token.
+            CreateToken(UserName, UInfo );
+            return true;
+        }
+
+        if(((UserName == DefaultUserName_) && (DefaultPassword_== ComputePasswordHash(UserName,Password))) || !Secure_)
+        {
+            ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
+            UInfo.webtoken.acl_template_ = ACL;
+            UInfo.userinfo.email = DefaultUserName_;
+            UInfo.userinfo.currentPassword = DefaultPassword_;
+            UInfo.userinfo.name = DefaultUserName_;
+            CreateToken(UserName, UInfo );
+            return true;
+        }
         return false;
     }
 
@@ -228,7 +254,6 @@ namespace uCentral {
     }
 
     bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo) {
-
         return true;
     }
 

@@ -21,6 +21,8 @@
 
 namespace uCentral{
 
+    static const std::string AUTHENTICATION_SYSTEM{"SYSTEM"};
+
     class AuthService : public SubSystemServer {
     public:
 
@@ -44,9 +46,10 @@ namespace uCentral{
         void Stop() override;
 
         [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo );
-        [[nodiscard]] bool Authorize( const std::string & UserName, const std::string & Password, SecurityObjects::UserInfoAndPolicy & UInfo );
+        [[nodiscard]] bool Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo );
         void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UserInfo  );
+        [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
 
         void Logout(const std::string &token);
 

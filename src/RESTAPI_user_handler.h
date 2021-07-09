@@ -20,7 +20,10 @@ namespace uCentral {
                                           Poco::Net::HTTPRequest::HTTP_OPTIONS}) {}
         void handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) override;
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/user/{id}"}; };
-
+        void DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);
+        void DoDelete(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);
+        void DoPost(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);
+        void DoPut(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);
     private:
 
     };

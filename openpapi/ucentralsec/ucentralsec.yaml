@@ -35,54 +35,41 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GenericErrorResponse'
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
 
     Unauthorized:
       description: The requested does not have sufficient rights to perform the operation.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GenericErrorResponse'
+            properties:
+              ErrorCode:
+                type: integer
+              ErrorDetails:
+                type: string
+              ErrorDescription:
+                type: string
 
     Success:
       description: The requested operation was performed.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GenericGoodAnswer'
-
-    CommandSubmitSuccess:
-      description: The command was submitted succesfully.
-      content:
-        application/json:
-          schema:
             properties:
-              serialNumber:
+              Operation:
                 type: string
-              UUID:
+              Details:
                 type: string
-                format: uuid
+              Code:
+                type: integer
 
   schemas:
-    GenericErrorResponse:
-      description: Typical error response
-      properties:
-        ErrorCode:
-          type: integer
-        ErrorDetails:
-          type: string
-        ErrorDescription:
-          type: string
-
-    GenericGoodAnswer:
-      description: used for all succesful responses.
-      properties:
-        Operation:
-          type: string
-        Details:
-          type: string
-        Code:
-          type: integer
 
     WebTokenRequest:
       description: User Id and password.
@@ -95,25 +82,6 @@ components:
           type: string
           default: support@example.com
         password:
-          type: string
-          default: support
-        refreshToken:
-          type: string
-      example:
-        userId: support@example.com
-        password: support
-
-    WebTokenRequestChangePassword:
-      description: User Id and password.
-      type: object
-      required:
-        - userId
-        - password
-      properties:
-        userId:
-          type: string
-          default: support@example.com
-        oldPassword:
           type: string
           default: support
         newPassword:
@@ -148,6 +116,8 @@ components:
           format: int64
         userMustChangePassword:
           type: boolean
+        errorCode:
+          type: integer     # 0 = no error, 1 = passwordAlreadyUsed, 2=invalidPassword
         aclTemplate:
           $ref: '#/components/schemas/WebTokenAclTemplate'
 
@@ -230,8 +200,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         name:
           type: string
         description:
@@ -241,10 +211,12 @@ components:
           format: uri
         email:
           type: string
+          format: email
         validated:
           type: boolean
         validationEmail:
           type: string
+          format: email
         validationDate:
           type: integer
           format: int64
@@ -319,7 +291,7 @@ components:
     UserList:
       type: object
       properties:
-        list:
+        users:
           type: array
           items:
             $ref: '#/components/schemas/UserInfo'
@@ -401,6 +373,7 @@ components:
         access:
           type: string
           enum:
+            - NONE
             - READ
             - MODIFY
             - DELETE
@@ -482,7 +455,7 @@ paths:
       operationId: getAccessToken
       parameters:
         - in: query
-          name: changePassword
+          name: newPassword
           schema:
             type: string
           required: false
@@ -492,9 +465,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/WebTokenRequestChangePassword'
-                - $ref: '#/components/schemas/WebTokenRequest'
+              $ref: '#/components/schemas/WebTokenRequest'
       responses:
         200:
           description: successful operation
@@ -526,7 +497,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GenericGoodAnswer'
+                $ref: '#/components/responses/Success'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -593,8 +564,8 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           required: true
       responses:
         200:

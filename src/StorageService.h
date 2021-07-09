@@ -25,6 +25,71 @@
 
 namespace uCentral {
 
+    static const std::string AllUsersFieldsForCreation{
+            "Id             varchar(36),"
+            "name           varchar,"
+            "description    varchar,"
+            "avatar         varchar,"
+            "email          varchar,"
+            "validated      int,"
+            "validationEmail    varchar,"
+            "validationDate bigint,"
+            "creationDate   bigint,"
+            "validationURI  varchar,"
+            "changePassword int,"
+            "lastLogin      bigint,"
+            "currentLoginURI    varchar,"
+            "lastPasswordChange bigint,"
+            "lastEmailCheck     bigint,"
+            "waitingForEmailCheck   int,"
+            "locale             varchar,"
+            "notes              text,"
+            "location           varchar,"
+            "owner              varchar,"
+            "suspended          int,"
+            "blackListed        int,"
+            "userRole           varchar,"
+            "userTypeProprietaryInfo    text,"
+            "securityPolicy     text,"
+            "securityPolicyChange   bigint,"
+            "currentPassword    varchar,"
+            "lastPasswords      varchar,"
+            "oauthType          varchar,"
+            "oauthUserInfo      text"};
+
+    static const std::string AllUsersFieldsForSelect{
+            "Id,"
+            "name,"
+            "description,"
+            "avatar,"
+            "email,"
+            "validated,"
+            "validationEmail,"
+            "validationDate,"
+            "creationDate,"
+            "validationURI,"
+            "changePassword,"
+            "lastLogin,"
+            "currentLoginURI,"
+            "lastPasswordChange,"
+            "lastEmailCheck,"
+            "waitingForEmailCheck,"
+            "locale,"
+            "notes,"
+            "location,"
+            "owner,"
+            "suspended,"
+            "blackListed,"
+            "userRole,"
+            "userTypeProprietaryInfo,"
+            "securityPolicy,"
+            "securityPolicyChange,"
+            "currentPassword,"
+            "lastPasswords,"
+            "oauthType,"
+            "oauthUserInfo"};
+
+
     class Storage : public SubSystemServer {
 
     public:
@@ -42,12 +107,15 @@ namespace uCentral {
             PASSWORD_DOES_NOT_MATCH,
             PASSWORD_ALREADY_USED,
             USERNAME_PENDING_VERIFICATION,
-            PASSWORD_INVALID
+            PASSWORD_INVALID,
+            INTERNAL_ERROR
         };
 
         enum USER_TYPE {
             UNKNOWN, ROOT, ADMIN, SUBSCRIBER, CSR, SYSTEM, SPECIAL
         };
+
+        typedef std::string USER_ID_TYPE;
 
         static USER_TYPE to_userType(const std::string &U) {
             if (U=="root")
@@ -90,45 +158,16 @@ namespace uCentral {
 
         //  all passwords passed here are all plaintext
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser);
-        bool DeleteUser(const std::string & Admin, uint64_t Id);
-        bool SetOwner(const std::string & Admin, uint64_t Id, const std::string &Owner);
-        bool SetLocation(const std::string & Admin, uint64_t Id, const std::string &Location);
-        AUTH_ERROR ChangePassword(const std::string & Admin, uint64_t Id, const std::string &OldPassword, const std::string &NewPassword);
-        bool AddNotes(const std::string & Admin, uint64_t Id, const std::string &Notes);
-        bool SetPolicyChange(const std::string & Admin, const std::string &NewPolicy);
-
-
-
-
-
-
-
-
-
-
-
-
-        bool IdentityExists(std::string & Identity, AuthService::ACCESS_TYPE Type);
-        bool AddIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL);
-        bool GetIdentity(std::string & Identity, std::string & Password,AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL);
-        bool UpdateIdentity(std::string & Identity, std::string & Password, AuthService::ACCESS_TYPE Type, SecurityObjects::AclTemplate & ACL);
-        bool DeleteIdentity(std::string & Identity, AuthService::ACCESS_TYPE Type);
-        bool ListIdentities(uint64_t Offset, uint64_t HowMany, std::vector<std::string> & Identities, AuthService::ACCESS_TYPE Type);
-        bool GetIdentityRights(std::string &Identity, SecurityObjects::AclTemplate &ACL);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        bool GetUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
+        bool GetUserById(USER_ID_TYPE & Id, SecurityObjects::UserInfo & User);
+        bool DeleteUser(const std::string & Admin, USER_ID_TYPE & Id);
+        bool SetOwner(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Owner);
+        bool SetLocation(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Location);
+        AUTH_ERROR ChangePassword(const std::string & Admin, USER_ID_TYPE & Id, const std::string &OldPassword, const std::string &NewPassword);
+        bool AddNotes(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Notes);
+        bool SetPolicyChange(const std::string & Admin, USER_ID_TYPE & Id, const std::string &NewPolicy);
+        bool UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
+        bool GetUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
 
 	  private:
 		static Storage      							*instance_;

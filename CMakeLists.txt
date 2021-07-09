@@ -64,7 +64,6 @@ add_executable( ucentralsec
                 src/AuthService.h src/AuthService.cpp
                 src/KafkaManager.h src/KafkaManager.cpp
                 src/StorageService.cpp src/StorageService.h
-                src/storage_identity.cpp
                 src/Utils.cpp src/Utils.h
                 src/storage_sqlite.cpp src/storage_odbc.cpp src/storage_sqlite.cpp src/storage_pgql.cpp src/storage_mysql.cpp
                 src/storage_tables.cpp src/SMTPMailerService.cpp src/SMTPMailerService.h
