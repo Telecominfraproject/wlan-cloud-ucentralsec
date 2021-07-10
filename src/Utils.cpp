@@ -18,7 +18,6 @@
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/StringTokenizer.h"
-#include "Poco/Logger.h"
 #include "Poco/Message.h"
 #include "Poco/File.h"
 #include "Poco/StreamCopier.h"

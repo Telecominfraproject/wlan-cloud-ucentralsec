@@ -43,14 +43,6 @@ namespace uCentral {
             RESTAPI_PartHandler PartHandler;
             Poco::Net::HTMLForm Form(Request, Request.stream(), PartHandler);
             if (!Form.empty()) {
-                /*
-                auto it = Form.begin();
-                auto end = Form.end();
-                for (; it != end; ++it)
-                {
-                    std::cout << it->first << ": " << it->second << std::endl;
-                }
-                */
                 auto Password1 = Form.get("password1","bla");
                 auto Password2 = Form.get("password1","blu");
                 Id = Form.get("id","");
@@ -74,6 +66,14 @@ namespace uCentral {
                     return;
                 }
 
+                if(UInfo.blackListed || UInfo.suspended) {
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                      {"ERROR_TEXT", "Please contact our system administrators. We have identified an error in your account that must be resolved first."}};
+                    SendHTMLFileBack(FormFile,Request, Response, FormVars);
+                    return;
+                }
+
                 if(!AuthService()->SetPassword(Password1,UInfo)) {
                     Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
                     Types::StringPairVec    FormVars{ {"UUID", Id},
@@ -87,25 +87,45 @@ namespace uCentral {
                                                   {"USERNAME", UInfo.email}};
                 SendHTMLFileBack(FormFile,Request, Response, FormVars);
             }
+        } else {
+            DoReturnA404(Request, Response);
         }
     }
 
     void RESTAPI_action_links::DoEmailVerification(std::string &Id,Poco::Net::HTTPServerRequest &Request,
                              Poco::Net::HTTPServerResponse &Response) {
         if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_GET) {
-            //  draw the  form
-        } else if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_POST) {
-            //  form has been posted...
+            SecurityObjects::UserInfo UInfo;
+
+            if (!Storage()->GetUserById(Id, UInfo)) {
+                Types::StringPairVec FormVars{{"UUID",       Id},
+                                              {"ERROR_TEXT", "This does not appear to be a valid email verification link.."}};
+
+                Poco::File FormFile{RESTAPI_Server()->AssetDir() + "/email_verification_error.html"};
+                SendHTMLFileBack(FormFile, Request, Response, FormVars);
+                return;
+            }
+
+            UInfo.waitingForEmailCheck = false;
+            UInfo.validated = true;
+            UInfo.lastEmailCheck = std::time(nullptr);
+            UInfo.validationDate = std::time(nullptr);
+            Storage()->UpdateUserInfo(UInfo.email, Id, UInfo);
+            Types::StringPairVec FormVars{{"UUID",     Id},
+                                          {"USERNAME", UInfo.email}};
+            Poco::File FormFile{RESTAPI_Server()->AssetDir() + "/email_verification_success.html"};
+            SendHTMLFileBack(FormFile, Request, Response, FormVars);
+            return;
+        } else {
+            DoReturnA404(Request, Response);
         }
     }
 
     void RESTAPI_action_links::DoReturnA404(Poco::Net::HTTPServerRequest &Request,
                                             Poco::Net::HTTPServerResponse &Response) {
-        if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_GET) {
-            //  draw the  form
-        } else if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_POST) {
-            //  form has been posted...
-        }
+        Types::StringPairVec FormVars;
+        Poco::File FormFile{RESTAPI_Server()->AssetDir() + "/404_error.html"};
+        SendHTMLFileBack(FormFile, Request, Response, FormVars);
     }
 
 }
