@@ -32,11 +32,13 @@ namespace uCentral {
 
         int Start() override;
         void Stop() override;
+        inline const std::string & AssetDir() { return AsserDir_; }
 
     private:
 		static RESTAPI_Server *instance_;
         std::vector<std::unique_ptr<Poco::Net::HTTPServer>>   RESTServers_;
 		Poco::ThreadPool	Pool_;
+		std::string         AsserDir_;
     };
 
     inline RESTAPI_Server * RESTAPI_Server() { return RESTAPI_Server::instance(); };

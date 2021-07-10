@@ -3,9 +3,89 @@
 //
 
 #include "RESTAPI_action_links.h"
+#include "StorageService.h"
+#include "Utils.h"
+#include "RESTAPI_utils.h"
+
+#include "Poco/JSON/Parser.h"
+#include "Poco/Net/HTMLForm.h"
+#include "RESTAPI_server.h"
 
 namespace uCentral {
-    void RESTAPI_action_links:: handleRequest(Poco::Net::HTTPServerRequest &Request,
+    void RESTAPI_action_links::handleRequest(Poco::Net::HTTPServerRequest &Request,
                        Poco::Net::HTTPServerResponse &Response) {
+        //  there is no authentication here, this is just someone clicking on a link
+        //  and arriving here. There should be a UUID in the link and this is all we need to know
+        //  what we need to do.
+        ParseParameters(Request);
+
+        auto Action = GetParameter("action","");
+        auto Id = GetParameter("id","");
+
+        if(Action=="reset_password")
+            DoResetPassword(Id, Request, Response);
+        else if(Action=="emailVerification")
+            DoEmailVerification(Id, Request, Response);
+        else
+            DoReturnA404(Request, Response);
     }
+
+    void RESTAPI_action_links::DoResetPassword(std::string &Id,Poco::Net::HTTPServerRequest &Request,
+                         Poco::Net::HTTPServerResponse &Response) {
+
+        if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_GET) {
+            Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password.html"};
+            Types::StringPairVec    FormVars{ {"UUID", Id},
+                                              {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
+            SendHTMLFileBack(FormFile,Request, Response, FormVars);
+        } else if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_POST) {
+            //  form has been posted...
+            RESTAPI_PartHandler PartHandler;
+            Poco::Net::HTMLForm Form(Request, Request.stream(), PartHandler);
+            if (!Form.empty()) {
+                auto it = Form.begin();
+                auto end = Form.end();
+                for (; it != end; ++it)
+                {
+                    std::cout << it->first << ": " << it->second << std::endl;
+                }
+                auto Password1 = Form.get("password1","bla");
+                auto Password2 = Form.get("password1","blu");
+                Id = Form.get("id","");
+
+                if(Password1!=Password2 || !AuthService()->ValidatePassword(Password2) || !AuthService()->ValidatePassword(Password1)) {
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                      {"ERROR_TEXT", "For some reason, the passwords entered do not match or they do not comply with"
+                                                                     " accepted password creation restrictions. Please consult our on-line help"
+                                                                     " to look at the our password policy. If you would like to contact us, please mention"
+                                                                     " id(" + Id + ")"}};
+                    SendHTMLFileBack(FormFile,Request, Response, FormVars);
+                    return;
+                }
+                Types::StringPairVec    FormVars{ {"UUID", Id}};
+                Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_success.html"};
+                SendHTMLFileBack(FormFile,Request, Response, FormVars);
+            }
+        }
+    }
+
+    void RESTAPI_action_links::DoEmailVerification(std::string &Id,Poco::Net::HTTPServerRequest &Request,
+                             Poco::Net::HTTPServerResponse &Response) {
+        if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_GET) {
+            //  draw the  form
+        } else if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_POST) {
+            //  form has been posted...
+        }
+    }
+
+    void RESTAPI_action_links::DoReturnA404(Poco::Net::HTTPServerRequest &Request,
+                                            Poco::Net::HTTPServerResponse &Response) {
+        if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_GET) {
+            //  draw the  form
+        } else if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_POST) {
+            //  form has been posted...
+        }
+    }
+
 }

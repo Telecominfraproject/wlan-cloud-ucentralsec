@@ -50,7 +50,7 @@ namespace uCentral {
         DefaultPassword_ = Daemon()->ConfigGetString("authentication.default.password","");
         DefaultUserName_ = Daemon()->ConfigGetString("authentication.default.username","");
         Mechanism_ = Daemon()->ConfigGetString("authentication.service.type","internal");
-        PasswordValidation_ = Daemon()->ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        PasswordValidation_ = PasswordValidationStr_ = Daemon()->ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
         TokenAging_ = (uint64_t) Daemon()->ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
         HowManyOldPassword_ = Daemon()->ConfigGetInt("authentication.oldpasswords", 5);
         return 0;

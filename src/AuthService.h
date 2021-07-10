@@ -62,7 +62,7 @@ namespace uCentral{
         void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UserInfo  );
         [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
-
+        [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
         void Logout(const std::string &token);
 
         bool ValidatePassword(const std::string &pwd);
@@ -84,6 +84,7 @@ namespace uCentral{
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
 		SecurityObjects::UserInfoCache UserCache_;
+        std::string          PasswordValidationStr_;
 		std::regex          PasswordValidation_;
 		uint64_t            TokenAging_ = 30 * 24 * 60 * 60;
         uint64_t            HowManyOldPassword_=5;

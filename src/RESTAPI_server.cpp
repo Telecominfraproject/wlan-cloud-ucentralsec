@@ -6,6 +6,8 @@
 //	Arilia Wireless Inc.
 //
 
+#include <memory>
+
 #include "Poco/URI.h"
 
 #include "RESTAPI_server.h"
@@ -15,7 +17,9 @@
 #include "RESTAPI_users_handler.h"
 #include "RESTAPI_action_links.h"
 #include "RESTAPI_systemEndpoints_handler.h"
+#include "RESTAPI_AssetServer.h"
 
+#include "Daemon.h"
 #include "Utils.h"
 
 namespace uCentral {
@@ -28,6 +32,8 @@ namespace uCentral {
 
     int RESTAPI_Server::Start() {
         Logger_.information("Starting.");
+
+        AsserDir_ = Daemon()->ConfigPath("ucentral.restapi.wwwassets");
 
         for(const auto & Svr: ConfigServersList_) {
 			Logger_.information(Poco::format("Starting: %s:%s Keyfile:%s CertFile: %s", Svr.Address(), std::to_string(Svr.Port()),
@@ -65,6 +71,7 @@ namespace uCentral {
                 RESTAPI_users_handler,
                 RESTAPI_user_handler,
                 RESTAPI_system_command,
+                RESTAPI_AssetServer,
                 RESTAPI_systemEndpoints_handler,
                 RESTAPI_action_links
                 >(Path,Bindings,Logger_);

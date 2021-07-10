@@ -15,7 +15,7 @@ ucentral.restapi.host.0.port = 16001
 ucentral.restapi.host.0.cert = $UCENTRALSEC_ROOT/certs/restapi-cert.pem
 ucentral.restapi.host.0.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
 ucentral.restapi.host.0.key.password = mypassword
-
+ucentral.restapi.wwwassets = $UCENTRALSEC_ROOT/wwwassets
 ucentral.internal.restapi.host.0.backlog = 100
 ucentral.internal.restapi.host.0.security = relaxed
 ucentral.internal.restapi.host.0.rootca = $UCENTRALSEC_ROOT/certs/restapi-ca.pem

@@ -7,6 +7,13 @@
 
 
 #include "RESTAPI_handler.h"
+#include "Poco/Net/PartHandler.h"
+#include "Poco/Message.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/NullStream.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/CountingStream.h"
 
 namespace uCentral {
     class RESTAPI_action_links : public RESTAPIHandler {
@@ -19,7 +26,13 @@ namespace uCentral {
                                                             Poco::Net::HTTPRequest::HTTP_OPTIONS}) {}
         void handleRequest(Poco::Net::HTTPServerRequest &Request,
                            Poco::Net::HTTPServerResponse &Response) override;
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/actions"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/actionLink"}; };
+        void DoResetPassword(std::string &Id,Poco::Net::HTTPServerRequest &Request,
+                            Poco::Net::HTTPServerResponse &Response);
+        void DoEmailVerification(std::string &Id,Poco::Net::HTTPServerRequest &Request,
+                            Poco::Net::HTTPServerResponse &Response);
+        void DoReturnA404(Poco::Net::HTTPServerRequest &Request,
+                          Poco::Net::HTTPServerResponse &Response);
     };
 }
 

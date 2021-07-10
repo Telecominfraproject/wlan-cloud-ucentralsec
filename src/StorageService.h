@@ -121,6 +121,63 @@ namespace uCentral {
             "oauthType=?, "
             "oauthUserInfo=? "};
 
+    static const std::string AllActionLinksFieldsForCreation {
+            "Id          varchar(36),"
+            "Action         varchar,"
+            "UserId         varchar,"
+            "template       varchar,"
+            "locale         varchar,"
+            "message        text,"
+            "sent           bigint,"
+            "created        bigint,"
+            "expires        bigint,"
+            "completed      bigint,"
+            "canceled       bigint"
+    };
+
+    static const std::string AllActionLinksFieldsForSelect {
+            "Id, "
+            "Action,"
+            "UserId,"
+            "template,"
+            "locale,"
+            "message,"
+            "sent,"
+            "created,"
+            "expires,"
+            "completed,"
+            "canceled"
+    };
+
+    static const std::string AllActionLinksFieldsForUpdate {
+            "Id=?, "
+            "Action=?,"
+            "UserId=?,"
+            "template=?,"
+            "locale=?,"
+            "message=?,"
+            "sent=?,"
+            "created=?,"
+            "expires=?,"
+            "completed=?,"
+            "canceled=?"
+    };
+
+
+    static const std::string AllEmailTemplatesFieldsForCreation {
+
+    };
+
+    static const std::string AllEmailTemplatesFieldsForSelect {
+
+    };
+
+    static const std::string AllEmailTemplatesFieldsForUpdate {
+
+    };
+
+
+
 
     class Storage : public SubSystemServer {
 
@@ -188,7 +245,9 @@ namespace uCentral {
         int 	Start() override;
         void 	Stop() override;
 
-        //  all passwords passed here are all plaintext
+        /*
+         *  All user management functions
+         */
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser);
         bool GetUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
         bool GetUserById(USER_ID_TYPE & Id, SecurityObjects::UserInfo & User);
@@ -200,7 +259,16 @@ namespace uCentral {
         bool SetPolicyChange(const std::string & Admin, USER_ID_TYPE & Id, const std::string &NewPolicy);
         bool UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
         bool GetUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
-        bool SetLastLogin(std::string &ID);
+        bool SetLastLogin(USER_ID_TYPE & Id);
+
+        /*
+         *  All ActionLinks functions
+         */
+        bool CreateAction(std::string &ActionId, std::string &Action, USER_ID_TYPE & Id, Types::StringPairVec & Elements );
+        bool DeleteAction(std::string &ActionId);
+        bool CompleteAction(std::string &ActionId);
+        bool CancelAction(std::string &ActionId);
+
 
 	  private:
 		static Storage      							*instance_;
