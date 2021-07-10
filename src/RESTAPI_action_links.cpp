@@ -43,16 +43,17 @@ namespace uCentral {
             RESTAPI_PartHandler PartHandler;
             Poco::Net::HTMLForm Form(Request, Request.stream(), PartHandler);
             if (!Form.empty()) {
+                /*
                 auto it = Form.begin();
                 auto end = Form.end();
                 for (; it != end; ++it)
                 {
                     std::cout << it->first << ": " << it->second << std::endl;
                 }
+                */
                 auto Password1 = Form.get("password1","bla");
                 auto Password2 = Form.get("password1","blu");
                 Id = Form.get("id","");
-
                 if(Password1!=Password2 || !AuthService()->ValidatePassword(Password2) || !AuthService()->ValidatePassword(Password1)) {
                     Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
                     Types::StringPairVec    FormVars{ {"UUID", Id},
@@ -63,8 +64,27 @@ namespace uCentral {
                     SendHTMLFileBack(FormFile,Request, Response, FormVars);
                     return;
                 }
-                Types::StringPairVec    FormVars{ {"UUID", Id}};
+
+                SecurityObjects::UserInfo   UInfo;
+                if(!Storage()->GetUserById(Id,UInfo)) {
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                      {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
+                    SendHTMLFileBack(FormFile,Request, Response, FormVars);
+                    return;
+                }
+
+                if(!AuthService()->SetPassword(Password1,UInfo)) {
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                      {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
+                    SendHTMLFileBack(FormFile,Request, Response, FormVars);
+                    return;
+                }
+                Storage()->UpdateUserInfo(UInfo.email,Id,UInfo);
                 Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_success.html"};
+                Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                  {"USERNAME", UInfo.email}};
                 SendHTMLFileBack(FormFile,Request, Response, FormVars);
             }
         }

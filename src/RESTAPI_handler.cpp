@@ -263,17 +263,14 @@ namespace uCentral {
                           Poco::Net::HTTPServerRequest &Request,
                           Poco::Net::HTTPServerResponse &Response ,
                           const Types::StringPairVec & FormVars) {
-        Poco::Path  P(File.path());
         Response.set("Pragma", "private");
         Response.set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
         Response.set("Content-Length", std::to_string(File.getSize()));
         AddCORS(Request, Response);
-
         auto FormContent = Utils::LoadFile(File.path());
         Utils::ReplaceVariables(FormContent, FormVars);
         Response.setChunkedTransferEncoding(true);
         Response.setContentType("text/html");
-
         std::ostream& ostr = Response.send();
         ostr << FormContent;
 	}
