@@ -44,6 +44,11 @@ namespace uCentral{
             INTERNAL_ERROR
         };
 
+        enum EMAIL_REASON {
+            FORGOT_PASSWORD,
+            EMAIL_VERIFICATION
+        };
+
         static ACCESS_TYPE IntToAccessType(int C);
         static int AccessTypeToInt(ACCESS_TYPE T);
 
@@ -74,6 +79,8 @@ namespace uCentral{
         [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
+
+        bool SendEmailToUser(const std::string &Email, EMAIL_REASON Reason);
 
     private:
 		static AuthService *instance_;

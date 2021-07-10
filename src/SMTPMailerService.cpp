@@ -2,6 +2,7 @@
 // Created by stephane bourque on 2021-06-17.
 //
 #include <iostream>
+#include <fstream>
 
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
@@ -16,6 +17,7 @@
 #include "Poco/Net/AcceptCertificateHandler.h"
 
 #include "SMTPMailerService.h"
+#include "Utils.h"
 #include "Daemon.h"
 
 namespace uCentral {
@@ -27,45 +29,98 @@ namespace uCentral {
         SenderLoginUserName_ = Daemon()->ConfigGetString("mailer.username");
         SenderLoginPassword_ = Daemon()->ConfigGetString("mailer.password");
         LoginMethod_ = Daemon()->ConfigGetString("mailer.loginmethod");
-        MailHostPort_ = Daemon()->ConfigGetInt("mailer.port");
+        MailHostPort_ = (int)Daemon()->ConfigGetInt("mailer.port");
+        TemplateDir_ = Daemon()->ConfigPath("mailer.templates", Daemon()->DataDir());
+        SenderThr_.start(*this);
         return 0;
     }
 
     void SMTPMailerService::Stop() {
-
+        Running_ = false;
+        SenderThr_.wakeUp();
+        SenderThr_.join();
     }
 
-    bool SMTPMailerService::SendMessage(SMTPMailerService::MessageAttributes Attrs) {
+    bool SMTPMailerService::SendMessage(const std::string &Recipient, const MessageAttributes &Attrs) {
+        SubMutexGuard G(Mutex_);
+
+        uint64_t Now = std::time(nullptr);
+        auto CE = Cache_.find(Poco::toLower(Recipient));
+        if(CE!=Cache_.end()) {
+            // only allow messages to the same user within 2 minutes
+            if((CE->second.LastRequest-Now)<30)
+                return false;
+            if((CE->second.HowManyRequests>30))
+                return false;
+        }
+
+        Messages_.push_back(MessageEvent{.Posted=(uint64_t )std::time(nullptr),
+                                            .LastTry=0,
+                                            .Attrs=Attrs});
+
         return false;
     }
 
-    bool SMTPMailerService::SendIt() {
+    void SMTPMailerService::run() {
+
+        Running_ = true;
+        while(Running_) {
+            Poco::Thread::trySleep(2000);
+
+            {
+                SubMutexGuard G(Mutex_);
+
+                uint64_t Now = std::time(nullptr);
+
+                for(auto &i:Messages_) {
+                    if(i.Sent==0 && (i.LastTry==0 || (Now-i.LastTry)>120)) {
+                        if (SendIt(i.Attrs)) {
+                            i.LastTry = i.Sent = std::time(nullptr);
+                        } else
+                            i.LastTry = std::time(nullptr);
+                    }
+                }
+
+                //  Clean the list
+                std::remove_if(Messages_.begin(),Messages_.end(),[Now](MessageEvent &E){ return (E.Sent!=0 || ((Now-E.LastTry)>(24*60*60)));});
+            }
+        }
+    }
+
+    bool SMTPMailerService::SendIt(const MessageAttributes & Attrs) {
         try
         {
             Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
 
-            /*
-            Poco::Net::MailMessage message;
-            message.setSender(Sender_);
-            message.addRecipient(MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, recipient));
-            message.setSubject("Hello from the POCO C++ Libraries");
+            Poco::Net::MailMessage  Message;
+            std::string             Recipient = Attrs.find(RECIPIENT_EMAIL)->second;
+            Message.setSender(Sender_);
+            Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
+            Message.setSubject("Hello from the POCO C++ Libraries");
 
             std::string content;
 
             content += "Hello ";
-            content += recipient;
+            content += Recipient;
             content += ",\r\n\r\n";
             content += "This is a greeting from the POCO C++ Libraries.\r\n\r\n";
-            std::string logo(reinterpret_cast<const char*>(PocoLogo), sizeof(PocoLogo));
-            message.addContent(new Poco::Net::StringPartSource(content));
-            message.addAttachment("logo", new Poco::Net::StringPartSource(logo, "image/gif"));
+            Message.addContent(new Poco::Net::StringPartSource(content));
+            auto Logo = Attrs.find(LOGO);
+            if(Logo!=Attrs.end()) {
+                Poco::File  LogoFile(TemplateDir_ + "/" + Logo->second);
+                std::ifstream   IF(LogoFile.path());
+                std::ostringstream   OS;
+                Poco::StreamCopier::copyStream(IF, OS);
+                Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/jpeg"));
+            }
+
 
             Poco::Net::SecureSMTPClientSession session(MailHost_,MailHostPort_);
-
             Poco::Net::Context::Params P;
-            auto ptrContext = new Poco::Net::Context(       Poco::Net::Context::CLIENT_USE, "", "", "",
+            auto ptrContext = Poco::AutoPtr<Poco::Net::Context>
+                    (new Poco::Net::Context(Poco::Net::Context::CLIENT_USE, "", "", "",
                                                             Poco::Net::Context::VERIFY_RELAXED, 9, true,
-                                                            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+                                                            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"));
 
             Poco::Net::SSLManager::instance().initializeClient(nullptr,
                                                                ptrHandler,
@@ -78,17 +133,15 @@ namespace uCentral {
                           SenderLoginUserName_,
                           SenderLoginPassword_
             );
-            session.sendMessage(message);
+            session.sendMessage(Message);
             session.close();
-             */
+            return true;
         }
-        catch (const Poco::Exception& exc)
+        catch (const Poco::Exception& E)
         {
-            std::cerr << exc.displayText() << std::endl;
-            return 1;
+            Logger_.log(E);
         }
-        return 0;
-
+        return false;
     }
 
 }

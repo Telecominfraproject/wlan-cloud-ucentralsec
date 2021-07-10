@@ -30,6 +30,19 @@ namespace uCentral {
 				auto password = GetS(uCentral::RESTAPI::Protocol::PASSWORD, Obj);
 				auto newPassword = GetS(uCentral::RESTAPI::Protocol::NEWPASSWORD, Obj);
 
+                ParseParameters(Request);
+
+                if(GetParameter("forgotPassword","false") == "true") {
+                    //  Send an email to the userId
+                    SecurityObjects::UserInfoAndPolicy UInfo;
+                    AuthService()->SendEmailToUser(userId,AuthService::FORGOT_PASSWORD);
+                    UInfo.webtoken.userMustChangePassword=true;
+                    Poco::JSON::Object ReturnObj;
+                    UInfo.webtoken.to_json(ReturnObj);
+                    ReturnObject(Request, ReturnObj, Response);
+                    return;
+                }
+
 				Poco::toLowerInPlace(userId);
                 SecurityObjects::UserInfoAndPolicy UInfo;
 

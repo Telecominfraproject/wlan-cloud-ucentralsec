@@ -20,6 +20,8 @@
 #include "KafkaManager.h"
 #include "Kafka_topics.h"
 
+#include "SMTPMailerService.h"
+
 namespace uCentral {
     class AuthService *AuthService::instance_ = nullptr;
 
@@ -276,6 +278,26 @@ namespace uCentral {
         std::string UName = Poco::trim(Poco::toLower(UserName));
         SHA2_.update(Password + UName);
         return uCentral::Utils::ToHex(SHA2_.digest());
+    }
+
+    bool AuthService::SendEmailToUser(const std::string &Email, EMAIL_REASON Reason) {
+        switch(Reason) {
+            case FORGOT_PASSWORD: {
+                MessageAttributes   Attrs;
+
+                Attrs[RECIPIENT_EMAIL] = "stephane.bourque@gmail.com";
+                Attrs[LOGO] = "logo.jpg";
+
+                SMTPMailerService()->SendMessage("stephane.bourque@gmail.com", Attrs); }
+                break;
+
+            case EMAIL_VERIFICATION:
+                break;
+
+            default:
+                break;
+        }
+        return false;
     }
 
     bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo) {

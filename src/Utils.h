@@ -57,5 +57,6 @@ namespace uCentral::Utils {
     void ReplaceVariables( std::string & Content , const Types::StringPairVec & P);
 
     [[nodiscard]] std::string FindMediaType(const Poco::File &F);
+    [[nodiscard]] std::string BinaryFileToHexString( const Poco::File &F);
 }
 #endif // UCENTRALGW_UTILS_H

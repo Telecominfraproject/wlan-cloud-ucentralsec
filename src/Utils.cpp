@@ -442,4 +442,28 @@ namespace uCentral::Utils {
         return "application/octet-stream";
 	}
 
+	std::string BinaryFileToHexString(const Poco::File &F) {
+        static const char hex[] = "0123456789abcdef";
+        std::string Result;
+        try {
+            std::ifstream IF(F.path());
+
+            int Count = 0;
+            while (IF.good()) {
+                if (Count)
+                    Result += ", ";
+                if ((Count % 32) == 0)
+                    Result += "\r\n";
+                Count++;
+                unsigned char C = IF.get();
+                Result += "0x";
+                Result += (char) (hex[(C & 0xf0) >> 4]);
+                Result += (char) (hex[(C & 0x0f)]);
+            }
+        } catch(...) {
+
+        }
+        return Result;
+	}
+
 }
