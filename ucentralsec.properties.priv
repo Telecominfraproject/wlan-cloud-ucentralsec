@@ -43,7 +43,7 @@ ucentral.service.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
 #
 mailer.hostname = smtp.gmail.com
 mailer.username = no-reply@arilia.com
-mailer.password = pink-elephants-play-hockey
+mailer.password = *********************************
 mailer.loginmethod = login
 mailer.port = 587
 mailer.templates = $UCENTRALSEC_ROOT/templates
