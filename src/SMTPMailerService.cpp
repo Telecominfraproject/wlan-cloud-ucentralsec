@@ -112,9 +112,6 @@ namespace uCentral {
             Utils::ReplaceVariables(Content, Variables);
             Message.addContent(new Poco::Net::StringPartSource(Content));
 
-            std::cout << Content << std::endl;
-
-
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
                 Poco::File  LogoFile(TemplateDir_ + "/" + Logo->second);
