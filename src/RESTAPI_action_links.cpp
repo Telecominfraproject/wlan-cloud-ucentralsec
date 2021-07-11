@@ -10,6 +10,7 @@
 #include "Poco/JSON/Parser.h"
 #include "Poco/Net/HTMLForm.h"
 #include "RESTAPI_server.h"
+#include "Daemon.h"
 
 namespace uCentral {
     void RESTAPI_action_links::handleRequest(Poco::Net::HTTPServerRequest &Request,
@@ -84,7 +85,8 @@ namespace uCentral {
                 Storage()->UpdateUserInfo(UInfo.email,Id,UInfo);
                 Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_success.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
-                                                  {"USERNAME", UInfo.email}};
+                                                  {"USERNAME", UInfo.email},
+                                                  {"ACTION_LINK",Daemon()->GetUIURI()}};
                 SendHTMLFileBack(FormFile,Request, Response, FormVars);
             }
         } else {
@@ -112,7 +114,8 @@ namespace uCentral {
             UInfo.validationDate = std::time(nullptr);
             Storage()->UpdateUserInfo(UInfo.email, Id, UInfo);
             Types::StringPairVec FormVars{{"UUID",     Id},
-                                          {"USERNAME", UInfo.email}};
+                                          {"USERNAME", UInfo.email},
+                                          {"ACTION_LINK",Daemon()->GetUIURI()}};
             Poco::File FormFile{RESTAPI_Server()->AssetDir() + "/email_verification_success.html"};
             SendHTMLFileBack(FormFile, Request, Response, FormVars);
             return;

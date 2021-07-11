@@ -35,6 +35,7 @@ authentication.default.password = 13268b7daa751240369d125e79c873bd8dd3bef7981bdf
 ucentral.system.data = $UCENTRALSEC_ROOT/data
 ucentral.system.uri.private = https://localhost:17001
 ucentral.system.uri.public = https://ucentral.dpaas.arilia.com:16001
+ucentral.system.uri.ui = https://ucentral-ui.arilia.com
 ucentral.system.commandchannel = /tmp/app.ucentralsec
 ucentral.service.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
 

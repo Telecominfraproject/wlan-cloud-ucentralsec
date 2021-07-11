@@ -280,22 +280,29 @@ namespace uCentral {
         return uCentral::Utils::ToHex(SHA2_.digest());
     }
 
-    bool AuthService::SendEmailToUser(const std::string &Email, EMAIL_REASON Reason) {
-        switch(Reason) {
-            case FORGOT_PASSWORD: {
-                MessageAttributes   Attrs;
+    bool AuthService::SendEmailToUser(std::string &Email, EMAIL_REASON Reason) {
+        SecurityObjects::UserInfo   UInfo;
+        if(Storage()->GetUserByEmail(Email,UInfo)) {
+            switch (Reason) {
+                case FORGOT_PASSWORD: {
+                    MessageAttributes Attrs;
 
-                Attrs[RECIPIENT_EMAIL] = "stephane.bourque@gmail.com";
-                Attrs[LOGO] = "logo.jpg";
+                    Attrs[RECIPIENT_EMAIL] = "stephane.bourque@gmail.com";
+                    Attrs[LOGO] = "logo.jpg";
+                    Attrs[SUBJECT] = "Password reset link";
+                    Attrs[ACTION_LINK] =
+                            Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=reset_password&id=" + UInfo.Id ;
 
-                SMTPMailerService()->SendMessage("stephane.bourque@gmail.com", Attrs); }
-                break;
+                    SMTPMailerService()->SendMessage("stephane.bourque@gmail.com", "password_reset.txt", Attrs);
+                }
+                    break;
 
-            case EMAIL_VERIFICATION:
-                break;
+                case EMAIL_VERIFICATION:
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
         return false;
     }

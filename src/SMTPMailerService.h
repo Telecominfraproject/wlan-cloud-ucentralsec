@@ -7,6 +7,8 @@
 
 #include "SubSystemServer.h"
 
+#include "Poco/File.h"
+
 namespace uCentral {
 
     enum MESSAGE_ATTRIBUTES {
@@ -58,6 +60,7 @@ namespace uCentral {
                uint64_t             Posted=0;
                uint64_t             LastTry=0;
                uint64_t             Sent=0;
+               Poco::File           File;
                MessageAttributes    Attrs;
             };
 
@@ -70,8 +73,8 @@ namespace uCentral {
 
             int Start() override;
             void Stop() override;
-            bool SendMessage(const std::string &Recipient, const MessageAttributes &Attrs);
-            bool SendIt(const MessageAttributes &Attrs);
+            bool SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs);
+            bool SendIt(const MessageEvent &Msg);
 
         private:
             static SMTPMailerService * instance_;

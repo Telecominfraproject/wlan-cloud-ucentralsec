@@ -194,6 +194,7 @@ namespace uCentral {
 			DebugMode_ = ConfigGetBool("ucentral.system.debug",false);
 		MyPrivateEndPoint_ = ConfigGetString("ucentral.system.uri.private");
 		MyPublicEndPoint_ = ConfigGetString("ucentral.system.uri.public");
+		UIURI_ = ConfigGetString("ucentral.system.uri.ui");
 		MyHash_ = CreateHash(MyPublicEndPoint_);
 		InitializeSubSystemServers();
 		ServerApplication::initialize(self);
