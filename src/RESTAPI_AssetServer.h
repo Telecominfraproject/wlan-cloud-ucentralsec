@@ -19,7 +19,8 @@ namespace uCentral {
                                           Poco::Net::HTTPRequest::HTTP_DELETE,
                                           Poco::Net::HTTPRequest::HTTP_OPTIONS}) {}
         void handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) override;
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/wwwassets/{id}"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/wwwassets/{id}" ,
+                                                                                         "/favicon.ico"}; };
         void DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response);
     private:
 

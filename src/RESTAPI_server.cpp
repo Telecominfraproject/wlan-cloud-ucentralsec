@@ -65,7 +65,6 @@ namespace uCentral {
         Poco::URI uri(Request.getURI());
         const auto & Path = uri.getPath();
         RESTAPIHandler::BindingMap Bindings;
-
         return RESTAPI_Router<
                 RESTAPI_oauth2Handler,
                 RESTAPI_users_handler,

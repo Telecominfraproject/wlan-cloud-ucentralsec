@@ -445,7 +445,6 @@ components:
     ##
     #########################################################################################
 
-
 paths:
   /oauth2:
     post:
@@ -456,8 +455,15 @@ paths:
       parameters:
         - in: query
           name: newPassword
+          description: used when a user is trying to change her password. This will be the new password.
           schema:
             type: string
+          required: false
+        -in: query
+          name: forgotPassword
+          description: A user forgot her password. She needs to present her e-mail address in the userId and set this to true
+          schema:
+            type: boolean
           required: false
       requestBody:
         description: User id and password

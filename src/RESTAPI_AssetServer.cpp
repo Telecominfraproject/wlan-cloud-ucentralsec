@@ -17,8 +17,14 @@ namespace uCentral {
     }
 
     void RESTAPI_AssetServer::DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-        std::string AssetName = GetBinding("id", "");
-        Poco::File  AssetFile(RESTAPI_Server()->AssetDir()+"/"+AssetName);
+        Poco::File  AssetFile;
+
+        if(Request.getURI().find("/favicon.ico") != std::string::npos) {
+            AssetFile = RESTAPI_Server()->AssetDir() + "/favicon.ico";
+        } else {
+            std::string AssetName = GetBinding("id", "");
+            AssetFile = RESTAPI_Server()->AssetDir() + "/" + AssetName;
+        }
         if(!AssetFile.isFile()) {
             NotFound(Request, Response);
             return;

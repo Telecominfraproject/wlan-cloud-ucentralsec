@@ -246,17 +246,21 @@ namespace uCentral {
 	}
 
     void RESTAPIHandler::SendFile(Poco::File & File, Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-        Response.set("Content-Type",Utils::FindMediaType(File));
         Poco::Path  P(File.path());
-        Response.set("Content-Disposition", "attachment; filename=" + P.getBaseName()  );
-        Response.set("Content-Transfer-Encoding","binary");
-        Response.set("Accept-Ranges", "bytes");
+        auto MT = Utils::FindMediaType(File);
+        if(MT.Encoding==Utils::BINARY) {
+            Response.set("Content-Transfer-Encoding","binary");
+            Response.set("Accept-Ranges", "bytes");
+        }
         Response.set("Cache-Control", "private");
         Response.set("Pragma", "private");
         Response.set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
-        Response.set("Content-Length", std::to_string(File.getSize()));
         AddCORS(Request, Response);
-        Response.sendFile(File.path(),Utils::FindMediaType(File));
+        Response.sendFile(File.path(),MT.ContentType);
+/*        for(auto const &i:Response) {
+            std::cout << "Name: " << i.first << " Value: " << i.second << std::endl;
+        }
+        */
     }
 
     void RESTAPIHandler::SendHTMLFileBack(Poco::File & File,
