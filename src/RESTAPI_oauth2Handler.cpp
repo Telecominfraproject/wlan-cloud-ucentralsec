@@ -35,7 +35,8 @@ namespace uCentral {
                 if(GetParameter("forgotPassword","false") == "true") {
                     //  Send an email to the userId
                     SecurityObjects::UserInfoAndPolicy UInfo;
-                    AuthService()->SendEmailToUser(userId,AuthService::FORGOT_PASSWORD);
+                    if(AuthService::SendEmailToUser(userId,AuthService::FORGOT_PASSWORD))
+                        Logger_.information(Poco::format("Send password reset link to %s",userId));
                     UInfo.webtoken.userMustChangePassword=true;
                     Poco::JSON::Object ReturnObj;
                     UInfo.webtoken.to_json(ReturnObj);

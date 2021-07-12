@@ -23,9 +23,9 @@ namespace uCentral {
         auto Action = GetParameter("action","");
         auto Id = GetParameter("id","");
 
-        if(Action=="reset_password")
+        if(Action=="password_reset")
             DoResetPassword(Id, Request, Response);
-        else if(Action=="emailVerification")
+        else if(Action=="email_verification")
             DoEmailVerification(Id, Request, Response);
         else
             DoReturnA404(Request, Response);
@@ -35,7 +35,7 @@ namespace uCentral {
                          Poco::Net::HTTPServerResponse &Response) {
 
         if(Request.getMethod()==Poco::Net::HTTPServerRequest::HTTP_GET) {
-            Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password.html"};
+            Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset.html"};
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
             SendHTMLFileBack(FormFile,Request, Response, FormVars);
@@ -48,7 +48,7 @@ namespace uCentral {
                 auto Password2 = Form.get("password1","blu");
                 Id = Form.get("id","");
                 if(Password1!=Password2 || !AuthService()->ValidatePassword(Password2) || !AuthService()->ValidatePassword(Password1)) {
-                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_error.html"};
                     Types::StringPairVec    FormVars{ {"UUID", Id},
                                                       {"ERROR_TEXT", "For some reason, the passwords entered do not match or they do not comply with"
                                                                      " accepted password creation restrictions. Please consult our on-line help"
@@ -60,7 +60,7 @@ namespace uCentral {
 
                 SecurityObjects::UserInfo   UInfo;
                 if(!Storage()->GetUserById(Id,UInfo)) {
-                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_error.html"};
                     Types::StringPairVec    FormVars{ {"UUID", Id},
                                                       {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
                     SendHTMLFileBack(FormFile,Request, Response, FormVars);
@@ -68,7 +68,7 @@ namespace uCentral {
                 }
 
                 if(UInfo.blackListed || UInfo.suspended) {
-                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_error.html"};
                     Types::StringPairVec    FormVars{ {"UUID", Id},
                                                       {"ERROR_TEXT", "Please contact our system administrators. We have identified an error in your account that must be resolved first."}};
                     SendHTMLFileBack(FormFile,Request, Response, FormVars);
@@ -76,14 +76,14 @@ namespace uCentral {
                 }
 
                 if(!AuthService()->SetPassword(Password1,UInfo)) {
-                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_error.html"};
+                    Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_error.html"};
                     Types::StringPairVec    FormVars{ {"UUID", Id},
                                                       {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
                     SendHTMLFileBack(FormFile,Request, Response, FormVars);
                     return;
                 }
                 Storage()->UpdateUserInfo(UInfo.email,Id,UInfo);
-                Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/reset_password_success.html"};
+                Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_success.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"USERNAME", UInfo.email},
                                                   {"ACTION_LINK",Daemon()->GetUIURI()}};
@@ -102,7 +102,6 @@ namespace uCentral {
             if (!Storage()->GetUserById(Id, UInfo)) {
                 Types::StringPairVec FormVars{{"UUID",       Id},
                                               {"ERROR_TEXT", "This does not appear to be a valid email verification link.."}};
-
                 Poco::File FormFile{RESTAPI_Server()->AssetDir() + "/email_verification_error.html"};
                 SendHTMLFileBack(FormFile, Request, Response, FormVars);
                 return;

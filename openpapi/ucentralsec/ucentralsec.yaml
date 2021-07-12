@@ -614,6 +614,11 @@ paths:
             type: integer
             format: int64
           required: true
+        - in: query
+          name: email_verification
+          schema:
+            type: boolean
+          required: false
       requestBody:
         description: User details (some fields are ignored during creation)
         content:
@@ -640,6 +645,11 @@ paths:
             type: integer
             format: int64
           required: true
+        - in: query
+          name: email_verification
+          schema:
+            type: boolean
+          required: false
       requestBody:
         description: User details (some fields are ignored during update)
         content:

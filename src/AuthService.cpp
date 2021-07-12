@@ -282,22 +282,32 @@ namespace uCentral {
 
     bool AuthService::SendEmailToUser(std::string &Email, EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
+
         if(Storage()->GetUserByEmail(Email,UInfo)) {
             switch (Reason) {
                 case FORGOT_PASSWORD: {
-                    MessageAttributes Attrs;
+                        MessageAttributes Attrs;
 
-                    Attrs[RECIPIENT_EMAIL] = "stephane.bourque@gmail.com";
-                    Attrs[LOGO] = "logo.jpg";
-                    Attrs[SUBJECT] = "Password reset link";
-                    Attrs[ACTION_LINK] =
-                            Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=reset_password&id=" + UInfo.Id ;
-
-                    SMTPMailerService()->SendMessage("stephane.bourque@gmail.com", "password_reset.txt", Attrs);
-                }
+                        Attrs[RECIPIENT_EMAIL] = UInfo.email;
+                        Attrs[LOGO] = "logo.jpg";
+                        Attrs[SUBJECT] = "Password reset link";
+                        Attrs[ACTION_LINK] =
+                                Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + UInfo.Id ;
+                        SMTPMailerService()->SendMessage(UInfo.email, "password_reset.txt", Attrs);
+                    }
                     break;
 
-                case EMAIL_VERIFICATION:
+                case EMAIL_VERIFICATION: {
+                        MessageAttributes Attrs;
+
+                        Attrs[RECIPIENT_EMAIL] = UInfo.email;
+                        Attrs[LOGO] = "logo.jpg";
+                        Attrs[SUBJECT] = "EMail Address Verification";
+                        Attrs[ACTION_LINK] =
+                                Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
+                        SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
+                        UInfo.waitingForEmailCheck = true;
+                    }
                     break;
 
                 default:
@@ -305,6 +315,19 @@ namespace uCentral {
             }
         }
         return false;
+    }
+
+    bool AuthService::VerifyEmail(SecurityObjects::UserInfo &UInfo) {
+        MessageAttributes Attrs;
+
+        Attrs[RECIPIENT_EMAIL] = UInfo.email;
+        Attrs[LOGO] = "logo.jpg";
+        Attrs[SUBJECT] = "EMail Address Verification";
+        Attrs[ACTION_LINK] =
+                Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
+        SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
+        UInfo.waitingForEmailCheck = true;
+        return true;
     }
 
     bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo) {

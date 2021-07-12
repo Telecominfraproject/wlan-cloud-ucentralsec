@@ -1,0 +1,10 @@
+Dear ${RECIPIENT_EMAIL},
+
+    Before you can access the system, you must validate your e-mail address. Please click on the link below
+    to complete this task.
+
+        ${ACTION_LINK}
+
+    And follow the instructions.
+
+Thank you!

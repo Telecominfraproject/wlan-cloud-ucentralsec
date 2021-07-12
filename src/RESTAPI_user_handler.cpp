@@ -101,6 +101,12 @@ namespace uCentral {
                 return;
             }
 
+            if(GetParameter("email_verification","false")=="true") {
+                if(AuthService::VerifyEmail(UInfo))
+                    Logger_.information(Poco::format("Verification e-mail requested for %s",UInfo.email));
+                Storage()->UpdateUserInfo(UserInfo_.userinfo.email,UInfo.Id,UInfo);
+            }
+
             if(!Storage()->GetUserByEmail(UInfo.email, UInfo)) {
                 Logger_.information(Poco::format("User '%s' but not retrieved.",UInfo.email));
                 BadRequest(Request, Response);
@@ -172,6 +178,12 @@ namespace uCentral {
                     return;
                 }
             }
+
+            if(GetParameter("email_verification","false")=="true") {
+                if(AuthService::VerifyEmail(LocalObject))
+                    Logger_.information(Poco::format("Verification e-mail requested for %s",LocalObject.email));
+            }
+
             if(Storage()->UpdateUserInfo(UserInfo_.userinfo.email,Id,LocalObject)) {
                 Poco::JSON::Object  ModifiedObject;
                 LocalObject.to_json(ModifiedObject);

@@ -80,7 +80,8 @@ namespace uCentral{
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
 
-        bool SendEmailToUser(std::string &Email, EMAIL_REASON Reason);
+        [[nodiscard]] static bool VerifyEmail(SecurityObjects::UserInfo &UInfo);
+        [[nodiscard]] static bool SendEmailToUser(std::string &Email, EMAIL_REASON Reason);
 
     private:
 		static AuthService *instance_;
