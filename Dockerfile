@@ -38,6 +38,8 @@ RUN cmake --build . --config Release -j8
 
 FROM alpine
 
+RUN addgroup -S ucentralsec && adduser -S -G ucentralsec ucentralsec
+
 RUN mkdir /ucentral
 RUN mkdir /ucentralsec-data
 RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc
@@ -50,4 +52,5 @@ EXPOSE 16001
 EXPOSE 17001
 EXPOSE 16101
 
+USER ucentralsec
 ENTRYPOINT /ucentral/ucentralsec
