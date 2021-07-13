@@ -167,6 +167,7 @@ configProperties:
   ucentral.system.debug: "true"
   ucentral.system.uri.private: https://localhost:17001
   ucentral.system.uri.public: https://localhost:16001
+  ucentral.system.uri.ui: https://localhost
   ucentral.system.commandchannel: /tmp/app_ucentralsec
   # Logging
   logging.formatters.f1.class: PatternFormatter
