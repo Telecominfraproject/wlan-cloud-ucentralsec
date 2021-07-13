@@ -116,6 +116,7 @@ configProperties:
   ucentral.restapi.host.0.port: 16001
   ucentral.restapi.host.0.cert: $UCENTRALSEC_ROOT/certs/restapi-cert.pem
   ucentral.restapi.host.0.key: $UCENTRALSEC_ROOT/certs/restapi-key.pem
+  ucentral.restapi.wwwassets: $UCENTRALSEC_ROOT/wwwassets
   ucentral.internal.restapi.host.0.backlog: 100
   ucentral.internal.restapi.host.0.security: relaxed
   ucentral.internal.restapi.host.0.rootca: $UCENTRALSEC_ROOT/certs/restapi-ca.pem
@@ -131,6 +132,7 @@ configProperties:
   mailer.hostname: smtp.gmail.com
   mailer.loginmethod: login
   mailer.port: 587
+  mailer.templates: $UCENTRALSEC_ROOT/templates
   # ALB
   alb.enable: "true"
   alb.port: 16101
