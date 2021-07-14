@@ -43,8 +43,8 @@ ucentral.service.key.password = mypassword
 # Security Microservice Specific Section
 #
 mailer.hostname = smtp.gmail.com
-mailer.username = no-reply@arilia.com
-mailer.password = *****************************
+mailer.username = ************************
+mailer.password = ************************
 mailer.loginmethod = login
 mailer.port = 587
 mailer.templates = $UCENTRALSEC_ROOT/templates
