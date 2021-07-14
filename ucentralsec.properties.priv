@@ -37,13 +37,14 @@ ucentral.system.uri.public = https://local.dpaas.arilia.com:16001
 ucentral.system.uri.ui = https://ucentral-ui.arilia.com
 ucentral.system.commandchannel = /tmp/app.ucentralsec
 ucentral.service.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
+ucentral.service.key.password = mypassword
 
 #
 # Security Microservice Specific Section
 #
 mailer.hostname = smtp.gmail.com
 mailer.username = no-reply@arilia.com
-mailer.password = *********************************
+mailer.password = *****************************
 mailer.loginmethod = login
 mailer.port = 587
 mailer.templates = $UCENTRALSEC_ROOT/templates
