@@ -5,6 +5,7 @@
 #include "RESTAPI_users_handler.h"
 #include "StorageService.h"
 #include "RESTAPI_protocol.h"
+#include "Utils.h"
 
 namespace uCentral {
     void RESTAPI_users_handler::handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
@@ -26,15 +27,37 @@ namespace uCentral {
             std::vector<SecurityObjects::UserInfo> Users;
             InitQueryBlock();
             bool IdOnly = GetParameter("idOnly",false);
-            if (Storage()->GetUsers(QB_.Offset, QB_.Limit, Users)) {
+
+            if(QB_.Select.empty()) {
+                if (Storage()->GetUsers(QB_.Offset, QB_.Limit, Users)) {
+                    Poco::JSON::Array ArrayObj;
+                    for (const auto &i : Users) {
+                        Poco::JSON::Object Obj;
+                        if (IdOnly) {
+                            ArrayObj.add(i.Id);
+                        } else {
+                            i.to_json(Obj);
+                            ArrayObj.add(Obj);
+                        }
+                    }
+                    Poco::JSON::Object RetObj;
+                    RetObj.set(uCentral::RESTAPI::Protocol::USERS, ArrayObj);
+                    ReturnObject(Request, RetObj, Response);
+                    return;
+                }
+            } else {
+                Types::StringVec IDs = Utils::Split(QB_.Select);
                 Poco::JSON::Array ArrayObj;
-                for (const auto &i : Users) {
-                    Poco::JSON::Object Obj;
-                    if(IdOnly) {
-                        ArrayObj.add(i.Id);
-                    } else {
-                        i.to_json(Obj);
-                        ArrayObj.add(Obj);
+                for(auto &i:IDs) {
+                    SecurityObjects::UserInfo   UInfo;
+                    if(Storage()->GetUserById(i,UInfo)) {
+                        Poco::JSON::Object Obj;
+                        if (IdOnly) {
+                            ArrayObj.add(UInfo.Id);
+                        } else {
+                            UInfo.to_json(Obj);
+                            ArrayObj.add(Obj);
+                        }
                     }
                 }
                 Poco::JSON::Object RetObj;
