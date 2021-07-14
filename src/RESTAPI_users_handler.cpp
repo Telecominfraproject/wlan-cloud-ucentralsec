@@ -25,12 +25,17 @@ namespace uCentral {
         try {
             std::vector<SecurityObjects::UserInfo> Users;
             InitQueryBlock();
+            bool IdOnly = GetParameter("idOnly",false);
             if (Storage()->GetUsers(QB_.Offset, QB_.Limit, Users)) {
                 Poco::JSON::Array ArrayObj;
                 for (const auto &i : Users) {
                     Poco::JSON::Object Obj;
-                    i.to_json(Obj);
-                    ArrayObj.add(Obj);
+                    if(IdOnly) {
+                        ArrayObj.add(i.Id);
+                    } else {
+                        i.to_json(Obj);
+                        ArrayObj.add(Obj);
+                    }
                 }
                 Poco::JSON::Object RetObj;
                 RetObj.set(uCentral::RESTAPI::Protocol::USERS, ArrayObj);

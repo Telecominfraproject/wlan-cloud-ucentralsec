@@ -552,6 +552,12 @@ paths:
           schema:
             type: string
           required: false
+        - in: query
+          description: Return only the ids.
+          name: idOnly
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
           $ref: '#/components/schemas/UserList'
