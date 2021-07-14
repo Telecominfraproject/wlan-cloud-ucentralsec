@@ -26,7 +26,7 @@ namespace uCentral {
         try {
             std::vector<SecurityObjects::UserInfo> Users;
             InitQueryBlock();
-            bool IdOnly = GetParameter("idOnly",false);
+            bool IdOnly = (GetParameter("idOnly","false")=="true");
 
             if(QB_.Select.empty()) {
                 if (Storage()->GetUsers(QB_.Offset, QB_.Limit, Users)) {
