@@ -26,14 +26,12 @@ namespace uCentral {
 
     class RESTAPI_Server *RESTAPI_Server::instance_ = nullptr;
 
-    RESTAPI_Server::RESTAPI_Server() noexcept: SubSystemServer("RESTAPIServer", "REST-SRV", "ucentral.restapi")
-    {
-    }
-
     int RESTAPI_Server::Start() {
         Logger_.information("Starting.");
 
         AsserDir_ = Daemon()->ConfigPath("ucentral.restapi.wwwassets");
+        AccessPolicy_ = Daemon()->ConfigGetString("ucentral.document.policy.access", "/wwwassets/access_policy.html");
+        PasswordPolicy_ = Daemon()->ConfigGetString("ucentral.document.policy.password", "/wwwassets/possword_policy.html");
 
         for(const auto & Svr: ConfigServersList_) {
 			Logger_.information(Poco::format("Starting: %s:%s Keyfile:%s CertFile: %s", Svr.Address(), std::to_string(Svr.Port()),
