@@ -11,6 +11,8 @@
 #include "AuthService.h"
 #include "RESTAPI_oauth2Handler.h"
 #include "RESTAPI_protocol.h"
+#include "RESTAPI_server.h"
+
 #include "Utils.h"
 
 namespace uCentral {
@@ -31,8 +33,16 @@ namespace uCentral {
 				auto newPassword = GetS(uCentral::RESTAPI::Protocol::NEWPASSWORD, Obj);
 
                 ParseParameters(Request);
+                if(GetBoolParameter("requirements",false)) {
+                    Poco::JSON::Object  Answer;
+                    Answer.set("passwordPattern",AuthService()->PasswordValidationExpression());
+                    Answer.set("accessPolicy", RESTAPI_Server()->GetAccessPolicy());
+                    Answer.set("passwordPolicy", RESTAPI_Server()->GetPasswordPolicy());
+                    ReturnObject(Request, Answer, Response);
+                    return;
+                }
 
-                if(GetParameter("forgotPassword","false") == "true") {
+                if(GetBoolParameter("forgotPassword",false)) {
                     //  Send an email to the userId
                     SecurityObjects::UserInfoAndPolicy UInfo;
                     if(AuthService::SendEmailToUser(userId,AuthService::FORGOT_PASSWORD))

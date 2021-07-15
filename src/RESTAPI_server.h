@@ -21,8 +21,6 @@ namespace uCentral {
     class RESTAPI_Server : public SubSystemServer {
 
     public:
-        RESTAPI_Server() noexcept;
-
         static RESTAPI_Server *instance() {
             if (instance_ == nullptr) {
                 instance_ = new RESTAPI_Server;
@@ -33,12 +31,20 @@ namespace uCentral {
         int Start() override;
         void Stop() override;
         inline const std::string & AssetDir() { return AsserDir_; }
-
+        inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }
+        inline const std::string & GetAccessPolicy() const { return AccessPolicy_; }
     private:
 		static RESTAPI_Server *instance_;
         std::vector<std::unique_ptr<Poco::Net::HTTPServer>>   RESTServers_;
 		Poco::ThreadPool	Pool_;
 		std::string         AsserDir_;
+		std::string         PasswordPolicy_;
+		std::string         AccessPolicy_;
+
+        RESTAPI_Server() noexcept:
+            SubSystemServer("RESTAPIServer", "REST-SRV", "ucentral.restapi")
+        {
+        }
     };
 
     inline RESTAPI_Server * RESTAPI_Server() { return RESTAPI_Server::instance(); };

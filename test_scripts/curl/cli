@@ -34,10 +34,10 @@ fi
 
 token=""
 result_file=result.json
-#username="tip@ucentral.com"
-#password="openwifi"
-username="stephb@incognito.com"
-password="blabla"
+username="tip@ucentral.com"
+password="openwifi"
+#username="stephb@incognito.com"
+#password="Snoopy98!"
 browser_list=(firefox sensible-browser xdg-open w3m links links2 lynx youtube-dl)
 browser=""
 
@@ -80,6 +80,14 @@ testlogin() {
                 -d "$payload" > ${result_file}
         jq < ${result_file}
     fi
+    jq < ${result_file}
+}
+
+emailtest() {
+    payload="{ \"userId\" : \"$1\"  }"
+    curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2?forgotPassword=true" \
+        -H "Content-Type: application/json" \
+        -d "$payload" > ${result_file}
     jq < ${result_file}
 }
 
@@ -146,9 +154,22 @@ listendpoints() {
     done
 }
 
+getlogo() {
+	curl ${FLAGS} -X GET "https://${UCENTRALSEC}/wwwassets/open-wifi.svg"
+}
+
 createuser() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
     curl  ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/user/0" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
+
+createuser_v() {
+    payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
+    curl  ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/user/0?email_verification=true" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -179,6 +200,14 @@ listusers() {
     jq < ${result_file}
 }
 
+policies() {
+    payload="{}"
+    curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2?requirements=true" \
+        -H "Content-Type: application/json" \
+        -d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
 help() {
   echo
   echo "listendpoints                     Get all the system endpoints."
@@ -188,11 +217,15 @@ help() {
 shopt -s nocasematch
 case "$1" in
     "createuser") login; createuser "$2" "$3"; logout;;
+    "createuser_v") login; createuser_v "$2" "$3"; logout;;
     "deleteuser") login; deleteuser "$2" ; logout;;
     "getuser") login; getuser "$2" ; logout;;
     "listusers") login; listusers ; logout ;;
     "listendpoints") login; listendpoints ; logout ;;
     "testlogin") testlogin "$2" "$3" "$4";;
+    "emailtest") emailtest "$2";;
+    "getlogo") getlogo ;;
+    "policies") policies ;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
