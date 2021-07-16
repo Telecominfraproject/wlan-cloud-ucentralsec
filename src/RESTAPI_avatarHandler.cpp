@@ -29,17 +29,13 @@ namespace uCentral {
 
     void RESTAPI_avatarHandler::handleRequest(Poco::Net::HTTPServerRequest &Request,
                                               Poco::Net::HTTPServerResponse &Response) {
-        DBGLINE
         if (!ContinueProcessing(Request, Response))
             return;
-        DBGLINE
 
         if (!IsAuthorized(Request, Response))
             return;
-        DBGLINE
 
         ParseParameters(Request);
-        DBGLINE
         if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
             DoGet(Request, Response);
         else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
@@ -58,6 +54,10 @@ namespace uCentral {
                 NotFound(Request, Response);
                 return;
             }
+
+            //  if there is an avatar, just remove it...
+            Storage()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+
             Poco::TemporaryFile TmpFile;
             AvatarPartHandler partHandler(Id, Logger_, TmpFile);
 
