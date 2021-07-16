@@ -7,42 +7,9 @@
 #include "Daemon.h"
 
 #include "Poco/Tuple.h"
+#include "storage_users.h"
 
 namespace uCentral {
-
-    typedef Poco::Tuple<
-            std::string,    // Id = 0;
-            std::string,    // name;
-            std::string,    // description;
-            std::string,    // avatar;
-            std::string,    // email;
-            uint64_t,       // bool validated = false;
-            std::string,    // validationEmail;
-            uint64_t,       // validationDate = 0;
-            uint64_t,       // creationDate = 0;
-            std::string,    // validationURI;
-            uint64_t,       // bool changePassword = true;
-            uint64_t,       // lastLogin = 0;
-            std::string,    // currentLoginURI;
-            uint64_t,       // lastPasswordChange = 0;
-            uint64_t,       // lastEmailCheck = 0;
-            uint64_t ,      // bool waitingForEmailCheck = false;
-            std::string,    // locale;
-            std::string,    // notes;
-            std::string,    // location;
-            std::string,    // owner;
-            uint64_t,       // bool suspended = false;
-            uint64_t,       // bool blackListed = false;
-            std::string,    // userRole;
-            std::string,    // userTypeProprietaryInfo;
-            std::string,    // securityPolicy;
-            uint64_t ,       // securityPolicyChange;
-            std::string,    // currentPassword;
-            std::string,    // lastPasswords;
-            std::string,    // oauthType;
-            std::string    // oauthUserInfo;
-            > UserInfoRecord;
-    typedef std::vector<UserInfoRecord> UserInfoRecordList;
 
     bool Convert(const UserInfoRecord &T, SecurityObjects::UserInfo &U) {
         U.Id = T.get<0>();

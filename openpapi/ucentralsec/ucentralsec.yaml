@@ -465,6 +465,12 @@ paths:
           schema:
             type: boolean
           required: false
+        -in: query
+          name: requirements
+          description: A user forgot her password. She needs to present her e-mail address in the userId and set this to true
+          schema:
+            type: boolean
+          required: false
       requestBody:
         description: User id and password
         required: true

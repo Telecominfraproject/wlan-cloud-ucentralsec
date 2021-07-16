@@ -18,6 +18,7 @@
 #include "RESTAPI_action_links.h"
 #include "RESTAPI_systemEndpoints_handler.h"
 #include "RESTAPI_AssetServer.h"
+#include "RESTAPI_avatarHandler.h"
 
 #include "Daemon.h"
 #include "Utils.h"
@@ -70,7 +71,8 @@ namespace uCentral {
                 RESTAPI_system_command,
                 RESTAPI_AssetServer,
                 RESTAPI_systemEndpoints_handler,
-                RESTAPI_action_links
+                RESTAPI_action_links,
+                RESTAPI_avatarHandler
                 >(Path,Bindings,Logger_);
     }
 

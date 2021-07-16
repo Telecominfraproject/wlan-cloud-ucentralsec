@@ -12,11 +12,12 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 
 #ifndef SMALL_BUILD
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/MySQL/Connector.h"
-#include "Poco/Data/ODBC/Connector.h"
 #endif
 
 #include "AuthService.h"
@@ -24,116 +25,6 @@
 #include "SubSystemServer.h"
 
 namespace uCentral {
-
-    static const std::string AllUsersFieldsForCreation{
-            "Id             varchar(36),"
-            "name           varchar,"
-            "description    varchar,"
-            "avatar         varchar,"
-            "email          varchar,"
-            "validated      int,"
-            "validationEmail    varchar,"
-            "validationDate bigint,"
-            "creationDate   bigint,"
-            "validationURI  varchar,"
-            "changePassword int,"
-            "lastLogin      bigint,"
-            "currentLoginURI    varchar,"
-            "lastPasswordChange bigint,"
-            "lastEmailCheck     bigint,"
-            "waitingForEmailCheck   int,"
-            "locale             varchar,"
-            "notes              text,"
-            "location           varchar,"
-            "owner              varchar,"
-            "suspended          int,"
-            "blackListed        int,"
-            "userRole           varchar,"
-            "userTypeProprietaryInfo    text,"
-            "securityPolicy     text,"
-            "securityPolicyChange   bigint,"
-            "currentPassword    varchar,"
-            "lastPasswords      varchar,"
-            "oauthType          varchar,"
-            "oauthUserInfo      text"};
-
-    static const std::string AllUsersFieldsForSelect{
-            "Id,"
-            "name,"
-            "description,"
-            "avatar,"
-            "email,"
-            "validated,"
-            "validationEmail,"
-            "validationDate,"
-            "creationDate,"
-            "validationURI,"
-            "changePassword,"
-            "lastLogin,"
-            "currentLoginURI,"
-            "lastPasswordChange,"
-            "lastEmailCheck,"
-            "waitingForEmailCheck,"
-            "locale,"
-            "notes,"
-            "location,"
-            "owner,"
-            "suspended,"
-            "blackListed,"
-            "userRole,"
-            "userTypeProprietaryInfo,"
-            "securityPolicy,"
-            "securityPolicyChange,"
-            "currentPassword,"
-            "lastPasswords,"
-            "oauthType,"
-            "oauthUserInfo"};
-
-    static const std::string AllUsersFieldsForUpdate{
-            " Id=?, "
-            "name=?, "
-            "description=?, "
-            "avatar=?, "
-            "email=?, "
-            "validated=?, "
-            "validationEmail=?, "
-            "validationDate=?, "
-            "creationDate=?, "
-            "validationURI=?, "
-            "changePassword=?, "
-            "lastLogin=?, "
-            "currentLoginURI=?, "
-            "lastPasswordChange=?, "
-            "lastEmailCheck=?, "
-            "waitingForEmailCheck=?, "
-            "locale=?, "
-            "notes=?, "
-            "location=?, "
-            "owner=?, "
-            "suspended=?, "
-            "blackListed=?, "
-            "userRole=?, "
-            "userTypeProprietaryInfo=?, "
-            "securityPolicy=?, "
-            "securityPolicyChange=?, "
-            "currentPassword=?, "
-            "lastPasswords=?, "
-            "oauthType=?, "
-            "oauthUserInfo=? "};
-
-    static const std::string AllActionLinksFieldsForCreation {
-            "Id          varchar(36),"
-            "Action         varchar,"
-            "UserId         varchar,"
-            "template       varchar,"
-            "locale         varchar,"
-            "message        text,"
-            "sent           bigint,"
-            "created        bigint,"
-            "expires        bigint,"
-            "completed      bigint,"
-            "canceled       bigint"
-    };
 
     static const std::string AllActionLinksFieldsForSelect {
             "Id, "
@@ -163,7 +54,6 @@ namespace uCentral {
             "canceled=?"
     };
 
-
     static const std::string AllEmailTemplatesFieldsForCreation {
 
     };
@@ -186,8 +76,7 @@ namespace uCentral {
         enum StorageType {
             sqlite,
             pgsql,
-            mysql,
-            odbc
+            mysql
         };
 
         enum AUTH_ERROR {
@@ -261,6 +150,10 @@ namespace uCentral {
         bool GetUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
         bool SetLastLogin(USER_ID_TYPE & Id);
 
+        bool SetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
+        bool GetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
+        bool DeleteAvatar(const std::string & Admin, std::string &Id);
+
         /*
          *  All ActionLinks functions
          */
@@ -278,12 +171,11 @@ namespace uCentral {
 #ifndef SMALL_BUILD
 		std::unique_ptr<Poco::Data::PostgreSQL::Connector>  PostgresConn_= nullptr;
 		std::unique_ptr<Poco::Data::MySQL::Connector>       MySQLConn_= nullptr;
-		std::unique_ptr<Poco::Data::ODBC::Connector>        ODBCConn_= nullptr;
 #endif
 
         int Create_Tables();
         int Create_UserTable();
-        int Create_APIKeyTable();
+        int Create_AvatarTable();
 
         int 	Setup_SQLite();
 		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
@@ -291,7 +183,6 @@ namespace uCentral {
 #ifndef SMALL_BUILD
         int 	Setup_MySQL();
         int 	Setup_PostgreSQL();
-        int 	Setup_ODBC();
 #endif
         Storage() noexcept;
    };

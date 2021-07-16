@@ -45,8 +45,7 @@ find_package(ZLIB REQUIRED)
 find_package(CppKafka REQUIRED)
 find_package(PostgreSQL REQUIRED)
 find_package(MySQL REQUIRED)
-find_package(ODBC REQUIRED)
-find_package(Poco REQUIRED COMPONENTS JSON Crypto JWT Net Util NetSSL Data DataSQLite DataPostgreSQL DataMySQL DataODBC)
+find_package(Poco REQUIRED COMPONENTS JSON Crypto JWT Net Util NetSSL Data DataSQLite DataPostgreSQL DataMySQL)
 
 add_executable( ucentralsec
                 build
@@ -63,18 +62,18 @@ add_executable( ucentralsec
                 src/KafkaManager.h src/KafkaManager.cpp
                 src/StorageService.cpp src/StorageService.h
                 src/Utils.cpp src/Utils.h
-                src/storage_sqlite.cpp src/storage_odbc.cpp src/storage_sqlite.cpp src/storage_pgql.cpp src/storage_mysql.cpp
+                src/storage_sqlite.cpp src/storage_sqlite.cpp src/storage_pgql.cpp src/storage_mysql.cpp
                 src/storage_tables.cpp src/SMTPMailerService.cpp src/SMTPMailerService.h
                 src/RESTAPI_users_handler.cpp src/RESTAPI_users_handler.h
                 src/RESTAPI_user_handler.cpp src/RESTAPI_user_handler.h
                 src/RESTAPI_action_links.cpp src/RESTAPI_action_links.h src/storage_users.cpp
                 src/RESTAPI_InternalServer.cpp src/RESTAPI_InternalServer.h
                 src/RESTAPI_validateToken_handler.cpp src/RESTAPI_validateToken_handler.h
-                src/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI_systemEndpoints_handler.h src/RESTAPI_AssetServer.cpp src/RESTAPI_AssetServer.h)
+                src/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI_systemEndpoints_handler.h src/RESTAPI_AssetServer.cpp src/RESTAPI_AssetServer.h src/RESTAPI_avatarHandler.cpp src/RESTAPI_avatarHandler.h src/storage_avatar.cpp src/storage_avatar.h src/storage_users.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(ucentralsec PUBLIC
-            ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES} ${ODBC_LIBRARIES} ${ZLIB_LIBRARIES} ${LUA_LIBRARIES}
+            ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES}  ${ZLIB_LIBRARIES}
             CppKafka::cppkafka
             )
     if(UNIX AND NOT APPLE)

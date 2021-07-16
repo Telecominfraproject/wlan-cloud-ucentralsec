@@ -4,11 +4,14 @@
 
 #include "StorageService.h"
 #include "Utils.h"
+#include "storage_users.h"
+#include "storage_avatar.h"
 
 namespace uCentral {
 
     int Storage::Create_Tables() {
         Create_UserTable();
+        Create_AvatarTable();
         return 0;
     }
 
@@ -37,8 +40,39 @@ namespace uCentral {
         return 1;
     }
 
-    int Storage::Create_APIKeyTable() {
+    int Storage::Create_AvatarTable() {
+            try {
+                Poco::Data::Session Sess = Pool_->get();
 
-        return 0;
-    }
+                if(dbType_==sqlite) {
+                    Sess << "CREATE TABLE IF NOT EXISTS Avatars ("
+                            "Id			    VARCHAR(36) PRIMARY KEY, "
+                            "Type			VARCHAR, "
+                            "Created 		BIGINT, "
+                            "Name           VARCHAR, "
+                            "Avatar     	BLOB"
+                            ") ", Poco::Data::Keywords::now;
+                } else if(dbType_==mysql) {
+                    Sess << "CREATE TABLE IF NOT EXISTS Avatars ("
+                            "Id			    VARCHAR(36) PRIMARY KEY, "
+                            "Type			VARCHAR, "
+                            "Created 		BIGINT, "
+                            "Name           VARCHAR, "
+                            "Avatar     	LONGBLOB"
+                            ") ", Poco::Data::Keywords::now;
+                } else if(dbType_==pgsql) {
+                    Sess << "CREATE TABLE IF NOT EXISTS Avatars ("
+                            "Id			    VARCHAR(36) PRIMARY KEY, "
+                            "Type			VARCHAR, "
+                            "Created 		BIGINT, "
+                            "Name           VARCHAR, "
+                            "Avatar     	BYTEA"
+                            ") ", Poco::Data::Keywords::now;
+                }
+                return 0;
+            } catch(const Poco::Exception &E) {
+                Logger_.log(E);
+            }
+            return 0;
+        }
 }
