@@ -40,6 +40,9 @@ ucentral.system.commandchannel = /tmp/app.ucentralsec
 ucentral.service.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
 ucentral.service.key.password = mypassword
 
+ucentral.document.policy.access = /wwwassets/access_policy.html
+ucentral.document.policy.password = /wwwassets/password_policy.html
+
 #
 # Security Microservice Specific Section
 #

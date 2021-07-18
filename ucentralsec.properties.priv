@@ -25,6 +25,9 @@ ucentral.internal.restapi.host.0.cert = $UCENTRALSEC_ROOT/certs/restapi-cert.pem
 ucentral.internal.restapi.host.0.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
 ucentral.internal.restapi.host.0.key.password = mypassword
 
+ucentral.document.policy.access = /wwwassets/access_policy.html
+ucentral.document.policy.password = /wwwassets/password_policy.html
+
 #
 # Generic section that all microservices must have
 #
