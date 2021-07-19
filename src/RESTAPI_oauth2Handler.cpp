@@ -23,6 +23,7 @@ namespace uCentral {
 			return;
 
 		try {
+            ParseParameters(Request);
 			if (Request.getMethod() == Poco::Net::HTTPServerRequest::HTTP_POST) {
 				// Extract the info for login...
 				Poco::JSON::Parser parser;
@@ -32,7 +33,6 @@ namespace uCentral {
 				auto password = GetS(uCentral::RESTAPI::Protocol::PASSWORD, Obj);
 				auto newPassword = GetS(uCentral::RESTAPI::Protocol::NEWPASSWORD, Obj);
 
-                ParseParameters(Request);
                 if(GetBoolParameter("requirements",false)) {
                     Poco::JSON::Object  Answer;
                     Answer.set("passwordPattern",AuthService()->PasswordValidationExpression());
@@ -86,8 +86,21 @@ namespace uCentral {
 				} else {
 					NotFound(Request, Response);
 				}
+			} else if (Request.getMethod() == Poco::Net::HTTPServerRequest::HTTP_GET) {
+                if (!IsAuthorized(Request, Response)) {
+                    UnAuthorized(Request, Response, "Not authorized.");
+                    return;
+                }
+                bool GetMe = GetBoolParameter("me",false);
+                if(GetMe) {
+                    Poco::JSON::Object Me;
+                    UserInfo_.userinfo.to_json(Me);
+                    ReturnObject(Request, Me, Response);
+                    return;
+                }
+                BadRequest(Request, Response);
 			} else {
-				BadRequest(Request, Response, "Unsupported HTTP method.");
+                BadRequest(Request, Response, "Unsupported HTTP method.");
 			}
 			return;
 		} catch (const Poco::Exception &E) {

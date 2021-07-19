@@ -18,6 +18,7 @@ namespace uCentral {
 			: RESTAPIHandler(bindings, L,
 							 std::vector<std::string>{Poco::Net::HTTPRequest::HTTP_POST,
 													  Poco::Net::HTTPRequest::HTTP_DELETE,
+                                                      Poco::Net::HTTPRequest::HTTP_GET,
 													  Poco::Net::HTTPRequest::HTTP_OPTIONS},
 													  Internal) {}
 		void handleRequest(Poco::Net::HTTPServerRequest &request,

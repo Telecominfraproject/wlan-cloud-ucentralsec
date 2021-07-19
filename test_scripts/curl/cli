@@ -118,6 +118,12 @@ logout() {
   rm -rf token.json
 }
 
+me() {
+    curl  ${FLAGS} -X GET -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    "https://${UCENTRALSEC}/api/v1/oauth2?me=true"
+}
+
 listendpoints() {
     curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/systemEndpoints" \
         -H "accept: application/json" \
@@ -241,6 +247,7 @@ case "$1" in
     "deleteuser") login; deleteuser "$2" ; logout;;
     "getuser") login; getuser "$2" ; logout;;
     "listusers") login; listusers ; logout ;;
+    "me") login; me ; logout ;;
     "listendpoints") login; listendpoints ; logout ;;
     "testlogin") testlogin "$2" "$3" "$4";;
     "emailtest") emailtest "$2";;
@@ -250,7 +257,6 @@ case "$1" in
     "getavatar") login; getavatar "$2"; logout;;
     "deleteavatar") login; deleteavatar "$2"; logout;;
     "help") login; help  ; logout ;;
-
     *) help ;;
 esac
 
