@@ -14,7 +14,7 @@ namespace uCentral {
         if (!ContinueProcessing(Request, Response))
             return;
 
-        if (!Daemon()->IsValidAPIKEY(Request))
+        if (!IsAuthorized(Request, Response))
             return;
 
         try {

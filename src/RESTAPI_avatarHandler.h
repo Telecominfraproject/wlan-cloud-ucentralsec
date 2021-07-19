@@ -33,13 +33,14 @@ namespace uCentral {
 
     class RESTAPI_avatarHandler : public RESTAPIHandler {
     public:
-        RESTAPI_avatarHandler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L)
+        RESTAPI_avatarHandler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
                 : RESTAPIHandler(bindings, L,
                                  std::vector<std::string>{
                                          Poco::Net::HTTPRequest::HTTP_GET,
                                          Poco::Net::HTTPRequest::HTTP_POST,
                                          Poco::Net::HTTPRequest::HTTP_DELETE,
-                                         Poco::Net::HTTPRequest::HTTP_OPTIONS}) {}
+                                         Poco::Net::HTTPRequest::HTTP_OPTIONS},
+                                         Internal) {}
 
         void handleRequest(Poco::Net::HTTPServerRequest &Request,
                            Poco::Net::HTTPServerResponse &Response) override;
