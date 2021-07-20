@@ -50,6 +50,7 @@ namespace uCentral {
         try {
             std::string Id = GetBinding("id", "");
             SecurityObjects::UserInfo UInfo;
+
             if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
                 NotFound(Request, Response);
                 return;
@@ -63,7 +64,7 @@ namespace uCentral {
 
             Poco::Net::HTMLForm form(Request, Request.stream(), partHandler);
             Poco::JSON::Object Answer;
-            if (!partHandler.Name().empty()) {
+            if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("ucentral.avatar.maxsize",2000000)) {
                 Answer.set("avatarId", Id);
                 Answer.set("errorCode", 0);
                 Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));

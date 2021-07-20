@@ -86,10 +86,22 @@ namespace uCentral {
             SecurityObjects::UserInfo   UInfo;
             RESTAPI_utils::from_request(UInfo,Request);
 
+            if(UInfo.userRole == SecurityObjects::UNKNOWN) {
+                BadRequest(Request, Response, "Invalid userRole.");
+                return;
+            }
+
             Poco::toLowerInPlace(UInfo.email);
             if(!Utils::ValidEMailAddress(UInfo.email)) {
                 BadRequest(Request, Response, "Invalid email address.");
                 return;
+            }
+
+            if(!UInfo.currentPassword.empty()) {
+                if(!AuthService()->ValidatePassword(UInfo.currentPassword)) {
+                    BadRequest(Request, Response, "Invalid password.");
+                    return;
+                }
             }
 
             if(UInfo.name.empty())
@@ -140,8 +152,14 @@ namespace uCentral {
                 return;
             }
 
+            // some basic validations
             Poco::JSON::Parser IncomingParser;
             auto RawObject = IncomingParser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
+
+            if(RawObject->has("userRole") && SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString())==SecurityObjects::UNKNOWN) {
+                BadRequest(Request, Response, "Bad userRole value.");
+                return;
+            }
 
             // The only valid things to change are: changePassword, name,
             if(RawObject->has("name"))
@@ -159,7 +177,7 @@ namespace uCentral {
             if(RawObject->has("locale"))
                 LocalObject.locale = RawObject->get("locale").toString();
             if(RawObject->has("userRole"))
-                LocalObject.location = RawObject->get("userRole").toString();
+                LocalObject.userRole = SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString());
             if(RawObject->has("suspended"))
                 LocalObject.suspended = RawObject->get("suspended").toString()=="true";
             if(RawObject->has("blackListed"))
@@ -173,6 +191,10 @@ namespace uCentral {
                 }
             }
             if(RawObject->has("currentPassword")) {
+                if(!AuthService()->ValidatePassword(RawObject->get("currentPassword").toString())) {
+                    BadRequest(Request, Response, "Invalid password.");
+                    return;
+                }
                 if(!AuthService()->SetPassword(RawObject->get("currentPassword").toString(),LocalObject)) {
                     BadRequest(Request, Response, "Password was rejected. This maybe an old password.");
                     return;
