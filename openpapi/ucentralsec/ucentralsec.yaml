@@ -459,13 +459,13 @@ paths:
           schema:
             type: string
           required: false
-        -in: query
+        - in: query
           name: forgotPassword
           description: A user forgot her password. She needs to present her e-mail address in the userId and set this to true
           schema:
             type: boolean
           required: false
-        -in: query
+        - in: query
           name: requirements
           description: A user forgot her password. She needs to present her e-mail address in the userId and set this to true
           schema:
@@ -683,6 +683,97 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /avatar/{id}:
+    get:
+      tags:
+        - Avatar
+      operationId: getAvatar
+      summary: Retrieve teh avatar associated with a user ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+
+      responses:
+        200:
+          description: Successfully retrieved the avatar
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Avatar
+      operationId: deleteAvatar
+      summary: Remove an Avatar associated with a user ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Avatar
+      operationId: createAvatar
+      summary: Create an Avatar associated with a user ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        description: User id and password
+        required: true
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   #########################################################################################
   ##
@@ -709,55 +800,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SystemCommandResults'
-        403:
-          $ref: '#/components/responses/Unauthorized'
-        404:
-          $ref: '#/components/responses/NotFound'
-
-  /callbackChannel:
-    post:
-      tags:
-        - Callback
-      summary: Generic callback hook
-      operationId: postCallback
-      parameters:
-        - in: query
-          name: subscribe
-          schema:
-            type: boolean
-          required: false
-        - in: query
-          name: uri
-          schema:
-            type: string
-            format: uri
-        - in: query
-          name: key
-          schema:
-            type: string
-        - in: query
-          name: topics
-          schema:
-            type: string
-        - in: query
-          name: id
-          schema:
-            type: string
-        - in: query
-          name: topic
-          schema:
-            type: string
-      requestBody:
-        description: A generic JSONDocument, may be empty too {}
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AnyPayload'
-
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
