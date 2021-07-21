@@ -12,17 +12,21 @@
 #include "RESTAPI_handler.h"
 
 namespace uCentral {
-    class RESTAPI_system_command : public RESTAPIHandler {
-      public:
-        RESTAPI_system_command(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
-            : RESTAPIHandler(bindings, L,
-                             std::vector<std::string>{Poco::Net::HTTPRequest::HTTP_POST,
-                                                      Poco::Net::HTTPRequest::HTTP_OPTIONS},
-                                                      Internal) {}
-        void handleRequest(Poco::Net::HTTPServerRequest &request,
-                           Poco::Net::HTTPServerResponse &response) override;
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/system"}; };
-    };
+class RESTAPI_system_command : public RESTAPIHandler {
+  public:
+	RESTAPI_system_command(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
+		: RESTAPIHandler(bindings, L,
+						 std::vector<std::string>{Poco::Net::HTTPRequest::HTTP_POST,
+														  Poco::Net::HTTPRequest::HTTP_GET,
+														  Poco::Net::HTTPRequest::HTTP_OPTIONS},
+						 Internal) {}
+	void handleRequest(Poco::Net::HTTPServerRequest &request,
+					   Poco::Net::HTTPServerResponse &response) override;
+	static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/system"};}
+	void DoGet(Poco::Net::HTTPServerRequest &Request,
+			   Poco::Net::HTTPServerResponse &Response);
+	void DoPost(Poco::Net::HTTPServerRequest &Request,
+				Poco::Net::HTTPServerResponse &Response);
+	};
 }
-
 #endif // UCENTRALGW_RESTAPI_SYSTEM_COMMAND_H
