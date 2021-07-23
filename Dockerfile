@@ -26,7 +26,7 @@ RUN cmake ..
 RUN cmake --build . --config Release -j8
 RUN cmake --build . --target install
 
-ADD CMakeLists.txt /ucentralsec/
+ADD CMakeLists.txt build /ucentralsec/
 ADD cmake /ucentralsec/cmake
 ADD src /ucentralsec/src
 
