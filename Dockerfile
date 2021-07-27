@@ -52,11 +52,9 @@ RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su
 COPY --from=builder /ucentralsec/cmake-build/ucentralsec /ucentral/ucentralsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
+COPY docker-entrypoint.sh /
 
 EXPOSE 16001 17001 16101
-
-COPY docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/ucentral/ucentralsec"]
