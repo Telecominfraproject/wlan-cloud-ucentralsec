@@ -112,7 +112,7 @@ namespace uCentral {
 				Poco::JSON::Array	Array;
 				Poco::JSON::Object 	Answer;
 				Poco::JSON::Object	UpTimeObj;
-				UpTimeObj.set(RESTAPI::Protocol::TAG,RESTAPI::Protocol::TIMES);
+				UpTimeObj.set(RESTAPI::Protocol::TAG,RESTAPI::Protocol::UPTIME);
 				UpTimeObj.set(RESTAPI::Protocol::VALUE, Daemon()->uptime().totalSeconds());
 				Poco::JSON::Object	StartObj;
 				StartObj.set(RESTAPI::Protocol::TAG,RESTAPI::Protocol::START);
