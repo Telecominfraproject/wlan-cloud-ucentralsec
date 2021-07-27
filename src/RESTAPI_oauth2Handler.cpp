@@ -33,16 +33,16 @@ namespace uCentral {
 				auto password = GetS(uCentral::RESTAPI::Protocol::PASSWORD, Obj);
 				auto newPassword = GetS(uCentral::RESTAPI::Protocol::NEWPASSWORD, Obj);
 
-                if(GetBoolParameter("requirements",false)) {
+                if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
                     Poco::JSON::Object  Answer;
-                    Answer.set("passwordPattern",AuthService()->PasswordValidationExpression());
-                    Answer.set("accessPolicy", RESTAPI_Server()->GetAccessPolicy());
-                    Answer.set("passwordPolicy", RESTAPI_Server()->GetPasswordPolicy());
+                    Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
+                    Answer.set(RESTAPI::Protocol::ACCESSPOLICY, RESTAPI_Server()->GetAccessPolicy());
+                    Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, RESTAPI_Server()->GetPasswordPolicy());
                     ReturnObject(Request, Answer, Response);
                     return;
                 }
 
-                if(GetBoolParameter("forgotPassword",false)) {
+                if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
                     //  Send an email to the userId
                     SecurityObjects::UserInfoAndPolicy UInfo;
                     if(AuthService::SendEmailToUser(userId,AuthService::FORGOT_PASSWORD))
@@ -91,7 +91,7 @@ namespace uCentral {
                     UnAuthorized(Request, Response, "Not authorized.");
                     return;
                 }
-                bool GetMe = GetBoolParameter("me",false);
+                bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
                 if(GetMe) {
                     Poco::JSON::Object Me;
                     UserInfo_.userinfo.to_json(Me);

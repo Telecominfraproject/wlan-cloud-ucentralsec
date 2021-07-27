@@ -10,16 +10,17 @@
 #include "Daemon.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Utils.h"
+#include "RESTAPI_protocol.h"
 
 namespace uCentral {
 
     void AvatarPartHandler::handlePart(const Poco::Net::MessageHeader &Header, std::istream &Stream) {
-        FileType_ = Header.get("Content-Type", "(unspecified)");
-        if (Header.has("Content-Disposition")) {
+        FileType_ = Header.get(RESTAPI::Protocol::CONTENTTYPE, RESTAPI::Protocol::UNSPECIFIED);
+        if (Header.has(RESTAPI::Protocol::CONTENTDISPOSITION)) {
             std::string Disposition;
             Poco::Net::NameValueCollection Parameters;
-            Poco::Net::MessageHeader::splitParameters(Header["Content-Disposition"], Disposition, Parameters);
-            Name_ = Parameters.get("name", "(unnamed)");
+            Poco::Net::MessageHeader::splitParameters(Header[RESTAPI::Protocol::CONTENTDISPOSITION], Disposition, Parameters);
+            Name_ = Parameters.get(RESTAPI::Protocol::NAME, RESTAPI::Protocol::UNNAMED);
         }
         Poco::CountingInputStream InputStream(Stream);
         std::ofstream OutputStream(TempFile_.path(), std::ofstream::out);
@@ -48,7 +49,7 @@ namespace uCentral {
 
     void RESTAPI_avatarHandler::DoPost(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string Id = GetBinding("id", "");
+            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
             SecurityObjects::UserInfo UInfo;
 
             if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
@@ -65,15 +66,15 @@ namespace uCentral {
             Poco::Net::HTMLForm form(Request, Request.stream(), partHandler);
             Poco::JSON::Object Answer;
             if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("ucentral.avatar.maxsize",2000000)) {
-                Answer.set("avatarId", Id);
-                Answer.set("errorCode", 0);
+                Answer.set(RESTAPI::Protocol::AVATARID, Id);
+                Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
                 Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
                 Storage()->SetAvatar(UserInfo_.userinfo.email,
                                      Id, TmpFile, partHandler.ContentType(), partHandler.Name());
             } else {
-                Answer.set("avatarId", Id);
-                Answer.set("errorCode", 13);
-                Answer.set("ErrorText", "Avatar upload could not complete.");
+                Answer.set(RESTAPI::Protocol::AVATARID, Id);
+                Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
+                Answer.set(RESTAPI::Protocol::ERRORTEXT, "Avatar upload could not complete.");
             }
             ReturnObject(Request, Answer, Response);
         } catch (const Poco::Exception &E) {
@@ -84,7 +85,7 @@ namespace uCentral {
 
     void RESTAPI_avatarHandler::DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string Id = GetBinding("id", "");
+            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
             if (Id.empty()) {
                 NotFound(Request, Response);
                 return;
@@ -105,7 +106,7 @@ namespace uCentral {
 
     void RESTAPI_avatarHandler::DoDelete(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
         try {
-            std::string Id = GetBinding("id", "");
+            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
             if (Id.empty()) {
                 NotFound(Request, Response);
                 return;

@@ -7,6 +7,7 @@
 #include "Daemon.h"
 #include "RESTAPI_server.h"
 #include "Utils.h"
+#include "RESTAPI_protocol.h"
 
 namespace uCentral {
     void RESTAPI_AssetServer::handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
@@ -22,7 +23,7 @@ namespace uCentral {
         if(Request.getURI().find("/favicon.ico") != std::string::npos) {
             AssetFile = RESTAPI_Server()->AssetDir() + "/favicon.ico";
         } else {
-            std::string AssetName = GetBinding("id", "");
+            std::string AssetName = GetBinding(RESTAPI::Protocol::ID, "");
             AssetFile = RESTAPI_Server()->AssetDir() + "/" + AssetName;
         }
         if(!AssetFile.isFile()) {
