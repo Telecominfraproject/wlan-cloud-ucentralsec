@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: uCentral Security API
   description: A process to manage security logins
-  version: 0.0.2
+  version: 2.0.0
   license:
     name: BSD3
     url: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
