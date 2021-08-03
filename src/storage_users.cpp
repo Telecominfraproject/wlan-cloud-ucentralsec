@@ -221,17 +221,16 @@ namespace uCentral {
         return false;
     }
 
-    bool Storage::GetUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users) {
+    bool Storage::GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Select(Sess);
             UserInfoRecordList Records;
 
-            std::string St1{"select " + AllUsersFieldsForSelect + " from users"};
+            std::string St1{"select " + AllUsersFieldsForSelect + " from users order by id "};
 
-            Select << ConvertParams(St1) ,
-                    Poco::Data::Keywords::into(Records),
-                    Poco::Data::Keywords::range(Offset, Offset + Limit);
+            Select << ConvertParams(St1) + ComputeRange(Offset, HowMany),
+                        Poco::Data::Keywords::into(Records);
             Select.execute();
 
             for(const auto &R:Records) {
