@@ -227,7 +227,7 @@ namespace uCentral {
             Poco::Data::Statement Select(Sess);
             UserInfoRecordList Records;
 
-            std::string St1{"select " + AllUsersFieldsForSelect + " from users order by id "};
+            std::string St1{"select " + AllUsersFieldsForSelect + " from users order by id ASC "};
 
             Select << ConvertParams(St1) + ComputeRange(Offset, HowMany),
                         Poco::Data::Keywords::into(Records);
