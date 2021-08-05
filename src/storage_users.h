@@ -7,7 +7,7 @@
 
 namespace uCentral {
     static const std::string AllUsersFieldsForCreation{
-            "Id             varchar(36),"
+        " Id             varchar(36) UNIQUE PRIMARY KEY,"
             "name           varchar,"
             "description    varchar,"
             "avatar         varchar,"
