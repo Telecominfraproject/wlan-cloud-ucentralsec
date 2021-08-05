@@ -116,6 +116,9 @@ namespace uCentral {
             "canceled       bigint"
     };
 
+
+
+
     typedef Poco::Tuple <
         std::string,    // Id = 0;
         std::string,    // name;

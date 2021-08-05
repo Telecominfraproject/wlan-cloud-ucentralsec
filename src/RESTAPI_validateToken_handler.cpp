@@ -33,6 +33,7 @@ namespace uCentral {
                 }
             }
             NotFound(Request, Response);
+            return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
