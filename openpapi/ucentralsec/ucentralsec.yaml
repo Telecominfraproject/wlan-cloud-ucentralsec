@@ -504,7 +504,7 @@ paths:
               string
           required: true
       responses:
-        200:
+        204:
           description: successful operation
           content:
             application/json:
@@ -613,7 +613,7 @@ paths:
             format: int64
           required: true
       responses:
-        200:
+        204:
           $ref: '#/components/responses/Success'
         403:
           $ref: '#/components/responses/Unauthorized'
@@ -731,7 +731,7 @@ paths:
             format: uuid
           required: true
       responses:
-        200:
+        204:
           $ref: '#/components/responses/Success'
         403:
           $ref: '#/components/responses/Unauthorized'
@@ -818,7 +818,7 @@ paths:
             enum:
               - version
               - times
-        required: true
+          required: true
 
       responses:
         200:
