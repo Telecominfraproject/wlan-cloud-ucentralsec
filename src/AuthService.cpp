@@ -22,7 +22,7 @@
 
 #include "SMTPMailerService.h"
 
-namespace uCentral {
+namespace OpenWifi {
     class AuthService *AuthService::instance_ = nullptr;
 
     AuthService::ACCESS_TYPE AuthService::IntToAccessType(int C) {
@@ -277,7 +277,7 @@ namespace uCentral {
     std::string AuthService::ComputePasswordHash(const std::string &UserName, const std::string &Password) {
         std::string UName = Poco::trim(Poco::toLower(UserName));
         SHA2_.update(Password + UName);
-        return uCentral::Utils::ToHex(SHA2_.digest());
+        return Utils::ToHex(SHA2_.digest());
     }
 
     bool AuthService::SendEmailToUser(std::string &Email, EMAIL_REASON Reason) {

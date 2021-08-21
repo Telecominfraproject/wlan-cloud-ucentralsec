@@ -15,7 +15,7 @@
 
 #include "Utils.h"
 
-namespace uCentral {
+namespace OpenWifi {
 	void RESTAPI_oauth2Handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
 											  Poco::Net::HTTPServerResponse &Response) {
 
@@ -29,9 +29,9 @@ namespace uCentral {
 				Poco::JSON::Parser parser;
 				Poco::JSON::Object::Ptr Obj = parser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
 
-				auto userId = GetS(uCentral::RESTAPI::Protocol::USERID, Obj);
-				auto password = GetS(uCentral::RESTAPI::Protocol::PASSWORD, Obj);
-				auto newPassword = GetS(uCentral::RESTAPI::Protocol::NEWPASSWORD, Obj);
+				auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
+				auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
+				auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
 
                 if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
                     Poco::JSON::Object  Answer;
@@ -79,7 +79,7 @@ namespace uCentral {
                     UnAuthorized(Request, Response, "Not authorized.");
 					return;
 				}
-				auto Token = GetBinding(uCentral::RESTAPI::Protocol::TOKEN, "...");
+				auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
 				if (Token == SessionToken_) {
 					AuthService()->Logout(Token);
 					ReturnStatus(Request, Response, Poco::Net::HTTPResponse::HTTP_NO_CONTENT, true);

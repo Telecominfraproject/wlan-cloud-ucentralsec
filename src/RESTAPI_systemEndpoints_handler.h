@@ -6,7 +6,7 @@
 #define UCENTRALSEC_RESTAPI_SYSTEMENDPOINTS_HANDLER_H
 
 #include "RESTAPI_handler.h"
-namespace uCentral {
+namespace OpenWifi {
     class RESTAPI_systemEndpoints_handler : public RESTAPIHandler {
     public:
         RESTAPI_systemEndpoints_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)

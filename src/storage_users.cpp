@@ -9,7 +9,7 @@
 #include "Poco/Tuple.h"
 #include "storage_users.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     bool Convert(const UserInfoRecord &T, SecurityObjects::UserInfo &U) {
         U.Id = T.get<0>();

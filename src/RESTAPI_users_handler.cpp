@@ -7,7 +7,7 @@
 #include "RESTAPI_protocol.h"
 #include "Utils.h"
 
-namespace uCentral {
+namespace OpenWifi {
     void RESTAPI_users_handler::handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
         if (!ContinueProcessing(Request, Response))
             return;
@@ -41,7 +41,7 @@ namespace uCentral {
                         }
                     }
                     Poco::JSON::Object RetObj;
-                    RetObj.set(uCentral::RESTAPI::Protocol::USERS, ArrayObj);
+                    RetObj.set(RESTAPI::Protocol::USERS, ArrayObj);
                     ReturnObject(Request, RetObj, Response);
                     return;
                 }
@@ -61,7 +61,7 @@ namespace uCentral {
                     }
                 }
                 Poco::JSON::Object RetObj;
-                RetObj.set(uCentral::RESTAPI::Protocol::USERS, ArrayObj);
+                RetObj.set(RESTAPI::Protocol::USERS, ArrayObj);
                 ReturnObject(Request, RetObj, Response);
                 return;
             }

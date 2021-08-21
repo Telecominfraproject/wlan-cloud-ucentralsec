@@ -20,7 +20,7 @@
 #include "Utils.h"
 #include "Daemon.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     class SMTPMailerService * SMTPMailerService::instance_ = nullptr;
 

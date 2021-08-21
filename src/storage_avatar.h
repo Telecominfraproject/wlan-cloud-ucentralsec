@@ -5,7 +5,7 @@
 #ifndef WLAN_CLOUD_UCENTRALSEC_STORAGE_AVATAR_H
 #define WLAN_CLOUD_UCENTRALSEC_STORAGE_AVATAR_H
 
-namespace uCentral {
+namespace OpenWifi {
 
 
 

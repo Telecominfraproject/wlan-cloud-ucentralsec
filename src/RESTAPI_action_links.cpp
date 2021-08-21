@@ -12,7 +12,7 @@
 #include "RESTAPI_server.h"
 #include "Daemon.h"
 
-namespace uCentral {
+namespace OpenWifi {
     void RESTAPI_action_links::handleRequest(Poco::Net::HTTPServerRequest &Request,
                        Poco::Net::HTTPServerResponse &Response) {
         //  there is no authentication here, this is just someone clicking on a link

@@ -5,7 +5,7 @@
 #ifndef UCENTRALSEC_STORAGE_USERS_H
 #define UCENTRALSEC_STORAGE_USERS_H
 
-namespace uCentral {
+namespace OpenWifi {
     static const std::string AllUsersFieldsForCreation{
         " Id             varchar(36) UNIQUE PRIMARY KEY,"
             "name           varchar,"

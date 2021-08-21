@@ -23,7 +23,7 @@
 #include "Daemon.h"
 #include "Utils.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     class RESTAPI_Server *RESTAPI_Server::instance_ = nullptr;
 
@@ -59,7 +59,7 @@ namespace uCentral {
 
     Poco::Net::HTTPRequestHandler *RequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest & Request) {
 
-        Logger_.debug(Poco::format("REQUEST(%s): %s %s", uCentral::Utils::FormatIPv6(Request.clientAddress().toString()), Request.getMethod(), Request.getURI()));
+        Logger_.debug(Poco::format("REQUEST(%s): %s %s", Utils::FormatIPv6(Request.clientAddress().toString()), Request.getMethod(), Request.getURI()));
 
         Poco::URI uri(Request.getURI());
         const auto & Path = uri.getPath();

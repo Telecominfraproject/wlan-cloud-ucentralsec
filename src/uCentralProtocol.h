@@ -11,7 +11,7 @@
 
 #include "Poco/String.h"
 
-namespace uCentral::uCentralProtocol {
+namespace OpenWifi::uCentralProtocol {
 
 	const int SERIAL_NUMBER_LENGTH = 30;
 
@@ -79,6 +79,15 @@ namespace uCentral::uCentralProtocol {
 	static const char * VERBOSE = "verbose";
 	static const char * BANDS = "bands";
 	static const char * CHANNELS = "channels";
+	static const char * PASSWORD = "password";
+	static const char * DEVICEUPDATE = "deviceupdate";
+
+    static const char * SERIALNUMBER = "serialNumber";
+    static const char * COMPATIBLE = "compatible";
+    static const char * DISCONNECTION = "disconnection";
+    static const char * TIMESTAMP = "timestamp";
+    static const char * SYSTEM = "system";
+    static const char * HOST = "host";
 
 	enum EVENT_MSG {
 			ET_UNKNOWN,
@@ -89,7 +98,8 @@ namespace uCentral::uCentralProtocol {
 			ET_CRASHLOG,
 			ET_PING,
 			ET_CFGPENDING,
-			ET_RECOVERY
+			ET_RECOVERY,
+			ET_DEVICEUPDATE
 		};
 
 	static EVENT_MSG EventFromString(const std::string & Method) {
@@ -109,6 +119,8 @@ namespace uCentral::uCentralProtocol {
 			return ET_CFGPENDING;
 		} else if (!Poco::icompare(Method, RECOVERY)) {
 			return ET_RECOVERY;
+		} else if (!Poco::icompare(Method, DEVICEUPDATE)) {
+			return ET_DEVICEUPDATE;
 		} else
 			return ET_UNKNOWN;
 	};

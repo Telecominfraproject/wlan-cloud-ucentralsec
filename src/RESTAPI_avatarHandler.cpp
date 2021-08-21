@@ -12,7 +12,7 @@
 #include "Utils.h"
 #include "RESTAPI_protocol.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     void AvatarPartHandler::handlePart(const Poco::Net::MessageHeader &Header, std::istream &Stream) {
         FileType_ = Header.get(RESTAPI::Protocol::CONTENTTYPE, RESTAPI::Protocol::UNSPECIFIED);

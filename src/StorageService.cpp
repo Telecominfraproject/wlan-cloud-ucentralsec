@@ -11,7 +11,7 @@
 #include "Poco/Util/Application.h"
 #include "Utils.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     class Storage *Storage::instance_ = nullptr;
 

@@ -24,7 +24,7 @@
 #include "RESTAPI_SecurityObjects.h"
 #include "SubSystemServer.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     static const std::string AllActionLinksFieldsForSelect {
             "Id, "

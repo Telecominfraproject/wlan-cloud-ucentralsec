@@ -7,7 +7,7 @@
 #include "AuthService.h"
 #include "Utils.h"
 
-namespace uCentral {
+namespace OpenWifi {
     void RESTAPI_validateToken_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
                                                       Poco::Net::HTTPServerResponse &Response) {
 

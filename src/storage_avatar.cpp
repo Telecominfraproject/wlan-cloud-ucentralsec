@@ -12,7 +12,7 @@
 #include "Poco/Data/LOBStream.h"
 #include "Daemon.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     /*
                             "Id			    VARCHAR(36) PRIMARY KEY, "

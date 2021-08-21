@@ -7,7 +7,7 @@
 
 #include "RESTAPI_handler.h"
 
-namespace uCentral {
+namespace OpenWifi {
     class RESTAPI_users_handler : public RESTAPIHandler {
     public:
         RESTAPI_users_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)

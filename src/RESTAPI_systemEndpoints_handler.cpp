@@ -6,7 +6,7 @@
 #include "Daemon.h"
 #include "RESTAPI_SecurityObjects.h"
 
-namespace uCentral {
+namespace OpenWifi {
     void RESTAPI_systemEndpoints_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
                                                         Poco::Net::HTTPServerResponse &Response) {
 

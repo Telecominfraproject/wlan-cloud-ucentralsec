@@ -21,7 +21,7 @@
 
 #include "RESTAPI_SecurityObjects.h"
 
-namespace uCentral{
+namespace OpenWifi{
 
     static const std::string AUTHENTICATION_SYSTEM{"SYSTEM"};
 

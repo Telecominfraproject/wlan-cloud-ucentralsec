@@ -9,7 +9,7 @@
 #include "Utils.h"
 #include "RESTAPI_protocol.h"
 
-namespace uCentral {
+namespace OpenWifi {
     void RESTAPI_AssetServer::handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
         if(Request.getMethod()==Poco::Net::HTTPRequest::HTTP_GET)
             DoGet(Request, Response);

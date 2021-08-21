@@ -14,7 +14,7 @@
 
 #include "Utils.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     class RESTAPI_InternalServer *RESTAPI_InternalServer::instance_ = nullptr;
 
@@ -58,7 +58,7 @@ namespace uCentral {
     Poco::Net::HTTPRequestHandler *InternalRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest & Request) {
 
         Logger_.debug(Poco::format("REQUEST(%s): %s %s",
-                                   uCentral::Utils::FormatIPv6(Request.clientAddress().toString()),
+                                   Utils::FormatIPv6(Request.clientAddress().toString()),
                                    Request.getMethod(), Request.getURI()));
 
         Poco::URI uri(Request.getURI());

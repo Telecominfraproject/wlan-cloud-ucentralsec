@@ -9,7 +9,7 @@
 
 #include "Poco/File.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     enum MESSAGE_ATTRIBUTES {
         RECIPIENT_EMAIL,

@@ -21,10 +21,10 @@
 #include "Poco/Crypto/Cipher.h"
 
 
-#include "uCentralTypes.h"
+#include "OpenWifiTypes.h"
 #include "MicroService.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     static const char * vDAEMON_PROPERTIES_FILENAME = "ucentralsec.properties";
     static const char * vDAEMON_ROOT_ENV_VAR = "UCENTRALSEC_ROOT";

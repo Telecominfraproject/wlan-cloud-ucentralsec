@@ -69,7 +69,11 @@ add_executable( ucentralsec
                 src/RESTAPI_action_links.cpp src/RESTAPI_action_links.h src/storage_users.cpp
                 src/RESTAPI_InternalServer.cpp src/RESTAPI_InternalServer.h
                 src/RESTAPI_validateToken_handler.cpp src/RESTAPI_validateToken_handler.h
-                src/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI_systemEndpoints_handler.h src/RESTAPI_AssetServer.cpp src/RESTAPI_AssetServer.h src/RESTAPI_avatarHandler.cpp src/RESTAPI_avatarHandler.h src/storage_avatar.cpp src/storage_avatar.h src/storage_users.h)
+                src/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI_systemEndpoints_handler.h
+                src/RESTAPI_AssetServer.cpp src/RESTAPI_AssetServer.h
+                src/RESTAPI_avatarHandler.cpp src/RESTAPI_avatarHandler.h
+                src/storage_avatar.cpp src/storage_avatar.h src/storage_users.h
+                src/OpenWifiTypes.h )
 
 if(NOT SMALL_BUILD)
     target_link_libraries(ucentralsec PUBLIC

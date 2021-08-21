@@ -8,7 +8,7 @@
 
 #include "RESTAPI_handler.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     class AvatarPartHandler : public Poco::Net::PartHandler {
     public:

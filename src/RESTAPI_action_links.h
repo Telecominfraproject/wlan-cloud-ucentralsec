@@ -15,7 +15,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/CountingStream.h"
 
-namespace uCentral {
+namespace OpenWifi {
     class RESTAPI_action_links : public RESTAPIHandler {
     public:
         RESTAPI_action_links(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)

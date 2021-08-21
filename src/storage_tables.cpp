@@ -7,7 +7,7 @@
 #include "storage_users.h"
 #include "storage_avatar.h"
 
-namespace uCentral {
+namespace OpenWifi {
 
     int Storage::Create_Tables() {
         Create_UserTable();
