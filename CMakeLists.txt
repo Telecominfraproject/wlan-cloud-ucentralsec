@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ucentralsec VERSION 2.0.0)
+project(ucentralsec VERSION 2.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -62,7 +62,7 @@ add_executable( ucentralsec
                 src/KafkaManager.h src/KafkaManager.cpp
                 src/StorageService.cpp src/StorageService.h
                 src/Utils.cpp src/Utils.h
-                src/storage_sqlite.cpp src/storage_sqlite.cpp src/storage_pgql.cpp src/storage_mysql.cpp
+                src/storage_setup.cpp
                 src/storage_tables.cpp src/SMTPMailerService.cpp src/SMTPMailerService.h
                 src/RESTAPI_users_handler.cpp src/RESTAPI_users_handler.h
                 src/RESTAPI_user_handler.cpp src/RESTAPI_user_handler.h
