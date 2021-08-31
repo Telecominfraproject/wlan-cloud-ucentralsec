@@ -27,8 +27,8 @@
 namespace OpenWifi {
 
     static const char * vDAEMON_PROPERTIES_FILENAME = "owsec.properties";
-    static const char * vDAEMON_ROOT_ENV_VAR = "UCENTRALSEC_ROOT";
-    static const char * vDAEMON_CONFIG_ENV_VAR = "UCENTRALSEC_CONFIG";
+    static const char * vDAEMON_ROOT_ENV_VAR = "OWSEC_ROOT";
+    static const char * vDAEMON_CONFIG_ENV_VAR = "OWSEC_CONFIG";
     static const char * vDAEMON_APP_NAME = uSERVICE_SECURITY.c_str();
     static const uint64_t vDAEMON_BUS_TIMER = 5000;
 
