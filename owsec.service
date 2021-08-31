@@ -5,8 +5,8 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-Environment="UCENTRALSEC_ROOT=/home/admin/dev/wlan-cloud-ucentralsec"
-ExecStart=/home/admin/dev/wlan-cloud-ucentralsec/cmake-build/ucentralsec
+Environment="OWSEC_ROOT=/home/admin/dev/wlan-cloud-ucentralsec"
+ExecStart=/home/admin/dev/wlan-cloud-ucentralsec/cmake-build/owsec
 WorkingDirectory=/home/admin/dev/wlan-cloud-ucentralsec
 # ExecReload=/bin/kill -s HUP $MAINPID
 User=admin
