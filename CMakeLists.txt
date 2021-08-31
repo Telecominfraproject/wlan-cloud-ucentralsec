@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ucentralsec VERSION 2.1.0)
+project(owsec VERSION 2.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -47,7 +47,7 @@ find_package(PostgreSQL REQUIRED)
 find_package(MySQL REQUIRED)
 find_package(Poco REQUIRED COMPONENTS JSON Crypto JWT Net Util NetSSL Data DataSQLite DataPostgreSQL DataMySQL)
 
-add_executable( ucentralsec
+add_executable( owsec
                 build
                 src/Daemon.h src/Daemon.cpp
                 src/MicroService.cpp src/MicroService.h
@@ -76,11 +76,11 @@ add_executable( ucentralsec
                 src/OpenWifiTypes.h )
 
 if(NOT SMALL_BUILD)
-    target_link_libraries(ucentralsec PUBLIC
+    target_link_libraries(owsec PUBLIC
             ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES}  ${ZLIB_LIBRARIES}
             CppKafka::cppkafka
             )
     if(UNIX AND NOT APPLE)
-        target_link_libraries(ucentralsec PUBLIC PocoJSON)
+        target_link_libraries(owsec PUBLIC PocoJSON)
     endif()
 endif()

@@ -20,10 +20,10 @@ then
   exit 1
 fi
 
-if [[ "${UCENTRALSEC}" == "" ]]
+if [[ "${OWSEC}" == "" ]]
 then
-  echo "You must set the variable UCENTRALSEC in order to use this script. Something like"
-  echo "UCENTRALSEC=myauthgateway.isp.com:16001"
+  echo "You must set the variable OWSEC in order to use this script. Something like"
+  echo "OWSEC=myauthgateway.isp.com:16001"
   exit 1
 fi
 
@@ -43,7 +43,7 @@ browser=""
 
 login() {
   payload="{ \"userId\" : \"$username\" , \"password\" : \"$password\" }"
-  token=$(curl ${FLAGS} -X POST -H "Content-Type: application/json" -d "$payload" "https://${UCENTRALSEC}/api/v1/oauth2" | jq -r '.access_token')
+  token=$(curl ${FLAGS} -X POST -H "Content-Type: application/json" -d "$payload" "https://${OWSEC}/api/v1/oauth2" | jq -r '.access_token')
 
   if [[ "${token}" == "" ]]
   then
@@ -55,7 +55,7 @@ login() {
 
 testlogin() {
     payload="{ \"userId\" : \"$1\" , \"password\" : \"$2\" }"
-    curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2" \
+    curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2" \
         -H "Content-Type: application/json" \
         -d "$payload" > ${result_file}
     userMustChangePassword=$(cat ${result_file} | jq -r '.userMustChangePassword')
@@ -68,14 +68,14 @@ testlogin() {
             exit 1
         fi
         payload="{ \"userId\" : \"$1\" , \"password\" : \"$2\", \"newPassword\" : \"$3\" }"
-        curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2" \
+        curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2" \
             -H "Content-Type: application/json" \
             -d "$payload" > ${result_file}
         jq < ${result_file}
     elif [[ "$3" != "" ]]
     then
         payload="{ \"userId\" : \"$1\" , \"password\" : \"$2\", \"newPassword\" : \"$3\" }"
-        curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2" \
+        curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2" \
                 -H "Content-Type: application/json" \
                 -d "$payload" > ${result_file}
         jq < ${result_file}
@@ -85,7 +85,7 @@ testlogin() {
 
 emailtest() {
     payload="{ \"userId\" : \"$1\"  }"
-    curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2?forgotPassword=true" \
+    curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2?forgotPassword=true" \
         -H "Content-Type: application/json" \
         -d "$payload" > ${result_file}
     jq < ${result_file}
@@ -114,18 +114,18 @@ findbrowser() {
 logout() {
   curl  ${FLAGS} -X DELETE -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${token}" \
-        "https://${UCENTRALSEC}/api/v1/oauth2/${token}"
+        "https://${OWSEC}/api/v1/oauth2/${token}"
   rm -rf token.json
 }
 
 me() {
     curl  ${FLAGS} -X GET -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
-    "https://${UCENTRALSEC}/api/v1/oauth2?me=true"
+    "https://${OWSEC}/api/v1/oauth2?me=true"
 }
 
 listendpoints() {
-    curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/systemEndpoints" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemEndpoints" \
         -H "accept: application/json" \
         -H "Authorization: Bearer ${token}"  > ${result_file}
     jq < ${result_file}
@@ -161,12 +161,12 @@ listendpoints() {
 }
 
 getlogo() {
-	curl ${FLAGS} -X GET "https://${UCENTRALSEC}/wwwassets/open-wifi.svg"
+	curl ${FLAGS} -X GET "https://${OWSEC}/wwwassets/open-wifi.svg"
 }
 
 createuser() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
-    curl  ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/user/0" \
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -175,7 +175,7 @@ createuser() {
 
 createuser_v() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
-    curl  ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/user/0?email_verification=true" \
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0?email_verification=true" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -183,7 +183,7 @@ createuser_v() {
 }
 
 deleteuser() {
-    curl  ${FLAGS} -X DELETE "https://${UCENTRALSEC}/api/v1/user/$1" \
+    curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/user/$1" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -191,7 +191,7 @@ deleteuser() {
 }
 
 getuser() {
-    curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/user/$1" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/user/$1" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -199,7 +199,7 @@ getuser() {
 }
 
 listusers() {
-    curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/users" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/users" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -208,41 +208,41 @@ listusers() {
 
 policies() {
     payload="{}"
-    curl ${FLAGS} -X POST "https://${UCENTRALSEC}/api/v1/oauth2?requirements=true" \
+    curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2?requirements=true" \
         -H "Content-Type: application/json" \
         -d "$payload" > ${result_file}
     jq < ${result_file}
 }
 
 setavatar() {
-    curl ${FLAGS} -F 'data=@open-wifi.svg' "https://${UCENTRALSEC}/api/v1/avatar/$1" \
+    curl ${FLAGS} -F 'data=@open-wifi.svg' "https://${OWSEC}/api/v1/avatar/$1" \
         -H "Authorization: Bearer ${token}" > ${result_file};
     jq < ${result_file}
 }
 
 getavatar() {
-    curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/avatar/$1" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/avatar/$1" \
         -H "accept: application/octet-stream" \
         -H "Authorization: Bearer ${token}" \
 		-o "user.svg"
 }
 
 deleteavatar() {
-    curl  ${FLAGS} -X DELETE "https://${UCENTRALSEC}/api/v1/avatar/$1" \
+    curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/avatar/$1" \
         -H "Authorization: Bearer ${token}" \
         -H "Content-Type: application/json" > ${result_file}
     jq < ${result_file}
 }
 
 secversion() {
-    curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/system?command=version" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/system?command=version" \
         -H "accept: application/json" \
         -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
 sectimes() {
-    curl  ${FLAGS} -X GET "https://${UCENTRALSEC}/api/v1/system?command=times" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/system?command=times" \
         -H "accept: application/json" \
         -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}

@@ -21,7 +21,7 @@ The entire uCentral systems uses several MicroServices. In order for the whole s
 access
 
 - Security
-  - Properties file: ucentralsec.properties
+  - Properties file: owsec.properties
   - Ports
     - Public: 16001
     - Private: 17001
@@ -42,7 +42,7 @@ access
     - ALB: 16104
 
 ## Security Configuration
-The service relies on a properties configuration file called `ucentralsec.properties`. In this file, you should configure several entries. Many values are optional 
+The service relies on a properties configuration file called `owsec.properties`. In this file, you should configure several entries. Many values are optional 
 and you can rely on the defaults. Here are some values of note:
 
 ### `authentication.default.password`
@@ -52,7 +52,7 @@ Set the hash of the default username and password. Please look below on how to d
 Set the default username to use to login.
 
 ### Default username and password
-The default username and password are set in `ucentralsec.properties` file. The following entries manage the username and password
+The default username and password are set in `owsec.properties` file. The following entries manage the username and password
 ```text
 authentication.default.username = tip@ucentral.com
 authentication.default.password = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -97,19 +97,19 @@ This security service uses Kafka to coordinate security with other services that
 in order to use this. You can find several examples of Kafka services available with Docker. Here are the values you need to configure.
 
 ```asm
-ucentral.kafka.group.id = security
-ucentral.kafka.client.id = security1
-ucentral.kafka.enable = true
-ucentral.kafka.brokerlist = my.kafkaserver.arilia.com:9092
-ucentral.kafka.auto.commit = false
-ucentral.kafka.queue.buffering.max.ms = 50
+openwifi.kafka.group.id = security
+openwifi.kafka.client.id = security1
+openwifi.kafka.enable = true
+openwifi.kafka.brokerlist = my.kafkaserver.arilia.com:9092
+openwifi.kafka.auto.commit = false
+openwifi.kafka.queue.buffering.max.ms = 50
 ```
 
-#### `ucentral.kafka.brokerlist`
+#### `openwifi.kafka.brokerlist`
 This is the list of your kafka brokers. This is a comma separated list. You should use IP addresses or FQDNs and the relevant ports, usually 9092 is the 
 default.
 
-#### `ucentral.kafka.group.id`
+#### `openwifi.kafka.group.id`
 Every service on the Kafka bux must have a unique value (at least in our case). This should be a string. We suggest using a name corresponding to the 
 function provided. In this case, security.
 
@@ -124,17 +124,17 @@ Here are the parameters for the public interface. The important files are:
 - `restapi-ca.pem` : the CA of your certificate
 - `restapi-cert.pem` : the certificate for the public interface
 - `restapi-key.pem` : the key associated with this certificate
-- `ucentral.restapi.host.0.key.password` : if you key is password protected, you may supply that password here.
+- `openwifi.restapi.host.0.key.password` : if you key is password protected, you may supply that password here.
 
 ```asm
-ucentral.restapi.host.0.backlog = 100
-ucentral.restapi.host.0.security = relaxed
-ucentral.restapi.host.0.rootca = $UCENTRALSEC_ROOT/certs/restapi-ca.pem
-ucentral.restapi.host.0.address = *
-ucentral.restapi.host.0.port = 16001
-ucentral.restapi.host.0.cert = $UCENTRALSEC_ROOT/certs/restapi-cert.pem
-ucentral.restapi.host.0.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
-ucentral.restapi.host.0.key.password = mypassword
+openwifi.restapi.host.0.backlog = 100
+openwifi.restapi.host.0.security = relaxed
+openwifi.restapi.host.0.rootca = $OWSEC_ROOT/certs/restapi-ca.pem
+openwifi.restapi.host.0.address = *
+openwifi.restapi.host.0.port = 16001
+openwifi.restapi.host.0.cert = $OWSEC_ROOT/certs/restapi-cert.pem
+openwifi.restapi.host.0.key = $OWSEC_ROOT/certs/restapi-key.pem
+openwifi.restapi.host.0.key.password = mypassword
 ```
 
 #### The private interface
@@ -142,14 +142,14 @@ The private interface is used for service-to-service communication. You can use 
 to the filenames used in the previous section.
 
 ```asm
-ucentral.internal.restapi.host.0.backlog = 100
-ucentral.internal.restapi.host.0.security = relaxed
-ucentral.internal.restapi.host.0.rootca = $UCENTRALSEC_ROOT/certs/restapi-ca.pem
-ucentral.internal.restapi.host.0.address = *
-ucentral.internal.restapi.host.0.port = 17001
-ucentral.internal.restapi.host.0.cert = $UCENTRALSEC_ROOT/certs/restapi-cert.pem
-ucentral.internal.restapi.host.0.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
-ucentral.internal.restapi.host.0.key.password = mypassword
+openwifi.internal.restapi.host.0.backlog = 100
+openwifi.internal.restapi.host.0.security = relaxed
+openwifi.internal.restapi.host.0.rootca = $OWSEC_ROOT/certs/restapi-ca.pem
+openwifi.internal.restapi.host.0.address = *
+openwifi.internal.restapi.host.0.port = 17001
+openwifi.internal.restapi.host.0.cert = $OWSEC_ROOT/certs/restapi-cert.pem
+openwifi.internal.restapi.host.0.key = $OWSEC_ROOT/certs/restapi-key.pem
+openwifi.internal.restapi.host.0.key.password = mypassword
 ```
 
 ### Other important values
@@ -157,19 +157,19 @@ Here are other important values you must set.
 
 
 ```asm
-ucentral.system.data = $UCENTRALSEC_ROOT/data
-ucentral.system.uri.private = https://localhost:17001
-ucentral.system.uri.public = https://ucentral.dpaas.arilia.com:16001
-ucentral.system.commandchannel = /tmp/app.ucentralsec
-ucentral.service.key = $UCENTRALSEC_ROOT/certs/restapi-key.pem
+openwifi.system.data = $OWSEC_ROOT/data
+openwifi.system.uri.private = https://localhost:17001
+openwifi.system.uri.public = https://openwifi.dpaas.arilia.com:16001
+openwifi.system.commandchannel = /tmp/app.ucentralsec
+openwifi.service.key = $OWSEC_ROOT/certs/restapi-key.pem
 ```
 
-#### `ucentral.system.data`
+#### `openwifi.system.data`
 The location of some important data files including the user name database.
 
-#### `ucentral.system.uri.private`
+#### `openwifi.system.uri.private`
 This is the FQDN used internally between services.
 
-#### `ucentral.system.uri.public`
+#### `openwifi.system.uri.public`
 This is the FQDN used externally serving the OpenAPI interface.
 

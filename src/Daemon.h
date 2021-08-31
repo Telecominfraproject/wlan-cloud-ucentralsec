@@ -26,7 +26,7 @@
 
 namespace OpenWifi {
 
-    static const char * vDAEMON_PROPERTIES_FILENAME = "ucentralsec.properties";
+    static const char * vDAEMON_PROPERTIES_FILENAME = "owsec.properties";
     static const char * vDAEMON_ROOT_ENV_VAR = "UCENTRALSEC_ROOT";
     static const char * vDAEMON_CONFIG_ENV_VAR = "UCENTRALSEC_CONFIG";
     static const char * vDAEMON_APP_NAME = uSERVICE_SECURITY.c_str();
@@ -34,15 +34,15 @@ namespace OpenWifi {
 
     class Daemon : public MicroService {
     public:
-        explicit Daemon(std::string PropFile,
-                        std::string RootEnv,
-                        std::string ConfigEnv,
-                        std::string AppName,
+        explicit Daemon(const std::string & PropFile,
+                        const std::string & RootEnv,
+                        const std::string & ConfigEnv,
+                        const std::string & AppName,
                         uint64_t BusTimer,
-                        Types::SubSystemVec SubSystems) :
+                        const Types::SubSystemVec & SubSystems) :
                 MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
-        void initialize(Poco::Util::Application &self);
+        void initialize(Poco::Util::Application &self) override;
         static Daemon *instance();
     private:
         static Daemon 				*instance_;

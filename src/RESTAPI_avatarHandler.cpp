@@ -65,7 +65,7 @@ namespace OpenWifi {
 
             Poco::Net::HTMLForm form(Request, Request.stream(), partHandler);
             Poco::JSON::Object Answer;
-            if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("ucentral.avatar.maxsize",2000000)) {
+            if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
                 Answer.set(RESTAPI::Protocol::AVATARID, Id);
                 Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
                 Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));

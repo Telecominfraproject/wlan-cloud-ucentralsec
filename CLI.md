@@ -1,9 +1,9 @@
 # Security Service CLI Documentation
 
 ## Before using the CLI
-You must set the environment variable `UCENTRALSEC`. You must specify the host and port for the security service. Here is an example
+You must set the environment variable `OWSEC`. You must specify the host and port for the security service. Here is an example
 ```csh
-export UCENTRALSEC=mysecurityservice,example.com:16001
+export OWSEC=mysecurityservice,example.com:16001
 ```
 Once set, you can start using the `CLI`.
 
