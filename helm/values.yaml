@@ -55,8 +55,8 @@ ingresses:
 volumes:
   ucentralsec:
     - name: config
-      mountPath: /ucentralsec-data/ucentralsec.properties
-      subPath: ucentralsec.properties
+      mountPath: /ucentralsec-data/owsec.properties
+      subPath: owsec.properties
       # Template below will be rendered in template
       volumeDefinition: |
         secret:
