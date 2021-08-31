@@ -46,7 +46,8 @@ RUN addgroup -S "$UCENTRALSEC_USER" && \
     adduser -S -G "$UCENTRALSEC_USER" "$UCENTRALSEC_USER"
 
 RUN mkdir /ucentral
-RUN mkdir -p "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG"
+RUN mkdir -p "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG" && \
+    chown "$UCENTRALSEC_USER": "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG"
 RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec
 
 COPY --from=builder /ucentralsec/cmake-build/ucentralsec /ucentral/ucentralsec
