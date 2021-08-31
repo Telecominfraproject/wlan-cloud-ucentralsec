@@ -1,0 +1,22 @@
+[Unit]
+Description=OpenWiFi Security Service
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment="UCENTRALSEC_ROOT=/home/admin/dev/wlan-cloud-ucentralsec"
+ExecStart=/home/admin/dev/wlan-cloud-ucentralsec/cmake-build/owsec
+WorkingDirectory=/home/admin/dev/wlan-cloud-ucentralsec
+# ExecReload=/bin/kill -s HUP $MAINPID
+User=admin
+# TimeoutSec=0
+RestartSec=2
+Restart=always
+StartLimitBurst=3
+# KillMode=process
+LimitNOFILE=500000
+LimitNPROC=500000
+
+[Install]
+WantedBy=multi-user.target

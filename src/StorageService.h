@@ -177,7 +177,6 @@ namespace OpenWifi {
         int Create_UserTable();
         int Create_AvatarTable();
 
-        int 	Setup_SQLite();
 		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
 		[[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {
 		    if(dbType_==sqlite) {
@@ -190,11 +189,15 @@ namespace OpenWifi {
 		    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
 		}
 
-#ifndef SMALL_BUILD
+		Storage() noexcept:
+            SubSystemServer("Storage", "STORAGE-SVR", "storage")
+            {
+            }
+
+        int 	Setup_SQLite();
         int 	Setup_MySQL();
         int 	Setup_PostgreSQL();
-#endif
-        Storage() noexcept;
+
    };
 
     inline Storage * Storage() { return Storage::instance(); };

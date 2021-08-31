@@ -64,9 +64,9 @@ namespace OpenWifi {
 	}
 
 	void RESTAPIHandler::ParseParameters(Poco::Net::HTTPServerRequest &request) {
-
 		Poco::URI uri(request.getURI());
 		Parameters_ = uri.getQueryParameters();
+		InitQueryBlock();
 	}
 
 	static bool is_number(const std::string &s) {
@@ -111,6 +111,26 @@ namespace OpenWifi {
 		return Default;
 	}
 
+	bool RESTAPIHandler::HasParameter(const std::string &Name, std::string &Value) {
+	    for (const auto &i : Parameters_) {
+	        if (i.first == Name) {
+	            Value = i.second;
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
+	bool RESTAPIHandler::HasParameter(const std::string &Name, uint64_t & Value) {
+	    for (const auto &i : Parameters_) {
+	        if (i.first == Name) {
+	            Value = std::stoi(i.second);
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
 	const std::string &RESTAPIHandler::GetBinding(const std::string &Name, const std::string &Default) {
 		auto E = Bindings_.find(Poco::toLower(Name));
 		if (E == Bindings_.end())
@@ -128,6 +148,22 @@ namespace OpenWifi {
 				Return += ", " + i;
 
 		return Return;
+	}
+
+	bool RESTAPIHandler::AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value) {
+	    if(O->has(Field)) {
+	        Value = O->get(Field).toString();
+	        return true;
+	    }
+	    return false;
+	}
+
+	bool RESTAPIHandler::AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, uint64_t &Value) {
+	    if(O->has(Field)) {
+	        Value = O->get(Field);
+	        return true;
+	    }
+	    return false;
 	}
 
 	void RESTAPIHandler::AddCORS(Poco::Net::HTTPServerRequest &Request,
@@ -364,7 +400,17 @@ namespace OpenWifi {
 		Poco::JSON::Stringifier::stringify(Object, Answer);
 	}
 
+	void RESTAPIHandler::ReturnCountOnly(Poco::Net::HTTPServerRequest &Request, uint64_t Count,
+                         Poco::Net::HTTPServerResponse &Response) {
+	    Poco::JSON::Object  Answer;
+	    Answer.set("count", Count);
+        ReturnObject(Request,Answer,Response);
+	}
+
 	bool RESTAPIHandler::InitQueryBlock() {
+	    if(QueryBlockInitialized_)
+	        return true;
+	    QueryBlockInitialized_=true;
 		QB_.SerialNumber = GetParameter(RESTAPI::Protocol::SERIALNUMBER, "");
 		QB_.StartDate = GetParameter(RESTAPI::Protocol::STARTDATE, 0);
 		QB_.EndDate = GetParameter(RESTAPI::Protocol::ENDDATE, 0);
@@ -376,8 +422,10 @@ namespace OpenWifi {
 		QB_.LogType = GetParameter(RESTAPI::Protocol::LOGTYPE,0);
 		QB_.LastOnly = GetBoolParameter(RESTAPI::Protocol::LASTONLY,false);
 		QB_.Newest = GetBoolParameter(RESTAPI::Protocol::NEWEST,false);
+		QB_.CountOnly = GetBoolParameter(RESTAPI::Protocol::COUNTONLY,false);
 
-		if(QB_.Offset<1) return false;
+		if(QB_.Offset<1)
+		    QB_.Offset=1;
 		return true;
 	}
 

@@ -42,7 +42,7 @@ namespace OpenWifi {
 		std::string         AccessPolicy_;
 
         RESTAPI_Server() noexcept:
-            SubSystemServer("RESTAPIServer", "REST-SRV", "ucentral.restapi")
+            SubSystemServer("RESTAPIServer", "REST-SRV", "openwifi.restapi")
         {
         }
     };
