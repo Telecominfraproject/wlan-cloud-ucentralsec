@@ -334,8 +334,12 @@ namespace OpenWifi {
         std::lock_guard G(Mutex_);
         auto It = UserCache_.find(Token);
 
+        std::cout << "Validating token" << std::endl;
+
         if(It==UserCache_.end())
             return false;
+        std::cout << "Token is valid" << std::endl;
+
         WebToken = It->second.webtoken;
         UserInfo = It->second.userinfo;
         return true;
