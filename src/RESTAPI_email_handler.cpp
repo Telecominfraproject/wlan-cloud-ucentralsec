@@ -18,9 +18,11 @@ namespace OpenWifi {
         if (!ContinueProcessing(Request, Response))
             return;
 
+        std::cout << __LINE__ << std::endl;
         if (!IsAuthorized(Request, Response))
             return;
 
+        std::cout << __LINE__ << std::endl;
         if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
             DoPost(Request, Response);
         else
@@ -29,9 +31,11 @@ namespace OpenWifi {
 
     void RESTAPI_email_handler::DoPost(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
         try {
+            std::cout << __LINE__ << std::endl;
             Poco::JSON::Parser parser;
             auto Obj = parser.parse(Request.stream()).extract<Poco::JSON::Object::Ptr>();
 
+            std::cout << __LINE__ << std::endl;
             if (Obj->has("subject") &&
                 Obj->has("from") &&
                 Obj->has("text") &&
@@ -48,10 +52,12 @@ namespace OpenWifi {
                     OK(Request, Response);
                     return;
                 }
+                std::cout << __LINE__ << std::endl;
             }
         } catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
+        std::cout << __LINE__ << std::endl;
         BadRequest(Request, Response, "Unsupported or missing parameters.");
     }
 
