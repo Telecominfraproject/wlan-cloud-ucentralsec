@@ -336,7 +336,7 @@ namespace OpenWifi {
         std::lock_guard G(Mutex_);
         auto It = UserCache_.find(Token);
 
-        std::cout << "Validating token" << std::endl;
+        std::cout << "Validating token: " << Token << std::endl;
 
         if(It==UserCache_.end())
             return false;
