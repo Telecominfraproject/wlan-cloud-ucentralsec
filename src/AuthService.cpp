@@ -331,6 +331,8 @@ namespace OpenWifi {
     }
 
     bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo) {
+        std::cout << "Validating token" << std::endl;
+
         std::lock_guard G(Mutex_);
         auto It = UserCache_.find(Token);
 
