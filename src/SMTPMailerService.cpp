@@ -28,6 +28,7 @@ namespace OpenWifi {
         MailHost_ = Daemon()->ConfigGetString("mailer.hostname");
         SenderLoginUserName_ = Daemon()->ConfigGetString("mailer.username");
         SenderLoginPassword_ = Daemon()->ConfigGetString("mailer.password");
+        Sender_ = Daemon()->ConfigGetString("mailer.sender");
         LoginMethod_ = Daemon()->ConfigGetString("mailer.loginmethod");
         MailHostPort_ = (int)Daemon()->ConfigGetInt("mailer.port");
         TemplateDir_ = Daemon()->ConfigPath("mailer.templates", Daemon()->DataDir());
