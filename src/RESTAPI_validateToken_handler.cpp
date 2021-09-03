@@ -29,7 +29,7 @@ namespace OpenWifi {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     SecurityObjects::UserInfoAndPolicy SecObj;
                     std::cout << "Line: " << i.first << std::endl;
-                    if (AuthService()->IsValidToken(i.first, SecObj.webtoken, SecObj.userinfo)) {
+                    if (AuthService()->IsValidToken(i.second, SecObj.webtoken, SecObj.userinfo)) {
                         Poco::JSON::Object Obj;
                         SecObj.to_json(Obj);
                         ReturnObject(Request, Obj, Response);
