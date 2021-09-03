@@ -41,10 +41,6 @@ namespace OpenWifi {
 
                 MessageAttributes Attrs;
 
-                std::cout << "Recipient: " << Recipients->get(0).toString() << std::endl;
-                std::cout << "Text: " << Obj->get("text").toString() << std::endl;
-                std::cout << "subject: " << Obj->get("subject").toString() << std::endl;
-
                 Attrs[RECIPIENT_EMAIL] = Recipients->get(0).toString();
                 Attrs[SUBJECT] = Obj->get("subject").toString();
                 Attrs[TEXT] = Obj->get("text").toString();
