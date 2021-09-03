@@ -258,6 +258,7 @@ sendemail() {
     payload="{ \"recipients\" : [ \"stephane.bourque@gmail.com\" ] , \"subject\" : \"test1\" , \"from\" : \"no-reply@arilia.com\" , \"text\" : \"This is a test from SES.\" }"
             curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/email" \
             -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${token}" \
             -d "$payload" > ${result_file}
             jq < ${result_file}
 }
