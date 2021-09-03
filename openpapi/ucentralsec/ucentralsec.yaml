@@ -296,6 +296,22 @@ components:
           items:
             $ref: '#/components/schemas/UserInfo'
 
+    EMailInfo:
+      type: object
+      properties:
+        from:
+          type: string
+          format: email
+        subject:
+          type: string
+        recipients:
+          type:
+            array:
+              items:
+                type: string
+                format: email
+        text:
+          type: string
 
     #########################################################################################
     ##
@@ -774,6 +790,36 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
+
+  /email:
+    post:
+      tags:
+        - EMail
+      summary: Send test email with the system
+      operationId: Send a test email
+      requestBody:
+        description: The requested message
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EMailInfo'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
 
   #########################################################################################
   ##
