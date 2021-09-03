@@ -60,15 +60,16 @@ namespace OpenWifi {
                                             .File=Poco::File(TemplateDir_ + "/" +Name),
                                             .Attrs=Attrs});
 
-        return false;
+        return true;
     }
 
     void SMTPMailerService::run() {
 
         Running_ = true;
         while(Running_) {
-            Poco::Thread::trySleep(2000);
-
+            Poco::Thread::trySleep(10000);
+            if(!Running_)
+                break;
             {
                 SubMutexGuard G(Mutex_);
 
@@ -106,11 +107,16 @@ namespace OpenWifi {
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
 
-            std::string Content = Utils::LoadFile(Msg.File);
-            Types::StringPairVec    Variables;
-            FillVariables(Msg.Attrs, Variables);
-            Utils::ReplaceVariables(Content, Variables);
-            Message.addContent(new Poco::Net::StringPartSource(Content));
+            if(Msg.Attrs.find(TEXT) != Msg.Attrs.end()) {
+                std::string Content = Msg.Attrs.find(TEXT)->second;
+                Message.addContent(new Poco::Net::StringPartSource(Content));
+            } else {
+                std::string Content = Utils::LoadFile(Msg.File);
+                Types::StringPairVec    Variables;
+                FillVariables(Msg.Attrs, Variables);
+                Utils::ReplaceVariables(Content, Variables);
+                Message.addContent(new Poco::Net::StringPartSource(Content));
+            }
 
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {

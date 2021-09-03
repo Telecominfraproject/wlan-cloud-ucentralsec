@@ -22,7 +22,8 @@ namespace OpenWifi {
         SUBJECT,
         TEMPLATE_TXT,
         TEMPLATE_HTML,
-        LOGO
+        LOGO,
+        TEXT
     };
 
     static const std::map<MESSAGE_ATTRIBUTES,const std::string>
@@ -36,7 +37,9 @@ namespace OpenWifi {
                                  {  SUBJECT, "SUBJECT"},
                                  {  TEMPLATE_TXT, "TEMPLATE_TXT"},
                                  {  TEMPLATE_HTML, "TEMPLATE_HTML"},
-                                 {  LOGO, "LOGO"}};
+                                 {  LOGO, "LOGO"},
+                                 {  TEXT, "TEXT"}
+                                 };
 
     inline const std::string & MessageAttributeToVar(MESSAGE_ATTRIBUTES Attr) {
         static const std::string EmptyString{};
