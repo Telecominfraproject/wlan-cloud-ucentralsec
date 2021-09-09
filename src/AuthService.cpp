@@ -80,23 +80,23 @@ namespace OpenWifi {
 		} catch(const Poco::Exception &E) {
 		}
 
-		if(CallToken.empty())
-			CallToken = Request.get("X-API-KEY ", "");
+		if(!CallToken.empty()) {
+		    if(Storage()->IsTokenRevocated(CallToken))
+		        return false;
+		    auto Client = UserCache_.find(CallToken);
+		    if( Client == UserCache_.end() )
+		        return ValidateToken(CallToken, CallToken, UInfo);
 
-		if(CallToken.empty())
-			return false;
-
-		auto Client = UserCache_.find(CallToken);
-
-		if( Client == UserCache_.end() )
-			return ValidateToken(CallToken, CallToken, UInfo);
-
-		if((Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr)) {
-			SessionToken = CallToken;
-            UInfo = Client->second ;
-			return true;
+		    if((Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr)) {
+		        SessionToken = CallToken;
+		        UInfo = Client->second ;
+		        return true;
+		    }
+		    UserCache_.erase(CallToken);
+		    Storage()->AddRevocatedToken(CallToken);
+		    return false;
 		}
-		UserCache_.erase(CallToken);
+
 		return false;
     }
 
@@ -115,6 +115,8 @@ namespace OpenWifi {
             Obj.set("token", token);
             std::stringstream ResultText;
             Poco::JSON::Stringifier::stringify(Obj, ResultText);
+            std::string Tmp{token};
+            Storage()->AddRevocatedToken(Tmp);
             KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, Daemon()->PrivateEndPoint(), ResultText.str(),
                                         false);
         } catch (const Poco::Exception &E) {

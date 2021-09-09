@@ -154,6 +154,10 @@ namespace OpenWifi {
         bool GetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
         bool DeleteAvatar(const std::string & Admin, std::string &Id);
 
+        bool AddRevocatedToken(std::string &Token);
+        bool IsTokenRevocated(std::string &Token);
+        bool CleanRevocatedTokens( uint64_t Oldest );
+
         /*
          *  All ActionLinks functions
          */
@@ -176,6 +180,7 @@ namespace OpenWifi {
         int Create_Tables();
         int Create_UserTable();
         int Create_AvatarTable();
+        int Create_RevocationTable();
 
 		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
 		[[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {

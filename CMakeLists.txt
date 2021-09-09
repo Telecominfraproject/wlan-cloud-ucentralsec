@@ -73,7 +73,8 @@ add_executable( owsec
                 src/RESTAPI_AssetServer.cpp src/RESTAPI_AssetServer.h
                 src/RESTAPI_avatarHandler.cpp src/RESTAPI_avatarHandler.h
                 src/storage_avatar.cpp src/storage_avatar.h src/storage_users.h
-                src/OpenWifiTypes.h src/RESTAPI_email_handler.cpp src/RESTAPI_email_handler.h)
+                src/OpenWifiTypes.h src/RESTAPI_email_handler.cpp src/RESTAPI_email_handler.h
+                src/storage_revocation.cpp )
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
