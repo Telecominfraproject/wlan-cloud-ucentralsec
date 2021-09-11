@@ -62,12 +62,26 @@ namespace OpenWifi {
                 BadRequest(Request, Response, "You must supply the ID of the user.");
                 return;
             }
-            if(!Storage()->DeleteUser(UserInfo_.userinfo.name,Id)) {
+
+            SecurityObjects::UserInfo UInfo;
+            if(!Storage()->GetUserById(Id,UInfo)) {
                 NotFound(Request, Response);
                 return;
             }
+
+            if(!Storage()->DeleteUser(UserInfo_.userinfo.email,Id)) {
+                NotFound(Request, Response);
+                return;
+            }
+
+            if(AuthService()->DeleteUserFromCache(UInfo.email))
+                Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
+
+            Storage()->RevokeAllTokens(UInfo.email);
+
             Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
             OK(Request, Response);
+
             return;
         } catch (const Poco::Exception &E ) {
             Logger_.log(E);
@@ -107,7 +121,7 @@ namespace OpenWifi {
             if(UInfo.name.empty())
                 UInfo.name = UInfo.email;
 
-            if(!Storage()->CreateUser(UserInfo_.userinfo.name,UInfo)) {
+            if(!Storage()->CreateUser(UInfo.email,UInfo)) {
                 Logger_.information(Poco::format("Could not add user '%s'.",UInfo.email));
                 BadRequest(Request, Response);
                 return;

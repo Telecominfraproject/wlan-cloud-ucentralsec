@@ -67,7 +67,7 @@ namespace OpenWifi {
         if(!Secure_)
             return true;
 
-		SubMutexGuard		Guard(Mutex_);
+        std::lock_guard		Guard(Mutex_);
 
 		std::string CallToken;
 
@@ -81,7 +81,7 @@ namespace OpenWifi {
 		}
 
 		if(!CallToken.empty()) {
-		    if(Storage()->IsTokenRevocated(CallToken))
+		    if(Storage()->IsTokenRevoked(CallToken))
 		        return false;
 		    auto Client = UserCache_.find(CallToken);
 		    if( Client == UserCache_.end() )
@@ -93,11 +93,25 @@ namespace OpenWifi {
 		        return true;
 		    }
 		    UserCache_.erase(CallToken);
-		    Storage()->AddRevocatedToken(CallToken);
+		    Storage()->RevokeToken(CallToken);
 		    return false;
 		}
 
 		return false;
+    }
+
+    bool AuthService::DeleteUserFromCache(const std::string &UserName) {
+        std::lock_guard		Guard(Mutex_);
+
+        for(auto i=UserCache_.begin();i!=UserCache_.end();) {
+            if (i->second.userinfo.email==UserName) {
+                Logout(i->first);
+                i = UserCache_.erase(i);
+            } else {
+                ++i;
+            }
+        }
+        return true;
     }
 
     bool AuthService::ValidatePassword(const std::string &Password) {
@@ -105,8 +119,9 @@ namespace OpenWifi {
     }
 
     void AuthService::Logout(const std::string &token) {
-		SubMutexGuard		Guard(Mutex_);
-        UserCache_.erase(token);
+		std::lock_guard		Guard(Mutex_);
+
+		UserCache_.erase(token);
 
         try {
             Poco::JSON::Object Obj;
@@ -116,7 +131,7 @@ namespace OpenWifi {
             std::stringstream ResultText;
             Poco::JSON::Stringifier::stringify(Obj, ResultText);
             std::string Tmp{token};
-            Storage()->AddRevocatedToken(Tmp);
+            Storage()->RevokeToken(Tmp);
             KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, Daemon()->PrivateEndPoint(), ResultText.str(),
                                         false);
         } catch (const Poco::Exception &E) {
@@ -125,7 +140,7 @@ namespace OpenWifi {
     }
 
     std::string AuthService::GenerateToken(const std::string & Identity, ACCESS_TYPE Type) {
-		SubMutexGuard		Guard(Mutex_);
+        std::lock_guard		Guard(Mutex_);
 
 		Poco::JWT::Token	T;
 
@@ -145,37 +160,22 @@ namespace OpenWifi {
     }
 
 	bool AuthService::ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo  ) {
-		SubMutexGuard		Guard(Mutex_);
+        std::lock_guard		Guard(Mutex_);
 		Poco::JWT::Token	DecryptedToken;
 
 		try {
             auto E = UserCache_.find(SessionToken);
             if(E == UserCache_.end()) {
-                if (Signer_.tryVerify(Token, DecryptedToken)) {
-                    auto Expires = DecryptedToken.getExpiration();
-                    if (Expires > Poco::Timestamp()) {
-                        auto Identity = DecryptedToken.payload().get("identity").toString();
-                        if(Storage()->GetUserById(Identity,UInfo.userinfo)) {
-                            auto IssuedAt = DecryptedToken.getIssuedAt();
-                            auto Subject = DecryptedToken.getSubject();
-                            UInfo.webtoken.access_token_ = Token;
-                            UInfo.webtoken.refresh_token_ = Token;
-                            UInfo.webtoken.username_ = Identity;
-                            UInfo.webtoken.id_token_ = Token;
-                            UInfo.webtoken.token_type_ = "Bearer";
-                            UInfo.webtoken.created_ = IssuedAt.epochTime();
-                            UInfo.webtoken.expires_in_ = Expires.epochTime() - IssuedAt.epochTime();
-                            UInfo.webtoken.idle_timeout_ = 5 * 60;
-                            UserCache_[UInfo.webtoken.access_token_] = UInfo;
-                            return true;
-                        }
+                if(Storage()->GetToken(SessionToken,UInfo)) {
+                    if(Storage()->GetUserById(UInfo.userinfo.email,UInfo.userinfo)) {
+                        UserCache_[UInfo.webtoken.access_token_] = UInfo;
+                        return true;
                     }
                 }
             } else {
                 UInfo = E->second;
                 return true;
             }
-
 		} catch (const Poco::Exception &E ) {
 			Logger_.log(E);
 		}
@@ -184,24 +184,26 @@ namespace OpenWifi {
 
     void AuthService::CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo)
     {
-		SubMutexGuard		Guard(Mutex_);
+        std::lock_guard		Guard(Mutex_);
 
-		std::string Token = GenerateToken(UInfo.userinfo.Id,USERNAME);
         SecurityObjects::AclTemplate	ACL;
         ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
         UInfo.webtoken.acl_template_ = ACL;
         UInfo.webtoken.expires_in_ = TokenAging_ ;
         UInfo.webtoken.idle_timeout_ = 5 * 60;
         UInfo.webtoken.token_type_ = "Bearer";
-        UInfo.webtoken.access_token_ = Token;
-        UInfo.webtoken.id_token_ = Token;
-        UInfo.webtoken.refresh_token_ = Token;
+        UInfo.webtoken.access_token_ = GenerateToken(UInfo.userinfo.Id,USERNAME);
+        UInfo.webtoken.id_token_ = GenerateToken(UInfo.userinfo.Id,USERNAME);
+        UInfo.webtoken.refresh_token_ = GenerateToken(UInfo.userinfo.Id,CUSTOM);
         UInfo.webtoken.created_ = time(nullptr);
         UInfo.webtoken.username_ = UserName;
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
-        UserCache_[Token] = UInfo;
+        UserCache_[UInfo.webtoken.access_token_] = UInfo;
         Storage()->SetLastLogin(UInfo.userinfo.Id);
+        Storage()->AddToken(UInfo.webtoken.username_, UInfo.webtoken.access_token_,
+                            UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
+                                UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
 
     bool AuthService::SetPassword(const std::string &NewPassword, SecurityObjects::UserInfo & UInfo) {
@@ -222,7 +224,7 @@ namespace OpenWifi {
 
     AuthService::AUTH_ERROR AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
-		SubMutexGuard					Guard(Mutex_);
+        std::lock_guard		Guard(Mutex_);
         SecurityObjects::AclTemplate	ACL;
 
         Poco::toLowerInPlace(UserName);
