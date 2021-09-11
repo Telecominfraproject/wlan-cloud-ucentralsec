@@ -115,6 +115,7 @@ logout() {
   curl  ${FLAGS} -X DELETE -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${token}" \
         "https://${OWSEC}/api/v1/oauth2/${token}"
+  token=""
   rm -rf token.json
 }
 
@@ -263,6 +264,17 @@ sendemail() {
             jq < ${result_file}
 }
 
+testlogout() {
+    echo "Logged in..."
+    oldtoken=${token}
+    listusers
+    logout
+    echo "Logged out..."
+    token=${oldtoken}
+    echo "This should be en error"
+    listusers
+}
+
 shopt -s nocasematch
 
 case "$1" in
@@ -283,6 +295,7 @@ case "$1" in
     "secversion") login; secversion ; logout;;
     "sectimes") login; sectimes ; logout;;
     "sendemail") login; sendemail ; logout;;
+    "testlogout") login; testlogout ;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac

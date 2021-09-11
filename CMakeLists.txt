@@ -74,7 +74,7 @@ add_executable( owsec
                 src/RESTAPI_avatarHandler.cpp src/RESTAPI_avatarHandler.h
                 src/storage_avatar.cpp src/storage_avatar.h src/storage_users.h
                 src/OpenWifiTypes.h src/RESTAPI_email_handler.cpp src/RESTAPI_email_handler.h
-                src/storage_revocation.cpp )
+        src/storage_tokens.cpp)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
