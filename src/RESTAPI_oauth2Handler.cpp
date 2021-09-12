@@ -17,6 +17,7 @@
 
 namespace OpenWifi {
 	void RESTAPI_oauth2Handler::DoGet() {
+	    std::cout << __LINE__ << std::endl;
 	    try {
 	        if (!IsAuthorized()) {
 	            UnAuthorized("Not authorized.");
@@ -58,6 +59,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_oauth2Handler::DoPost() {
+	    std::cout << __LINE__ << std::endl;
 	    try {
 
 	        // Extract the info for login...
