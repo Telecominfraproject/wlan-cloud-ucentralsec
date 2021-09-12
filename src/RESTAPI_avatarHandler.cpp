@@ -28,32 +28,13 @@ namespace OpenWifi {
         Length_ = InputStream.chars();
     };
 
-    void RESTAPI_avatarHandler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                              Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
-
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else
-            BadRequest(Request, Response);
-    }
-
-    void RESTAPI_avatarHandler::DoPost(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_avatarHandler::DoPost() {
         try {
             std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
             SecurityObjects::UserInfo UInfo;
 
             if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
 
@@ -63,7 +44,7 @@ namespace OpenWifi {
             Poco::TemporaryFile TmpFile;
             AvatarPartHandler partHandler(Id, Logger_, TmpFile);
 
-            Poco::Net::HTMLForm form(Request, Request.stream(), partHandler);
+            Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
             Poco::JSON::Object Answer;
             if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
                 Answer.set(RESTAPI::Protocol::AVATARID, Id);
@@ -76,50 +57,50 @@ namespace OpenWifi {
                 Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
                 Answer.set(RESTAPI::Protocol::ERRORTEXT, "Avatar upload could not complete.");
             }
-            ReturnObject(Request, Answer, Response);
+            ReturnObject(Answer);
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 
-    void RESTAPI_avatarHandler::DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_avatarHandler::DoGet() {
         try {
             std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
             if (Id.empty()) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
             Poco::TemporaryFile TempAvatar;
             std::string Type, Name;
             if (!Storage()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
-            SendFile(TempAvatar, Type, Name, Request, Response);
+            SendFile(TempAvatar, Type, Name);
             return;
         } catch (const Poco::Exception&E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 
-    void RESTAPI_avatarHandler::DoDelete(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_avatarHandler::DoDelete() {
         try {
             std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
             if (Id.empty()) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
             if (!Storage()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
-                NotFound(Request, Response);
+                NotFound();
                 return;
             }
-            OK(Request, Response);
+            OK();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 }

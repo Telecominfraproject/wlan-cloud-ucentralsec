@@ -25,15 +25,16 @@ namespace OpenWifi {
                                                             Poco::Net::HTTPRequest::HTTP_POST,
                                                             Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                                             Internal) {}
-        void handleRequest(Poco::Net::HTTPServerRequest &Request,
-                           Poco::Net::HTTPServerResponse &Response) override;
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/actionLink"}; };
-        void DoResetPassword(std::string &Id,Poco::Net::HTTPServerRequest &Request,
-                            Poco::Net::HTTPServerResponse &Response);
-        void DoEmailVerification(std::string &Id,Poco::Net::HTTPServerRequest &Request,
-                            Poco::Net::HTTPServerResponse &Response);
-        void DoReturnA404(Poco::Net::HTTPServerRequest &Request,
-                          Poco::Net::HTTPServerResponse &Response);
+        void RequestResetPassword(std::string &Id);
+        void CompleteResetPassword(std::string &Id);
+        void DoEmailVerification(std::string &Id);
+        void DoReturnA404();
+
+        void DoGet() final;
+        void DoPost() final;
+        void DoDelete() final {};
+        void DoPut() final {};
     };
 }
 

@@ -16,11 +16,11 @@ namespace OpenWifi {
                          std::vector<std::string>{Poco::Net::HTTPRequest::HTTP_POST,
                                                   Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                                   Internal) {}
-                                                  void handleRequest(Poco::Net::HTTPServerRequest &request,
-                                                                     Poco::Net::HTTPServerResponse &response) override;
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/email"};}
-        void DoPost(Poco::Net::HTTPServerRequest &Request,
-                    Poco::Net::HTTPServerResponse &Response);
+        void DoGet() final {};
+        void DoPost() final;
+        void DoDelete() final {};
+        void DoPut() final {};
     };
 }
 

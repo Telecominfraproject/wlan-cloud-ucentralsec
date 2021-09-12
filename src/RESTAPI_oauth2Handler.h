@@ -20,17 +20,12 @@ namespace OpenWifi {
 													  Poco::Net::HTTPRequest::HTTP_DELETE,
                                                       Poco::Net::HTTPRequest::HTTP_GET,
 													  Poco::Net::HTTPRequest::HTTP_OPTIONS},
-													  Internal) {}
-		void handleRequest(Poco::Net::HTTPServerRequest &request,
-						   Poco::Net::HTTPServerResponse &response) override;
+													  Internal, false) {}
 		static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/oauth2/{token}","/api/v1/oauth2"}; };
-		void DoGet(Poco::Net::HTTPServerRequest &request,
-                   Poco::Net::HTTPServerResponse &response);
-		void DoPost(Poco::Net::HTTPServerRequest &request,
-                   Poco::Net::HTTPServerResponse &response);
-		void DoDelete(Poco::Net::HTTPServerRequest &request,
-                   Poco::Net::HTTPServerResponse &response);
-
+		void DoGet() final;
+		void DoPost() final;
+		void DoDelete() final;
+		void DoPut() final {};
 	};
 }
 #endif //UCENTRAL_RESTAPI_OAUTH2HANDLER_H

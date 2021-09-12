@@ -7,38 +7,27 @@
 #include "RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
-    void RESTAPI_systemEndpoints_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                        Poco::Net::HTTPServerResponse &Response) {
 
-        if (!ContinueProcessing(Request, Response))
-            return;
-
-        if (!IsAuthorized(Request, Response))
-            return;
-
+    void RESTAPI_systemEndpoints_handler::DoGet() {
         try {
-            if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET) {
-                auto Services = Daemon()->GetServices();
+            auto Services = Daemon()->GetServices();
 
-                SecurityObjects::SystemEndpointList L;
+            SecurityObjects::SystemEndpointList L;
 
-                for(const auto &i:Services) {
-                    SecurityObjects::SystemEndpoint S{
-                        .type = i.Type,
-                        .id = i.Id,
-                        .uri = i.PublicEndPoint};
-                    L.endpoints.push_back(S);
-                }
-                Poco::JSON::Object  Obj;
-                L.to_json(Obj);
-
-                ReturnObject(Request, Obj, Response);
-                return;
+            for(const auto &i:Services) {
+                SecurityObjects::SystemEndpoint S{
+                    .type = i.Type,
+                    .id = i.Id,
+                    .uri = i.PublicEndPoint};
+                L.endpoints.push_back(S);
             }
+            Poco::JSON::Object  Obj;
+            L.to_json(Obj);
+            ReturnObject(Obj);
+            return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
-
 }

@@ -8,21 +8,7 @@
 #include "Utils.h"
 
 namespace OpenWifi {
-    void RESTAPI_users_handler::handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
-
-        if (!IsAuthorized(Request, Response))
-            return;
-
-        ParseParameters(Request);
-        if(Request.getMethod()==Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else
-            BadRequest(Request, Response);
-    }
-
-    void RESTAPI_users_handler::DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_users_handler::DoGet() {
         try {
             std::vector<SecurityObjects::UserInfo> Users;
             InitQueryBlock();
@@ -42,7 +28,7 @@ namespace OpenWifi {
                     }
                     Poco::JSON::Object RetObj;
                     RetObj.set(RESTAPI::Protocol::USERS, ArrayObj);
-                    ReturnObject(Request, RetObj, Response);
+                    ReturnObject(RetObj);
                     return;
                 }
             } else {
@@ -62,12 +48,12 @@ namespace OpenWifi {
                 }
                 Poco::JSON::Object RetObj;
                 RetObj.set(RESTAPI::Protocol::USERS, ArrayObj);
-                ReturnObject(Request, RetObj, Response);
+                ReturnObject(RetObj);
                 return;
             }
         } catch ( const Poco::Exception &E ) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        BadRequest("Internal error.");
     }
 }
