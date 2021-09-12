@@ -63,7 +63,9 @@ namespace OpenWifi {
 	    try {
 
 	        // Extract the info for login...
+	        std::cout << __LINE__ << std::endl;
 	        auto Obj = ParseStream();
+	        std::cout << __LINE__ << std::endl;
 	        auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
 	        auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
 	        auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
