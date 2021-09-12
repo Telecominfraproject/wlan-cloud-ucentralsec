@@ -67,9 +67,13 @@ namespace OpenWifi {
 	        auto Obj = ParseStream();
 	        std::cout << __LINE__ << std::endl;
 	        auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
+	        std::cout << __LINE__ << std::endl;
 	        auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
+	        std::cout << __LINE__ << std::endl;
 	        auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
+	        std::cout << __LINE__ << std::endl;
 	        Poco::toLowerInPlace(userId);
+	        std::cout << __LINE__ << std::endl;
 
 	        std::cout << __LINE__ << std::endl;
 
