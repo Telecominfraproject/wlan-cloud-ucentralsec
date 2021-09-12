@@ -67,7 +67,10 @@ namespace OpenWifi {
 	        auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
 	        Poco::toLowerInPlace(userId);
 
+	        std::cout << __LINE__ << std::endl;
+
 	        if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
+	            std::cout << __LINE__ << std::endl;
 	            Poco::JSON::Object  Answer;
 	            Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
 	            Answer.set(RESTAPI::Protocol::ACCESSPOLICY, RESTAPI_Server()->GetAccessPolicy());
@@ -75,8 +78,10 @@ namespace OpenWifi {
 	            ReturnObject(Answer);
 	            return;
 	        }
+	        std::cout << __LINE__ << std::endl;
 
 	        if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
+	            std::cout << __LINE__ << std::endl;
 	            //  Send an email to the userId
 	            SecurityObjects::UserInfoAndPolicy UInfo;
 	            if(AuthService::SendEmailToUser(userId,AuthService::FORGOT_PASSWORD))
@@ -85,18 +90,23 @@ namespace OpenWifi {
 	            Poco::JSON::Object ReturnObj;
 	            UInfo.webtoken.to_json(ReturnObj);
 	            ReturnObject(ReturnObj);
+	            std::cout << __LINE__ << std::endl;
 	            return;
 	        }
 
 	        SecurityObjects::UserInfoAndPolicy UInfo;
+	        std::cout << __LINE__ << std::endl;
 
 	        auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo);
+	        std::cout << __LINE__ << std::endl;
 	        if (Code==AuthService::SUCCESS) {
 	            Poco::JSON::Object ReturnObj;
 	            UInfo.webtoken.to_json(ReturnObj);
 	            ReturnObject(ReturnObj);
+	            std::cout << __LINE__ << std::endl;
 	            return;
 	        } else {
+	            std::cout << __LINE__ << std::endl;
 	            switch(Code) {
 	                case AuthService::INVALID_CREDENTIALS: UnAuthorized("Unrecognized credentials (username/password)."); break;
 	                case AuthService::PASSWORD_INVALID: UnAuthorized("Invalid password."); break;
@@ -107,9 +117,12 @@ namespace OpenWifi {
 	            }
 	            return;
 	        }
+	        std::cout << __LINE__ << std::endl;
 	    } catch(const Poco::Exception &E) {
+	        std::cout << __LINE__ << std::endl;
 	        Logger_.log(E);
 	    }
+	    std::cout << __LINE__ << std::endl;
 	    BadRequest("Internal error has occurred. Please try later.");
 	}
 }
