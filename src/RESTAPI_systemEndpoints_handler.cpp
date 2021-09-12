@@ -9,25 +9,17 @@
 namespace OpenWifi {
 
     void RESTAPI_systemEndpoints_handler::DoGet() {
-        try {
-            auto Services = Daemon()->GetServices();
-
-            SecurityObjects::SystemEndpointList L;
-
-            for(const auto &i:Services) {
-                SecurityObjects::SystemEndpoint S{
-                    .type = i.Type,
-                    .id = i.Id,
-                    .uri = i.PublicEndPoint};
-                L.endpoints.push_back(S);
-            }
-            Poco::JSON::Object  Obj;
-            L.to_json(Obj);
-            ReturnObject(Obj);
-            return;
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+        auto Services = Daemon()->GetServices();
+        SecurityObjects::SystemEndpointList L;
+        for(const auto &i:Services) {
+            SecurityObjects::SystemEndpoint S{
+                .type = i.Type,
+                .id = i.Id,
+                .uri = i.PublicEndPoint};
+            L.endpoints.push_back(S);
         }
-        BadRequest("Internal error.");
+        Poco::JSON::Object  Obj;
+        L.to_json(Obj);
+        ReturnObject(Obj);
     }
 }
