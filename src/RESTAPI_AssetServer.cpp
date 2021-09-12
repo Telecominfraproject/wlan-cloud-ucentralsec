@@ -10,26 +10,19 @@
 #include "RESTAPI_protocol.h"
 
 namespace OpenWifi {
-    void RESTAPI_AssetServer::handleRequest(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-        if(Request.getMethod()==Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else
-            NotFound(Request, Response);
-    }
-
-    void RESTAPI_AssetServer::DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
+    void RESTAPI_AssetServer::DoGet() {
         Poco::File  AssetFile;
 
-        if(Request.getURI().find("/favicon.ico") != std::string::npos) {
+        if(Request->getURI().find("/favicon.ico") != std::string::npos) {
             AssetFile = RESTAPI_Server()->AssetDir() + "/favicon.ico";
         } else {
             std::string AssetName = GetBinding(RESTAPI::Protocol::ID, "");
             AssetFile = RESTAPI_Server()->AssetDir() + "/" + AssetName;
         }
         if(!AssetFile.isFile()) {
-            NotFound(Request, Response);
+            NotFound();
             return;
         }
-        SendFile(AssetFile,Request, Response);
+        SendFile(AssetFile);
     }
 }

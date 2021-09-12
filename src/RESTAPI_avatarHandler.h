@@ -41,18 +41,13 @@ namespace OpenWifi {
                                          Poco::Net::HTTPRequest::HTTP_DELETE,
                                          Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                          Internal) {}
-
-        void handleRequest(Poco::Net::HTTPServerRequest &Request,
-                           Poco::Net::HTTPServerResponse &Response) override;
-
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/avatar/{id}"}; };
 
-        void DoGet(     Poco::Net::HTTPServerRequest &Request,
-                        Poco::Net::HTTPServerResponse &Response);
-        void DoPost(     Poco::Net::HTTPServerRequest &Request,
-                        Poco::Net::HTTPServerResponse &Response);
-        void DoDelete(     Poco::Net::HTTPServerRequest &Request,
-                        Poco::Net::HTTPServerResponse &Response);
+        void DoGet() final;
+        void DoPost() final;
+        void DoDelete() final;
+        void DoPut() final {};
+
     };
 }
 #endif //UCENTRALSEC_RESTAPI_AVATARHANDLER_H

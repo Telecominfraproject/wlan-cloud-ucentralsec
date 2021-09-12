@@ -8,16 +8,9 @@
 #include "Utils.h"
 
 namespace OpenWifi {
-    void RESTAPI_validateToken_handler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                                      Poco::Net::HTTPServerResponse &Response) {
-
-        if (!ContinueProcessing(Request, Response))
-            return;
-        if (!IsAuthorized(Request, Response))
-            return;
-
+    void RESTAPI_validateToken_handler::DoGet() {
         try {
-            Poco::URI URI(Request.getURI());
+            Poco::URI URI(Request->getURI());
             auto Parameters = URI.getQueryParameters();
             for(auto const &i:Parameters) {
                 if (i.first == "token") {
@@ -26,16 +19,17 @@ namespace OpenWifi {
                     if (AuthService()->IsValidToken(i.second, SecObj.webtoken, SecObj.userinfo)) {
                         Poco::JSON::Object Obj;
                         SecObj.to_json(Obj);
-                        ReturnObject(Request, Obj, Response);
+                        ReturnObject(Obj);
                         return;
                     }
                 }
             }
-            NotFound(Request, Response);
+            NotFound();
             return;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
-        BadRequest(Request, Response);
-    };
+        BadRequest("Internal error.");
+    }
+
 }
