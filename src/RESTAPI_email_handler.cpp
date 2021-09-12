@@ -13,25 +13,24 @@
 
 namespace OpenWifi {
     void RESTAPI_email_handler::DoPost() {
-        try {
-            auto Obj = ParseStream();
-            if (Obj->has("subject") &&
+        auto Obj = ParseStream();
+        if (Obj->has("subject") &&
             Obj->has("from") &&
             Obj->has("text") &&
             Obj->has("recipients")) {
-                auto   Recipients = Obj->getArray("recipients");
-                MessageAttributes Attrs;
-                Attrs[RECIPIENT_EMAIL] = Recipients->get(0).toString();
-                Attrs[SUBJECT] = Obj->get("subject").toString();
-                Attrs[TEXT] = Obj->get("text").toString();
-                if(SMTPMailerService()->SendMessage(Recipients->get(0).toString(), "password_reset.txt", Attrs)) {
-                    OK();
-                    return;
-                }
+            auto   Recipients = Obj->getArray("recipients");
+            MessageAttributes Attrs;
+            Attrs[RECIPIENT_EMAIL] = Recipients->get(0).toString();
+            Attrs[SUBJECT] = Obj->get("subject").toString();
+            Attrs[TEXT] = Obj->get("text").toString();
+            if(SMTPMailerService()->SendMessage(Recipients->get(0).toString(), "password_reset.txt", Attrs)) {
+                OK();
+                return;
+            } else {
+                ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
             }
-        } catch(const Poco::Exception &E) {
-            Logger_.log(E);
+        } else {
+            BadRequest("Unsupported or missing parameters.");
         }
-        BadRequest("Unsupported or missing parameters.");
     }
 }

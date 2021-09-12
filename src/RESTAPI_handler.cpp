@@ -32,27 +32,33 @@ namespace OpenWifi {
 
     void RESTAPIHandler::handleRequest(Poco::Net::HTTPServerRequest &RequestIn,
                        Poco::Net::HTTPServerResponse &ResponseIn) {
-        Request = & RequestIn;
-        Response = & ResponseIn;
+		try {
+			Request = &RequestIn;
+			Response = &ResponseIn;
 
-        if (!ContinueProcessing())
-            return;
+			if (!ContinueProcessing())
+				return;
 
-        if (AlwaysAuthorize_ && !IsAuthorized())
-            return;
+			if (AlwaysAuthorize_ && !IsAuthorized())
+				return;
 
-        ParseParameters();
-        if(Request->getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet();
-        else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost();
-        else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete();
-        else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-            DoPut();
-        else
-            BadRequest("Unknown HTTP Method");
-    }
+			ParseParameters();
+			if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
+				DoGet();
+			else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
+				DoPost();
+			else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
+				DoDelete();
+			else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
+				DoPut();
+			else
+				BadRequest("Unsupported HTTP Method");
+			return;
+		} catch (const Poco::Exception &E) {
+			Logger_.log(E);
+			BadRequest("Internal error.");
+		}
+	}
 
     const Poco::JSON::Object::Ptr &RESTAPIHandler::ParseStream() {
         return IncomingParser_.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();

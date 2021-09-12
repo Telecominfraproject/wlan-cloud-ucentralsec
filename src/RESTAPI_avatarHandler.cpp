@@ -29,78 +29,61 @@ namespace OpenWifi {
     };
 
     void RESTAPI_avatarHandler::DoPost() {
-        try {
-            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
-            SecurityObjects::UserInfo UInfo;
+        std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+        SecurityObjects::UserInfo UInfo;
 
-            if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
-                NotFound();
-                return;
-            }
-
-            //  if there is an avatar, just remove it...
-            Storage()->DeleteAvatar(UserInfo_.userinfo.email,Id);
-
-            Poco::TemporaryFile TmpFile;
-            AvatarPartHandler partHandler(Id, Logger_, TmpFile);
-
-            Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
-            Poco::JSON::Object Answer;
-            if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
-                Answer.set(RESTAPI::Protocol::AVATARID, Id);
-                Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
-                Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
-                Storage()->SetAvatar(UserInfo_.userinfo.email,
-                                     Id, TmpFile, partHandler.ContentType(), partHandler.Name());
-            } else {
-                Answer.set(RESTAPI::Protocol::AVATARID, Id);
-                Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
-                Answer.set(RESTAPI::Protocol::ERRORTEXT, "Avatar upload could not complete.");
-            }
-            ReturnObject(Answer);
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+        if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
+            NotFound();
+            return;
         }
-        BadRequest("Internal error.");
+
+        //  if there is an avatar, just remove it...
+        Storage()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+
+        Poco::TemporaryFile TmpFile;
+        AvatarPartHandler partHandler(Id, Logger_, TmpFile);
+
+        Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
+        Poco::JSON::Object Answer;
+        if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
+            Answer.set(RESTAPI::Protocol::AVATARID, Id);
+            Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
+            Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
+            Storage()->SetAvatar(UserInfo_.userinfo.email,
+                                 Id, TmpFile, partHandler.ContentType(), partHandler.Name());
+        } else {
+            Answer.set(RESTAPI::Protocol::AVATARID, Id);
+            Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
+            Answer.set(RESTAPI::Protocol::ERRORTEXT, "Avatar upload could not complete.");
+        }
+        ReturnObject(Answer);
     }
 
     void RESTAPI_avatarHandler::DoGet() {
-        try {
-            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
-            if (Id.empty()) {
-                NotFound();
-                return;
-            }
-            Poco::TemporaryFile TempAvatar;
-            std::string Type, Name;
-            if (!Storage()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
-                NotFound();
-                return;
-            }
-            SendFile(TempAvatar, Type, Name);
+        std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+        if (Id.empty()) {
+            NotFound();
             return;
-        } catch (const Poco::Exception&E) {
-            Logger_.log(E);
         }
-        BadRequest("Internal error.");
+        Poco::TemporaryFile TempAvatar;
+        std::string Type, Name;
+        if (!Storage()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
+            NotFound();
+            return;
+        }
+        SendFile(TempAvatar, Type, Name);
     }
 
     void RESTAPI_avatarHandler::DoDelete() {
-        try {
-            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
-            if (Id.empty()) {
-                NotFound();
-                return;
-            }
-            if (!Storage()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
-                NotFound();
-                return;
-            }
-            OK();
+        std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+        if (Id.empty()) {
+            NotFound();
             return;
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
         }
-        BadRequest("Internal error.");
+        if (!Storage()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
+            NotFound();
+            return;
+        }
+        OK();
     }
 }
