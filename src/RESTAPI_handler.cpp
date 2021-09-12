@@ -55,8 +55,7 @@ namespace OpenWifi {
     }
 
     const Poco::JSON::Object::Ptr &RESTAPIHandler::ParseStream() {
-        Poco::JSON::Parser IncomingParser;
-        return IncomingParser.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
+        return IncomingParser_.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
     }
 
 	bool RESTAPIHandler::ParseBindings(const std::string & Request, const std::list<const char *> & EndPoints, BindingMap &bindings) {
