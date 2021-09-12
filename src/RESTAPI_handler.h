@@ -172,6 +172,7 @@ namespace OpenWifi {
 		Poco::Net::HTTPServerRequest    *Request= nullptr;
 		Poco::Net::HTTPServerResponse   *Response= nullptr;
 		bool                        AlwaysAuthorize_=true;
+		Poco::JSON::Parser          IncomingParser_;
 	};
 
 	class RESTAPI_UnknownRequestHandler : public RESTAPIHandler {
