@@ -10,7 +10,7 @@
 namespace OpenWifi {
     class RESTAPI_AssetServer : public RESTAPIHandler {
     public:
-        RESTAPI_AssetServer(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, bool Internal)
+        RESTAPI_AssetServer(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
                 : RESTAPIHandler(bindings, L,
                                  std::vector<std::string>
                                          {Poco::Net::HTTPRequest::HTTP_POST,
@@ -18,6 +18,7 @@ namespace OpenWifi {
                                           Poco::Net::HTTPRequest::HTTP_PUT,
                                           Poco::Net::HTTPRequest::HTTP_DELETE,
                                           Poco::Net::HTTPRequest::HTTP_OPTIONS},
+                                          Server,
                                           Internal) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/wwwassets/{id}" ,
                                                                                          "/favicon.ico"}; };
