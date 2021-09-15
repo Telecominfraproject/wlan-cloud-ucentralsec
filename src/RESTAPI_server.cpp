@@ -30,6 +30,7 @@ namespace OpenWifi {
 
     int RESTAPI_Server::Start() {
         Logger_.information("Starting.");
+        Server_.InitLogging();
 
         AsserDir_ = Daemon()->ConfigPath("openwifi.restapi.wwwassets");
         AccessPolicy_ = Daemon()->ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
@@ -50,7 +51,7 @@ namespace OpenWifi {
             Params->setMaxQueued(200);
 			Params->setKeepAlive(true);
 
-            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory, Pool_, Sock, Params);
+            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory(Server_), Pool_, Sock, Params);
             NewServer->start();
             RESTServers_.push_back(std::move(NewServer));
         }
@@ -75,7 +76,7 @@ namespace OpenWifi {
                 RESTAPI_action_links,
                 RESTAPI_avatarHandler,
                 RESTAPI_email_handler
-                >(Path,Bindings,Logger_);
+                >(Path,Bindings,Logger_,Server_);
     }
 
     void RESTAPI_Server::Stop() {
