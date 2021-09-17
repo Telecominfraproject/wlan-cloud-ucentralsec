@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+if [ "$SELFSIGNED_CERTS" = 'true' ]; then
+    wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
+    update-ca-certificates
+fi
+
 if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$UCENTRALSEC_CONFIG"/ucentralsec.properties ]]; then
   RESTAPI_HOST_ROOTCA=${RESTAPI_HOST_ROOTCA:-"\$UCENTRALSEC_ROOT/certs/restapi-ca.pem"} \
   RESTAPI_HOST_PORT=${RESTAPI_HOST_PORT:-"16001"} \
