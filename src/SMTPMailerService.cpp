@@ -43,7 +43,7 @@ namespace OpenWifi {
     }
 
     bool SMTPMailerService::SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
-        SubMutexGuard G(Mutex_);
+        std::lock_guard G(Mutex_);
 
         uint64_t Now = std::time(nullptr);
         auto CE = Cache_.find(Poco::toLower(Recipient));
@@ -72,7 +72,7 @@ namespace OpenWifi {
             if(!Running_)
                 break;
             {
-                SubMutexGuard G(Mutex_);
+                std::lock_guard G(Mutex_);
 
                 uint64_t Now = std::time(nullptr);
 
