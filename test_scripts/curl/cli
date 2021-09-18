@@ -235,17 +235,10 @@ deleteavatar() {
     jq < ${result_file}
 }
 
-secversion() {
-    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/system?command=version" \
-        -H "accept: application/json" \
-        -H "Authorization: Bearer ${token}" > ${result_file}
-    jq < ${result_file}
-}
-
-sectimes() {
-    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/system?command=times" \
-        -H "accept: application/json" \
-        -H "Authorization: Bearer ${token}" > ${result_file}
+systeminfo() {
+    curl  ${FLAGS} -X GET "https://${OWGW}/api/v1/system?command=info" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
@@ -292,8 +285,7 @@ case "$1" in
     "setavatar") login; setavatar "$2"; logout;;
     "getavatar") login; getavatar "$2"; logout;;
     "deleteavatar") login; deleteavatar "$2"; logout;;
-    "secversion") login; secversion ; logout;;
-    "sectimes") login; sectimes ; logout;;
+    "systeminfo") login; systeminfo ; logout;;
     "sendemail") login; sendemail ; logout;;
     "testlogout") login; testlogout ;;
     "help") login; help  ; logout ;;
