@@ -31,6 +31,8 @@ namespace OpenWifi {
 
         int Start() override;
         void Stop() override;
+        void reinitialize(Poco::Util::Application &self) override;
+
         inline const std::string & AssetDir() { return AsserDir_; }
         inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }
         inline const std::string & GetAccessPolicy() const { return AccessPolicy_; }
