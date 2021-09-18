@@ -55,7 +55,6 @@ namespace OpenWifi {
             NewServer->start();
             RESTServers_.push_back(std::move(NewServer));
         }
-
         return 0;
     }
 
@@ -80,6 +79,13 @@ namespace OpenWifi {
         Logger_.information("Stopping ");
         for( const auto & svr : RESTServers_ )
             svr->stop();
+        RESTServers_.clear();
+    }
+
+    void RESTAPI_Server::reinitialize(Poco::Util::Application &self) {
+        Logger_.information("Reinitializing.");
+        Stop();
+        Start();
     }
 
 }  // namespace
