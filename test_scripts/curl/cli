@@ -216,7 +216,7 @@ policies() {
 }
 
 setavatar() {
-    curl ${FLAGS} -F 'data=@open-wifi.svg' "https://${OWSEC}/api/v1/avatar/$1" \
+    curl ${FLAGS} -F 'data=@$2' "https://${OWSEC}/api/v1/avatar/$1" \
         -H "Authorization: Bearer ${token}" > ${result_file};
     jq < ${result_file}
 }
@@ -235,14 +235,8 @@ deleteavatar() {
     jq < ${result_file}
 }
 
-help() {
-  echo
-  echo "listendpoints                     Get all the system endpoints."
-  echo
-}
-
 sendemail() {
-    payload="{ \"recipients\" : [ \"stephane.bourque@gmail.com\" ] , \"subject\" : \"test1\" , \"from\" : \"no-reply@arilia.com\" , \"text\" : \"This is a test from SES.\" }"
+    payload="{ \"recipients\" : [ \"$1\" ] , \"subject\" : \"test1\" , \"from\" : \"$2\" , \"text\" : \"This is a test from SES.\" }"
             curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/email" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${token}" \
@@ -263,7 +257,7 @@ testlogout() {
 
 setloglevel() {
     payload="{ \"command\" : \"setloglevel\" , \"subsystems\" : [ { \"tag\" : \"$1\" , \"value\" : \"$2\" } ] }"
-            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
             -d "$payload"
@@ -271,7 +265,7 @@ setloglevel() {
 
 getloglevels() {
     payload="{ \"command\" : \"getloglevels\" }"
-            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
             -d "$payload"
@@ -279,7 +273,7 @@ getloglevels() {
 
 getloglevelnames() {
     payload="{ \"command\" : \"getloglevelnames\" }"
-            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
             -d "$payload"
@@ -287,27 +281,52 @@ getloglevelnames() {
 
 getsubsystemnames() {
     payload="{ \"command\" : \"getsubsystemnames\" }"
-            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
             -d "$payload"
 }
 
 systeminfo() {
-    curl  ${FLAGS} -X GET "https://${OWFMS}/api/v1/system?command=info" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/system?command=info" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
 reloadsubsystem() {
-    payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"OUIServer\" , \"CommandManager\" ] }"
-            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+    payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"$1\" ] }"
+            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
             -d "$payload"
 }
 
+help() {
+    echo
+    echo    "Usage: cli <cmd> [args]"
+    echo
+    echo    "listendpoints                          Get all the system endpoints."
+    echo    "emailtest                              Generate a forgot Password e-amil to the logged in user."
+    echo    "me                                     Show information about the logged user."
+    echo    "createuser <email> <password>          Create a user with an initial password and force the user to change password."
+    echo    "createuser_v <email> <password>        Same as create user but also force an e-mail verification."
+    echo    "deleteuser <user UUID>                 Delete the user."
+    echo    "getuser <user UUID>                    Get the user information."
+    echo    "listusers                              List users."
+    echo    "policies                               List the login and access policies."
+    echo    "setavatar <user UUID> <filename>       Sets the avatar for user to the image in filename."
+    echo    "getavatar <user UUID>                  Get the avatar for the user."
+    echo    "deleteavatar <user UUID>               Remove the avatar for a user."
+    echo    "sendemail <recipient> <from>           Sends a test email to see if the e-mail system is working."
+    echo    "setloglevel <subsystem> <loglevel>     Set the log level for s specific subsystem."
+    echo    "getloglevels                           Get the current log levels for all subsystems."
+    echo    "getloglevelnames                       Get the log level names available."
+    echo    "getsubsystemnames                      Get the list of subsystems."
+    echo    "systeminfo                             Get basic system information."
+    echo    "reloadsubsystem <subsystem name>       Reload the configuration for a subsystem."
+    echo
+}
 
 shopt -s nocasematch
 
@@ -332,7 +351,7 @@ case "$1" in
     "getloglevels") login; getloglevels; logout ;;
     "getloglevelnames") login; getloglevelnames; logout ;;
     "getsubsystemnames") login; getsubsystemnames; logout ;;
-    "reloadsubsystem") login; reloadsubsystem; logout ;;
+    "reloadsubsystem") login; reloadsubsystem "$2"; logout ;;
     "systeminfo") login; systeminfo ; logout;;
     "help") login; help  ; logout ;;
     *) help ;;

@@ -12,64 +12,59 @@ Most commands will take from 0 to 2 parameters. You should include all parameter
 
 ## The commands
 
-### `cli createuser <email> <initial password>`
-This will create a simple user as admin using the email as login ID and setting the initial password.
+### listendpoints                          
+Get all the system endpoints.
 
-### `cli createuser_v <email> <initial password>`
-This will create a simple user and force email verification. 
+### emailtest                              
+Generate a forgot Password e-amil to the logged in user.
 
-### `cli deleteuser <id>`
-Delete the specified user using the user's UUID.
+### me
+Show information about the logged user.
 
-### `cli getuser <id>`
-Get the specified user using the user's UUID.
+### createuser <email> <password>          
+Create a user with an initial password and force the user to change password.
 
-### `cli listusers`
-Get a list of users.
+### createuser_v <email> <password>        
+Same as create user but also force an e-mail verification.
 
-### `cli policies`
-List the link used to display password and usage policies for the management site.
+### deleteuser <user UUID>                 
+Delete the user.
+    
+### getuser <user UUID>                    
+Get the user information.
 
-### `cli setavatar <id> <filename>`
-Sets the avatar for the user with ID. The file should be gif, png, svg.
+### listusers
+List users.
 
-### `cli deleteavatar <id>`
-Remove the avatar fort the specified user ID.
+### policies
+List the login and access policies.
 
-### `cli secversion`
-Get the vewrsion of the secufiry service.
+### setavatar <user UUID> <filename>       
+Sets the avatar for user to the image in filename.
 
-### `cli sectimes`
-Get the starttime and uptime for the security service.
+### getavatar <user UUID>                  
+Get the avatar for the user.
 
+### deleteavatar <user UUID>               
+Remove the avatar for a user.
 
+### sendemail <recipient> <from>           
+Sends a test email to see if the e-mail system is working.
 
+### setloglevel <subsystem> <loglevel>
+Set the log level for s specific subsystem.
 
-### `cli revisions`
-Get the list of currently available revisions.
+### getloglevels
+Get the current log levels for all subsystems.
 
-### `cli devicetypes`
-Retrieve the list of known `device_types`
+### getloglevelnames
+Get the log level names available.
 
-### `cli firmwareage <device_type> <revision>`
-If you specify your `device_type` and `revision`, the system will do its best to estimate how
-far in the past you `revision` is compared to the latest revision.
+### getsubsystemnames
+Get the list of subsystems.
 
-### `cli gethistory <serialNumber>`
-Get the revision history for a given device.
+### systeminfo
+Get basic system information.
 
-### `cli connecteddevices`
-Get a list of the currently known devices and the last connection information we have about the,
-
-### `cli connecteddevice <serialNumber>`
-Get the information relevant to a specific device.
-
-### `cli devicereport`
-Give a simplified dashboard report of the data in the service.
-
-### `cli fmsversion`
-Display the version of the service.
-
-### `cli fmstimes`
-Display the uptime and start time of the service.
-
+### reloadsubsystem <subsystem name>
+Reload the configuration for a subsystem.
