@@ -235,13 +235,6 @@ deleteavatar() {
     jq < ${result_file}
 }
 
-systeminfo() {
-    curl  ${FLAGS} -X GET "https://${OWGW}/api/v1/system?command=info" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" > ${result_file}
-    jq < ${result_file}
-}
-
 help() {
   echo
   echo "listendpoints                     Get all the system endpoints."
@@ -268,17 +261,48 @@ testlogout() {
     listusers
 }
 
-getsubsystemnames() {
-    payload="{ \"command\" : \"getsubsystemnames\" }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
+setloglevel() {
+    payload="{ \"command\" : \"setloglevel\" , \"subsystems\" : [ { \"tag\" : \"$1\" , \"value\" : \"$2\" } ] }"
+            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
             -d "$payload"
 }
 
+getloglevels() {
+    payload="{ \"command\" : \"getloglevels\" }"
+            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+            -H  "accept: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"
+}
+
+getloglevelnames() {
+    payload="{ \"command\" : \"getloglevelnames\" }"
+            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+            -H  "accept: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"
+}
+
+getsubsystemnames() {
+    payload="{ \"command\" : \"getsubsystemnames\" }"
+            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
+            -H  "accept: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"
+}
+
+systeminfo() {
+    curl  ${FLAGS} -X GET "https://${OWFMS}/api/v1/system?command=info" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
 reloadsubsystem() {
     payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"OUIServer\" , \"CommandManager\" ] }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
+            curl  ${FLAGS} -X POST "https://${OWFMS}/api/v1/system" \
             -H  "accept: application/json" \
             -H "Authorization: Bearer ${token}" \
             -d "$payload"
@@ -302,11 +326,14 @@ case "$1" in
     "setavatar") login; setavatar "$2"; logout;;
     "getavatar") login; getavatar "$2"; logout;;
     "deleteavatar") login; deleteavatar "$2"; logout;;
-    "systeminfo") login; systeminfo ; logout;;
     "sendemail") login; sendemail ; logout;;
     "testlogout") login; testlogout ;;
+    "setloglevel") login; setloglevel "$2" "$3"  ; logout ;;
+    "getloglevels") login; getloglevels; logout ;;
+    "getloglevelnames") login; getloglevelnames; logout ;;
     "getsubsystemnames") login; getsubsystemnames; logout ;;
     "reloadsubsystem") login; reloadsubsystem; logout ;;
+    "systeminfo") login; systeminfo ; logout;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
