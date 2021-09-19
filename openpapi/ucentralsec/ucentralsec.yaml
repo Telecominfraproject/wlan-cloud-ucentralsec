@@ -305,11 +305,10 @@ components:
         subject:
           type: string
         recipients:
-          type:
-            array:
-              items:
-                type: string
-                format: email
+          type: array
+          items:
+            type: string
+            format: email
         text:
           type: string
 
@@ -473,6 +472,80 @@ components:
           $ref: '#/components/schemas/UserInfo'
         tokenInfo:
           $ref: '#/components/schemas/WebTokenResult'
+
+    SystemCommandSetLogLevel:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - setloglevel
+        subsystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagValuePair'
+
+    SystemCommandReload:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - reload
+        subsystems:
+          type: array
+          items:
+            type: string
+            example: these are the SubSystems names retrieve with the GetSubSystemsNamesResult.
+
+    SystemCommandGetLogLevels:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - getloglevels
+
+    SystemGetLogLevelsResult:
+      type: object
+      properties:
+        taglist:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagValuePair'
+
+    SystemCommandGetLogLevelNames:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - getloglevelnames
+
+    SystemCommandGetSubsystemNames:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - getsubsystemnames
+
+    SystemCommandGetLogLevelNamesResult:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            type: string
+
+    SystemGetSubSystemNemesResult:
+      type: object
+      properties:
+        taglist:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagValuePair'
+
     #########################################################################################
     ##
     ## End of uCentral system wide values
@@ -829,6 +902,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
         500:
+          description: Error description
           content:
             application/json:
               schema:
@@ -844,58 +918,6 @@ paths:
   ## These are endpoints that all services in the uCentral stack must provide
   ##
   #########################################################################################
-
-  /system:
-    post:
-      tags:
-        - System Commands
-      summary: Perform some systeme wide commands
-      operationId: systemCommand
-      requestBody:
-        description: Command details
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SystemCommandDetails'
-      responses:
-        200:
-          description: Successfull command execution
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SystemCommandResults'
-        403:
-          $ref: '#/components/responses/Unauthorized'
-        404:
-          $ref: '#/components/responses/NotFound'
-    get:
-      tags:
-        - System Commands
-      summary: Retrieve different values from the running service.
-      operationId: getSystemCommand
-      parameters:
-        - in: query
-          description: Get a value
-          name: command
-          schema:
-            type: string
-            enum:
-              - info
-          required: true
-
-      responses:
-        200:
-          description: Successfull command execution
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/SystemInfoResults'
-        403:
-          $ref: '#/components/responses/Unauthorized'
-        404:
-          $ref: '#/components/responses/NotFound'
-
   /securityProfiles:
     get:
       tags:
@@ -961,6 +983,65 @@ paths:
       responses:
         200:
           $ref: '#/components/schemas/TokenValidationResult'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /system:
+    post:
+      tags:
+        - System Commands
+      summary: Perform some systeme wide commands
+      operationId: systemCommand
+      requestBody:
+        description: Command details
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/SystemCommandSetLogLevel'
+                - $ref: '#/components/schemas/SystemCommandReload'
+                - $ref: '#/components/schemas/SystemCommandGetLogLevels'
+                - $ref: '#/components/schemas/SystemCommandGetLogLevelNames'
+                - $ref: '#/components/schemas/SystemCommandGetSubsystemNames'
+      responses:
+        200:
+          description: Successfull command execution
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SystemGetLogLevelsResult'
+                  - $ref: '#/components/schemas/SystemCommandGetLogLevelNamesResult'
+                  - $ref: '#/components/schemas/SystemGetSubSystemNemesResult'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    get:
+      tags:
+        - System Commands
+      summary: Retrieve different values from the running service.
+      operationId: getSystemCommand
+      parameters:
+        - in: query
+          description: Get a value
+          name: command
+          schema:
+            type: string
+            enum:
+              - info
+          required: true
+
+      responses:
+        200:
+          description: Successfull command execution
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SystemInfoResults'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
