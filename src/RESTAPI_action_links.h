@@ -25,7 +25,8 @@ namespace OpenWifi {
                                         Poco::Net::HTTPRequest::HTTP_POST,
                                         Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                         Server,
-                                        Internal) {}
+                                        Internal,
+                                        false) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/actionLink"}; };
         void RequestResetPassword(std::string &Id);
         void CompleteResetPassword(std::string &Id);

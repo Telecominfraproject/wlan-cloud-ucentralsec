@@ -23,6 +23,7 @@ namespace OpenWifi {
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
         if(GetMe) {
+            Logger_.information(Poco::format("REQUEST-ME(%s): Request for %s", Request->clientAddress().toString(), UserInfo_.userinfo.email));
             Poco::JSON::Object Me;
             UserInfo_.userinfo.to_json(Me);
             ReturnObject(Me);
@@ -41,6 +42,7 @@ namespace OpenWifi {
             AuthService()->Logout(Token);
             ReturnStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, true);
         } else {
+            Logger_.information(Poco::format("BAD-LOGOUT(%s): Request for %s", Request->clientAddress().toString(), UserInfo_.userinfo.email));
             NotFound();
         }
 	}
@@ -53,6 +55,7 @@ namespace OpenWifi {
         Poco::toLowerInPlace(userId);
 
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
+            Logger_.information(Poco::format("POLICY-REQUEST(%s): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
             Answer.set(RESTAPI::Protocol::ACCESSPOLICY, RESTAPI_Server()->GetAccessPolicy());
@@ -63,6 +66,7 @@ namespace OpenWifi {
 
         if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
             //  Send an email to the userId
+            Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
             SecurityObjects::UserInfoAndPolicy UInfo;
             if(AuthService::SendEmailToUser(userId,AuthService::FORGOT_PASSWORD))
                 Logger_.information(Poco::format("Send password reset link to %s",userId));
