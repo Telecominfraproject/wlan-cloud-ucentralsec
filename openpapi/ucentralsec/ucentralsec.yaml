@@ -287,6 +287,8 @@ components:
         securityPolicyChange:
           type: integer
           format: int64
+        userTypeProprietaryInfo:
+          type: string
 
     UserList:
       type: object
