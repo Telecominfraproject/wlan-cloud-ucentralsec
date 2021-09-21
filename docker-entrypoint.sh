@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+if [ "$SELFSIGNED_CERTS" = 'true' ]; then
+    update-ca-certificates
+fi
+
 if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$UCENTRALSEC_CONFIG"/ucentralsec.properties ]]; then
   RESTAPI_HOST_ROOTCA=${RESTAPI_HOST_ROOTCA:-"\$UCENTRALSEC_ROOT/certs/restapi-ca.pem"} \
   RESTAPI_HOST_PORT=${RESTAPI_HOST_PORT:-"16001"} \
