@@ -24,7 +24,7 @@ namespace OpenWifi {
 
     class SMTPMailerService * SMTPMailerService::instance_ = nullptr;
 
-    int SMTPMailerService::Start() {
+    void SMTPMailerService::LoadMyConfig() {
         MailHost_ = Daemon()->ConfigGetString("mailer.hostname");
         SenderLoginUserName_ = Daemon()->ConfigGetString("mailer.username");
         SenderLoginPassword_ = Daemon()->ConfigGetString("mailer.password");
@@ -32,6 +32,10 @@ namespace OpenWifi {
         LoginMethod_ = Daemon()->ConfigGetString("mailer.loginmethod");
         MailHostPort_ = (int)Daemon()->ConfigGetInt("mailer.port");
         TemplateDir_ = Daemon()->ConfigPath("mailer.templates", Daemon()->DataDir());
+    }
+
+    int SMTPMailerService::Start() {
+        LoadMyConfig();
         SenderThr_.start(*this);
         return 0;
     }
@@ -40,6 +44,12 @@ namespace OpenWifi {
         Running_ = false;
         SenderThr_.wakeUp();
         SenderThr_.join();
+    }
+
+    void SMTPMailerService::reinitialize(Poco::Util::Application &self) {
+        Daemon()->LoadConfigurationFile();
+        Logger_.information("Reinitializing.");
+        LoadMyConfig();
     }
 
     bool SMTPMailerService::SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {

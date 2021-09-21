@@ -78,7 +78,8 @@ namespace OpenWifi {
             void Stop() override;
             bool SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs);
             bool SendIt(const MessageEvent &Msg);
-
+            void LoadMyConfig();
+            void reinitialize(Poco::Util::Application &self) override;
         private:
             static SMTPMailerService * instance_;
             std::string             MailHost_;
