@@ -46,13 +46,17 @@ RUN addgroup -S "$UCENTRALSEC_USER" && \
     adduser -S -G "$UCENTRALSEC_USER" "$UCENTRALSEC_USER"
 
 RUN mkdir /ucentral
-RUN mkdir -p "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG"
-RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec
-
+RUN mkdir -p "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG" && \
+    chown "$UCENTRALSEC_USER": "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG"
+RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec gettext ca-certificates
 COPY --from=builder /ucentralsec/cmake-build/ucentralsec /ucentral/ucentralsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
+
+COPY ucentralsec.properties.tmpl ${UCENTRALSEC_CONFIG}/
 COPY docker-entrypoint.sh /
+RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
+    -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
 
 EXPOSE 16001 17001 16101
 
