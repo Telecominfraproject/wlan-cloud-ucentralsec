@@ -7,24 +7,24 @@
 #
 # REST API access
 #
-ucentral.restapi.host.0.backlog = 100
-ucentral.restapi.host.0.security = relaxed
-ucentral.restapi.host.0.rootca = ${RESTAPI_HOST_ROOTCA}
-ucentral.restapi.host.0.address = *
-ucentral.restapi.host.0.port = ${RESTAPI_HOST_PORT}
-ucentral.restapi.host.0.cert = ${RESTAPI_HOST_CERT}
-ucentral.restapi.host.0.key = ${RESTAPI_HOST_KEY}
-ucentral.restapi.host.0.key.password = ${RESTAPI_HOST_KEY_PASSWORD}
-ucentral.restapi.wwwassets = ${RESTAPI_WWWASSETS}
+openwifi.restapi.host.0.backlog = 100
+openwifi.restapi.host.0.security = relaxed
+openwifi.restapi.host.0.rootca = ${RESTAPI_HOST_ROOTCA}
+openwifi.restapi.host.0.address = *
+openwifi.restapi.host.0.port = ${RESTAPI_HOST_PORT}
+openwifi.restapi.host.0.cert = ${RESTAPI_HOST_CERT}
+openwifi.restapi.host.0.key = ${RESTAPI_HOST_KEY}
+openwifi.restapi.host.0.key.password = ${RESTAPI_HOST_KEY_PASSWORD}
+openwifi.restapi.wwwassets = ${RESTAPI_WWWASSETS}
 
-ucentral.internal.restapi.host.0.backlog = 100
-ucentral.internal.restapi.host.0.security = relaxed
-ucentral.internal.restapi.host.0.rootca = ${INTERNAL_RESTAPI_HOST_ROOTCA}
-ucentral.internal.restapi.host.0.address = *
-ucentral.internal.restapi.host.0.port = ${INTERNAL_RESTAPI_HOST_PORT}
-ucentral.internal.restapi.host.0.cert = ${INTERNAL_RESTAPI_HOST_CERT}
-ucentral.internal.restapi.host.0.key = ${INTERNAL_RESTAPI_HOST_KEY}
-ucentral.internal.restapi.host.0.key.password = ${INTERNAL_RESTAPI_HOST_KEY_PASSWORD}
+openwifi.internal.restapi.host.0.backlog = 100
+openwifi.internal.restapi.host.0.security = relaxed
+openwifi.internal.restapi.host.0.rootca = ${INTERNAL_RESTAPI_HOST_ROOTCA}
+openwifi.internal.restapi.host.0.address = *
+openwifi.internal.restapi.host.0.port = ${INTERNAL_RESTAPI_HOST_PORT}
+openwifi.internal.restapi.host.0.cert = ${INTERNAL_RESTAPI_HOST_CERT}
+openwifi.internal.restapi.host.0.key = ${INTERNAL_RESTAPI_HOST_KEY}
+openwifi.internal.restapi.host.0.key.password = ${INTERNAL_RESTAPI_HOST_KEY_PASSWORD}
 
 #
 # Generic section that all microservices must have
@@ -32,13 +32,13 @@ ucentral.internal.restapi.host.0.key.password = ${INTERNAL_RESTAPI_HOST_KEY_PASS
 authentication.enabled = true
 authentication.default.username = ${AUTHENTICATION_DEFAULT_USERNAME}
 authentication.default.password = ${AUTHENTICATION_DEFAULT_PASSWORD}
-ucentral.system.data = ${SYSTEM_DATA}
-ucentral.system.uri.private = ${SYSTEM_URI_PRIVATE}
-ucentral.system.uri.public = ${SYSTEM_URI_PUBLIC}
-ucentral.system.uri.ui = ${SYSTEM_URI_UI}
-ucentral.system.commandchannel = /tmp/app.ucentralsec
-ucentral.service.key = ${SERVICE_KEY}
-ucentral.service.key.password = ${SERVICE_KEY_PASSWORD}
+openwifi.system.data = ${SYSTEM_DATA}
+openwifi.system.uri.private = ${SYSTEM_URI_PRIVATE}
+openwifi.system.uri.public = ${SYSTEM_URI_PUBLIC}
+openwifi.system.uri.ui = ${SYSTEM_URI_UI}
+openwifi.system.commandchannel = /tmp/app.ucentralsec
+openwifi.service.key = ${SERVICE_KEY}
+openwifi.service.key.password = ${SERVICE_KEY_PASSWORD}
 
 #
 # Security Microservice Specific Section
@@ -63,16 +63,16 @@ alb.port = 16101
 #
 # Kafka
 #
-ucentral.kafka.group.id = security
-ucentral.kafka.client.id = security1
-ucentral.kafka.enable = ${KAFKA_ENABLE}
-ucentral.kafka.brokerlist = ${KAFKA_BROKERLIST}
-ucentral.kafka.auto.commit = false
-ucentral.kafka.queue.buffering.max.ms = 50
+openwifi.kafka.group.id = security
+openwifi.kafka.client.id = security1
+openwifi.kafka.enable = ${KAFKA_ENABLE}
+openwifi.kafka.brokerlist = ${KAFKA_BROKERLIST}
+openwifi.kafka.auto.commit = false
+openwifi.kafka.queue.buffering.max.ms = 50
 
-ucentral.document.policy.access = /wwwassets/access_policy.html
-ucentral.document.policy.password = /wwwassets/password_policy.html
-ucentral.avatar.maxsize = 2000000
+openwifi.document.policy.access = /wwwassets/access_policy.html
+openwifi.document.policy.password = /wwwassets/password_policy.html
+openwifi.avatar.maxsize = 2000000
 #
 # This section select which form of persistence you need
 # Only one selected at a time. If you select multiple, this service will die if a horrible

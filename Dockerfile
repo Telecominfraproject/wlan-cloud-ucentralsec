@@ -26,34 +26,34 @@ RUN cmake ..
 RUN cmake --build . --config Release -j8
 RUN cmake --build . --target install
 
-ADD CMakeLists.txt build /ucentralsec/
-ADD cmake /ucentralsec/cmake
-ADD src /ucentralsec/src
+ADD CMakeLists.txt build /owsec/
+ADD cmake /owsec/cmake
+ADD src /owsec/src
 
-WORKDIR /ucentralsec
+WORKDIR /owsec
 RUN mkdir cmake-build
-WORKDIR /ucentralsec/cmake-build
+WORKDIR /owsec/cmake-build
 RUN cmake ..
 RUN cmake --build . --config Release -j8
 
 FROM alpine
 
-ENV UCENTRALSEC_USER=ucentralsec \
-    UCENTRALSEC_ROOT=/ucentralsec-data \
-    UCENTRALSEC_CONFIG=/ucentralsec-data
+ENV OWSEC_USER=owsec \
+    OWSEC_ROOT=/owsec-data \
+    OWSEC_CONFIG=/owsec-data
 
-RUN addgroup -S "$UCENTRALSEC_USER" && \
-    adduser -S -G "$UCENTRALSEC_USER" "$UCENTRALSEC_USER"
+RUN addgroup -S "$OWSEC_USER" && \
+    adduser -S -G "$OWSEC_USER" "$OWSEC_USER"
 
-RUN mkdir /ucentral
-RUN mkdir -p "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG" && \
-    chown "$UCENTRALSEC_USER": "$UCENTRALSEC_ROOT" "$UCENTRALSEC_CONFIG"
+RUN mkdir /openwifi
+RUN mkdir -p "$OWSEC_ROOT" "$OWSEC_CONFIG" && \
+    chown "$OWSEC_USER": "$OWSEC_ROOT" "$OWSEC_CONFIG"
 RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec gettext ca-certificates
-COPY --from=builder /ucentralsec/cmake-build/ucentralsec /ucentral/ucentralsec
+COPY --from=builder /owsec/cmake-build/owsec /openwifi/owsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
 
-COPY ucentralsec.properties.tmpl ${UCENTRALSEC_CONFIG}/
+COPY owsec.properties.tmpl ${OWSEC_CONFIG}/
 COPY docker-entrypoint.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
@@ -61,4 +61,4 @@ RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentr
 EXPOSE 16001 17001 16101
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/ucentral/ucentralsec"]
+CMD ["/openwifi/owsec"]

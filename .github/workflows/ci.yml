@@ -28,7 +28,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build Docker image
-      run: docker build -t wlan-cloud-ucentralsec:${{ github.sha }} .
+      run: docker build -t wlan-cloud-owsec:${{ github.sha }} .
 
     - name: Tag Docker image
       run: |
@@ -52,7 +52,7 @@ jobs:
         echo "Result tags: $TAGS"
 
         for tag in $TAGS; do
-          docker tag wlan-cloud-ucentralsec:${{ github.sha }} ${{ env.DOCKER_REGISTRY_URL }}/ucentralsec:$tag
+          docker tag wlan-cloud-owsec:${{ github.sha }} ${{ env.DOCKER_REGISTRY_URL }}/owsec:$tag
         done
 
     - name: Log into Docker registry
@@ -66,4 +66,4 @@ jobs:
     - name: Push Docker images
       if: startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/pull/') || github.ref == 'refs/heads/main'
       run: |
-        docker images | grep ${{ env.DOCKER_REGISTRY_URL }}/ucentralsec | awk -F ' ' '{print $1":"$2}' | xargs -I {} docker push {}
+        docker images | grep ${{ env.DOCKER_REGISTRY_URL }}/owsec | awk -F ' ' '{print $1":"$2}' | xargs -I {} docker push {}
