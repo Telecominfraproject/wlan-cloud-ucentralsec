@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export UCENTRALSEC_CONFIG=`pwd`
-export UCENTRALSEC_ROOT=`pwd`
+export OWSEC_CONFIG=`pwd`
+export OWSEC_ROOT=`pwd`

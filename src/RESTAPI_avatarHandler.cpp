@@ -28,98 +28,62 @@ namespace OpenWifi {
         Length_ = InputStream.chars();
     };
 
-    void RESTAPI_avatarHandler::handleRequest(Poco::Net::HTTPServerRequest &Request,
-                                              Poco::Net::HTTPServerResponse &Response) {
-        if (!ContinueProcessing(Request, Response))
-            return;
+    void RESTAPI_avatarHandler::DoPost() {
+        std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+        SecurityObjects::UserInfo UInfo;
 
-        if (!IsAuthorized(Request, Response))
+        if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
+            NotFound();
             return;
+        }
 
-        ParseParameters(Request);
-        if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-            DoGet(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-            DoPost(Request, Response);
-        else if (Request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-            DoDelete(Request, Response);
-        else
-            BadRequest(Request, Response);
+        //  if there is an avatar, just remove it...
+        Storage()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+
+        Poco::TemporaryFile TmpFile;
+        AvatarPartHandler partHandler(Id, Logger_, TmpFile);
+
+        Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
+        Poco::JSON::Object Answer;
+        if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
+            Answer.set(RESTAPI::Protocol::AVATARID, Id);
+            Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
+            Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
+            Storage()->SetAvatar(UserInfo_.userinfo.email,
+                                 Id, TmpFile, partHandler.ContentType(), partHandler.Name());
+        } else {
+            Answer.set(RESTAPI::Protocol::AVATARID, Id);
+            Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
+            Answer.set(RESTAPI::Protocol::ERRORTEXT, "Avatar upload could not complete.");
+        }
+        ReturnObject(Answer);
     }
 
-    void RESTAPI_avatarHandler::DoPost(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-        try {
-            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
-            SecurityObjects::UserInfo UInfo;
-
-            if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
-                NotFound(Request, Response);
-                return;
-            }
-
-            //  if there is an avatar, just remove it...
-            Storage()->DeleteAvatar(UserInfo_.userinfo.email,Id);
-
-            Poco::TemporaryFile TmpFile;
-            AvatarPartHandler partHandler(Id, Logger_, TmpFile);
-
-            Poco::Net::HTMLForm form(Request, Request.stream(), partHandler);
-            Poco::JSON::Object Answer;
-            if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("ucentral.avatar.maxsize",2000000)) {
-                Answer.set(RESTAPI::Protocol::AVATARID, Id);
-                Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
-                Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
-                Storage()->SetAvatar(UserInfo_.userinfo.email,
-                                     Id, TmpFile, partHandler.ContentType(), partHandler.Name());
-            } else {
-                Answer.set(RESTAPI::Protocol::AVATARID, Id);
-                Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
-                Answer.set(RESTAPI::Protocol::ERRORTEXT, "Avatar upload could not complete.");
-            }
-            ReturnObject(Request, Answer, Response);
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+    void RESTAPI_avatarHandler::DoGet() {
+        std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+        if (Id.empty()) {
+            NotFound();
+            return;
         }
-        BadRequest(Request, Response);
+        Poco::TemporaryFile TempAvatar;
+        std::string Type, Name;
+        if (!Storage()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
+            NotFound();
+            return;
+        }
+        SendFile(TempAvatar, Type, Name);
     }
 
-    void RESTAPI_avatarHandler::DoGet(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-        try {
-            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
-            if (Id.empty()) {
-                NotFound(Request, Response);
-                return;
-            }
-            Poco::TemporaryFile TempAvatar;
-            std::string Type, Name;
-            if (!Storage()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
-                NotFound(Request, Response);
-                return;
-            }
-            SendFile(TempAvatar, Type, Name, Request, Response);
+    void RESTAPI_avatarHandler::DoDelete() {
+        std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+        if (Id.empty()) {
+            NotFound();
             return;
-        } catch (const Poco::Exception&E) {
-            Logger_.log(E);
         }
-        BadRequest(Request, Response);
-    }
-
-    void RESTAPI_avatarHandler::DoDelete(Poco::Net::HTTPServerRequest &Request, Poco::Net::HTTPServerResponse &Response) {
-        try {
-            std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
-            if (Id.empty()) {
-                NotFound(Request, Response);
-                return;
-            }
-            if (!Storage()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
-                NotFound(Request, Response);
-                return;
-            }
-            OK(Request, Response);
+        if (!Storage()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
+            NotFound();
             return;
-        } catch (const Poco::Exception &E) {
-            Logger_.log(E);
         }
-        BadRequest(Request, Response);
+        OK();
     }
 }

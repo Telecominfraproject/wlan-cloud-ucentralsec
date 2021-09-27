@@ -15,11 +15,6 @@ namespace OpenWifi {
 
     class Storage *Storage::instance_ = nullptr;
 
-    Storage::Storage() noexcept:
-        SubSystemServer("Storage", "STORAGE-SVR", "storage")
-    {
-    }
-
 	std::string Storage::ConvertParams(const std::string & S) const {
 		std::string R;
 
@@ -43,7 +38,7 @@ namespace OpenWifi {
 	}
 
     int Storage::Start() {
-		SubMutexGuard		Guard(Mutex_);
+		std::lock_guard		Guard(Mutex_);
 
 		Logger_.setLevel(Poco::Message::PRIO_NOTICE);
         Logger_.notice("Starting.");

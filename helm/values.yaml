@@ -6,8 +6,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 images:
-  ucentralsec:
-    repository: tip-tip-wlan-cloud-ucentral.jfrog.io/ucentralsec
+  owsec:
+    repository: tip-tip-wlan-cloud-ucentral.jfrog.io/owsec
     tag: main
     pullPolicy: Always
 #    regcred:
@@ -16,7 +16,7 @@ images:
 #      password: password
 
 services:
-  ucentralsec:
+  owsec:
     type: LoadBalancer
     ports:
       restapi:
@@ -29,7 +29,7 @@ services:
         protocol: TCP
 
 checks:
-  ucentralsec:
+  owsec:
     liveness:
       httpGet:
         path: /
@@ -49,29 +49,29 @@ ingresses:
     - restapi.chart-example.local
     paths:
     - path: /
-      serviceName: ucentralsec
+      serviceName: owsec
       servicePort: restapi
 
 volumes:
-  ucentralsec:
+  owsec:
     - name: config
-      mountPath: /ucentralsec-data/ucentralsec.properties
-      subPath: ucentralsec.properties
+      mountPath: /owsec-data/owsec.properties
+      subPath: owsec.properties
       # Template below will be rendered in template
       volumeDefinition: |
         secret:
-          secretName: {{ include "ucentralsec.fullname" . }}-config
+          secretName: {{ include "owsec.fullname" . }}-config
     - name: certs
-      mountPath: /ucentralsec-data/certs
+      mountPath: /owsec-data/certs
       volumeDefinition: |
         secret:
-          secretName: {{ include "ucentralsec.fullname" . }}-certs
+          secretName: {{ include "owsec.fullname" . }}-certs
     # Change this if you want to use another volume type
     - name: persist
-      mountPath: /ucentralsec-data/persist
+      mountPath: /owsec-data/persist
       volumeDefinition: |
         persistentVolumeClaim:
-          claimName: {{ template "ucentralsec.fullname" . }}-pvc
+          claimName: {{ template "owsec.fullname" . }}-pvc
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -104,29 +104,29 @@ persistence:
 
 # Application
 public_env_variables:
-  UCENTRALSEC_ROOT: /ucentralsec-data
-  UCENTRALSEC_CONFIG: /ucentralsec-data
+  OWSEC_ROOT: /owsec-data
+  OWSEC_CONFIG: /owsec-data
 
 secret_env_variables: {}
 
 configProperties:
   # -> Public part
   # REST API
-  ucentral.restapi.host.0.backlog: 100
-  ucentral.restapi.host.0.security: relaxed
-  ucentral.restapi.host.0.rootca: $UCENTRALSEC_ROOT/certs/restapi-ca.pem
-  ucentral.restapi.host.0.address: "*"
-  ucentral.restapi.host.0.port: 16001
-  ucentral.restapi.host.0.cert: $UCENTRALSEC_ROOT/certs/restapi-cert.pem
-  ucentral.restapi.host.0.key: $UCENTRALSEC_ROOT/certs/restapi-key.pem
-  ucentral.restapi.wwwassets: $UCENTRALSEC_ROOT/wwwassets
-  ucentral.internal.restapi.host.0.backlog: 100
-  ucentral.internal.restapi.host.0.security: relaxed
-  ucentral.internal.restapi.host.0.rootca: $UCENTRALSEC_ROOT/certs/restapi-ca.pem
-  ucentral.internal.restapi.host.0.address: "*"
-  ucentral.internal.restapi.host.0.port: 17001
-  ucentral.internal.restapi.host.0.cert: $UCENTRALSEC_ROOT/certs/restapi-cert.pem
-  ucentral.internal.restapi.host.0.key: $UCENTRALSEC_ROOT/certs/restapi-key.pem
+  openwifi.restapi.host.0.backlog: 100
+  openwifi.restapi.host.0.security: relaxed
+  openwifi.restapi.host.0.rootca: $OWSEC_ROOT/certs/restapi-ca.pem
+  openwifi.restapi.host.0.address: "*"
+  openwifi.restapi.host.0.port: 16001
+  openwifi.restapi.host.0.cert: $OWSEC_ROOT/certs/restapi-cert.pem
+  openwifi.restapi.host.0.key: $OWSEC_ROOT/certs/restapi-key.pem
+  openwifi.restapi.wwwassets: $OWSEC_ROOT/wwwassets
+  openwifi.internal.restapi.host.0.backlog: 100
+  openwifi.internal.restapi.host.0.security: relaxed
+  openwifi.internal.restapi.host.0.rootca: $OWSEC_ROOT/certs/restapi-ca.pem
+  openwifi.internal.restapi.host.0.address: "*"
+  openwifi.internal.restapi.host.0.port: 17001
+  openwifi.internal.restapi.host.0.cert: $OWSEC_ROOT/certs/restapi-cert.pem
+  openwifi.internal.restapi.host.0.key: $OWSEC_ROOT/certs/restapi-key.pem
   # Authentication
   authentication.enabled: true
   authentication.default.access: master
@@ -135,17 +135,17 @@ configProperties:
   mailer.hostname: smtp.gmail.com
   mailer.loginmethod: login
   mailer.port: 587
-  mailer.templates: $UCENTRALSEC_ROOT/templates
+  mailer.templates: $OWSEC_ROOT/templates
   # ALB
   alb.enable: "true"
   alb.port: 16101
   # Kafka
-  ucentral.kafka.enable: "false"
-  ucentral.kafka.group.id: security
-  ucentral.kafka.client.id: security1
-  ucentral.kafka.brokerlist: localhost:9092
-  ucentral.kafka.auto.commit: false
-  ucentral.kafka.queue.buffering.max.ms: 50
+  openwifi.kafka.enable: "false"
+  openwifi.kafka.group.id: security
+  openwifi.kafka.client.id: security1
+  openwifi.kafka.brokerlist: localhost:9092
+  openwifi.kafka.auto.commit: false
+  openwifi.kafka.queue.buffering.max.ms: 50
   # Storage
   storage.type: sqlite # (sqlite|postgresql|mysql|odbc)
   ## SQLite
@@ -156,24 +156,24 @@ configProperties:
   storage.type.postgresql.maxsessions: 64
   storage.type.postgresql.idletime: 60
   storage.type.postgresql.host: localhost
-  storage.type.postgresql.database: ucentral
+  storage.type.postgresql.database: owsec
   storage.type.postgresql.port: 5432
   storage.type.postgresql.connectiontimeout: 60
   ## MySQL
   storage.type.mysql.maxsessions: 64
   storage.type.mysql.idletime: 60
   storage.type.mysql.host: localhost
-  storage.type.mysql.database: ucentral
+  storage.type.mysql.database: owsec
   storage.type.mysql.port: 3306
   storage.type.mysql.connectiontimeout: 60
   # System
-  ucentral.service.key: $UCENTRALSEC_ROOT/certs/restapi-key.pem
-  ucentral.system.data: $UCENTRALSEC_ROOT/persist
-  ucentral.system.debug: "true"
-  ucentral.system.uri.private: https://localhost:17001
-  ucentral.system.uri.public: https://localhost:16001
-  ucentral.system.uri.ui: https://localhost
-  ucentral.system.commandchannel: /tmp/app_ucentralsec
+  openwifi.service.key: $OWSEC_ROOT/certs/restapi-key.pem
+  openwifi.system.data: $OWSEC_ROOT/persist
+  openwifi.system.debug: "true"
+  openwifi.system.uri.private: https://localhost:17001
+  openwifi.system.uri.public: https://localhost:16001
+  openwifi.system.uri.ui: https://localhost
+  openwifi.system.commandchannel: /tmp/app_owsec
   # Logging
   logging.formatters.f1.class: PatternFormatter
   logging.formatters.f1.pattern: "%Y-%m-%d %H:%M:%S %s: [%p] %t"
@@ -181,7 +181,7 @@ configProperties:
   logging.channels.c1.class: ConsoleChannel
   logging.channels.c1.formatter: f1
   logging.channels.c2.class: FileChannel
-  logging.channels.c2.path: /tmp/log_ucentralsec
+  logging.channels.c2.path: /tmp/log_owsec
   logging.channels.c2.formatter.class: PatternFormatter
   logging.channels.c2.formatter.pattern: "%Y-%m-%d %H:%M:%S %s: [%p] %t"
   logging.channels.c2.rotation: "20 M"
@@ -194,8 +194,8 @@ configProperties:
 
   # -> Secret part
   # REST API
-  ucentral.restapi.host.0.key.password: mypassword
-  ucentral.internal.restapi.host.0.key.password: mypassword
+  openwifi.restapi.host.0.key.password: mypassword
+  openwifi.internal.restapi.host.0.key.password: mypassword
   # Authentication
   authentication.default.username: tip@ucentral.com
   authentication.default.password: 13268b7daa751240369d125e79c873bd8dd3bef7981bdfd38ea03dbb1fbe7dcf
@@ -224,10 +224,10 @@ postgresql:
     repository: bitnami/postgresql
     tag: 11.13.0-debian-10-r0
 
-  postgresqlPostgresPassword: ""
-  postgresqlUsername: postgres
-  postgresqlPassword: ""
-  postgresqlDatabase: ""
+  postgresqlPostgresPassword: "rootPassword"
+  postgresqlUsername: stephb
+  postgresqlPassword: snoopy99
+  postgresqlDatabase: owgw
 
   persistence:
     enabled: true
@@ -244,10 +244,10 @@ mysql:
     tag: 8.0.26-debian-10-r10
 
   auth:
-    rootPassword: ""
-    database: my_database
-    username: ""
-    password: ""
+    rootPassword: rootPassword
+    database: owgw
+    username: stephb
+    password: snoopy99
 
   primary:
     persistence:
@@ -265,10 +265,10 @@ mariadb:
     tag: 10.5.12-debian-10-r0
 
   auth:
-    rootPassword: ""
-    database: my_database
-    username: ""
-    password: ""
+    rootPassword: rootPassword
+    database: owgw
+    username: stephb
+    password: snoopy99
 
   primary:
     persistence:

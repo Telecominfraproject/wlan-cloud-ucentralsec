@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ucentralsec VERSION 2.1.0)
+project(owsec VERSION 2.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -47,7 +47,7 @@ find_package(PostgreSQL REQUIRED)
 find_package(MySQL REQUIRED)
 find_package(Poco REQUIRED COMPONENTS JSON Crypto JWT Net Util NetSSL Data DataSQLite DataPostgreSQL DataMySQL)
 
-add_executable( ucentralsec
+add_executable( owsec
                 build
                 src/Daemon.h src/Daemon.cpp
                 src/MicroService.cpp src/MicroService.h
@@ -73,14 +73,18 @@ add_executable( ucentralsec
                 src/RESTAPI_AssetServer.cpp src/RESTAPI_AssetServer.h
                 src/RESTAPI_avatarHandler.cpp src/RESTAPI_avatarHandler.h
                 src/storage_avatar.cpp src/storage_avatar.h src/storage_users.h
-                src/OpenWifiTypes.h )
+                src/OpenWifiTypes.h src/RESTAPI_email_handler.cpp src/RESTAPI_email_handler.h
+                src/storage_tokens.cpp
+                src/RESTAPI_GenericServer.h src/RESTAPI_GenericServer.cpp
+                src/RESTAPI_errors.h
+                )
 
 if(NOT SMALL_BUILD)
-    target_link_libraries(ucentralsec PUBLIC
+    target_link_libraries(owsec PUBLIC
             ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES}  ${ZLIB_LIBRARIES}
             CppKafka::cppkafka
             )
     if(UNIX AND NOT APPLE)
-        target_link_libraries(ucentralsec PUBLIC PocoJSON)
+        target_link_libraries(owsec PUBLIC PocoJSON)
     endif()
 endif()

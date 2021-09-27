@@ -15,6 +15,7 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/NetException.h"
+#include "RESTAPI_GenericServer.h"
 
 namespace OpenWifi {
 
@@ -30,6 +31,8 @@ namespace OpenWifi {
 
         int Start() override;
         void Stop() override;
+        void reinitialize(Poco::Util::Application &self) override;
+
         inline const std::string & AssetDir() { return AsserDir_; }
         inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }
         inline const std::string & GetAccessPolicy() const { return AccessPolicy_; }
@@ -40,9 +43,10 @@ namespace OpenWifi {
 		std::string         AsserDir_;
 		std::string         PasswordPolicy_;
 		std::string         AccessPolicy_;
+		RESTAPI_GenericServer   Server_;
 
         RESTAPI_Server() noexcept:
-            SubSystemServer("RESTAPIServer", "REST-SRV", "ucentral.restapi")
+            SubSystemServer("RESTAPIServer", "REST-SRV", "openwifi.restapi")
         {
         }
     };
@@ -51,12 +55,14 @@ namespace OpenWifi {
 
     class RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
         public:
-            RequestHandlerFactory() :
-                Logger_(RESTAPI_Server()->Logger()){}
+        RequestHandlerFactory(RESTAPI_GenericServer &Server) :
+                Logger_(RESTAPI_Server()->Logger()),
+                Server_(Server){}
 
             Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
         private:
             Poco::Logger    & Logger_;
+            RESTAPI_GenericServer   &Server_;
     };
 
 

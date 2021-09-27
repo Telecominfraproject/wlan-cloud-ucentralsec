@@ -12,6 +12,7 @@ namespace OpenWifi {
     int Storage::Create_Tables() {
         Create_UserTable();
         Create_AvatarTable();
+        Create_TokensTable();
         return 0;
     }
 
@@ -75,4 +76,48 @@ namespace OpenWifi {
             }
             return 0;
         }
+
+        int Storage::Create_TokensTable() {
+        try {
+            Poco::Data::Session Sess = Pool_->get();
+            if(dbType_==sqlite) {
+                Sess << "CREATE TABLE IF NOT EXISTS Tokens ("
+                        "Token			    TEXT PRIMARY KEY, "
+                        "RefreshToken       TEXT, "
+                        "TokenType          TEXT, "
+                        "UserName           TEXT, "
+                        "Created 		    BIGINT, "
+                        "Expires 		    BIGINT, "
+                        "IdleTimeOut        BIGINT, "
+                        "RevocationDate 	BIGINT "
+                        ") ", Poco::Data::Keywords::now;
+            } else if(dbType_==mysql) {
+                Sess << "CREATE TABLE IF NOT EXISTS Tokens ("
+                        "Token			    TEXT PRIMARY KEY, "
+                        "RefreshToken       TEXT, "
+                        "TokenType          TEXT, "
+                        "UserName           TEXT, "
+                        "Created 		    BIGINT, "
+                        "Expires 		    BIGINT, "
+                        "IdleTimeOut        BIGINT, "
+                        "RevocationDate 	BIGINT "
+                        ") ", Poco::Data::Keywords::now;
+            } else if(dbType_==pgsql) {
+                Sess << "CREATE TABLE IF NOT EXISTS Tokens ("
+                        "Token			    TEXT PRIMARY KEY, "
+                        "RefreshToken       TEXT, "
+                        "TokenType          TEXT, "
+                        "UserName           TEXT, "
+                        "Created 		    BIGINT, "
+                        "Expires 		    BIGINT, "
+                        "IdleTimeOut        BIGINT, "
+                        "RevocationDate 	BIGINT "
+                        ") ", Poco::Data::Keywords::now;
+            }
+            return 0;
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        return 0;
+    }
 }

@@ -24,13 +24,18 @@ namespace OpenWifi {
 
     class SMTPMailerService * SMTPMailerService::instance_ = nullptr;
 
-    int SMTPMailerService::Start() {
+    void SMTPMailerService::LoadMyConfig() {
         MailHost_ = Daemon()->ConfigGetString("mailer.hostname");
         SenderLoginUserName_ = Daemon()->ConfigGetString("mailer.username");
         SenderLoginPassword_ = Daemon()->ConfigGetString("mailer.password");
+        Sender_ = Daemon()->ConfigGetString("mailer.sender");
         LoginMethod_ = Daemon()->ConfigGetString("mailer.loginmethod");
         MailHostPort_ = (int)Daemon()->ConfigGetInt("mailer.port");
         TemplateDir_ = Daemon()->ConfigPath("mailer.templates", Daemon()->DataDir());
+    }
+
+    int SMTPMailerService::Start() {
+        LoadMyConfig();
         SenderThr_.start(*this);
         return 0;
     }
@@ -41,8 +46,14 @@ namespace OpenWifi {
         SenderThr_.join();
     }
 
+    void SMTPMailerService::reinitialize(Poco::Util::Application &self) {
+        Daemon()->LoadConfigurationFile();
+        Logger_.information("Reinitializing.");
+        LoadMyConfig();
+    }
+
     bool SMTPMailerService::SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
-        SubMutexGuard G(Mutex_);
+        std::lock_guard G(Mutex_);
 
         uint64_t Now = std::time(nullptr);
         auto CE = Cache_.find(Poco::toLower(Recipient));
@@ -60,17 +71,18 @@ namespace OpenWifi {
                                             .File=Poco::File(TemplateDir_ + "/" +Name),
                                             .Attrs=Attrs});
 
-        return false;
+        return true;
     }
 
     void SMTPMailerService::run() {
 
         Running_ = true;
         while(Running_) {
-            Poco::Thread::trySleep(2000);
-
+            Poco::Thread::trySleep(10000);
+            if(!Running_)
+                break;
             {
-                SubMutexGuard G(Mutex_);
+                std::lock_guard G(Mutex_);
 
                 uint64_t Now = std::time(nullptr);
 
@@ -106,11 +118,16 @@ namespace OpenWifi {
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
 
-            std::string Content = Utils::LoadFile(Msg.File);
-            Types::StringPairVec    Variables;
-            FillVariables(Msg.Attrs, Variables);
-            Utils::ReplaceVariables(Content, Variables);
-            Message.addContent(new Poco::Net::StringPartSource(Content));
+            if(Msg.Attrs.find(TEXT) != Msg.Attrs.end()) {
+                std::string Content = Msg.Attrs.find(TEXT)->second;
+                Message.addContent(new Poco::Net::StringPartSource(Content));
+            } else {
+                std::string Content = Utils::LoadFile(Msg.File);
+                Types::StringPairVec    Variables;
+                FillVariables(Msg.Attrs, Variables);
+                Utils::ReplaceVariables(Content, Variables);
+                Message.addContent(new Poco::Net::StringPartSource(Content));
+            }
 
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {

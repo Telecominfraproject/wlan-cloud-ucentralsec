@@ -19,6 +19,7 @@
 #include "RESTAPI_systemEndpoints_handler.h"
 #include "RESTAPI_AssetServer.h"
 #include "RESTAPI_avatarHandler.h"
+#include "RESTAPI_email_handler.h"
 
 #include "Daemon.h"
 #include "Utils.h"
@@ -29,10 +30,11 @@ namespace OpenWifi {
 
     int RESTAPI_Server::Start() {
         Logger_.information("Starting.");
+        Server_.InitLogging();
 
-        AsserDir_ = Daemon()->ConfigPath("ucentral.restapi.wwwassets");
-        AccessPolicy_ = Daemon()->ConfigGetString("ucentral.document.policy.access", "/wwwassets/access_policy.html");
-        PasswordPolicy_ = Daemon()->ConfigGetString("ucentral.document.policy.password", "/wwwassets/possword_policy.html");
+        AsserDir_ = Daemon()->ConfigPath("openwifi.restapi.wwwassets");
+        AccessPolicy_ = Daemon()->ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
+        PasswordPolicy_ = Daemon()->ConfigGetString("openwifi.document.policy.password", "/wwwassets/possword_policy.html");
 
         for(const auto & Svr: ConfigServersList_) {
 			Logger_.information(Poco::format("Starting: %s:%s Keyfile:%s CertFile: %s", Svr.Address(), std::to_string(Svr.Port()),
@@ -49,18 +51,14 @@ namespace OpenWifi {
             Params->setMaxQueued(200);
 			Params->setKeepAlive(true);
 
-            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory, Pool_, Sock, Params);
+            auto NewServer = std::make_unique<Poco::Net::HTTPServer>(new RequestHandlerFactory(Server_), Pool_, Sock, Params);
             NewServer->start();
             RESTServers_.push_back(std::move(NewServer));
         }
-
         return 0;
     }
 
     Poco::Net::HTTPRequestHandler *RequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest & Request) {
-
-        Logger_.debug(Poco::format("REQUEST(%s): %s %s", Utils::FormatIPv6(Request.clientAddress().toString()), Request.getMethod(), Request.getURI()));
-
         Poco::URI uri(Request.getURI());
         const auto & Path = uri.getPath();
         RESTAPIHandler::BindingMap Bindings;
@@ -72,14 +70,23 @@ namespace OpenWifi {
                 RESTAPI_AssetServer,
                 RESTAPI_systemEndpoints_handler,
                 RESTAPI_action_links,
-                RESTAPI_avatarHandler
-                >(Path,Bindings,Logger_);
+                RESTAPI_avatarHandler,
+                RESTAPI_email_handler
+                >(Path,Bindings,Logger_,Server_);
     }
 
     void RESTAPI_Server::Stop() {
         Logger_.information("Stopping ");
         for( const auto & svr : RESTServers_ )
             svr->stop();
+        RESTServers_.clear();
+    }
+
+    void RESTAPI_Server::reinitialize(Poco::Util::Application &self) {
+        Daemon()->LoadConfigurationFile();
+        Logger_.information("Reinitializing.");
+        Stop();
+        Start();
     }
 
 }  // namespace
