@@ -3,10 +3,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ucentralsec.fullname" . }}
+  name: {{ include "owsec.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "ucentralsec.name" . }}
-    helm.sh/chart: {{ include "ucentralsec.chart" . }}
+    app.kubernetes.io/name: {{ include "owsec.name" . }}
+    helm.sh/chart: {{ include "owsec.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
@@ -15,28 +15,28 @@ spec:
     type: {{ .Values.strategyType }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "ucentralsec.name" . }}
+      app.kubernetes.io/name: {{ include "owsec.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-      {{- with .Values.services.ucentralsec.labels }}
+      {{- with .Values.services.owsec.labels }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
   template:
     metadata:
       annotations:
-        checksum/config: {{ include "ucentralsec.config" . | sha256sum }}
+        checksum/config: {{ include "owsec.config" . | sha256sum }}
       labels:
-        app.kubernetes.io/name: {{ include "ucentralsec.name" . }}
+        app.kubernetes.io/name: {{ include "owsec.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
-        {{- with .Values.services.ucentralsec.labels }}
+        {{- with .Values.services.owsec.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
 
       containers:
 
-        - name: ucentralsec
-          image: "{{ .Values.images.ucentralsec.repository }}:{{ .Values.images.ucentralsec.tag }}"
-          imagePullPolicy: {{ .Values.images.ucentralsec.pullPolicy }}
+        - name: owsec
+          image: "{{ .Values.images.owsec.repository }}:{{ .Values.images.owsec.tag }}"
+          imagePullPolicy: {{ .Values.images.owsec.pullPolicy }}
 
           env:
             - name: KUBERNETES_DEPLOYED
@@ -49,19 +49,19 @@ spec:
             - name: {{ $key }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "ucentralsec.fullname" $root }}-env
+                  name: {{ include "owsec.fullname" $root }}-env
                   key: {{ $key }}
           {{- end }}
 
           ports:
-          {{- range $port, $portValue := .Values.services.ucentralsec.ports }}
+          {{- range $port, $portValue := .Values.services.owsec.ports }}
             - name: {{ $port }}
               containerPort: {{ $portValue.targetPort }}
               protocol: {{ $portValue.protocol }}
           {{- end }}
 
           volumeMounts:
-          {{- range .Values.volumes.ucentralsec }}
+          {{- range .Values.volumes.owsec }}
           - name: {{ .name }}
             mountPath: {{ .mountPath }}
             {{- if .subPath }}
@@ -69,13 +69,13 @@ spec:
             {{- end }}
           {{- end }}
 
-          {{- if .Values.checks.ucentralsec.liveness }}
+          {{- if .Values.checks.owsec.liveness }}
           livenessProbe:
-            {{- toYaml .Values.checks.ucentralsec.liveness | nindent 12 }}
+            {{- toYaml .Values.checks.owsec.liveness | nindent 12 }}
           {{- end }}
-          {{- if .Values.checks.ucentralsec.readiness }}
+          {{- if .Values.checks.owsec.readiness }}
           readinessProbe:
-            {{- toYaml .Values.checks.ucentralsec.readiness | nindent 12 }}
+            {{- toYaml .Values.checks.owsec.readiness | nindent 12 }}
           {{- end }}
 
           {{- with .Values.resources }}
@@ -91,7 +91,7 @@ spec:
       imagePullSecrets:
       {{- range $image, $imageValue := .Values.images }}
         {{- if $imageValue.regcred }}
-      - name: {{ include "ucentralsec.fullname" $root }}-{{ $image }}-regcred
+      - name: {{ include "owsec.fullname" $root }}-{{ $image }}-regcred
         {{- end }}
       {{- end }}
 
