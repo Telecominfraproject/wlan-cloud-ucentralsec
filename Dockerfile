@@ -49,7 +49,7 @@ RUN mkdir /openwifi
 RUN mkdir -p "$OWSEC_ROOT" "$OWSEC_CONFIG" && \
     chown "$OWSEC_USER": "$OWSEC_ROOT" "$OWSEC_CONFIG"
 RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec gettext ca-certificates
-COPY --from=builder /ucentralsec/cmake-build/ucentralsec /ucentral/ucentralsec
+COPY --from=builder /owsec/cmake-build/ucentralsec /openwifi/owsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
 
