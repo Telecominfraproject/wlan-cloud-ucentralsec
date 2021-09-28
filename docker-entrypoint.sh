@@ -28,6 +28,7 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWSEC_CONFIG"/owsec.properties ]]; t
   MAILER_HOSTNAME=${MAILER_HOSTNAME:-"smtp.gmail.com"} \
   MAILER_USERNAME=${MAILER_USERNAME:-"************************"} \
   MAILER_PASSWORD=${MAILER_PASSWORD:-"************************"} \
+  MAILER_SENDER=${MAILER_SENDER:-"OpenWIFI"} \
   MAILER_PORT=${MAILER_PORT:-"587"} \
   KAFKA_ENABLE=${KAFKA_ENABLE:-"true"} \
   KAFKA_BROKERLIST=${KAFKA_BROKERLIST:-"localhost:9092"} \
