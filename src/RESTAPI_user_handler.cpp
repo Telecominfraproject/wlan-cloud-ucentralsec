@@ -7,12 +7,13 @@
 #include "Poco/JSON/Parser.h"
 #include "Utils.h"
 #include "RESTAPI_utils.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi {
     void RESTAPI_user_handler::DoGet() {
         std::string Id = GetBinding("id", "");
         if(Id.empty()) {
-            BadRequest("You must supply the ID of the user.");
+            BadRequest(RESTAPI::Errors::MissingUserID);
             return;
         }
 
@@ -29,7 +30,7 @@ namespace OpenWifi {
     void RESTAPI_user_handler::DoDelete() {
         std::string Id = GetBinding("id", "");
         if(Id.empty()) {
-            BadRequest("You must supply the ID of the user.");
+            BadRequest(RESTAPI::Errors::MissingUserID);
             return;
         }
 
@@ -45,10 +46,9 @@ namespace OpenWifi {
         }
 
         if(AuthService()->DeleteUserFromCache(UInfo.email))
-            Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
-
+            ;
+        Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
         Storage()->RevokeAllTokens(UInfo.email);
-
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
         OK();
     }
@@ -56,7 +56,7 @@ namespace OpenWifi {
     void RESTAPI_user_handler::DoPost() {
         std::string Id = GetBinding("id", "");
         if(Id!="0") {
-            BadRequest("To create a user, you must set the ID to 0");
+            BadRequest(RESTAPI::Errors::IdMustBe0);
             return;
         }
 
@@ -64,19 +64,19 @@ namespace OpenWifi {
         RESTAPI_utils::from_request(UInfo,*Request);
 
         if(UInfo.userRole == SecurityObjects::UNKNOWN) {
-            BadRequest("Invalid userRole.");
+            BadRequest(RESTAPI::Errors::InvalidUserRole);
             return;
         }
 
         Poco::toLowerInPlace(UInfo.email);
         if(!Utils::ValidEMailAddress(UInfo.email)) {
-            BadRequest("Invalid email address.");
+            BadRequest(RESTAPI::Errors::InvalidEmailAddress);
             return;
         }
 
         if(!UInfo.currentPassword.empty()) {
             if(!AuthService()->ValidatePassword(UInfo.currentPassword)) {
-                BadRequest("Invalid password.");
+                BadRequest(RESTAPI::Errors::InvalidPassword);
                 return;
             }
         }
@@ -86,7 +86,7 @@ namespace OpenWifi {
 
         if(!Storage()->CreateUser(UInfo.email,UInfo)) {
             Logger_.information(Poco::format("Could not add user '%s'.",UInfo.email));
-            BadRequest("Could not ad this user.");
+            BadRequest(RESTAPI::Errors::RecordNotCreated);
             return;
         }
 
@@ -113,7 +113,7 @@ namespace OpenWifi {
     void RESTAPI_user_handler::DoPut() {
         std::string Id = GetBinding("id", "");
         if(Id.empty()) {
-            BadRequest("You must supply the ID of the user.");
+            BadRequest(RESTAPI::Errors::MissingUserID);
             return;
         }
 
@@ -126,7 +126,7 @@ namespace OpenWifi {
         // some basic validations
         auto RawObject = ParseStream();
         if(RawObject->has("userRole") && SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString())==SecurityObjects::UNKNOWN) {
-            BadRequest("Bad userRole value.");
+            BadRequest(RESTAPI::Errors::InvalidUserRole);
             return;
         }
 
@@ -161,11 +161,11 @@ namespace OpenWifi {
         }
         if(RawObject->has("currentPassword")) {
             if(!AuthService()->ValidatePassword(RawObject->get("currentPassword").toString())) {
-                BadRequest("Invalid password.");
+                BadRequest(RESTAPI::Errors::InvalidPassword);
                 return;
             }
             if(!AuthService()->SetPassword(RawObject->get("currentPassword").toString(),LocalObject)) {
-                BadRequest("Password was rejected. This maybe an old password.");
+                BadRequest(RESTAPI::Errors::PasswordRejected);
                 return;
             }
         }
@@ -180,8 +180,7 @@ namespace OpenWifi {
             LocalObject.to_json(ModifiedObject);
             ReturnObject(ModifiedObject);
             return;
-        } else {
-            BadRequest("Failed to update user.");
         }
+        BadRequest(RESTAPI::Errors::RecordNotUpdated);
     }
 }

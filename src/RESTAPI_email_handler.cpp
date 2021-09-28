@@ -10,6 +10,7 @@
 
 #include "Daemon.h"
 #include "SMTPMailerService.h"
+#include "RESTAPI_errors.h"
 
 namespace OpenWifi {
     void RESTAPI_email_handler::DoPost() {
@@ -26,11 +27,10 @@ namespace OpenWifi {
             if(SMTPMailerService()->SendMessage(Recipients->get(0).toString(), "password_reset.txt", Attrs)) {
                 OK();
                 return;
-            } else {
-                ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
             }
-        } else {
-            BadRequest("Unsupported or missing parameters.");
+            ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
+            return;
         }
+        BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }
 }
