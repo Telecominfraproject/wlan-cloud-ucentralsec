@@ -133,6 +133,7 @@ configProperties:
   authentication.service.type: internal
   # Mailer
   mailer.hostname: smtp.gmail.com
+  mailer.sender: OpenWIFI
   mailer.loginmethod: login
   mailer.port: 587
   mailer.templates: $OWSEC_ROOT/templates
