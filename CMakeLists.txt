@@ -77,6 +77,7 @@ add_executable( owsec
                 src/storage_tokens.cpp
                 src/RESTAPI_GenericServer.h src/RESTAPI_GenericServer.cpp
                 src/RESTAPI_errors.h
+                src/Storage.h
                 )
 
 if(NOT SMALL_BUILD)

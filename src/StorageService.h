@@ -23,6 +23,7 @@
 #include "AuthService.h"
 #include "RESTAPI_SecurityObjects.h"
 #include "SubSystemServer.h"
+#include "Storage.h"
 
 namespace OpenWifi {
 
@@ -66,18 +67,8 @@ namespace OpenWifi {
 
     };
 
-
-
-
     class Storage : public SubSystemServer {
-
     public:
-
-        enum StorageType {
-            sqlite,
-            pgsql,
-            mysql
-        };
 
         enum AUTH_ERROR {
             SUCCESS,
@@ -169,11 +160,10 @@ namespace OpenWifi {
         bool CompleteAction(std::string &ActionId);
         bool CancelAction(std::string &ActionId);
 
-
 	  private:
 		static Storage      							*instance_;
 		std::unique_ptr<Poco::Data::SessionPool>        Pool_= nullptr;
-		StorageType 									dbType_ = sqlite;
+		DBType       									dbType_ = sqlite;
 		std::unique_ptr<Poco::Data::SQLite::Connector>  SQLiteConn_= nullptr;
 #ifndef SMALL_BUILD
 		std::unique_ptr<Poco::Data::PostgreSQL::Connector>  PostgresConn_= nullptr;
