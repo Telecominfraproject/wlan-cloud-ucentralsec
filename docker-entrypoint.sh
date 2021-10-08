@@ -30,8 +30,11 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWSEC_CONFIG"/owsec.properties ]]; t
   MAILER_PASSWORD=${MAILER_PASSWORD:-"************************"} \
   MAILER_SENDER=${MAILER_SENDER:-"OpenWIFI"} \
   MAILER_PORT=${MAILER_PORT:-"587"} \
+  MAILER_TEMPLATES=${MAILER_TEMPLATES:-"\$OWSEC_ROOT/templates"} \
   KAFKA_ENABLE=${KAFKA_ENABLE:-"true"} \
   KAFKA_BROKERLIST=${KAFKA_BROKERLIST:-"localhost:9092"} \
+  DOCUMENT_POLICY_ACCESS=${DOCUMENT_POLICY_ACCESS:-"\$OWSEC_ROOT/wwwassets/access_policy.html"} \
+  DOCUMENT_POLICY_PASSWORD=${DOCUMENT_POLICY_PASSWORD:-"\$OWSEC_ROOT/wwwassets/password_policy.html"} \
   STORAGE_TYPE=${STORAGE_TYPE:-"sqlite"} \
   STORAGE_TYPE_POSTGRESQL_HOST=${STORAGE_TYPE_POSTGRESQL_HOST:-"localhost"} \
   STORAGE_TYPE_POSTGRESQL_USERNAME=${STORAGE_TYPE_POSTGRESQL_USERNAME:-"owsec"} \
@@ -43,7 +46,7 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWSEC_CONFIG"/owsec.properties ]]; t
   STORAGE_TYPE_MYSQL_PASSWORD=${STORAGE_TYPE_MYSQL_PASSWORD:-"owsec"} \
   STORAGE_TYPE_MYSQL_DATABASE=${STORAGE_TYPE_MYSQL_DATABASE:-"owsec"} \
   STORAGE_TYPE_MYSQL_PORT=${STORAGE_TYPE_MYSQL_PORT:-"3306"} \
-  envsubst < $OWSEC_CONFIG/owsec.properties.tmpl > $OWSEC_CONFIG/owsec.properties
+  envsubst < /owsec.properties.tmpl > $OWSEC_CONFIG/owsec.properties
 fi
 
 if [ "$1" = '/openwifi/owsec' -a "$(id -u)" = '0' ]; then
