@@ -49,7 +49,7 @@ mailer.password = ${MAILER_PASSWORD}
 mailer.sender = ${MAILER_SENDER}
 mailer.loginmethod = login
 mailer.port = ${MAILER_PORT}
-mailer.templates = $UCENTRALSEC_ROOT/templates
+mailer.templates = ${MAILER_TEMPLATES}
 
 
 #############################
@@ -71,8 +71,8 @@ openwifi.kafka.brokerlist = ${KAFKA_BROKERLIST}
 openwifi.kafka.auto.commit = false
 openwifi.kafka.queue.buffering.max.ms = 50
 
-openwifi.document.policy.access = /wwwassets/access_policy.html
-openwifi.document.policy.password = /wwwassets/password_policy.html
+openwifi.document.policy.access = ${DOCUMENT_POLICY_ACCESS}
+openwifi.document.policy.password = ${DOCUMENT_POLICY_PASSWORD}
 openwifi.avatar.maxsize = 2000000
 #
 # This section select which form of persistence you need
@@ -118,7 +118,7 @@ logging.channels.c1.formatter = f1
 
 # This is where the logs will be written. This path MUST exist
 logging.channels.c2.class = FileChannel
-logging.channels.c2.path = $UCENTRALSEC_ROOT/logs/log
+logging.channels.c2.path = $OWSEC_ROOT/logs/log
 logging.channels.c2.formatter.class = PatternFormatter
 logging.channels.c2.formatter.pattern = %Y-%m-%d %H:%M:%S %s: [%p] %t
 logging.channels.c2.rotation = 20 M

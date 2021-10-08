@@ -53,7 +53,9 @@ COPY --from=builder /owsec/cmake-build/owsec /openwifi/owsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
 
-COPY owsec.properties.tmpl ${OWSEC_CONFIG}/
+COPY owsec.properties.tmpl /
+COPY wwwassets $OWSEC_ROOT/wwwassets
+COPY templates $OWSEC_ROOT/templates
 COPY docker-entrypoint.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
