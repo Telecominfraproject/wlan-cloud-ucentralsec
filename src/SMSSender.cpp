@@ -32,10 +32,10 @@ namespace OpenWifi {
         Aws::Client::ClientConfiguration    AwsConfig_;
         Aws::Auth::AWSCredentials           AwsCreds_;
 
-        AwsConfig_.enableTcpKeepAlive = true;
-        AwsConfig_.enableEndpointDiscovery = true;
-        AwsConfig_.useDualStack = true;
-        AwsConfig_.verifySSL = true;
+        //AwsConfig_.enableTcpKeepAlive = true;
+        //AwsConfig_.enableEndpointDiscovery = true;
+        //AwsConfig_.useDualStack = true;
+        //AwsConfig_.verifySSL = true;
         AwsConfig_.region = Region_;
 
         AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
