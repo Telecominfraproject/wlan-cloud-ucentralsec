@@ -29,7 +29,7 @@ namespace OpenWifi {
     }
 
     int SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
-        Aws::Client::ClientConfiguration    AwsConfig_{"ARILIA"};
+        Aws::Client::ClientConfiguration    AwsConfig_;
         Aws::Auth::AWSCredentials           AwsCreds_;
 
         AwsConfig_.enableTcpKeepAlive = true;
