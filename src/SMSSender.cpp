@@ -19,6 +19,7 @@ namespace OpenWifi {
             Logger_.debug("SMSSender is disabled. Please provide key and access key in configuration.");
             return -1;
         }
+        std::cout << "K:" << SecretKey_ << " A:" << AccessKey_ << " R:" << Region_ << std::endl;
         AwsConfig_.enableTcpKeepAlive = true;
         AwsConfig_.enableEndpointDiscovery = true;
         AwsConfig_.useDualStack = true;
