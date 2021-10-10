@@ -22,6 +22,10 @@ namespace OpenWifi {
             return -1;
         }
 
+        AwsConfig_.region = Region_;
+        AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
+        AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
+
         return 0;
     }
 
@@ -29,33 +33,12 @@ namespace OpenWifi {
     }
 
     int SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
-        Aws::Client::ClientConfiguration    AwsConfig_;
-        Aws::Auth::AWSCredentials           AwsCreds_;
-
-        //AwsConfig_.enableTcpKeepAlive = true;
-        //AwsConfig_.enableEndpointDiscovery = true;
-        //AwsConfig_.useDualStack = true;
-        //AwsConfig_.verifySSL = true;
-        AwsConfig_.region = Region_;
-
-        AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
-        AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
-
         Aws::SNS::SNSClient sns(AwsCreds_,AwsConfig_);
 
         Aws::SNS::Model::PublishRequest psms_req;
         psms_req.SetMessage(Message.c_str());
         psms_req.SetPhoneNumber(PhoneNumber.c_str());
 
-/*
-        Aws::SNS::Model::GetSMSAttributesRequest AttrReq;
-        auto req_out = sns.GetSMSAttributes(AttrReq);
-        if(req_out.IsSuccess()) {
-            std::cout << "Got attributes..." << std::endl;
-        } else {
-            std::cout << "Not Got attributes..." << std::endl;
-        }
-*/
         std::cout << "Sending message: " << PhoneNumber << " ...:" << Message << std::endl;
 
         auto psms_out = sns.Publish(psms_req);
