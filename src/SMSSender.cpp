@@ -25,8 +25,8 @@ namespace OpenWifi {
         AwsConfig_.enableTcpKeepAlive = true;
         AwsConfig_.enableEndpointDiscovery = true;
         AwsConfig_.useDualStack = true;
-        if(!Region_.empty())
-            AwsConfig_.region = Region_;
+//        if(!Region_.empty())
+//            AwsConfig_.region = Region_;
         AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
         AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
 
