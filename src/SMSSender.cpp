@@ -25,6 +25,7 @@ namespace OpenWifi {
         AwsConfig_.enableTcpKeepAlive = true;
         AwsConfig_.enableEndpointDiscovery = true;
         AwsConfig_.useDualStack = true;
+        AwsConfig_.verifySSL = true;
 //        if(!Region_.empty())
 //            AwsConfig_.region = Region_;
         AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
@@ -43,6 +44,7 @@ namespace OpenWifi {
         psms_req.SetMessage(Message.c_str());
         psms_req.SetPhoneNumber(PhoneNumber.c_str());
 
+/*
         Aws::SNS::Model::GetSMSAttributesRequest AttrReq;
         auto req_out = sns.GetSMSAttributes(AttrReq);
         if(req_out.IsSuccess()) {
@@ -50,7 +52,7 @@ namespace OpenWifi {
         } else {
             std::cout << "Not Got attributes..." << std::endl;
         }
-
+*/
         std::cout << "Sending message: " << PhoneNumber << " ...:" << Message << std::endl;
 
         auto psms_out = sns.Publish(psms_req);
