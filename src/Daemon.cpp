@@ -63,22 +63,24 @@ namespace OpenWifi {
 }
 
 int main(int argc, char **argv) {
-    SSL_library_init();
     try {
+        SSL_library_init();
         Aws::SDKOptions AwsOptions;
         AwsOptions.memoryManagementOptions.memoryManager = nullptr;
         AwsOptions.cryptoOptions.initAndCleanupOpenSSL = false;
         AwsOptions.httpOptions.initAndCleanupCurl = true;
 
         Aws::InitAPI(AwsOptions);
-        auto App = OpenWifi::Daemon::instance();
-        auto ExitCode =  App->run(argc, argv);
-        delete App;
 
+        int ExitCode=0;
+        {
+            auto App = OpenWifi::Daemon::instance();
+            ExitCode =  App->run(argc, argv);
+        }
         ShutdownAPI(AwsOptions);
         return ExitCode;
     } catch (Poco::Exception &exc) {
-        std::cerr << exc.displayText() << std::endl;
+        std::cout << exc.displayText() << std::endl;
         return Poco::Util::Application::EXIT_SOFTWARE;
     }
 }
