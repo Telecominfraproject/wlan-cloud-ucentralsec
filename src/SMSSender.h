@@ -32,6 +32,7 @@ namespace OpenWifi {
             std::string         Region_;
             Aws::Client::ClientConfiguration    AwsConfig_;
             Aws::Auth::AWSCredentials           AwsCreds_;
+            bool                Enabled_=false;
 
             SMSSender() noexcept:
                 SubSystemServer("SMSSender", "SMS-SVR", "smssender.aws")
