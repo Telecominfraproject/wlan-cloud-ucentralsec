@@ -39,6 +39,8 @@ namespace OpenWifi {
         psms_req.SetMessage(Message.c_str());
         psms_req.SetPhoneNumber(PhoneNumber.c_str());
 
+        std::cout << "Sending message: " << PhoneNumber << " ...:" << Message << std::endl;
+
         auto psms_out = sns.Publish(psms_req);
 
         if (psms_out.IsSuccess())
