@@ -39,7 +39,7 @@ namespace OpenWifi {
         AwsConfig_.region = Region_;
 
         AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
-        AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
+        AwsCreds_.SetAWSSecretKey(/* SecretKey_.c_str() */ "akldjfldjfldf");
 
         Aws::SNS::SNSClient sns(AwsCreds_,AwsConfig_);
 
