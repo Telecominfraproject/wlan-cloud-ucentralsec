@@ -17,19 +17,10 @@ namespace OpenWifi {
         AccessKey_ = Daemon()->ConfigGetString("smssender.aws.accesskey","");
         Region_ = Daemon()->ConfigGetString("smssender.aws.region","");
 
-        if(SecretKey_.empty() || AccessKey_.empty()) {
+        if(SecretKey_.empty() || AccessKey_.empty() || Region_.empty()) {
             Logger_.debug("SMSSender is disabled. Please provide key and access key in configuration.");
             return -1;
         }
-
-        AwsConfig_.enableTcpKeepAlive = true;
-        AwsConfig_.enableEndpointDiscovery = true;
-        AwsConfig_.useDualStack = true;
-        AwsConfig_.verifySSL = true;
-//        if(!Region_.empty())
-//            AwsConfig_.region = Region_;
-        AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
-        AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
 
         return 0;
     }
@@ -38,6 +29,18 @@ namespace OpenWifi {
     }
 
     int SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
+        Aws::Client::ClientConfiguration    AwsConfig_{"ARILIA"};
+        Aws::Auth::AWSCredentials           AwsCreds_;
+
+        AwsConfig_.enableTcpKeepAlive = true;
+        AwsConfig_.enableEndpointDiscovery = true;
+        AwsConfig_.useDualStack = true;
+        AwsConfig_.verifySSL = true;
+        AwsConfig_.region = Region_;
+
+        AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
+        AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
+
         Aws::SNS::SNSClient sns(AwsCreds_,AwsConfig_);
 
         Aws::SNS::Model::PublishRequest psms_req;

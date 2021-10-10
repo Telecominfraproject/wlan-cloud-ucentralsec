@@ -30,9 +30,6 @@ namespace OpenWifi {
             std::string         SecretKey_;
             std::string         AccessKey_;
             std::string         Region_;
-            Aws::Client::ClientConfiguration    AwsConfig_{"ARILIA"};
-            Aws::Auth::AWSCredentials           AwsCreds_;
-
 
             SMSSender() noexcept:
                 SubSystemServer("SMSSender", "SMS-SVR", "smssender.aws")
