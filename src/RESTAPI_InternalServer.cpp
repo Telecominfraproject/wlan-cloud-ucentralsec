@@ -11,6 +11,7 @@
 #include "RESTAPI_action_links.h"
 #include "RESTAPI_validateToken_handler.h"
 #include "RESTAPI_InternalServer.h"
+#include "RESTAPI_sms_handler.h"
 
 #include "Utils.h"
 
@@ -73,7 +74,8 @@ namespace OpenWifi {
                 RESTAPI_user_handler,
                 RESTAPI_system_command,
                 RESTAPI_action_links,
-                RESTAPI_validateToken_handler
+                RESTAPI_validateToken_handler,
+                RESTAPI_sms_handler
         >(Path,Bindings,Logger_, Server_);
     }
 

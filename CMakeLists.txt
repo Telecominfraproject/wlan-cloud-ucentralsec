@@ -79,7 +79,7 @@ add_executable( owsec
                 src/RESTAPI_GenericServer.h src/RESTAPI_GenericServer.cpp
                 src/RESTAPI_errors.h
                 src/Storage.h
-        src/SMSSender.cpp src/SMSSender.h)
+        src/SMSSender.cpp src/SMSSender.h src/RESTAPI_sms_handler.cpp src/RESTAPI_sms_handler.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

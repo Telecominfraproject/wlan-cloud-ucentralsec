@@ -20,6 +20,7 @@
 #include "RESTAPI_AssetServer.h"
 #include "RESTAPI_avatarHandler.h"
 #include "RESTAPI_email_handler.h"
+#include "RESTAPI_sms_handler.h"
 
 #include "Daemon.h"
 #include "Utils.h"
@@ -71,7 +72,8 @@ namespace OpenWifi {
                 RESTAPI_systemEndpoints_handler,
                 RESTAPI_action_links,
                 RESTAPI_avatarHandler,
-                RESTAPI_email_handler
+                RESTAPI_email_handler,
+                RESTAPI_sms_handler
                 >(Path,Bindings,Logger_,Server_);
     }
 

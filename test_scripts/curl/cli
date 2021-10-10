@@ -244,6 +244,15 @@ sendemail() {
             jq < ${result_file}
 }
 
+sendsms() {
+    payload="{ \"to\" : \"$1\" , \"text\" : \"$2\" }"
+            curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/sms" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload" > ${result_file}
+            jq < ${result_file}
+}
+
 testlogout() {
     echo "Logged in..."
     oldtoken=${token}
@@ -346,6 +355,7 @@ case "$1" in
     "getavatar") login; getavatar "$2"; logout;;
     "deleteavatar") login; deleteavatar "$2"; logout;;
     "sendemail") login; sendemail ; logout;;
+    "sendsms") login; sendsms "$2" "$3" ; logout;;
     "testlogout") login; testlogout ;;
     "setloglevel") login; setloglevel "$2" "$3"  ; logout ;;
     "getloglevels") login; getloglevels; logout ;;

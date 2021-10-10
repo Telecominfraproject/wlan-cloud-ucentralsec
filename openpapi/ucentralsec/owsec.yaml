@@ -314,6 +314,16 @@ components:
         text:
           type: string
 
+    SMSInfo:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        text:
+          type: string
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the uCentral stack must provide
@@ -906,6 +916,37 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EMailInfo'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          description: Error description
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+  /sms:
+    post:
+      tags:
+        - EMail
+      summary: Send test email with the system
+      operationId: Send a test SMS
+      requestBody:
+        description: The requested message
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SMSInfo'
       responses:
         200:
           $ref: '#/components/responses/Success'
