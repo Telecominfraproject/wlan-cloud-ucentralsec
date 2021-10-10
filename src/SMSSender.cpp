@@ -7,6 +7,7 @@
 #include <aws/sns/SNSClient.h>
 #include <aws/sns/model/PublishRequest.h>
 #include <aws/sns/model/PublishResult.h>
+#include <aws/sns/model/GetSMSAttributesRequest.h>
 
 namespace OpenWifi {
     class SMSSender * SMSSender::instance_ = nullptr;
@@ -15,11 +16,12 @@ namespace OpenWifi {
         SecretKey_ = Daemon()->ConfigGetString("smssender.aws.secretkey","");
         AccessKey_ = Daemon()->ConfigGetString("smssender.aws.accesskey","");
         Region_ = Daemon()->ConfigGetString("smssender.aws.region","");
+
         if(SecretKey_.empty() || AccessKey_.empty()) {
             Logger_.debug("SMSSender is disabled. Please provide key and access key in configuration.");
             return -1;
         }
-        std::cout << "K:" << SecretKey_ << " A:" << AccessKey_ << " R:" << Region_ << std::endl;
+
         AwsConfig_.enableTcpKeepAlive = true;
         AwsConfig_.enableEndpointDiscovery = true;
         AwsConfig_.useDualStack = true;
@@ -27,6 +29,7 @@ namespace OpenWifi {
             AwsConfig_.region = Region_;
         AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
         AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
+
         return 0;
     }
 
@@ -39,6 +42,14 @@ namespace OpenWifi {
         Aws::SNS::Model::PublishRequest psms_req;
         psms_req.SetMessage(Message.c_str());
         psms_req.SetPhoneNumber(PhoneNumber.c_str());
+
+        Aws::SNS::Model::GetSMSAttributesRequest AttrReq;
+        auto req_out = sns.GetSMSAttributes(AttrReq);
+        if(req_out.IsSuccess()) {
+            std::cout << "Got attributes..." << std::endl;
+        } else {
+            std::cout << "Not Got attributes..." << std::endl;
+        }
 
         std::cout << "Sending message: " << PhoneNumber << " ...:" << Message << std::endl;
 
