@@ -19,6 +19,13 @@
 
 #include "Daemon.h"
 
+#include <aws/core/Aws.h>
+#include <aws/s3/model/CreateBucketRequest.h>
+#include <aws/s3/model/PutObjectRequest.h>
+#include <aws/s3/model/AccessControlPolicy.h>
+#include <aws/s3/model/PutBucketAclRequest.h>
+#include <aws/s3/model/GetBucketAclRequest.h>
+
 #include "ALBHealthCheckServer.h"
 #include "KafkaManager.h"
 #include "StorageService.h"
@@ -26,6 +33,7 @@
 #include "SMTPMailerService.h"
 #include "RESTAPI_InternalServer.h"
 #include "AuthService.h"
+#include "SMSSender.h"
 
 namespace OpenWifi {
     class Daemon *Daemon::instance_ = nullptr;
@@ -39,6 +47,7 @@ namespace OpenWifi {
                                    vDAEMON_BUS_TIMER,
                                    Types::SubSystemVec{
                                            Storage(),
+                                           SMSSender(),
                                            RESTAPI_Server(),
                                            RESTAPI_InternalServer(),
                                            SMTPMailerService(),
@@ -55,12 +64,18 @@ namespace OpenWifi {
 
 int main(int argc, char **argv) {
     try {
+        Aws::SDKOptions AwsOptions;
+        AwsOptions.memoryManagementOptions.memoryManager = nullptr;
+        AwsOptions.cryptoOptions.initAndCleanupOpenSSL = false;
+        AwsOptions.httpOptions.initAndCleanupCurl = true;
+
+        Aws::InitAPI(AwsOptions);
         auto App = OpenWifi::Daemon::instance();
         auto ExitCode =  App->run(argc, argv);
         delete App;
 
+        ShutdownAPI(AwsOptions);
         return ExitCode;
-
     } catch (Poco::Exception &exc) {
         std::cerr << exc.displayText() << std::endl;
         return Poco::Util::Application::EXIT_SOFTWARE;

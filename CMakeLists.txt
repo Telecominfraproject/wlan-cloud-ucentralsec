@@ -41,6 +41,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED system)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(AWSSDK     REQUIRED COMPONENTS sns)
 
 find_package(CppKafka REQUIRED)
 find_package(PostgreSQL REQUIRED)
@@ -78,12 +79,12 @@ add_executable( owsec
                 src/RESTAPI_GenericServer.h src/RESTAPI_GenericServer.cpp
                 src/RESTAPI_errors.h
                 src/Storage.h
-                )
+        src/SMSSender.cpp src/SMSSender.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
             ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES}  ${ZLIB_LIBRARIES}
-            CppKafka::cppkafka
+            CppKafka::cppkafka ${AWSSDK_LINK_LIBRARIES}
             )
     if(UNIX AND NOT APPLE)
         target_link_libraries(owsec PUBLIC PocoJSON)
