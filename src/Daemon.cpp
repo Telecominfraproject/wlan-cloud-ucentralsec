@@ -63,6 +63,7 @@ namespace OpenWifi {
 }
 
 int main(int argc, char **argv) {
+    SSL_library_init();
     try {
         Aws::SDKOptions AwsOptions;
         AwsOptions.memoryManagementOptions.memoryManager = nullptr;
