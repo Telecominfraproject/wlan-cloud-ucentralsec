@@ -35,7 +35,7 @@ namespace OpenWifi {
         U.suspended = T.get<20>();
         U.blackListed = T.get<21>();
         U.userRole = SecurityObjects::UserTypeFromString(T.get<22>());
-        U.userTypeProprietaryInfo = T.get<23>();
+        U.userTypeProprietaryInfo = RESTAPI_utils::to_object<SecurityObjects::UserLoginLoginExtensions>(T.get<23>());
         U.securityPolicy = T.get<24>();
         U.securityPolicyChange = T.get<25>();
         U.currentPassword = T.get<26>();
@@ -69,7 +69,7 @@ namespace OpenWifi {
         T.set<20>(U.suspended);
         T.set<21>(U.blackListed);
         T.set<22>(SecurityObjects::UserTypeToString(U.userRole));
-        T.set<23>(U.userTypeProprietaryInfo);
+        T.set<23>(RESTAPI_utils::to_string(U.userTypeProprietaryInfo));
         T.set<24>(U.securityPolicy);
         T.set<25>(U.securityPolicyChange);
         T.set<26>(U.currentPassword);
@@ -120,6 +120,7 @@ namespace OpenWifi {
             auto Notes = RESTAPI_utils::to_string(NewUser.notes);
             auto UserType = SecurityObjects::UserTypeToString(NewUser.userRole);
             auto OldPasswords = RESTAPI_utils::to_string(NewUser.lastPasswords);
+            auto userTypeProprietaryInfo = RESTAPI_utils::to_string(NewUser.userTypeProprietaryInfo);
 
             St1 = "INSERT INTO Users (" + AllUsersFieldsForSelect + ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             Poco::Data::Statement Statement(Sess);
@@ -147,7 +148,7 @@ namespace OpenWifi {
                     Poco::Data::Keywords::use(NewUser.suspended),
                     Poco::Data::Keywords::use(NewUser.blackListed),
                     Poco::Data::Keywords::use(UserType),
-                    Poco::Data::Keywords::use(NewUser.userTypeProprietaryInfo),
+                    Poco::Data::Keywords::use(userTypeProprietaryInfo),
                     Poco::Data::Keywords::use(NewUser.securityPolicy),
                     Poco::Data::Keywords::use(NewUser.securityPolicyChange),
                     Poco::Data::Keywords::use(NewUser.currentPassword),
@@ -254,6 +255,7 @@ namespace OpenWifi {
             auto Notes = RESTAPI_utils::to_string(UInfo.notes);
             auto UserType = SecurityObjects::UserTypeToString(UInfo.userRole);
             auto OldPasswords = RESTAPI_utils::to_string(UInfo.lastPasswords);
+            auto userTypeProprietaryInfo = RESTAPI_utils::to_string(UInfo.userTypeProprietaryInfo);
             Update << ConvertParams(St1),
                     Poco::Data::Keywords::use(UInfo.Id),
                     Poco::Data::Keywords::use(UInfo.name),
@@ -278,7 +280,7 @@ namespace OpenWifi {
                     Poco::Data::Keywords::use(UInfo.suspended),
                     Poco::Data::Keywords::use(UInfo.blackListed),
                     Poco::Data::Keywords::use(UserType),
-                    Poco::Data::Keywords::use(UInfo.userTypeProprietaryInfo),
+                    Poco::Data::Keywords::use(userTypeProprietaryInfo),
                     Poco::Data::Keywords::use(UInfo.securityPolicy),
                     Poco::Data::Keywords::use(UInfo.securityPolicyChange),
                     Poco::Data::Keywords::use(UInfo.currentPassword),

@@ -12,6 +12,12 @@
 
 namespace OpenWifi {
 
+    struct SMSValidationCacheEntry {
+        std::string Number;
+        std::string Code;
+        uint64_t    Created;
+    };
+
     class SMSSender : public SubSystemServer {
         public:
             static SMSSender *instance() {
@@ -24,7 +30,9 @@ namespace OpenWifi {
             int Start() final;
             void Stop() final;
             [[nodiscard]] int Send(const std::string &PhoneNumber, const std::string &Message);
-
+            bool Enabled() const { return Enabled_; }
+            bool StartValidation(const std::string &Number);
+            bool CompleteValidation(const std::string &Number, const std::string &Code);
         private:
             static SMSSender * instance_;
             std::string         SecretKey_;
@@ -33,11 +41,14 @@ namespace OpenWifi {
             Aws::Client::ClientConfiguration    AwsConfig_;
             Aws::Auth::AWSCredentials           AwsCreds_;
             bool                Enabled_=false;
+            std::vector<SMSValidationCacheEntry>    Cache_;
 
             SMSSender() noexcept:
                 SubSystemServer("SMSSender", "SMS-SVR", "smssender.aws")
             {
             }
+
+            void CleanCache();
     };
     inline SMSSender * SMSSender() { return SMSSender::instance(); }
 

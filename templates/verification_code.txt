@@ -1,0 +1,10 @@
+Dear ${RECIPIENT_EMAIL},
+
+    You have requested your login validation. Please enter the following code on the login screen:
+
+        ${CHALLENGE_CODE}
+
+    If you are not trying to login, please login and change your password. Someone maybe trying to
+    access your account illegally.
+
+Thank you!

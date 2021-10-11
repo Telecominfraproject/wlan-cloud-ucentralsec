@@ -11,16 +11,37 @@ namespace OpenWifi {
 
     void OpenWifi::RESTAPI_sms_handler::DoPost() {
         auto Obj = ParseStream();
+
+        std::string Arg;
+        if(HasParameter("validateNumber",Arg) && Arg=="true" && Obj->has("to")) {
+            auto Number = Obj->get("to").toString();
+            if(SMSSender()->StartValidation(Number)) {
+                return OK();
+            }
+            return BadRequest("SMS could not be sent to validate device, try later or change the phone number.");
+        }
+
+        std::string Code;
+        if( HasParameter("completeValidation",Arg) &&
+            Arg=="true" &&
+            HasParameter("validationCode", Code) &&
+            Obj->has("to")) {
+            auto Number = Obj->get("to").toString();
+            if(SMSSender()->CompleteValidation(Number, Code)) {
+                return OK();
+            }
+            return BadRequest("Code and number could not be validated");
+        }
+
         if (Obj->has("to") &&
             Obj->has("text")) {
 
             std::string PhoneNumber = Obj->get("to").toString();
             std::string Text = Obj->get("text").toString();
             if(SMSSender()->Send(PhoneNumber, Text)==0)
-                OK();
-            else
-                InternalError("SMS Message could not be sent.");
-            return;
+                return OK();
+
+            return InternalError("SMS Message could not be sent.");
         }
         BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }

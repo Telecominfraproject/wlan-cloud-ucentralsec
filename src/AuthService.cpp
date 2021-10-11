@@ -21,6 +21,7 @@
 #include "Kafka_topics.h"
 
 #include "SMTPMailerService.h"
+#include "MFAServer.h"
 
 namespace OpenWifi {
     class AuthService *AuthService::instance_ = nullptr;
@@ -112,6 +113,10 @@ namespace OpenWifi {
             }
         }
         return true;
+    }
+
+    bool AuthService::RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo) {
+        return (UInfo.userinfo.userTypeProprietaryInfo.mfa.enabled && MFAServer().MethodEnabled(UInfo.userinfo.userTypeProprietaryInfo.mfa.method));
     }
 
     bool AuthService::ValidatePassword(const std::string &Password) {

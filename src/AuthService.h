@@ -83,6 +83,7 @@ namespace OpenWifi{
         [[nodiscard]] static bool VerifyEmail(SecurityObjects::UserInfo &UInfo);
         [[nodiscard]] static bool SendEmailToUser(std::string &Email, EMAIL_REASON Reason);
         [[nodiscard]] bool DeleteUserFromCache(const std::string &UserName);
+        [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
 
     private:
 		static AuthService *instance_;

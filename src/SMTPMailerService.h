@@ -23,7 +23,8 @@ namespace OpenWifi {
         TEMPLATE_TXT,
         TEMPLATE_HTML,
         LOGO,
-        TEXT
+        TEXT,
+        CHALLENGE_CODE
     };
 
     static const std::map<MESSAGE_ATTRIBUTES,const std::string>
@@ -38,7 +39,8 @@ namespace OpenWifi {
                                  {  TEMPLATE_TXT, "TEMPLATE_TXT"},
                                  {  TEMPLATE_HTML, "TEMPLATE_HTML"},
                                  {  LOGO, "LOGO"},
-                                 {  TEXT, "TEXT"}
+                                 {  TEXT, "TEXT"},
+                                 {  CHALLENGE_CODE, "CHALLENGE_CODE"}
                                  };
 
     inline const std::string & MessageAttributeToVar(MESSAGE_ATTRIBUTES Attr) {
@@ -80,6 +82,7 @@ namespace OpenWifi {
             bool SendIt(const MessageEvent &Msg);
             void LoadMyConfig();
             void reinitialize(Poco::Util::Application &self) override;
+            bool Enabled() const { return Enabled_; }
         private:
             static SMTPMailerService * instance_;
             std::string             MailHost_;
@@ -94,6 +97,7 @@ namespace OpenWifi {
             std::map<std::string,MessageCacheEntry> Cache_;
             Poco::Thread            SenderThr_;
             std::atomic_bool        Running_=false;
+            bool                    Enabled_=false;
 
             SMTPMailerService() noexcept:
                 SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer")

@@ -8,6 +8,7 @@
 #include <aws/sns/model/PublishRequest.h>
 #include <aws/sns/model/PublishResult.h>
 #include <aws/sns/model/GetSMSAttributesRequest.h>
+#include "MFAServer.h"
 
 namespace OpenWifi {
     class SMSSender * SMSSender::instance_ = nullptr;
@@ -30,6 +31,37 @@ namespace OpenWifi {
     }
 
     void SMSSender::Stop() {
+    }
+
+    void SMSSender::CleanCache() {
+        uint64_t Now=std::time(nullptr);
+        for(auto i=begin(Cache_);i!=end(Cache_);) {
+            if((Now-i->Created)>300)
+                i = Cache_.erase(i);
+            else
+                ++i;
+        }
+    }
+
+    bool SMSSender::StartValidation(const std::string &Number) {
+        std::lock_guard     G(Mutex_);
+        CleanCache();
+        uint64_t Now=std::time(nullptr);
+        auto Challenge = MFAServer::MakeChallenge();
+        Cache_.emplace_back(SMSValidationCacheEntry{.Number=Number, .Code=Challenge, .Created=Now});
+        std::string Message = "Please enter the following code on your login screen: " + Challenge;
+        return Send(Number, Message)==0;
+    }
+
+    bool SMSSender::CompleteValidation(const std::string &Number, const std::string &Code) {
+        std::lock_guard     G(Mutex_);
+
+        for(const auto &i:Cache_) {
+            if(i.Code==Code && i.Number==Number) {
+                return true;
+            }
+        }
+        return false;
     }
 
     int SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {

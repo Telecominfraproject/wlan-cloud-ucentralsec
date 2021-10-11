@@ -32,6 +32,7 @@ namespace OpenWifi {
         LoginMethod_ = Daemon()->ConfigGetString("mailer.loginmethod");
         MailHostPort_ = (int)Daemon()->ConfigGetInt("mailer.port");
         TemplateDir_ = Daemon()->ConfigPath("mailer.templates", Daemon()->DataDir());
+        Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
     }
 
     int SMTPMailerService::Start() {
