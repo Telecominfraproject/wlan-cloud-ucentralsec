@@ -5,12 +5,23 @@ RUN apk add --update --no-cache \
     ncurses-libs \
     bash util-linux coreutils curl \
     make cmake gcc g++ libstdc++ libgcc git zlib-dev \
-    openssl-dev boost-dev unixodbc-dev postgresql-dev mariadb-dev \
+    openssl-dev boost-dev curl-dev unixodbc-dev postgresql-dev mariadb-dev \
     apache2-utils yaml-dev apr-util-dev \
     librdkafka-dev
 
 RUN git clone https://github.com/stephb9959/poco /poco
 RUN git clone https://github.com/stephb9959/cppkafka /cppkafka
+RUN git clone --recurse-submodules https://github.com/aws/aws-sdk-cpp /aws-sdk-cpp
+
+WORKDIR /aws-sdk-cpp
+RUN mkdir cmake-build
+WORKDIR cmake-build
+RUN cmake .. -DBUILD_ONLY="sns;s3" \
+             -DCMAKE_BUILD_TYPE=Release \
+             -DCMAKE_CXX_FLAGS="-Wno-error=stringop-overflow -Wno-error=uninitialized" \
+             -DAUTORUN_UNIT_TESTS=OFF
+RUN cmake --build . --config Release -j8
+RUN cmake --build . --target install
 
 WORKDIR /cppkafka
 RUN mkdir cmake-build
@@ -52,6 +63,8 @@ RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su
 COPY --from=builder /owsec/cmake-build/owsec /openwifi/owsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
+COPY --from=builder /aws-sdk-cpp/cmake-build/aws-cpp-sdk-core/libaws-cpp-sdk-core.so /lib/
+COPY --from=builder /aws-sdk-cpp/cmake-build/aws-cpp-sdk-s3/libaws-cpp-sdk-s3.so /lib/
 
 COPY owsec.properties.tmpl /
 COPY wwwassets $OWSEC_ROOT/wwwassets
