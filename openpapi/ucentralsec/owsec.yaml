@@ -196,6 +196,38 @@ components:
           items:
             $ref: '#/components/schemas/SystemEndpoint'
 
+    MobilePhoneNumber:
+      type: object
+      properties:
+        number:
+          type: string
+        verified:
+          type: boolean
+        primary:
+          type: boolean
+
+    MfaAuthInfo:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        method:
+          type: string
+          enum:
+            - sms
+            - email
+            - voice
+
+    UserLoginLoginExtensions:
+      type: object
+      properties:
+        mobiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/MobilePhoneNumber'
+        mfa:
+          $ref: '#/components/schemas/MfaAuthInfo'
+
     UserInfo:
       type: object
       properties:
@@ -288,7 +320,7 @@ components:
           type: integer
           format: int64
         userTypeProprietaryInfo:
-          type: string
+          $ref: '#/components/schemas/UserLoginLoginExtensions'
 
     UserList:
       type: object
@@ -322,6 +354,29 @@ components:
         to:
           type: string
         text:
+          type: string
+
+    MFAChallengeRequest:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        question:
+          type: string
+        created:
+          type: integer
+          format: integer64
+        method:
+          type: string
+
+    MFAChallengeResponse:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        answer:
           type: string
 
     #########################################################################################
@@ -600,20 +655,34 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          name: resendMFACode
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: completeMFAChallenge
+          schema:
+            type: boolean
+          required: false
       requestBody:
         description: User id and password
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WebTokenRequest'
+              oneOf:
+                - $ref: '#/components/schemas/WebTokenRequest'
+                - $ref: '#/components/schemas/MFAChallengeResponse'
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebTokenResult'
+                oneOf:
+                  - $ref: '#/components/schemas/WebTokenResult'
+                  - $ref: '#/components/schemas/MFAChallengeRequest'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -941,6 +1010,22 @@ paths:
         - EMail
       summary: Send test email with the system
       operationId: Send a test SMS
+      parameters:
+        - in: query
+          name: validateNumber
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: completeValidation
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: validationCode
+          schema:
+            type: string
+          required: false
       requestBody:
         description: The requested message
         content:
