@@ -38,7 +38,7 @@ namespace OpenWifi {
 
             std::string PhoneNumber = Obj->get("to").toString();
             std::string Text = Obj->get("text").toString();
-            if(SMSSender()->Send(PhoneNumber, Text)==0)
+            if(SMSSender()->Send(PhoneNumber, Text))
                 return OK();
 
             return InternalError("SMS Message could not be sent.");

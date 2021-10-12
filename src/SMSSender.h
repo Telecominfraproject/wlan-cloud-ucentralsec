@@ -29,18 +29,19 @@ namespace OpenWifi {
                 return instance_;
             }
 
-            int Start() final;
+            int  Start() final;
             void Stop() final;
-            [[nodiscard]] int Send(const std::string &PhoneNumber, const std::string &Message);
             bool Enabled() const { return Enabled_; }
             bool StartValidation(const std::string &Number, const std::string &UserName);
             bool CompleteValidation(const std::string &Number, const std::string &Code, const std::string &UserName);
             bool IsNumberValid(const std::string &Number, const std::string &UserName);
+            [[nodiscard]] bool Send(const std::string &PhoneNumber, const std::string &Message);
         private:
             static SMSSender * instance_;
             std::string         SecretKey_;
             std::string         AccessKey_;
             std::string         Region_;
+            std::string         Provider_;
             Aws::Client::ClientConfiguration    AwsConfig_;
             Aws::Auth::AWSCredentials           AwsCreds_;
             bool                Enabled_=false;
@@ -51,7 +52,9 @@ namespace OpenWifi {
             {
             }
 
+            bool SendAWS(const std::string &PhoneNumber, const std::string &Message);
             void CleanCache();
+
     };
     inline SMSSender * SMSSender() { return SMSSender::instance(); }
 

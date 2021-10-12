@@ -14,19 +14,21 @@ namespace OpenWifi {
     class SMSSender * SMSSender::instance_ = nullptr;
 
     int SMSSender::Start() {
-        SecretKey_ = Daemon()->ConfigGetString("smssender.aws.secretkey","");
-        AccessKey_ = Daemon()->ConfigGetString("smssender.aws.accesskey","");
-        Region_ = Daemon()->ConfigGetString("smssender.aws.region","");
+        Provider_ = Daemon()->ConfigGetString("sms.provider","aws");
+        if(Provider_=="aws") {
+            SecretKey_ = Daemon()->ConfigGetString("smssender.aws.secretkey","");
+            AccessKey_ = Daemon()->ConfigGetString("smssender.aws.accesskey","");
+            Region_ = Daemon()->ConfigGetString("smssender.aws.region","");
 
-        if(SecretKey_.empty() || AccessKey_.empty() || Region_.empty()) {
-            Logger_.debug("SMSSender is disabled. Please provide key, secret, and region.");
-            return -1;
+            if(SecretKey_.empty() || AccessKey_.empty() || Region_.empty()) {
+                Logger_.debug("SMSSender is disabled. Please provide key, secret, and region.");
+                return -1;
+            }
+            Enabled_=true;
+            AwsConfig_.region = Region_;
+            AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
+            AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
         }
-        Enabled_=true;
-        AwsConfig_.region = Region_;
-        AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
-        AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
-
         return 0;
     }
 
@@ -75,12 +77,7 @@ namespace OpenWifi {
         return false;
     }
 
-    int SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
-        if(!Enabled_) {
-            Logger_.information("SMS has not been enabled. Messages cannot be sent.");
-            return -2;
-        }
-
+    bool SMSSender::SendAWS(const std::string &PhoneNumber, const std::string &Message) {
         Aws::SNS::SNSClient sns(AwsCreds_,AwsConfig_);
 
         Aws::SNS::Model::PublishRequest psms_req;
@@ -90,10 +87,20 @@ namespace OpenWifi {
         auto psms_out = sns.Publish(psms_req);
         if (psms_out.IsSuccess()) {
             Logger_.debug(Poco::format("SMS sent to %s",PhoneNumber));
-            return 0;
+            return true;
         }
+        std::string ErrMsg = psms_out.GetError().GetMessage().c_str();
+        Logger_.debug(Poco::format("SMS NOT sent to %s: %s",PhoneNumber, ErrMsg));
+        return false;
+    }
 
-        Logger_.debug(Poco::format("SMS NOT sent to %s",PhoneNumber));
-        return -1;
+    bool SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
+        if(!Enabled_) {
+            Logger_.information("SMS has not been enabled. Messages cannot be sent.");
+            return false;
+        }
+        if(Provider_=="aws")
+            return SendAWS(PhoneNumber, Message);
+        return false;
     }
 }
