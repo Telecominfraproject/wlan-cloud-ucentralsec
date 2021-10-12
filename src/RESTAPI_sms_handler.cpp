@@ -15,7 +15,7 @@ namespace OpenWifi {
         std::string Arg;
         if(HasParameter("validateNumber",Arg) && Arg=="true" && Obj->has("to")) {
             auto Number = Obj->get("to").toString();
-            if(SMSSender()->StartValidation(Number)) {
+            if(SMSSender()->StartValidation(Number, UserInfo_.userinfo.email)) {
                 return OK();
             }
             return BadRequest("SMS could not be sent to validate device, try later or change the phone number.");
@@ -27,7 +27,7 @@ namespace OpenWifi {
             HasParameter("validationCode", Code) &&
             Obj->has("to")) {
             auto Number = Obj->get("to").toString();
-            if(SMSSender()->CompleteValidation(Number, Code)) {
+            if(SMSSender()->CompleteValidation(Number, Code, UserInfo_.userinfo.email)) {
                 return OK();
             }
             return BadRequest("Code and number could not be validated");

@@ -165,7 +165,7 @@ namespace OpenWifi {
                 if(Info->isArray("mobiles")) {
                     Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
                 }
-                if(!NewUser.userTypeProprietaryInfo.mobiles.empty() && !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number)){
+                if(!NewUser.userTypeProprietaryInfo.mobiles.empty() && !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number,UserInfo_.userinfo.email)){
                     return BadRequest(RESTAPI::Errors::NeedMobileNumber);
                 }
                 if(NewUser.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mobiles.empty()) {

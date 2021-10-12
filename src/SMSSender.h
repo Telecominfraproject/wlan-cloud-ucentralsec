@@ -15,6 +15,7 @@ namespace OpenWifi {
     struct SMSValidationCacheEntry {
         std::string Number;
         std::string Code;
+        std::string UserName;
         uint64_t    Created;
         bool        Validated=false;
     };
@@ -32,9 +33,9 @@ namespace OpenWifi {
             void Stop() final;
             [[nodiscard]] int Send(const std::string &PhoneNumber, const std::string &Message);
             bool Enabled() const { return Enabled_; }
-            bool StartValidation(const std::string &Number);
-            bool CompleteValidation(const std::string &Number, const std::string &Code);
-            bool IsNumberValid(const std::string &Number);
+            bool StartValidation(const std::string &Number, const std::string &UserName);
+            bool CompleteValidation(const std::string &Number, const std::string &Code, const std::string &UserName);
+            bool IsNumberValid(const std::string &Number, const std::string &UserName);
         private:
             static SMSSender * instance_;
             std::string         SecretKey_;

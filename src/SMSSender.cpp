@@ -43,31 +43,31 @@ namespace OpenWifi {
         }
     }
 
-    bool SMSSender::StartValidation(const std::string &Number) {
+    bool SMSSender::StartValidation(const std::string &Number, const std::string &UserName) {
         std::lock_guard     G(Mutex_);
         CleanCache();
         uint64_t Now=std::time(nullptr);
         auto Challenge = MFAServer::MakeChallenge();
-        Cache_.emplace_back(SMSValidationCacheEntry{.Number=Number, .Code=Challenge, .Created=Now});
+        Cache_.emplace_back(SMSValidationCacheEntry{.Number=Number, .Code=Challenge, .UserName=UserName, .Created=Now});
         std::string Message = "Please enter the following code on your login screen: " + Challenge;
         return Send(Number, Message)==0;
     }
 
-    bool SMSSender::IsNumberValid(const std::string &Number) {
+    bool SMSSender::IsNumberValid(const std::string &Number, const std::string &UserName) {
         std::lock_guard     G(Mutex_);
 
         for(const auto &i:Cache_) {
-            if(i.Number==Number)
+            if(i.Number==Number && i.UserName==UserName)
                 return i.Validated;
         }
         return false;
     }
 
-    bool SMSSender::CompleteValidation(const std::string &Number, const std::string &Code) {
+    bool SMSSender::CompleteValidation(const std::string &Number, const std::string &Code, const std::string &UserName) {
         std::lock_guard     G(Mutex_);
 
         for(auto &i:Cache_) {
-            if(i.Code==Code && i.Number==Number) {
+            if(i.Code==Code && i.Number==Number && i.UserName==UserName) {
                 i.Validated=true;
                 return true;
             }
