@@ -53,11 +53,22 @@ namespace OpenWifi {
         return Send(Number, Message)==0;
     }
 
-    bool SMSSender::CompleteValidation(const std::string &Number, const std::string &Code) {
+    bool SMSSender::IsNumberValid(const std::string &Number) {
         std::lock_guard     G(Mutex_);
 
         for(const auto &i:Cache_) {
+            if(i.Number==Number)
+                return i.Validated;
+        }
+        return false;
+    }
+
+    bool SMSSender::CompleteValidation(const std::string &Number, const std::string &Code) {
+        std::lock_guard     G(Mutex_);
+
+        for(auto &i:Cache_) {
             if(i.Code==Code && i.Number==Number) {
+                i.Validated=true;
                 return true;
             }
         }

@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "RESTAPI_utils.h"
 #include "RESTAPI_errors.h"
+#include "SMSSender.h"
 
 namespace OpenWifi {
     void RESTAPI_user_handler::DoGet() {
@@ -113,50 +114,43 @@ namespace OpenWifi {
     void RESTAPI_user_handler::DoPut() {
         std::string Id = GetBinding("id", "");
         if(Id.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUserID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
-        SecurityObjects::UserInfo   LocalObject;
-        if(!Storage()->GetUserById(Id,LocalObject)) {
-            NotFound();
-            return;
+        SecurityObjects::UserInfo   Existing;
+        if(!Storage()->GetUserById(Id,Existing)) {
+            return NotFound();
+        }
+
+        SecurityObjects::UserInfo   NewUser;
+        auto RawObject = ParseStream();
+        if(!NewUser.from_json(RawObject)) {
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
         // some basic validations
-        auto RawObject = ParseStream();
         if(RawObject->has("userRole") && SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString())==SecurityObjects::UNKNOWN) {
-            BadRequest(RESTAPI::Errors::InvalidUserRole);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
         // The only valid things to change are: changePassword, name,
-        if(RawObject->has("name"))
-            LocalObject.name = RawObject->get("name").toString();
-        if(RawObject->has("description"))
-            LocalObject.description = RawObject->get("description").toString();
-        if(RawObject->has("avatar"))
-            LocalObject.avatar = RawObject->get("avatar").toString();
-        if(RawObject->has("changePassword"))
-            LocalObject.changePassword = RawObject->get("changePassword").toString()=="true";
-        if(RawObject->has("owner"))
-            LocalObject.owner = RawObject->get("owner").toString();
-        if(RawObject->has("location"))
-            LocalObject.location = RawObject->get("location").toString();
-        if(RawObject->has("locale"))
-            LocalObject.locale = RawObject->get("locale").toString();
+        AssignIfPresent(RawObject,"name", Existing.name);
+        AssignIfPresent(RawObject,"description", Existing.description);
+        AssignIfPresent(RawObject,"owner", Existing.owner);
+        AssignIfPresent(RawObject,"location", Existing.location);
+        AssignIfPresent(RawObject,"locale", Existing.locale);
+        AssignIfPresent(RawObject,"changePassword", Existing.changePassword);
+        AssignIfPresent(RawObject,"suspended", Existing.suspended);
+        AssignIfPresent(RawObject,"blackListed", Existing.blackListed);
+
         if(RawObject->has("userRole"))
-            LocalObject.userRole = SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString());
-        if(RawObject->has("suspended"))
-            LocalObject.suspended = RawObject->get("suspended").toString()=="true";
-        if(RawObject->has("blackListed"))
-            LocalObject.blackListed = RawObject->get("blackListed").toString()=="true";
+            Existing.userRole = SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString());
         if(RawObject->has("notes")) {
             SecurityObjects::NoteInfoVec NIV;
             NIV = RESTAPI_utils::to_object_array<SecurityObjects::NoteInfo>(RawObject->get("notes").toString());
             for(auto const &i:NIV) {
                 SecurityObjects::NoteInfo   ii{.created=(uint64_t)std::time(nullptr), .createdBy=UserInfo_.userinfo.email, .note=i.note};
-                LocalObject.notes.push_back(ii);
+                Existing.notes.push_back(ii);
             }
         }
         if(RawObject->has("currentPassword")) {
@@ -164,22 +158,54 @@ namespace OpenWifi {
                 BadRequest(RESTAPI::Errors::InvalidPassword);
                 return;
             }
-            if(!AuthService()->SetPassword(RawObject->get("currentPassword").toString(),LocalObject)) {
+            if(!AuthService()->SetPassword(RawObject->get("currentPassword").toString(),Existing)) {
                 BadRequest(RESTAPI::Errors::PasswordRejected);
                 return;
             }
         }
 
         if(GetParameter("email_verification","false")=="true") {
-            if(AuthService::VerifyEmail(LocalObject))
-                Logger_.information(Poco::format("Verification e-mail requested for %s",LocalObject.email));
+            if(AuthService::VerifyEmail(Existing))
+                Logger_.information(Poco::format("Verification e-mail requested for %s",Existing.email));
         }
 
-        if(Storage()->UpdateUserInfo(UserInfo_.userinfo.email,Id,LocalObject)) {
+        if(NewUser.userTypeProprietaryInfo.mfa.enabled!=Existing.userTypeProprietaryInfo.mfa.enabled) {
+            std::cout << "Saving MFA" << std::endl;
+            if(!NewUser.userTypeProprietaryInfo.mfa.enabled) {
+                Existing.userTypeProprietaryInfo.mfa.enabled=false;
+            } else {
+                //  Need to make sure the provided number has been validated.
+                if(NewUser.userTypeProprietaryInfo.mfa.method=="sms") {
+                    std::cout << "Saving in sms" << std::endl;
+                    if(NewUser.userTypeProprietaryInfo.mobiles.empty()) {
+                        return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+                    }
+                    if(!SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number)){
+                        return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+                    }
+                    Existing.userTypeProprietaryInfo.mfa.method = "sms";
+                    Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
+                    std::cout << "Saving in mobiles" << std::endl;
+                } else if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
+
+                } else {
+                    return BadRequest(RESTAPI::Errors::BadMFAMethod);
+                }
+            }
+            Existing.userTypeProprietaryInfo.mfa.enabled = NewUser.userTypeProprietaryInfo.mfa.enabled;
+        }
+
+        if(Storage()->UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
+
+            std::cout << "Saved data." << std::endl;
+
+            SecurityObjects::UserInfo   NewUserInfo;
+            Storage()->GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
+
             Poco::JSON::Object  ModifiedObject;
-            LocalObject.to_json(ModifiedObject);
-            ReturnObject(ModifiedObject);
-            return;
+            NewUserInfo.to_json(ModifiedObject);
+
+            return ReturnObject(ModifiedObject);
         }
         BadRequest(RESTAPI::Errors::RecordNotUpdated);
     }

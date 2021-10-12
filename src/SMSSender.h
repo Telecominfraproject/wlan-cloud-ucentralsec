@@ -16,6 +16,7 @@ namespace OpenWifi {
         std::string Number;
         std::string Code;
         uint64_t    Created;
+        bool        Validated=false;
     };
 
     class SMSSender : public SubSystemServer {
@@ -33,6 +34,7 @@ namespace OpenWifi {
             bool Enabled() const { return Enabled_; }
             bool StartValidation(const std::string &Number);
             bool CompleteValidation(const std::string &Number, const std::string &Code);
+            bool IsNumberValid(const std::string &Number);
         private:
             static SMSSender * instance_;
             std::string         SecretKey_;
