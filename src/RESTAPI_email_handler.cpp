@@ -20,11 +20,13 @@ namespace OpenWifi {
             Obj->has("text") &&
             Obj->has("recipients")) {
             auto   Recipients = Obj->getArray("recipients");
+            auto Recipient = Recipients->get(0).toString();
             MessageAttributes Attrs;
-            Attrs[RECIPIENT_EMAIL] = Recipients->get(0).toString();
+            std::cout << "Mailing to:" << Recipient << std::endl;
+            Attrs[RECIPIENT_EMAIL] = Recipient;
             Attrs[SUBJECT] = Obj->get("subject").toString();
             Attrs[TEXT] = Obj->get("text").toString();
-            if(SMTPMailerService()->SendMessage(Recipients->get(0).toString(), "password_reset.txt", Attrs)) {
+            if(SMTPMailerService()->SendMessage(Recipient, "password_reset.txt", Attrs)) {
                 return OK();
             }
             return ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);

@@ -115,6 +115,7 @@ namespace OpenWifi {
 
             Poco::Net::MailMessage  Message;
             std::string             Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
+            std::cout << "Mailer: " << Recipient << std::endl;
             Message.setSender(Sender_);
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
