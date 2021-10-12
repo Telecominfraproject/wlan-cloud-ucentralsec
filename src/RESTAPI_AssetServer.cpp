@@ -20,8 +20,7 @@ namespace OpenWifi {
             AssetFile = RESTAPI_Server()->AssetDir() + "/" + AssetName;
         }
         if(!AssetFile.isFile()) {
-            NotFound();
-            return;
+            return NotFound();
         }
         SendFile(AssetFile);
     }

@@ -25,11 +25,9 @@ namespace OpenWifi {
             Attrs[SUBJECT] = Obj->get("subject").toString();
             Attrs[TEXT] = Obj->get("text").toString();
             if(SMTPMailerService()->SendMessage(Recipients->get(0).toString(), "password_reset.txt", Attrs)) {
-                OK();
-                return;
+                return OK();
             }
-            ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
-            return;
+            return ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
         }
         BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }

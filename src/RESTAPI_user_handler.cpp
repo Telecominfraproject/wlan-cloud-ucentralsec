@@ -14,14 +14,12 @@ namespace OpenWifi {
     void RESTAPI_user_handler::DoGet() {
         std::string Id = GetBinding("id", "");
         if(Id.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUserID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
         SecurityObjects::UserInfo   UInfo;
         if(!Storage()->GetUserById(Id,UInfo)) {
-            NotFound();
-            return;
+            return NotFound();
         }
         Poco::JSON::Object  UserInfoObject;
         UInfo.to_json(UserInfoObject);
@@ -31,19 +29,16 @@ namespace OpenWifi {
     void RESTAPI_user_handler::DoDelete() {
         std::string Id = GetBinding("id", "");
         if(Id.empty()) {
-            BadRequest(RESTAPI::Errors::MissingUserID);
-            return;
+            return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
         SecurityObjects::UserInfo UInfo;
         if(!Storage()->GetUserById(Id,UInfo)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         if(!Storage()->DeleteUser(UserInfo_.userinfo.email,Id)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         if(AuthService()->DeleteUserFromCache(UInfo.email))
@@ -57,28 +52,24 @@ namespace OpenWifi {
     void RESTAPI_user_handler::DoPost() {
         std::string Id = GetBinding("id", "");
         if(Id!="0") {
-            BadRequest(RESTAPI::Errors::IdMustBe0);
-            return;
+            return BadRequest(RESTAPI::Errors::IdMustBe0);
         }
 
         SecurityObjects::UserInfo   UInfo;
         RESTAPI_utils::from_request(UInfo,*Request);
 
         if(UInfo.userRole == SecurityObjects::UNKNOWN) {
-            BadRequest(RESTAPI::Errors::InvalidUserRole);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
         Poco::toLowerInPlace(UInfo.email);
         if(!Utils::ValidEMailAddress(UInfo.email)) {
-            BadRequest(RESTAPI::Errors::InvalidEmailAddress);
-            return;
+            return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
         }
 
         if(!UInfo.currentPassword.empty()) {
             if(!AuthService()->ValidatePassword(UInfo.currentPassword)) {
-                BadRequest(RESTAPI::Errors::InvalidPassword);
-                return;
+                return BadRequest(RESTAPI::Errors::InvalidPassword);
             }
         }
 
@@ -87,8 +78,7 @@ namespace OpenWifi {
 
         if(!Storage()->CreateUser(UInfo.email,UInfo)) {
             Logger_.information(Poco::format("Could not add user '%s'.",UInfo.email));
-            BadRequest(RESTAPI::Errors::RecordNotCreated);
-            return;
+            return BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
 
         if(GetParameter("email_verification","false")=="true") {
@@ -99,8 +89,7 @@ namespace OpenWifi {
 
         if(!Storage()->GetUserByEmail(UInfo.email, UInfo)) {
             Logger_.information(Poco::format("User '%s' but not retrieved.",UInfo.email));
-            NotFound();
-            return;
+            return NotFound();
         }
 
         Poco::JSON::Object  UserInfoObject;
@@ -155,12 +144,10 @@ namespace OpenWifi {
         }
         if(RawObject->has("currentPassword")) {
             if(!AuthService()->ValidatePassword(RawObject->get("currentPassword").toString())) {
-                BadRequest(RESTAPI::Errors::InvalidPassword);
-                return;
+                return BadRequest(RESTAPI::Errors::InvalidPassword);
             }
             if(!AuthService()->SetPassword(RawObject->get("currentPassword").toString(),Existing)) {
-                BadRequest(RESTAPI::Errors::PasswordRejected);
-                return;
+                return BadRequest(RESTAPI::Errors::PasswordRejected);
             }
         }
 
@@ -181,6 +168,9 @@ namespace OpenWifi {
                 if(!NewUser.userTypeProprietaryInfo.mobiles.empty() && !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number)){
                     return BadRequest(RESTAPI::Errors::NeedMobileNumber);
                 }
+                if(NewUser.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mobiles.empty()) {
+                    return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+                }
             } else if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
                 Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
             } else {
@@ -189,15 +179,10 @@ namespace OpenWifi {
         }
 
         if(Storage()->UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
-
-            std::cout << "Saved data." << std::endl;
-
             SecurityObjects::UserInfo   NewUserInfo;
             Storage()->GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
-
             Poco::JSON::Object  ModifiedObject;
             NewUserInfo.to_json(ModifiedObject);
-
             return ReturnObject(ModifiedObject);
         }
         BadRequest(RESTAPI::Errors::RecordNotUpdated);

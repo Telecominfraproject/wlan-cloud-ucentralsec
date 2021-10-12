@@ -18,11 +18,10 @@ namespace OpenWifi {
                 if (AuthService()->IsValidToken(i.second, SecObj.webtoken, SecObj.userinfo)) {
                     Poco::JSON::Object Obj;
                     SecObj.to_json(Obj);
-                    ReturnObject(Obj);
-                    return;
+                    return ReturnObject(Obj);
                 }
             }
         }
-        NotFound();
+        return NotFound();
     }
 }

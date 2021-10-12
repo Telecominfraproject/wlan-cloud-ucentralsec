@@ -33,8 +33,7 @@ namespace OpenWifi {
         SecurityObjects::UserInfo UInfo;
 
         if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
-            NotFound();
-            return;
+            return NotFound();
         }
 
         //  if there is an avatar, just remove it...
@@ -62,14 +61,12 @@ namespace OpenWifi {
     void RESTAPI_avatarHandler::DoGet() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
         if (Id.empty()) {
-            NotFound();
-            return;
+            return NotFound();
         }
         Poco::TemporaryFile TempAvatar;
         std::string Type, Name;
         if (!Storage()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
-            NotFound();
-            return;
+            return NotFound();
         }
         SendFile(TempAvatar, Type, Name);
     }
@@ -77,12 +74,10 @@ namespace OpenWifi {
     void RESTAPI_avatarHandler::DoDelete() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
         if (Id.empty()) {
-            NotFound();
-            return;
+            return NotFound();
         }
         if (!Storage()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
-            NotFound();
-            return;
+            return NotFound();
         }
         OK();
     }

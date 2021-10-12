@@ -19,11 +19,11 @@ namespace OpenWifi {
         auto Id = GetParameter("id","");
 
         if(Action=="password_reset")
-            RequestResetPassword(Id);
+            return RequestResetPassword(Id);
         else if(Action=="email_verification")
-            DoEmailVerification(Id);
+            return DoEmailVerification(Id);
         else
-            DoReturnA404();
+            return DoReturnA404();
     }
 
     void RESTAPI_action_links::DoPost() {
@@ -60,8 +60,7 @@ namespace OpenWifi {
                                                                  " accepted password creation restrictions. Please consult our on-line help"
                                                                  " to look at the our password policy. If you would like to contact us, please mention"
                                                                  " id(" + Id + ")"}};
-                SendHTMLFileBack(FormFile,FormVars);
-                return;
+                return SendHTMLFileBack(FormFile,FormVars);
             }
 
             SecurityObjects::UserInfo   UInfo;
@@ -69,24 +68,21 @@ namespace OpenWifi {
                 Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
-                SendHTMLFileBack(FormFile,FormVars);
-                return;
+                return SendHTMLFileBack(FormFile,FormVars);
             }
 
             if(UInfo.blackListed || UInfo.suspended) {
                 Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "Please contact our system administrators. We have identified an error in your account that must be resolved first."}};
-                SendHTMLFileBack(FormFile,FormVars);
-                return;
+                return SendHTMLFileBack(FormFile,FormVars);
             }
 
             if(!AuthService()->SetPassword(Password1,UInfo)) {
                 Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
-                SendHTMLFileBack(FormFile,FormVars);
-                return;
+                return SendHTMLFileBack(FormFile,FormVars);
             }
             Storage()->UpdateUserInfo(UInfo.email,Id,UInfo);
             Poco::File  FormFile{ RESTAPI_Server()->AssetDir() + "/password_reset_success.html"};
@@ -107,8 +103,7 @@ namespace OpenWifi {
             Types::StringPairVec FormVars{{"UUID",       Id},
                                           {"ERROR_TEXT", "This does not appear to be a valid email verification link.."}};
             Poco::File FormFile{RESTAPI_Server()->AssetDir() + "/email_verification_error.html"};
-            SendHTMLFileBack(FormFile, FormVars);
-            return;
+            return SendHTMLFileBack(FormFile, FormVars);
         }
 
         UInfo.waitingForEmailCheck = false;

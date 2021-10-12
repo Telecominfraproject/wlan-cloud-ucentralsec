@@ -27,8 +27,7 @@ namespace OpenWifi {
                 }
                 Answer.set(RESTAPI::Protocol::USERS, ArrayObj);
             }
-            ReturnObject(Answer);
-            return;
+            return ReturnObject(Answer);
         } else {
             Types::StringVec IDs = Utils::Split(QB_.Select);
             Poco::JSON::Array ArrayObj;
@@ -46,8 +45,7 @@ namespace OpenWifi {
             }
             Poco::JSON::Object RetObj;
             RetObj.set(RESTAPI::Protocol::USERS, ArrayObj);
-            ReturnObject(RetObj);
-            return;
+            return ReturnObject(RetObj);
         }
     }
 }
