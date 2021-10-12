@@ -3,7 +3,7 @@ FROM alpine AS builder
 RUN apk add --update --no-cache \
     openssl openssh \
     ncurses-libs \
-    bash util-linux coreutils curl \
+    bash util-linux coreutils curl libcurl \
     make cmake gcc g++ libstdc++ libgcc git zlib-dev \
     openssl-dev boost-dev curl-dev unixodbc-dev postgresql-dev mariadb-dev \
     apache2-utils yaml-dev apr-util-dev \
