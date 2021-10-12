@@ -41,7 +41,7 @@ namespace OpenWifi {
     bool MFAServer::SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge) {
         if(Method=="sms" && SMSSender()->Enabled() && !UInfo.userinfo.userTypeProprietaryInfo.mobiles.empty()) {
             std::string Message = "This is your login code: " + Challenge + " Please enter this in your login screen.";
-            return SMSSender()->Send(UInfo.userinfo.userTypeProprietaryInfo.mobiles[0].number, Message);
+            return (SMSSender()->Send(UInfo.userinfo.userTypeProprietaryInfo.mobiles[0].number, Message)==0);
         }
 
         if(Method=="email" && SMTPMailerService()->Enabled() && !UInfo.userinfo.email.empty()) {

@@ -169,30 +169,23 @@ namespace OpenWifi {
                 Logger_.information(Poco::format("Verification e-mail requested for %s",Existing.email));
         }
 
-        if(NewUser.userTypeProprietaryInfo.mfa.enabled!=Existing.userTypeProprietaryInfo.mfa.enabled) {
-            std::cout << "Saving MFA" << std::endl;
-            if(!NewUser.userTypeProprietaryInfo.mfa.enabled) {
-                Existing.userTypeProprietaryInfo.mfa.enabled=false;
-            } else {
-                //  Need to make sure the provided number has been validated.
-                if(NewUser.userTypeProprietaryInfo.mfa.method=="sms") {
-                    std::cout << "Saving in sms" << std::endl;
-                    if(NewUser.userTypeProprietaryInfo.mobiles.empty()) {
-                        return BadRequest(RESTAPI::Errors::NeedMobileNumber);
-                    }
-                    if(!SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number)){
-                        return BadRequest(RESTAPI::Errors::NeedMobileNumber);
-                    }
-                    Existing.userTypeProprietaryInfo.mfa.method = "sms";
-                    Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
-                    std::cout << "Saving in mobiles" << std::endl;
-                } else if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
-
-                } else {
-                    return BadRequest(RESTAPI::Errors::BadMFAMethod);
-                }
-            }
+        if(RawObject->has("userTypeProprietaryInfo")) {
             Existing.userTypeProprietaryInfo.mfa.enabled = NewUser.userTypeProprietaryInfo.mfa.enabled;
+            if(NewUser.userTypeProprietaryInfo.mfa.method=="sms") {
+                Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
+                auto MobileStruct = RawObject->get("userTypeProprietaryInfo");
+                auto Info = MobileStruct.extract<Poco::JSON::Object::Ptr>();
+                if(Info->isArray("mobiles")) {
+                    Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
+                }
+                if(!NewUser.userTypeProprietaryInfo.mobiles.empty() && !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number)){
+                    return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+                }
+            } else if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
+                Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
+            } else {
+                return BadRequest(RESTAPI::Errors::BadMFAMethod);
+            }
         }
 
         if(Storage()->UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
