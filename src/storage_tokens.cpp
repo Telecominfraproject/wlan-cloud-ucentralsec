@@ -79,7 +79,7 @@ namespace OpenWifi {
 
             uint32_t RevocationDate = 0 ;
 
-            std::string St2{"SELECT Revoked From Tokens WHERE Token=?"};
+            std::string St2{"SELECT RevocationDate From Tokens WHERE Token=?"};
             Select << ConvertParams(St2),
                 Poco::Data::Keywords::into(RevocationDate),
                 Poco::Data::Keywords::use(Token);
@@ -100,7 +100,6 @@ namespace OpenWifi {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Update(Sess);
 
-            uint32_t Revoked = 1 ;
             uint64_t Now = std::time(nullptr);
 
             // update users set lastLogin=? where id=?
