@@ -65,6 +65,7 @@ COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
 COPY --from=builder /aws-sdk-cpp/cmake-build/aws-cpp-sdk-core/libaws-cpp-sdk-core.so /lib/
 COPY --from=builder /aws-sdk-cpp/cmake-build/aws-cpp-sdk-s3/libaws-cpp-sdk-s3.so /lib/
+COPY --from=builder /aws-sdk-cpp/cmake-build/aws-cpp-sdk-sns/libaws-cpp-sdk-sns.so /lib/
 
 COPY owsec.properties.tmpl /
 COPY wwwassets $OWSEC_ROOT/wwwassets
