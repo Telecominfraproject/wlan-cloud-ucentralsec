@@ -354,7 +354,7 @@ case "$1" in
     "setavatar") login; setavatar "$2"; logout;;
     "getavatar") login; getavatar "$2"; logout;;
     "deleteavatar") login; deleteavatar "$2"; logout;;
-    "sendemail") login; sendemail ; logout;;
+    "sendemail") login; sendemail "$2" "$3"; logout;;
     "sendsms") login; sendsms "$2" "$3" ; logout;;
     "testlogout") login; testlogout ;;
     "setloglevel") login; setloglevel "$2" "$3"  ; logout ;;
