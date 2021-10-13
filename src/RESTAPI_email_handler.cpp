@@ -22,7 +22,7 @@ namespace OpenWifi {
             auto Recipients = Obj->getArray("recipients");
             std::string Recipient;
             for(const auto &i:*Recipients) {
-                Recipient = i.toString();
+                Recipient = i.extract<std::string>();
                 std::cout << "R: " << Recipient << std::endl;
             }
             MessageAttributes Attrs;
