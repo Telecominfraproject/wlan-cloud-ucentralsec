@@ -22,6 +22,7 @@ namespace OpenWifi {
             Obj->isArray("recipients")) {
 
             Poco::JSON::Array::Ptr Recipients = Obj->getArray("recipients");
+            std::cout << "Size: " << Recipients->size();
             std::string Recipient;
             for(const auto &i:*Recipients) {
                 Recipient = i.toString();
