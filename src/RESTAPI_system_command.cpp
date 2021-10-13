@@ -109,6 +109,7 @@ namespace OpenWifi {
 			Answer.set(RESTAPI::Protocol::OS, Poco::Environment::osName());
 			Answer.set(RESTAPI::Protocol::PROCESSORS, Poco::Environment::processorCount());
 			Answer.set(RESTAPI::Protocol::HOSTNAME, Poco::Environment::nodeName());
+			Answer.set(RESTAPI::Protocol::UI, Daemon()->GetUIURI());
 
 			Poco::JSON::Array   Certificates;
 			auto SubSystems = Daemon()->GetFullSubSystems();

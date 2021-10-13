@@ -62,7 +62,7 @@ namespace OpenWifi {
 		}
 	}
 
-    const Poco::JSON::Object::Ptr & RESTAPIHandler::ParseStream() {
+    const Poco::JSON::Object::Ptr &RESTAPIHandler::ParseStream() {
         return IncomingParser_.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
     }
 
