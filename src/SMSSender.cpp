@@ -52,7 +52,7 @@ namespace OpenWifi {
         auto Challenge = MFAServer::MakeChallenge();
         Cache_.emplace_back(SMSValidationCacheEntry{.Number=Number, .Code=Challenge, .UserName=UserName, .Created=Now});
         std::string Message = "Please enter the following code on your login screen: " + Challenge;
-        return Send(Number, Message)==0;
+        return Send(Number, Message);
     }
 
     bool SMSSender::IsNumberValid(const std::string &Number, const std::string &UserName) {

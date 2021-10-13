@@ -174,7 +174,9 @@ namespace OpenWifi {
             } else if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
                 Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
             } else {
-                return BadRequest(RESTAPI::Errors::BadMFAMethod);
+                if(NewUser.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mfa.method.empty()) {
+                    return BadRequest(RESTAPI::Errors::BadMFAMethod);
+                }
             }
         }
 
