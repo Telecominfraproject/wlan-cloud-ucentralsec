@@ -21,10 +21,13 @@ namespace OpenWifi {
             Obj->has("recipients") &&
             Obj->isArray("recipients")) {
 
+            std::cout << "subject: " << Obj->get("subject").toString() << std::endl;
+            std::cout << "from: " << Obj->get("from").toString() << std::endl;
+            std::cout << "text: " << Obj->get("text").toString() << std::endl;
+
             Poco::JSON::Array::Ptr Recipients = Obj->getArray("recipients");
-            std::cout << "Size: " << Recipients->size();
-            std::string Recipient = Recipients->get(0).toString();
-//            std::string Recipient = Recipients->get(1).toString();
+            auto Recipient = Recipients->get(0).toString();
+            std::cout << "Size: " << Recipients->size() << std::endl;
             std::cout << "R: " << Recipient << std::endl;
             MessageAttributes Attrs;
             std::cout << "Mailing to:" << Recipient << std::endl;
