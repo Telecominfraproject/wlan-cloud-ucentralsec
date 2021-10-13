@@ -27,6 +27,7 @@ namespace OpenWifi {
             Attrs[RECIPIENT_EMAIL] = Recipient;
             Attrs[SUBJECT] = Obj->get("subject").toString();
             Attrs[TEXT] = Obj->get("text").toString();
+            Attrs[SENDER] = Obj->get("from").toString();
             if(SMTPMailerService()->SendMessage(Recipient, "password_reset.txt", Attrs)) {
                 return OK();
             }

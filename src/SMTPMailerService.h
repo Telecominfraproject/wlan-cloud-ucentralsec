@@ -8,6 +8,8 @@
 #include "SubSystemServer.h"
 
 #include "Poco/File.h"
+#include "Poco/Net/InvalidCertificateHandler.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
 
 namespace OpenWifi {
 
@@ -24,7 +26,8 @@ namespace OpenWifi {
         TEMPLATE_HTML,
         LOGO,
         TEXT,
-        CHALLENGE_CODE
+        CHALLENGE_CODE,
+        SENDER
     };
 
     static const std::map<MESSAGE_ATTRIBUTES,const std::string>
@@ -40,7 +43,8 @@ namespace OpenWifi {
                                  {  TEMPLATE_HTML, "TEMPLATE_HTML"},
                                  {  LOGO, "LOGO"},
                                  {  TEXT, "TEXT"},
-                                 {  CHALLENGE_CODE, "CHALLENGE_CODE"}
+                                 {  CHALLENGE_CODE, "CHALLENGE_CODE"},
+                                 {  SENDER, "SENDER"}
                                  };
 
     inline const std::string & MessageAttributeToVar(MESSAGE_ATTRIBUTES Attr) {
@@ -98,9 +102,11 @@ namespace OpenWifi {
             Poco::Thread            SenderThr_;
             std::atomic_bool        Running_=false;
             bool                    Enabled_=false;
+            Poco::Net::AcceptCertificateHandler  ptrHandler_;
 
             SMTPMailerService() noexcept:
-                SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer")
+                SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer"),
+                ptrHandler_(false)
             {
                 std::string E{"SHA512"};
             }

@@ -57,13 +57,20 @@ namespace OpenWifi {
         std::lock_guard G(Mutex_);
 
         uint64_t Now = std::time(nullptr);
-        auto CE = Cache_.find(Poco::toLower(Recipient));
+        std::string RecipientLower = Poco::toLower(Recipient);
+        auto CE = Cache_.find(RecipientLower);
         if(CE!=Cache_.end()) {
             // only allow messages to the same user within 2 minutes
-            if((CE->second.LastRequest-Now)<30)
+            if(!((CE->second.LastRequest-Now)<30 && CE->second.HowManyRequests<10))
                 return false;
-            if((CE->second.HowManyRequests>30))
-                return false;
+            if(CE->second.LastRequest-Now>30) {
+                CE->second.LastRequest = Now;
+                CE->second.HowManyRequests=0;
+            } else {
+                CE->second.HowManyRequests++;
+            }
+        } else {
+            Cache_[RecipientLower] = MessageCacheEntry{.LastRequest=Now, .HowManyRequests=0};
         }
 
         Messages_.push_back(MessageEvent{.Posted=(uint64_t )std::time(nullptr),
@@ -97,7 +104,7 @@ namespace OpenWifi {
                 }
 
                 //  Clean the list
-                std::remove_if(Messages_.begin(),Messages_.end(),[Now](MessageEvent &E){ return (E.Sent!=0 || ((Now-E.LastTry)>(24*60*60)));});
+                std::remove_if(Messages_.begin(),Messages_.end(),[Now](MessageEvent &E){ return (E.Sent!=0 || ((Now-E.LastTry)>(15*60)));});
             }
         }
     }
@@ -111,11 +118,18 @@ namespace OpenWifi {
     bool SMTPMailerService::SendIt(const MessageEvent &Msg) {
         try
         {
-            Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
-
             Poco::Net::MailMessage  Message;
             std::string             Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
-            Message.setSender(Sender_);
+
+            auto H1 = Msg.Attrs.find(SENDER);
+            if(H1!=Msg.Attrs.end()) {
+                Message.setSender(H1->second);
+            } else {
+                Message.setSender(Sender_);
+            }
+
+            Logger_.information(Poco::format("Sending message to:%s from %s",Recipient,Sender_));
+
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
 
@@ -146,7 +160,7 @@ namespace OpenWifi {
                                                             Poco::Net::Context::VERIFY_RELAXED, 9, true,
                                                             "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"));
             Poco::Net::SSLManager::instance().initializeClient(nullptr,
-                                                               ptrHandler,
+                                                               &ptrHandler_,
                                                                ptrContext);
             session.login();
             session.startTLS(ptrContext);
