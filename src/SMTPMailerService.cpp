@@ -122,13 +122,14 @@ namespace OpenWifi {
             std::string             Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
 
             auto H1 = Msg.Attrs.find(SENDER);
+            std::string TheSender;
             if(H1!=Msg.Attrs.end()) {
-                Message.setSender(H1->second);
+                TheSender = H1->second ;
             } else {
-                Message.setSender(Sender_);
+                TheSender = Sender_ ;
             }
-
-            Logger_.information(Poco::format("Sending message to:%s from %s",Recipient,Sender_));
+            Message.setSender( TheSender );
+            Logger_.information(Poco::format("Sending message to:%s from %s",Recipient,TheSender));
 
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
