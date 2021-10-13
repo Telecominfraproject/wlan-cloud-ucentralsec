@@ -23,11 +23,9 @@ namespace OpenWifi {
 
             Poco::JSON::Array::Ptr Recipients = Obj->getArray("recipients");
             std::cout << "Size: " << Recipients->size();
-            std::string Recipient;
-            for(const auto &i:*Recipients) {
-                Recipient = i.toString();
-                std::cout << "R: " << Recipient << std::endl;
-            }
+            std::string Recipient = Recipients->get(0).toString();
+//            std::string Recipient = Recipients->get(1).toString();
+            std::cout << "R: " << Recipient << std::endl;
             MessageAttributes Attrs;
             std::cout << "Mailing to:" << Recipient << std::endl;
             Attrs[RECIPIENT_EMAIL] = Recipient;
