@@ -19,8 +19,12 @@ namespace OpenWifi {
             Obj->has("from") &&
             Obj->has("text") &&
             Obj->has("recipients")) {
-            auto   Recipients = Obj->getArray("recipients");
-            auto Recipient = Recipients->get(0).toString();
+            auto Recipients = Obj->getArray("recipients");
+            std::string Recipient;
+            for(const auto &i:*Recipients) {
+                Recipient = i.toString();
+                std::cout << "R: " << Recipient << std::endl;
+            }
             MessageAttributes Attrs;
             std::cout << "Mailing to:" << Recipient << std::endl;
             Attrs[RECIPIENT_EMAIL] = Recipient;
