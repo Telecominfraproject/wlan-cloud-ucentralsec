@@ -11,7 +11,7 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWSEC_CONFIG"/owsec.properties ]]; t
   RESTAPI_HOST_CERT=${RESTAPI_HOST_CERT:-"\$OWSEC_ROOT/certs/restapi-cert.pem"} \
   RESTAPI_HOST_KEY=${RESTAPI_HOST_KEY:-"\$OWSEC_ROOT/certs/restapi-key.pem"} \
   RESTAPI_HOST_KEY_PASSWORD=${RESTAPI_HOST_KEY_PASSWORD:-"mypassword"} \
-  RESTAPI_WWWASSETS=${RESTAPI_WWWASSETS:-"\$OWSEC_ROOT/wwwassets"} \
+  RESTAPI_WWWASSETS=${RESTAPI_WWWASSETS:-"\$OWSEC_ROOT/persist/wwwassets"} \
   INTERNAL_RESTAPI_HOST_ROOTCA=${INTERNAL_RESTAPI_HOST_ROOTCA:-"\$OWSEC_ROOT/certs/restapi-ca.pem"} \
   INTERNAL_RESTAPI_HOST_PORT=${INTERNAL_RESTAPI_HOST_PORT:-"17001"} \
   INTERNAL_RESTAPI_HOST_CERT=${INTERNAL_RESTAPI_HOST_CERT:-"\$OWSEC_ROOT/certs/restapi-cert.pem"} \
@@ -30,7 +30,7 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWSEC_CONFIG"/owsec.properties ]]; t
   MAILER_PASSWORD=${MAILER_PASSWORD:-"************************"} \
   MAILER_SENDER=${MAILER_SENDER:-"OpenWIFI"} \
   MAILER_PORT=${MAILER_PORT:-"587"} \
-  MAILER_TEMPLATES=${MAILER_TEMPLATES:-"\$OWSEC_ROOT/templates"} \
+  MAILER_TEMPLATES=${MAILER_TEMPLATES:-"\$OWSEC_ROOT/persist/templates"} \
   KAFKA_ENABLE=${KAFKA_ENABLE:-"true"} \
   KAFKA_BROKERLIST=${KAFKA_BROKERLIST:-"localhost:9092"} \
   DOCUMENT_POLICY_ACCESS=${DOCUMENT_POLICY_ACCESS:-"\$OWSEC_ROOT/wwwassets/access_policy.html"} \
@@ -47,6 +47,24 @@ if [[ "$TEMPLATE_CONFIG" = 'true' && ! -f "$OWSEC_CONFIG"/owsec.properties ]]; t
   STORAGE_TYPE_MYSQL_DATABASE=${STORAGE_TYPE_MYSQL_DATABASE:-"owsec"} \
   STORAGE_TYPE_MYSQL_PORT=${STORAGE_TYPE_MYSQL_PORT:-"3306"} \
   envsubst < /owsec.properties.tmpl > $OWSEC_CONFIG/owsec.properties
+fi
+
+# Check if wwwassets directory exists
+export RESTAPI_WWWASSETS=$(grep 'openwifi.restapi.wwwassets' $OWSEC_CONFIG/owsec.properties | awk -F '=' '{print $2}' | xargs | envsubst)
+if [[ ! -d "$(dirname $RESTAPI_WWWASSETS)" ]]; then
+  mkdir -p $(dirname $RESTAPI_WWWASSETS)
+fi
+if [[ ! -d "$RESTAPI_WWWASSETS" ]]; then
+  cp -r /dist/wwwassets $RESTAPI_WWWASSETS
+fi
+
+# Check if templates directory exists
+export MAILER_TEMPLATES=$(grep 'mailer.templates' $OWSEC_CONFIG/owsec.properties | awk -F '=' '{print $2}' | xargs | envsubst)
+if [[ ! -d "$(dirname $MAILER_TEMPLATES)" ]]; then
+  mkdir -p $(dirname $MAILER_TEMPLATES)
+fi
+if [[ ! -d "$MAILER_TEMPLATES" ]]; then
+  cp -r /dist/templates $MAILER_TEMPLATES
 fi
 
 if [ "$1" = '/openwifi/owsec' -a "$(id -u)" = '0' ]; then
