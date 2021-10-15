@@ -10,25 +10,20 @@
 #include <aws/sns/model/GetSMSAttributesRequest.h>
 #include "MFAServer.h"
 
+#include "SMS_provider_aws.h"
+#include "SMS_provider_twilio.h"
+
 namespace OpenWifi {
     class SMSSender * SMSSender::instance_ = nullptr;
 
     int SMSSender::Start() {
         Provider_ = Daemon()->ConfigGetString("sms.provider","aws");
         if(Provider_=="aws") {
-            SecretKey_ = Daemon()->ConfigGetString("smssender.aws.secretkey","");
-            AccessKey_ = Daemon()->ConfigGetString("smssender.aws.accesskey","");
-            Region_ = Daemon()->ConfigGetString("smssender.aws.region","");
-
-            if(SecretKey_.empty() || AccessKey_.empty() || Region_.empty()) {
-                Logger_.debug("SMSSender is disabled. Please provide key, secret, and region.");
-                return -1;
-            }
-            Enabled_=true;
-            AwsConfig_.region = Region_;
-            AwsCreds_.SetAWSAccessKeyId(AccessKey_.c_str());
-            AwsCreds_.SetAWSSecretKey(SecretKey_.c_str());
+            ProviderImpl_ = std::make_unique<SMS_provider_aws>(Logger_);
+        } else if(Provider_=="twilio") {
+            ProviderImpl_ = std::make_unique<SMS_provider_twilio>(Logger_);
         }
+        Enabled_ = ProviderImpl_->Initialize();
         return 0;
     }
 
@@ -52,7 +47,7 @@ namespace OpenWifi {
         auto Challenge = MFAServer::MakeChallenge();
         Cache_.emplace_back(SMSValidationCacheEntry{.Number=Number, .Code=Challenge, .UserName=UserName, .Created=Now});
         std::string Message = "Please enter the following code on your login screen: " + Challenge;
-        return Send(Number, Message);
+        return ProviderImpl_->Send(Number, Message);
     }
 
     bool SMSSender::IsNumberValid(const std::string &Number, const std::string &UserName) {
@@ -77,30 +72,11 @@ namespace OpenWifi {
         return false;
     }
 
-    bool SMSSender::SendAWS(const std::string &PhoneNumber, const std::string &Message) {
-        Aws::SNS::SNSClient sns(AwsCreds_,AwsConfig_);
-
-        Aws::SNS::Model::PublishRequest psms_req;
-        psms_req.SetMessage(Message.c_str());
-        psms_req.SetPhoneNumber(PhoneNumber.c_str());
-
-        auto psms_out = sns.Publish(psms_req);
-        if (psms_out.IsSuccess()) {
-            Logger_.debug(Poco::format("SMS sent to %s",PhoneNumber));
-            return true;
-        }
-        std::string ErrMsg = psms_out.GetError().GetMessage().c_str();
-        Logger_.debug(Poco::format("SMS NOT sent to %s: %s",PhoneNumber, ErrMsg));
-        return false;
-    }
-
     bool SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
         if(!Enabled_) {
             Logger_.information("SMS has not been enabled. Messages cannot be sent.");
             return false;
         }
-        if(Provider_=="aws")
-            return SendAWS(PhoneNumber, Message);
-        return false;
+        return ProviderImpl_->Send(PhoneNumber,Message);
     }
 }

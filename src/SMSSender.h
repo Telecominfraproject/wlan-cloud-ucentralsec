@@ -9,6 +9,7 @@
 #include <aws/core/Aws.h>
 #include <aws/s3/S3Client.h>
 #include <aws/core/auth/AWSCredentials.h>
+#include "SMS_provider.h"
 
 namespace OpenWifi {
 
@@ -38,14 +39,10 @@ namespace OpenWifi {
             [[nodiscard]] bool Send(const std::string &PhoneNumber, const std::string &Message);
         private:
             static SMSSender * instance_;
-            std::string         SecretKey_;
-            std::string         AccessKey_;
-            std::string         Region_;
             std::string         Provider_;
-            Aws::Client::ClientConfiguration    AwsConfig_;
-            Aws::Auth::AWSCredentials           AwsCreds_;
             bool                Enabled_=false;
             std::vector<SMSValidationCacheEntry>    Cache_;
+            std::unique_ptr<SMS_provider>           ProviderImpl_;
 
             SMSSender() noexcept:
                 SubSystemServer("SMSSender", "SMS-SVR", "smssender.aws")
