@@ -119,7 +119,7 @@ configProperties:
   openwifi.restapi.host.0.port: 16001
   openwifi.restapi.host.0.cert: $OWSEC_ROOT/certs/restapi-cert.pem
   openwifi.restapi.host.0.key: $OWSEC_ROOT/certs/restapi-key.pem
-  openwifi.restapi.wwwassets: $OWSEC_ROOT/wwwassets
+  openwifi.restapi.wwwassets: $OWSEC_ROOT/persist/wwwassets
   openwifi.internal.restapi.host.0.backlog: 100
   openwifi.internal.restapi.host.0.security: relaxed
   openwifi.internal.restapi.host.0.rootca: $OWSEC_ROOT/certs/restapi-ca.pem
@@ -136,7 +136,7 @@ configProperties:
   mailer.sender: OpenWIFI
   mailer.loginmethod: login
   mailer.port: 587
-  mailer.templates: $OWSEC_ROOT/templates
+  mailer.templates: $OWSEC_ROOT/persist/templates
   # ALB
   alb.enable: "true"
   alb.port: 16101
