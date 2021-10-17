@@ -13,12 +13,12 @@ into your own systems. If all you need it to access the uCentralGW for example (
 - choose one to manage (pick an endpoint that matches what you are trying to do by looking at its `type`. For the gateway, type = ucentrtalgw)
 - make your calls (use the PublicEndPoint of the corresponding entry to make your calls, do not forget to add `/api/v1` as the root os the call)
 
-The CLI for the [uCentralGW](https://github.com/telecominfraproject/wlan-cloud-ucentralgw/blob/main/test_scripts/curl/cli) has a very good example of this. Loog for the `setgateway` 
-function.
+The CLI for the [uCentralGW](https://github.com/telecominfraproject/wlan-cloud-ucentralgw/blob/main/test_scripts/curl/cli) has a very good example of this. 
+Look for the `setgateway` function.
 
 ## Firewall Considerations
 The entire uCentral systems uses several MicroServices. In order for the whole system to work, you should provide the following port
-access
+access:
 
 - Security
   - Properties file: owsec.properties
@@ -28,14 +28,21 @@ access
     - ALB: 16101
 
 - Gateway:
-  - Properties file: ucentralgw.properties
+  - Properties file: owgw.properties
   - Ports
     - Public: 16002
     - Private: 17002
     - ALB: 16102
 
 - Firmware:
-  - Properties file: ucentralfms.properties
+  - Properties file: owfms.properties
+  - Ports
+    - Public: 16004
+    - Private: 17004
+    - ALB: 16104
+
+- Provisioning:
+  - Properties file: owprov.properties
   - Ports
     - Public: 16004
     - Private: 17004
@@ -78,7 +85,6 @@ Remember, when you login, use `root@system.com` with the password `weLoveWifi`, 
 Is this safe to show the hash in a text file? Let me put it this way, if you can find a way to break this encryption, you
 would have control over the entire internet. It's incredibly safe. If you love math, you can find a lot of videos explaining
 how hashes work and why they are safe.
-
 
 ### `authentication.validation.expression`
 This is a regular expression (regex) to verify the incoming password. You can find many examples on the internet on how to create these expressions. I suggest 
@@ -160,10 +166,11 @@ Here are other important values you must set.
 openwifi.system.data = $OWSEC_ROOT/data
 openwifi.system.uri.private = https://localhost:17001
 openwifi.system.uri.public = https://openwifi.dpaas.arilia.com:16001
+openwifi.system.uri.ui = https://ucentral-ui.arilia.com
 openwifi.system.commandchannel = /tmp/app.ucentralsec
 openwifi.service.key = $OWSEC_ROOT/certs/restapi-key.pem
+openwifi.service.key.password = mypassword
 ```
-
 #### `openwifi.system.data`
 The location of some important data files including the user name database.
 
@@ -173,3 +180,41 @@ This is the FQDN used internally between services.
 #### `openwifi.system.uri.public`
 This is the FQDN used externally serving the OpenAPI interface.
 
+### Sending SMS for Multifactor Aithentication
+`owsec` hs the ability to send SMS messages to users during login or to send notifications. In order to do so,
+an SMS provider must be configured. At present time, 2 providers are supported: Tilio and AWS SNS
+
+#### AWS SNS
+For SNS you must create an IAM ID that has sns:sendmessage rights. 
+
+```asm
+smssender.provider = aws
+smssender.aws.secretkey = ***************************************
+smssender.aws.accesskey = ***************************************
+smssender.aws.region = **************
+```
+
+#### Twilio
+For Twilio, you must provide the following
+
+```asm
+smssender.provider = twilio
+smssender.twilio.sid = ***********************
+smssender.twilio.token = **********************
+smssender.twilio.phonenumber = +18888888888
+```
+
+### `owsec` Messaging Configuration
+`owsec` nay require to send e-mails. In order to do so, you must configure an email sender. We have run tests 
+with GMail and AWS SES. For each, you must obtain the proper credentials and insert them in this configuration as well
+as the proper mail host.
+
+```asm
+mailer.hostname = smtp.gmail.com
+mailer.username = ************************
+mailer.password = ************************
+mailer.sender = OpenWIFI
+mailer.loginmethod = login
+mailer.port = 587
+mailer.templates = $OWSEC_ROOT/templates
+```
