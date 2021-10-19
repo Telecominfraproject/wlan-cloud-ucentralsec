@@ -299,10 +299,12 @@ components:
           enum:
             - root
             - admin
-            - sub
+            - subscriber
             - csr
             - system
-            - special
+            - installer
+            - noc
+            - accounting
         oauthType:
           type: string
           enum:
