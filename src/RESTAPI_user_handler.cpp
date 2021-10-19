@@ -20,9 +20,11 @@ namespace OpenWifi {
         Poco::toLowerInPlace(Id);
         std::string Arg;
         SecurityObjects::UserInfo   UInfo;
-        if(HasParameter("byEmail",Arg) && Arg=="true" && !Storage()->GetUserByEmail(Id,UInfo)) {
-            std::cout << "Could not find e-mail: " << Id << std::endl;
-            return NotFound();
+        if(HasParameter("byEmail",Arg) && Arg=="true") {
+            if(!Storage()->GetUserByEmail(Id,UInfo)) {
+                std::cout << "Could not find e-mail: " << Id << std::endl;
+                return NotFound();
+            }
         } else if(!Storage()->GetUserById(Id,UInfo)) {
             std::cout << "Could not find ID: " << Id << std::endl;
             return NotFound();

@@ -200,12 +200,13 @@ getuser() {
 }
 
 getuserbyemail() {
-    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/user/$1?byEmail=true" \
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/user/${1}?byEmail=true" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
+
 listusers() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/users" \
     -H "accept: application/json" \
