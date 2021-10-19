@@ -17,8 +17,12 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
+        Poco::toLowerInPlace(Id);
+        std::string Arg;
         SecurityObjects::UserInfo   UInfo;
-        if(!Storage()->GetUserById(Id,UInfo)) {
+        if(HasParameter("byEmail",Arg) && Arg=="true" && !Storage()->GetUserByEmail(Id,UInfo)) {
+            return NotFound();
+        } else if(!Storage()->GetUserById(Id,UInfo)) {
             return NotFound();
         }
         Poco::JSON::Object  UserInfoObject;
