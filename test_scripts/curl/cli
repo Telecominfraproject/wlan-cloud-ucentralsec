@@ -199,6 +199,13 @@ getuser() {
     jq < ${result_file}
 }
 
+getuserbyemail() {
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/user/$1?byEmail=true" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
 listusers() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/users" \
     -H "accept: application/json" \
@@ -344,6 +351,7 @@ case "$1" in
     "createuser_v") login; createuser_v "$2" "$3"; logout;;
     "deleteuser") login; deleteuser "$2" ; logout;;
     "getuser") login; getuser "$2" ; logout;;
+    "getuserbyemail") login; getuserbyemail "$2" ; logout;;
     "listusers") login; listusers ; logout ;;
     "me") login; me ; logout ;;
     "listendpoints") login; listendpoints ; logout ;;
