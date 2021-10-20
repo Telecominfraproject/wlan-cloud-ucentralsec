@@ -48,38 +48,48 @@ find_package(PostgreSQL REQUIRED)
 find_package(MySQL REQUIRED)
 find_package(Poco REQUIRED COMPONENTS JSON Crypto JWT Net Util NetSSL Data DataSQLite DataPostgreSQL DataMySQL)
 
+include_directories(/usr/local/include  /usr/local/opt/openssl/include src include/kafka /usr/local/opt/mysql-client/include)
+
 add_executable( owsec
-                build
-                src/Daemon.h src/Daemon.cpp
-                src/MicroService.cpp src/MicroService.h
-                src/SubSystemServer.cpp src/SubSystemServer.h
-                src/RESTAPI_oauth2Handler.h src/RESTAPI_oauth2Handler.cpp
-                src/RESTAPI_handler.h src/RESTAPI_handler.cpp
-                src/RESTAPI_server.cpp src/RESTAPI_server.h
-                src/RESTAPI_SecurityObjects.cpp src/RESTAPI_SecurityObjects.h
-                src/RESTAPI_system_command.h src/RESTAPI_system_command.cpp
-                src/RESTAPI_protocol.h
-                src/AuthService.h src/AuthService.cpp
-                src/KafkaManager.h src/KafkaManager.cpp
-                src/StorageService.cpp src/StorageService.h
-                src/Utils.cpp src/Utils.h
-                src/storage_setup.cpp
-                src/storage_tables.cpp src/SMTPMailerService.cpp src/SMTPMailerService.h
-                src/RESTAPI_users_handler.cpp src/RESTAPI_users_handler.h
-                src/RESTAPI_user_handler.cpp src/RESTAPI_user_handler.h
-                src/RESTAPI_action_links.cpp src/RESTAPI_action_links.h src/storage_users.cpp
-                src/RESTAPI_InternalServer.cpp src/RESTAPI_InternalServer.h
-                src/RESTAPI_validateToken_handler.cpp src/RESTAPI_validateToken_handler.h
-                src/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI_systemEndpoints_handler.h
-                src/RESTAPI_AssetServer.cpp src/RESTAPI_AssetServer.h
-                src/RESTAPI_avatarHandler.cpp src/RESTAPI_avatarHandler.h
-                src/storage_avatar.cpp src/storage_avatar.h src/storage_users.h
-                src/OpenWifiTypes.h src/RESTAPI_email_handler.cpp src/RESTAPI_email_handler.h
-                src/storage_tokens.cpp
-                src/RESTAPI_GenericServer.h src/RESTAPI_GenericServer.cpp
-                src/RESTAPI_errors.h
-                src/Storage.h
-        src/SMSSender.cpp src/SMSSender.h src/RESTAPI_sms_handler.cpp src/RESTAPI_sms_handler.h src/MFAServer.cpp src/MFAServer.h src/SMS_provider_aws.cpp src/SMS_provider_aws.h src/SMS_provider.cpp src/SMS_provider.h src/SMS_provider_twilio.cpp src/SMS_provider_twilio.h)
+        build
+        src/Daemon.h src/Daemon.cpp
+        src/framework/MicroService.cpp src/framework/MicroService.h
+        src/framework/SubSystemServer.cpp src/framework/SubSystemServer.h
+        src/RESTAPI/RESTAPI_oauth2Handler.h src/RESTAPI/RESTAPI_oauth2Handler.cpp
+        src/framework/RESTAPI_handler.h src/framework/RESTAPI_handler.cpp
+        src/RESTAPI/RESTAPI_server.cpp src/RESTAPI/RESTAPI_server.h
+        src/RESTAPI/RESTAPI_SecurityObjects.cpp src/RESTAPI/RESTAPI_SecurityObjects.h
+        src/framework/RESTAPI_system_command.h src/framework/RESTAPI_system_command.cpp
+        src/AuthService.h src/AuthService.cpp
+        src/framework/KafkaManager.h src/framework/KafkaManager.cpp
+        src/StorageService.cpp src/StorageService.h
+        src/framework/Utils.cpp src/framework/Utils.h
+        src/SMTPMailerService.cpp src/SMTPMailerService.h
+        src/RESTAPI/RESTAPI_users_handler.cpp src/RESTAPI/RESTAPI_users_handler.h
+        src/RESTAPI/RESTAPI_user_handler.cpp src/RESTAPI/RESTAPI_user_handler.h
+        src/RESTAPI/RESTAPI_action_links.cpp src/RESTAPI/RESTAPI_action_links.h
+        src/RESTAPI/RESTAPI_InternalServer.cpp src/RESTAPI/RESTAPI_InternalServer.h
+        src/RESTAPI/RESTAPI_validateToken_handler.cpp src/RESTAPI/RESTAPI_validateToken_handler.h
+        src/RESTAPI/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI/RESTAPI_systemEndpoints_handler.h
+        src/RESTAPI/RESTAPI_AssetServer.cpp src/RESTAPI/RESTAPI_AssetServer.h
+        src/RESTAPI/RESTAPI_avatarHandler.cpp src/RESTAPI/RESTAPI_avatarHandler.h
+        src/storage/storage_avatar.cpp src/storage/storage_avatar.h src/storage/storage_users.h
+        src/RESTAPI/RESTAPI_email_handler.cpp src/RESTAPI/RESTAPI_email_handler.h
+        src/framework/RESTAPI_GenericServer.h src/framework/RESTAPI_GenericServer.cpp
+        src/framework/storage_setup.cpp
+        src/storage/storage_tables.cpp
+        src/framework/RESTAPI_protocol.h
+        src/framework/OpenWifiTypes.h
+        src/storage/storage_users.cpp
+        src/storage/storage_tokens.cpp
+        src/framework/RESTAPI_errors.h
+        src/framework/Storage.h
+        src/SMSSender.cpp src/SMSSender.h
+        src/RESTAPI/RESTAPI_sms_handler.cpp src/RESTAPI/RESTAPI_sms_handler.h
+        src/MFAServer.cpp src/MFAServer.h
+        src/SMS_provider_aws.cpp src/SMS_provider_aws.h
+        src/SMS_provider.cpp src/SMS_provider.h
+        src/SMS_provider_twilio.cpp src/SMS_provider_twilio.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

@@ -5,7 +5,7 @@
 #ifndef OWSEC_SMSSENDER_H
 #define OWSEC_SMSSENDER_H
 
-#include "SubSystemServer.h"
+#include "framework/SubSystemServer.h"
 #include <aws/core/Aws.h>
 #include <aws/s3/S3Client.h>
 #include <aws/core/auth/AWSCredentials.h>

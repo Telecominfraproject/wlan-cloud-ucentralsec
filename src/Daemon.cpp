@@ -26,12 +26,12 @@
 #include <aws/s3/model/PutBucketAclRequest.h>
 #include <aws/s3/model/GetBucketAclRequest.h>
 
-#include "ALBHealthCheckServer.h"
-#include "KafkaManager.h"
+#include "framework/ALBHealthCheckServer.h"
+#include "framework/KafkaManager.h"
 #include "StorageService.h"
-#include "RESTAPI_server.h"
+#include "RESTAPI/RESTAPI_server.h"
 #include "SMTPMailerService.h"
-#include "RESTAPI_InternalServer.h"
+#include "RESTAPI/RESTAPI_InternalServer.h"
 #include "AuthService.h"
 #include "SMSSender.h"
 

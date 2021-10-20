@@ -11,7 +11,7 @@
 
 #include <regex>
 
-#include "SubSystemServer.h"
+#include "framework/SubSystemServer.h"
 
 #include "Poco/JSON/Object.h"
 #include "Poco/Net/HTTPServerRequest.h"
@@ -19,7 +19,7 @@
 #include "Poco/JWT/Signer.h"
 #include "Poco/SHA2Engine.h"
 
-#include "RESTAPI_SecurityObjects.h"
+#include "RESTAPI/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi{
 

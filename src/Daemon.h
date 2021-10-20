@@ -21,8 +21,8 @@
 #include "Poco/Crypto/Cipher.h"
 
 
-#include "OpenWifiTypes.h"
-#include "MicroService.h"
+#include "framework/OpenWifiTypes.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 

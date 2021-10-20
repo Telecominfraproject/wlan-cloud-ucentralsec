@@ -13,12 +13,12 @@
 #include "Poco/JWT/Signer.h"
 
 #include "Daemon.h"
-#include "RESTAPI_handler.h"
+#include "framework/RESTAPI_handler.h"
 #include "StorageService.h"
 #include "AuthService.h"
-#include "Utils.h"
-#include "KafkaManager.h"
-#include "Kafka_topics.h"
+#include "framework/Utils.h"
+#include "framework/KafkaManager.h"
+#include "framework/Kafka_topics.h"
 
 #include "SMTPMailerService.h"
 #include "MFAServer.h"

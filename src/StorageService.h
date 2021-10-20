@@ -21,9 +21,9 @@
 #endif
 
 #include "AuthService.h"
-#include "RESTAPI_SecurityObjects.h"
-#include "SubSystemServer.h"
-#include "Storage.h"
+#include "RESTAPI/RESTAPI_SecurityObjects.h"
+#include "framework/SubSystemServer.h"
+#include "framework/Storage.h"
 
 namespace OpenWifi {
 
