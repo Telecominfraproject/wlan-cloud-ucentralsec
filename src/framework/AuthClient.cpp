@@ -9,8 +9,8 @@
 #include <utility>
 
 #include "AuthClient.h"
-#include "../RESTAPI/RESTAPI_SecurityObjects.h"
-#include "../Daemon.h"
+#include "RESTAPI/RESTAPI_SecurityObjects.h"
+#include "Daemon.h"
 #include "OpenAPIRequest.h"
 
 namespace OpenWifi {

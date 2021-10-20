@@ -2,8 +2,8 @@
 // Created by stephane bourque on 2021-08-22.
 //
 
-#include "../StorageService.h"
-#include "../Daemon.h"
+#include "StorageService.h"
+#include "Daemon.h"
 
 namespace OpenWifi {
 

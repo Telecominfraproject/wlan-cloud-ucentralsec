@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 
-#include "../Daemon.h"
+#include "Daemon.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Net/HTTPRequest.h"
 

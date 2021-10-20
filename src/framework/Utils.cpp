@@ -29,7 +29,7 @@
 #include "Poco/Net/HTTPResponse.h"
 
 #include "uCentralProtocol.h"
-#include "../Daemon.h"
+#include "Daemon.h"
 
 namespace OpenWifi::Utils {
 

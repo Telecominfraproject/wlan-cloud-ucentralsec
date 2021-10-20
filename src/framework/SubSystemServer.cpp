@@ -7,7 +7,7 @@
 //
 
 #include "SubSystemServer.h"
-#include "../Daemon.h"
+#include "Daemon.h"
 
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/DateTimeFormatter.h"
@@ -17,7 +17,7 @@
 
 #include "openssl/ssl.h"
 
-#include "../Daemon.h"
+#include "Daemon.h"
 
 namespace OpenWifi {
 SubSystemServer::SubSystemServer(std::string Name, const std::string &LoggingPrefix,

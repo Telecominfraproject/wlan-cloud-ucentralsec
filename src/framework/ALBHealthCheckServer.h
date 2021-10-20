@@ -21,7 +21,7 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Logger.h"
 
-#include "../Daemon.h"
+#include "Daemon.h"
 #include "SubSystemServer.h"
 
 namespace OpenWifi {

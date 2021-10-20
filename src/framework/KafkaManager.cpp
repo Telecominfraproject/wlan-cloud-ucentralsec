@@ -9,7 +9,7 @@
 
 #include "KafkaManager.h"
 
-#include "../Daemon.h"
+#include "Daemon.h"
 #include "Utils.h"
 
 namespace OpenWifi {

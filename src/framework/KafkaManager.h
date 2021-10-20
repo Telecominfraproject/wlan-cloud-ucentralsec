@@ -13,7 +13,7 @@
 #include <thread>
 
 #include "SubSystemServer.h"
-#include "framework/OpenWifiTypes.h"
+#include "OpenWifiTypes.h"
 
 #include "cppkafka/cppkafka.h"
 

@@ -18,7 +18,7 @@
 #include <Poco/URI.h>
 #include <Poco/Exception.h>
 #include "Utils.h"
-#include "../Daemon.h"
+#include "Daemon.h"
 
 namespace OpenWifi {
 
