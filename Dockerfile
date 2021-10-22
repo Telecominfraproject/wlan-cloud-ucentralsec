@@ -59,7 +59,7 @@ RUN addgroup -S "$OWSEC_USER" && \
 RUN mkdir /openwifi
 RUN mkdir -p "$OWSEC_ROOT" "$OWSEC_CONFIG" && \
     chown "$OWSEC_USER": "$OWSEC_ROOT" "$OWSEC_CONFIG"
-RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec gettext ca-certificates libcurl curl-dev 
+RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec gettext ca-certificates libcurl curl-dev bash jq curl
 COPY --from=builder /owsec/cmake-build/owsec /openwifi/owsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
@@ -73,6 +73,8 @@ COPY templates /dist/templates
 COPY docker-entrypoint.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
+
+COPY readiness_check /readiness_check
 
 EXPOSE 16001 17001 16101
 
