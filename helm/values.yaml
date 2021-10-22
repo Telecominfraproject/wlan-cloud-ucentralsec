@@ -35,9 +35,10 @@ checks:
         path: /
         port: 16101
     readiness:
-      httpGet:
-        path: /
-        port: 16101
+      exec:
+        command:
+          - /readiness_check
+      failureThreshold: 1
 
 ingresses:
   restapi:
@@ -106,8 +107,14 @@ persistence:
 public_env_variables:
   OWSEC_ROOT: /owsec-data
   OWSEC_CONFIG: /owsec-data
+  # Environment variables required for the readiness checks using script
+  FLAGS: "-s --connect-timeout 3"
+  # NOTE in order for readiness check to use system info you need to set READINESS_METHOD to "systeminfo" and set OWSEC to the OWSEC's REST API endpoint
+  #READINESS_METHOD: systeminfo
 
-secret_env_variables: {}
+secret_env_variables:
+  OWSEC_USERNAME: tip@ucentral.com
+  OWSEC_PASSWORD: openwifi
 
 configProperties:
   # -> Public part
