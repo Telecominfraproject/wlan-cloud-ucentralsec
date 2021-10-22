@@ -2,6 +2,8 @@
 // Created by stephane bourque on 2021-06-25.
 //
 
+#include <vector>
+
 #include "Poco/Tuple.h"
 #include "storage_users.h"
 
