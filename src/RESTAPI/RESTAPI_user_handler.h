@@ -5,7 +5,7 @@
 #ifndef UCENTRALSEC_RESTAPI_USER_HANDLER_H
 #define UCENTRALSEC_RESTAPI_USER_HANDLER_H
 
-#include "framework/RESTAPI_handler.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
     class RESTAPI_user_handler : public RESTAPIHandler {

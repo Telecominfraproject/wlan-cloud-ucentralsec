@@ -6,7 +6,7 @@
 #define OWSEC_RESTAPI_EMAIL_HANDLER_H
 
 
-#include "framework/RESTAPI_handler.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
     class RESTAPI_email_handler : public RESTAPIHandler {

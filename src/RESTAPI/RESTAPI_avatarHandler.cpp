@@ -6,11 +6,10 @@
 #include <iostream>
 
 #include "RESTAPI_avatarHandler.h"
-#include "../StorageService.h"
-#include "../Daemon.h"
+#include "StorageService.h"
 #include "Poco/Net/HTMLForm.h"
-#include "../framework/Utils.h"
-#include "../framework/RESTAPI_protocol.h"
+#include "framework/RESTAPI_protocol.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -32,23 +31,23 @@ namespace OpenWifi {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
         SecurityObjects::UserInfo UInfo;
 
-        if (Id.empty() || !Storage()->GetUserById(Id, UInfo)) {
+        if (Id.empty() || !StorageService()->GetUserById(Id, UInfo)) {
             return NotFound();
         }
 
         //  if there is an avatar, just remove it...
-        Storage()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+        StorageService()->DeleteAvatar(UserInfo_.userinfo.email,Id);
 
         Poco::TemporaryFile TmpFile;
         AvatarPartHandler partHandler(Id, Logger_, TmpFile);
 
         Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
         Poco::JSON::Object Answer;
-        if (!partHandler.Name().empty() && partHandler.Length()<Daemon()->ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
+        if (!partHandler.Name().empty() && partHandler.Length()< MicroService::instance().ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
             Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
-            Storage()->SetAvatar(UserInfo_.userinfo.email,
+            StorageService()->SetAvatar(UserInfo_.userinfo.email,
                                  Id, TmpFile, partHandler.ContentType(), partHandler.Name());
         } else {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
@@ -65,7 +64,7 @@ namespace OpenWifi {
         }
         Poco::TemporaryFile TempAvatar;
         std::string Type, Name;
-        if (!Storage()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
+        if (!StorageService()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
             return NotFound();
         }
         SendFile(TempAvatar, Type, Name);
@@ -76,7 +75,7 @@ namespace OpenWifi {
         if (Id.empty()) {
             return NotFound();
         }
-        if (!Storage()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
+        if (!StorageService()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
             return NotFound();
         }
         OK();

@@ -2,12 +2,11 @@
 // Created by stephane bourque on 2021-06-25.
 //
 
-#include "../StorageService.h"
-#include "../framework/RESTAPI_utils.h"
-#include "../Daemon.h"
-
 #include "Poco/Tuple.h"
 #include "storage_users.h"
+
+#include "StorageService.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -102,7 +101,7 @@ namespace OpenWifi {
             if(!Records.empty())
                 return false;
 
-            NewUser.Id = Daemon()->CreateUUID();
+            NewUser.Id = MicroService::instance().CreateUUID();
             NewUser.creationDate = std::time(nullptr);
 
             //  if there is a password, we assume that we do not want email verification,

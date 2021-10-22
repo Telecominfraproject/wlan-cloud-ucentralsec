@@ -2,22 +2,22 @@
 // Created by stephane bourque on 2021-10-09.
 //
 
-#include "SMSSender.h"
-#include "Daemon.h"
 #include <aws/sns/SNSClient.h>
 #include <aws/sns/model/PublishRequest.h>
 #include <aws/sns/model/PublishResult.h>
 #include <aws/sns/model/GetSMSAttributesRequest.h>
-#include "MFAServer.h"
 
+#include "MFAServer.h"
 #include "SMS_provider_aws.h"
 #include "SMS_provider_twilio.h"
+#include "SMSSender.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
     class SMSSender * SMSSender::instance_ = nullptr;
 
     int SMSSender::Start() {
-        Provider_ = Daemon()->ConfigGetString("sms.provider","aws");
+        Provider_ = MicroService::instance().ConfigGetString("sms.provider","aws");
         if(Provider_=="aws") {
             ProviderImpl_ = std::make_unique<SMS_provider_aws>(Logger_);
         } else if(Provider_=="twilio") {

@@ -26,8 +26,6 @@
 #include <aws/s3/model/PutBucketAclRequest.h>
 #include <aws/s3/model/GetBucketAclRequest.h>
 
-#include "framework/ALBHealthCheckServer.h"
-#include "framework/KafkaManager.h"
 #include "StorageService.h"
 #include "RESTAPI/RESTAPI_server.h"
 #include "SMTPMailerService.h"
@@ -45,8 +43,8 @@ namespace OpenWifi {
                                    vDAEMON_CONFIG_ENV_VAR,
                                    vDAEMON_APP_NAME,
                                    vDAEMON_BUS_TIMER,
-                                   Types::SubSystemVec{
-                                           Storage(),
+                                   SubSystemVec{
+                                           StorageService(),
                                            SMSSender(),
                                            RESTAPI_Server(),
                                            RESTAPI_InternalServer(),

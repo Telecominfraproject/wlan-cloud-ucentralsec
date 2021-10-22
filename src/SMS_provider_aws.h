@@ -5,10 +5,11 @@
 #ifndef OWSEC_SMS_PROVIDER_AWS_H
 #define OWSEC_SMS_PROVIDER_AWS_H
 
-#include "SMS_provider.h"
 #include <aws/core/Aws.h>
 #include <aws/s3/S3Client.h>
 #include <aws/core/auth/AWSCredentials.h>
+
+#include "SMS_provider.h"
 
 namespace OpenWifi {
     class SMS_provider_aws : public SMS_provider {

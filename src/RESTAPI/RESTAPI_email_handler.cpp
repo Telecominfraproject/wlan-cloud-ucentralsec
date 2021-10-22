@@ -8,9 +8,9 @@
 #include "Poco/Exception.h"
 #include "Poco/JSON/Parser.h"
 
-#include "../Daemon.h"
-#include "../SMTPMailerService.h"
-#include "../framework/RESTAPI_errors.h"
+#include "SMTPMailerService.h"
+#include "framework/RESTAPI_errors.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
     void RESTAPI_email_handler::DoPost() {

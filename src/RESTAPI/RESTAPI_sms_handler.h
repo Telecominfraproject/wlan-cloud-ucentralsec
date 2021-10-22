@@ -6,7 +6,7 @@
 #define OWSEC_RESTAPI_SMS_HANDLER_H
 
 
-#include "../framework/RESTAPI_handler.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
     class RESTAPI_sms_handler : public RESTAPIHandler {

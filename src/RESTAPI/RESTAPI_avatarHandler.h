@@ -6,7 +6,7 @@
 #define UCENTRALSEC_RESTAPI_AVATARHANDLER_H
 
 
-#include "framework/RESTAPI_handler.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 

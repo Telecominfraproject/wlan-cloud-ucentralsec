@@ -8,13 +8,12 @@
 
 #include "Poco/JSON/Parser.h"
 
-#include "../AuthService.h"
+#include "AuthService.h"
 #include "RESTAPI_oauth2Handler.h"
-#include "../framework/RESTAPI_protocol.h"
+#include "framework/RESTAPI_protocol.h"
 #include "RESTAPI_server.h"
-#include "../MFAServer.h"
-
-#include "../framework/Utils.h"
+#include "MFAServer.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 	void RESTAPI_oauth2Handler::DoGet() {

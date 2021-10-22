@@ -3,9 +3,9 @@
 //
 
 #include "MFAServer.h"
-#include "Daemon.h"
 #include "SMSSender.h"
 #include "SMTPMailerService.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -27,7 +27,7 @@ namespace OpenWifi {
             return false;
 
         std::string Challenge = MakeChallenge();
-        std::string uuid = Daemon()->CreateUUID();
+        std::string uuid = MicroService::instance().CreateUUID();
         uint64_t Created = std::time(nullptr);
 
         ChallengeStart.set("uuid",uuid);

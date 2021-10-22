@@ -4,7 +4,7 @@
 
 #include "RESTAPI_systemEndpoints_handler.h"
 #include "../Daemon.h"
-#include "RESTAPI_SecurityObjects.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
 

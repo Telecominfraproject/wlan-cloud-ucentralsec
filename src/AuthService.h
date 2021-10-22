@@ -11,15 +11,14 @@
 
 #include <regex>
 
-#include "framework/SubSystemServer.h"
-
 #include "Poco/JSON/Object.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/JWT/Signer.h"
 #include "Poco/SHA2Engine.h"
 
-#include "RESTAPI/RESTAPI_SecurityObjects.h"
+#include "framework/MicroService.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi{
 
@@ -105,6 +104,10 @@ namespace OpenWifi{
     };
 
     inline AuthService * AuthService() { return AuthService::instance(); }
+
+    [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo ) {
+        return AuthService()->IsAuthorized(Request, SessionToken, UInfo );
+    }
 
 } // end of namespace
 

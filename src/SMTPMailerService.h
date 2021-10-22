@@ -5,7 +5,7 @@
 #ifndef UCENTRALSEC_SMTPMAILERSERVICE_H
 #define UCENTRALSEC_SMTPMAILERSERVICE_H
 
-#include "framework/SubSystemServer.h"
+#include "framework/MicroService.h"
 
 #include "Poco/File.h"
 #include "Poco/Net/InvalidCertificateHandler.h"

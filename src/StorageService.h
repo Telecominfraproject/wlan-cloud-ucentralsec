@@ -21,9 +21,8 @@
 #endif
 
 #include "AuthService.h"
-#include "RESTAPI/RESTAPI_SecurityObjects.h"
-#include "framework/SubSystemServer.h"
-#include "framework/Storage.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "framework/StorageClass.h"
 
 namespace OpenWifi {
 
@@ -67,7 +66,7 @@ namespace OpenWifi {
 
     };
 
-    class Storage : public SubSystemServer {
+    class Storage : public StorageClass {
     public:
 
         enum AUTH_ERROR {
@@ -162,43 +161,14 @@ namespace OpenWifi {
 
 	  private:
 		static Storage      							*instance_;
-		std::unique_ptr<Poco::Data::SessionPool>        Pool_= nullptr;
-		DBType       									dbType_ = sqlite;
-		std::unique_ptr<Poco::Data::SQLite::Connector>  SQLiteConn_= nullptr;
-#ifndef SMALL_BUILD
-		std::unique_ptr<Poco::Data::PostgreSQL::Connector>  PostgresConn_= nullptr;
-		std::unique_ptr<Poco::Data::MySQL::Connector>       MySQLConn_= nullptr;
-#endif
 
         int Create_Tables();
         int Create_UserTable();
         int Create_AvatarTable();
         int Create_TokensTable();
-
-		[[nodiscard]] std::string ConvertParams(const std::string &S) const;
-		[[nodiscard]] inline std::string ComputeRange(uint64_t From, uint64_t HowMany) {
-		    if(dbType_==sqlite) {
-		        return " LIMIT " + std::to_string(From-1) + ", " + std::to_string(HowMany) + " ";
-		    } else if(dbType_==pgsql) {
-		        return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
-		    } else if(dbType_==mysql) {
-		        return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
-		    }
-		    return " LIMIT " + std::to_string(HowMany) + " OFFSET " + std::to_string(From-1) + " ";
-		}
-
-		Storage() noexcept:
-            SubSystemServer("Storage", "STORAGE-SVR", "storage")
-            {
-            }
-
-        int 	Setup_SQLite();
-        int 	Setup_MySQL();
-        int 	Setup_PostgreSQL();
-
    };
 
-    inline Storage * Storage() { return Storage::instance(); };
+    inline Storage * StorageService() { return Storage::instance(); };
 
 }  // namespace
 

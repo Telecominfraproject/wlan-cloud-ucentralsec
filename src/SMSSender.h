@@ -5,10 +5,11 @@
 #ifndef OWSEC_SMSSENDER_H
 #define OWSEC_SMSSENDER_H
 
-#include "framework/SubSystemServer.h"
 #include <aws/core/Aws.h>
 #include <aws/s3/S3Client.h>
 #include <aws/core/auth/AWSCredentials.h>
+
+#include "framework/MicroService.h"
 #include "SMS_provider.h"
 
 namespace OpenWifi {

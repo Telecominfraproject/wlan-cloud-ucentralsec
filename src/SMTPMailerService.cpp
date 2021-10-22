@@ -17,21 +17,20 @@
 #include "Poco/Net/AcceptCertificateHandler.h"
 
 #include "SMTPMailerService.h"
-#include "framework/Utils.h"
-#include "Daemon.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
     class SMTPMailerService * SMTPMailerService::instance_ = nullptr;
 
     void SMTPMailerService::LoadMyConfig() {
-        MailHost_ = Daemon()->ConfigGetString("mailer.hostname");
-        SenderLoginUserName_ = Daemon()->ConfigGetString("mailer.username");
-        SenderLoginPassword_ = Daemon()->ConfigGetString("mailer.password");
-        Sender_ = Daemon()->ConfigGetString("mailer.sender");
-        LoginMethod_ = Daemon()->ConfigGetString("mailer.loginmethod");
-        MailHostPort_ = (int)Daemon()->ConfigGetInt("mailer.port");
-        TemplateDir_ = Daemon()->ConfigPath("mailer.templates", Daemon()->DataDir());
+        MailHost_ = MicroService::instance().ConfigGetString("mailer.hostname");
+        SenderLoginUserName_ = MicroService::instance().ConfigGetString("mailer.username");
+        SenderLoginPassword_ = MicroService::instance().ConfigGetString("mailer.password");
+        Sender_ = MicroService::instance().ConfigGetString("mailer.sender");
+        LoginMethod_ = MicroService::instance().ConfigGetString("mailer.loginmethod");
+        MailHostPort_ = (int) MicroService::instance().ConfigGetInt("mailer.port");
+        TemplateDir_ = MicroService::instance().ConfigPath("mailer.templates", MicroService::instance().DataDir());
         Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
     }
 
@@ -48,7 +47,7 @@ namespace OpenWifi {
     }
 
     void SMTPMailerService::reinitialize(Poco::Util::Application &self) {
-        Daemon()->LoadConfigurationFile();
+        MicroService::instance().LoadConfigurationFile();
         Logger_.information("Reinitializing.");
         LoadMyConfig();
     }

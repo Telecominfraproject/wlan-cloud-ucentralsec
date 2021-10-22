@@ -6,14 +6,7 @@
 #define UCENTRALSEC_RESTAPI_ACTION_LINKS_H
 
 
-#include "../framework/RESTAPI_handler.h"
-#include "Poco/Net/PartHandler.h"
-#include "Poco/Message.h"
-#include "Poco/Net/MessageHeader.h"
-#include "Poco/Net/NameValueCollection.h"
-#include "Poco/NullStream.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/CountingStream.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
     class RESTAPI_action_links : public RESTAPIHandler {

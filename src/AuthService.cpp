@@ -12,13 +12,10 @@
 #include "Poco/JWT/Token.h"
 #include "Poco/JWT/Signer.h"
 
-#include "Daemon.h"
-#include "framework/RESTAPI_handler.h"
+#include "framework/MicroService.h"
 #include "StorageService.h"
 #include "AuthService.h"
-#include "framework/Utils.h"
-#include "framework/KafkaManager.h"
-#include "framework/Kafka_topics.h"
+#include "framework/KafkaTopics.h"
 
 #include "SMTPMailerService.h"
 #include "MFAServer.h"
@@ -46,16 +43,16 @@ namespace OpenWifi {
 	}
 
     int AuthService::Start() {
-		Signer_.setRSAKey(Daemon()->Key());
+		Signer_.setRSAKey(MicroService::instance().Key());
 		Signer_.addAllAlgorithms();
 		Logger_.notice("Starting...");
-        Secure_ = Daemon()->ConfigGetBool("authentication.enabled",true);
-        DefaultPassword_ = Daemon()->ConfigGetString("authentication.default.password","");
-        DefaultUserName_ = Daemon()->ConfigGetString("authentication.default.username","");
-        Mechanism_ = Daemon()->ConfigGetString("authentication.service.type","internal");
-        PasswordValidation_ = PasswordValidationStr_ = Daemon()->ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-        TokenAging_ = (uint64_t) Daemon()->ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
-        HowManyOldPassword_ = Daemon()->ConfigGetInt("authentication.oldpasswords", 5);
+        Secure_ = MicroService::instance().ConfigGetBool("authentication.enabled",true);
+        DefaultPassword_ = MicroService::instance().ConfigGetString("authentication.default.password","");
+        DefaultUserName_ = MicroService::instance().ConfigGetString("authentication.default.username","");
+        Mechanism_ = MicroService::instance().ConfigGetString("authentication.service.type","internal");
+        PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
+        HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
         return 0;
     }
 
@@ -82,7 +79,7 @@ namespace OpenWifi {
 		}
 
 		if(!CallToken.empty()) {
-		    if(Storage()->IsTokenRevoked(CallToken))
+		    if(StorageService()->IsTokenRevoked(CallToken))
 		        return false;
 		    auto Client = UserCache_.find(CallToken);
 		    if( Client == UserCache_.end() )
@@ -94,7 +91,7 @@ namespace OpenWifi {
 		        return true;
 		    }
 		    UserCache_.erase(CallToken);
-		    Storage()->RevokeToken(CallToken);
+		    StorageService()->RevokeToken(CallToken);
 		    return false;
 		}
 
@@ -131,13 +128,13 @@ namespace OpenWifi {
         try {
             Poco::JSON::Object Obj;
             Obj.set("event", "remove-token");
-            Obj.set("id", Daemon()->ID());
+            Obj.set("id", MicroService::instance().ID());
             Obj.set("token", token);
             std::stringstream ResultText;
             Poco::JSON::Stringifier::stringify(Obj, ResultText);
             std::string Tmp{token};
-            Storage()->RevokeToken(Tmp);
-            KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, Daemon()->PrivateEndPoint(), ResultText.str(),
+            StorageService()->RevokeToken(Tmp);
+            KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroService::instance().PrivateEndPoint(), ResultText.str(),
                                         false);
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
@@ -171,8 +168,8 @@ namespace OpenWifi {
 		try {
             auto E = UserCache_.find(SessionToken);
             if(E == UserCache_.end()) {
-                if(Storage()->GetToken(SessionToken,UInfo)) {
-                    if(Storage()->GetUserById(UInfo.userinfo.email,UInfo.userinfo)) {
+                if(StorageService()->GetToken(SessionToken,UInfo)) {
+                    if(StorageService()->GetUserById(UInfo.userinfo.email,UInfo.userinfo)) {
                         UserCache_[UInfo.webtoken.access_token_] = UInfo;
                         return true;
                     }
@@ -205,8 +202,8 @@ namespace OpenWifi {
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
         UserCache_[UInfo.webtoken.access_token_] = UInfo;
-        Storage()->SetLastLogin(UInfo.userinfo.Id);
-        Storage()->AddToken(UInfo.webtoken.username_, UInfo.webtoken.access_token_,
+        StorageService()->SetLastLogin(UInfo.userinfo.Id);
+        StorageService()->AddToken(UInfo.webtoken.username_, UInfo.webtoken.access_token_,
                             UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                 UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
@@ -235,7 +232,7 @@ namespace OpenWifi {
         Poco::toLowerInPlace(UserName);
         auto PasswordHash = ComputePasswordHash(UserName, Password);
 
-        if(Storage()->GetUserByEmail(UserName,UInfo.userinfo)) {
+        if(StorageService()->GetUserByEmail(UserName,UInfo.userinfo)) {
             if(UInfo.userinfo.waitingForEmailCheck) {
                 return USERNAME_PENDING_VERIFICATION;
             }
@@ -260,12 +257,12 @@ namespace OpenWifi {
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
-                Storage()->UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
+                StorageService()->UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
             UInfo.userinfo.lastLogin=std::time(nullptr);
-            Storage()->SetLastLogin(UInfo.userinfo.Id);
+            StorageService()->SetLastLogin(UInfo.userinfo.Id);
             CreateToken(UserName, UInfo );
             return SUCCESS;
         }
@@ -292,7 +289,7 @@ namespace OpenWifi {
     bool AuthService::SendEmailToUser(std::string &Email, EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
 
-        if(Storage()->GetUserByEmail(Email,UInfo)) {
+        if(StorageService()->GetUserByEmail(Email,UInfo)) {
             switch (Reason) {
                 case FORGOT_PASSWORD: {
                         MessageAttributes Attrs;
@@ -301,7 +298,7 @@ namespace OpenWifi {
                         Attrs[LOGO] = "logo.jpg";
                         Attrs[SUBJECT] = "Password reset link";
                         Attrs[ACTION_LINK] =
-                                Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + UInfo.Id ;
+                                MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + UInfo.Id ;
                         SMTPMailerService()->SendMessage(UInfo.email, "password_reset.txt", Attrs);
                     }
                     break;
@@ -313,7 +310,7 @@ namespace OpenWifi {
                         Attrs[LOGO] = "logo.jpg";
                         Attrs[SUBJECT] = "EMail Address Verification";
                         Attrs[ACTION_LINK] =
-                                Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
+                                MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
                         SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
                         UInfo.waitingForEmailCheck = true;
                     }
@@ -333,7 +330,7 @@ namespace OpenWifi {
         Attrs[LOGO] = "logo.jpg";
         Attrs[SUBJECT] = "EMail Address Verification";
         Attrs[ACTION_LINK] =
-                Daemon()->GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
+                MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
         SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
         UInfo.waitingForEmailCheck = true;
         return true;

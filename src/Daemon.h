@@ -20,7 +20,6 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 
-
 #include "framework/OpenWifiTypes.h"
 #include "framework/MicroService.h"
 
@@ -39,7 +38,7 @@ namespace OpenWifi {
                         const std::string & ConfigEnv,
                         const std::string & AppName,
                         uint64_t BusTimer,
-                        const Types::SubSystemVec & SubSystems) :
+                        const SubSystemVec & SubSystems) :
                 MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
         void initialize(Poco::Util::Application &self) override;

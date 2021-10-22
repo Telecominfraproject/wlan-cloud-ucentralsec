@@ -3,9 +3,7 @@
 //
 
 #include "RESTAPI_validateToken_handler.h"
-#include "../Daemon.h"
-#include "../AuthService.h"
-#include "../framework/Utils.h"
+#include "AuthService.h"
 
 namespace OpenWifi {
     void RESTAPI_validateToken_handler::DoGet() {

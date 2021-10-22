@@ -5,7 +5,6 @@
 
 #include "Poco/URI.h"
 
-#include "../framework/RESTAPI_system_command.h"
 #include "RESTAPI_user_handler.h"
 #include "RESTAPI_users_handler.h"
 #include "RESTAPI_action_links.h"
@@ -13,7 +12,7 @@
 #include "RESTAPI_InternalServer.h"
 #include "RESTAPI_sms_handler.h"
 
-#include "../framework/Utils.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -59,7 +58,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_InternalServer::reinitialize(Poco::Util::Application &self) {
-        Daemon()->LoadConfigurationFile();
+        MicroService::instance().LoadConfigurationFile();
         Logger_.information("Reinitializing.");
         Stop();
         Start();

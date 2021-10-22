@@ -53,17 +53,12 @@ include_directories(/usr/local/include  /usr/local/opt/openssl/include src inclu
 add_executable( owsec
         build
         src/Daemon.h src/Daemon.cpp
-        src/framework/MicroService.cpp src/framework/MicroService.h
-        src/framework/SubSystemServer.cpp src/framework/SubSystemServer.h
+        src/framework/MicroService.h
         src/RESTAPI/RESTAPI_oauth2Handler.h src/RESTAPI/RESTAPI_oauth2Handler.cpp
-        src/framework/RESTAPI_handler.h src/framework/RESTAPI_handler.cpp
         src/RESTAPI/RESTAPI_server.cpp src/RESTAPI/RESTAPI_server.h
-        src/RESTAPI/RESTAPI_SecurityObjects.cpp src/RESTAPI/RESTAPI_SecurityObjects.h
-        src/framework/RESTAPI_system_command.h src/framework/RESTAPI_system_command.cpp
+        src/RESTObjects/RESTAPI_SecurityObjects.cpp src/RESTObjects/RESTAPI_SecurityObjects.h
         src/AuthService.h src/AuthService.cpp
-        src/framework/KafkaManager.h src/framework/KafkaManager.cpp
         src/StorageService.cpp src/StorageService.h
-        src/framework/Utils.cpp src/framework/Utils.h
         src/SMTPMailerService.cpp src/SMTPMailerService.h
         src/RESTAPI/RESTAPI_users_handler.cpp src/RESTAPI/RESTAPI_users_handler.h
         src/RESTAPI/RESTAPI_user_handler.cpp src/RESTAPI/RESTAPI_user_handler.h
@@ -75,15 +70,12 @@ add_executable( owsec
         src/RESTAPI/RESTAPI_avatarHandler.cpp src/RESTAPI/RESTAPI_avatarHandler.h
         src/storage/storage_avatar.cpp src/storage/storage_avatar.h src/storage/storage_users.h
         src/RESTAPI/RESTAPI_email_handler.cpp src/RESTAPI/RESTAPI_email_handler.h
-        src/framework/RESTAPI_GenericServer.h src/framework/RESTAPI_GenericServer.cpp
-        src/framework/storage_setup.cpp
         src/storage/storage_tables.cpp
         src/framework/RESTAPI_protocol.h
         src/framework/OpenWifiTypes.h
         src/storage/storage_users.cpp
         src/storage/storage_tokens.cpp
         src/framework/RESTAPI_errors.h
-        src/framework/Storage.h
         src/SMSSender.cpp src/SMSSender.h
         src/RESTAPI/RESTAPI_sms_handler.cpp src/RESTAPI/RESTAPI_sms_handler.h
         src/MFAServer.cpp src/MFAServer.h

@@ -5,7 +5,7 @@
 #ifndef UCENTRALSEC_RESTAPI_ASSETSERVER_H
 #define UCENTRALSEC_RESTAPI_ASSETSERVER_H
 
-#include "../framework/RESTAPI_handler.h"
+#include "../framework/MicroService.h"
 
 namespace OpenWifi {
     class RESTAPI_AssetServer : public RESTAPIHandler {

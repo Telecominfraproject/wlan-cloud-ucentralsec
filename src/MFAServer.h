@@ -5,9 +5,9 @@
 #ifndef OWSEC_MFASERVER_H
 #define OWSEC_MFASERVER_H
 
-#include "framework/SubSystemServer.h"
+#include "framework/MicroService.h"
 #include "Poco/JSON/Object.h"
-#include "RESTAPI/RESTAPI_SecurityObjects.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
     struct MFACacheEntry {

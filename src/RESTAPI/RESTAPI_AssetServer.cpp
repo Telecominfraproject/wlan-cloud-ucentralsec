@@ -4,10 +4,9 @@
 
 #include "RESTAPI_AssetServer.h"
 #include "Poco/File.h"
-#include "../Daemon.h"
+#include "framework/RESTAPI_protocol.h"
+#include "framework/MicroService.h"
 #include "RESTAPI_server.h"
-#include "../framework/Utils.h"
-#include "../framework/RESTAPI_protocol.h"
 
 namespace OpenWifi {
     void RESTAPI_AssetServer::DoGet() {

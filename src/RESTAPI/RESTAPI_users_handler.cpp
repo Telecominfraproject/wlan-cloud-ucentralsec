@@ -3,9 +3,9 @@
 //
 
 #include "RESTAPI_users_handler.h"
-#include "../StorageService.h"
-#include "../framework/RESTAPI_protocol.h"
-#include "../framework/Utils.h"
+#include "StorageService.h"
+#include "framework/RESTAPI_protocol.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
     void RESTAPI_users_handler::DoGet() {
@@ -15,7 +15,7 @@ namespace OpenWifi {
         if(QB_.Select.empty()) {
             Poco::JSON::Array ArrayObj;
             Poco::JSON::Object Answer;
-            if (Storage()->GetUsers(QB_.Offset, QB_.Limit, Users)) {
+            if (StorageService()->GetUsers(QB_.Offset, QB_.Limit, Users)) {
                 for (const auto &i : Users) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
@@ -33,7 +33,7 @@ namespace OpenWifi {
             Poco::JSON::Array ArrayObj;
             for(auto &i:IDs) {
                 SecurityObjects::UserInfo   UInfo;
-                if(Storage()->GetUserById(i,UInfo)) {
+                if(StorageService()->GetUserById(i,UInfo)) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
                         ArrayObj.add(UInfo.Id);

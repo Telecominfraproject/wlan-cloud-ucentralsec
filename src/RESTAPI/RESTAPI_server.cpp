@@ -12,7 +12,6 @@
 
 #include "RESTAPI_server.h"
 #include "RESTAPI_oauth2Handler.h"
-#include "../framework/RESTAPI_system_command.h"
 #include "RESTAPI_user_handler.h"
 #include "RESTAPI_users_handler.h"
 #include "RESTAPI_action_links.h"
@@ -22,8 +21,7 @@
 #include "RESTAPI_email_handler.h"
 #include "RESTAPI_sms_handler.h"
 
-#include "../Daemon.h"
-#include "../framework/Utils.h"
+#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -33,9 +31,9 @@ namespace OpenWifi {
         Logger_.information("Starting.");
         Server_.InitLogging();
 
-        AsserDir_ = Daemon()->ConfigPath("openwifi.restapi.wwwassets");
-        AccessPolicy_ = Daemon()->ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
-        PasswordPolicy_ = Daemon()->ConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
+        AsserDir_ = MicroService::instance().ConfigPath("openwifi.restapi.wwwassets");
+        AccessPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
+        PasswordPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
 
         for(const auto & Svr: ConfigServersList_) {
 			Logger_.information(Poco::format("Starting: %s:%s Keyfile:%s CertFile: %s", Svr.Address(), std::to_string(Svr.Port()),
@@ -85,7 +83,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_Server::reinitialize(Poco::Util::Application &self) {
-        Daemon()->LoadConfigurationFile();
+        MicroService::instance().LoadConfigurationFile();
         Logger_.information("Reinitializing.");
         Stop();
         Start();
