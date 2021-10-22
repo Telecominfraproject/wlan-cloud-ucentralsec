@@ -6,6 +6,7 @@
 #define UCENTRALSEC_RESTAPI_SYSTEMENDPOINTS_HANDLER_H
 
 #include "../framework/MicroService.h"
+
 namespace OpenWifi {
     class RESTAPI_systemEndpoints_handler : public RESTAPIHandler {
     public:

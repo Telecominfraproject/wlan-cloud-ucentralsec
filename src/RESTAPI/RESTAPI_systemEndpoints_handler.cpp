@@ -3,13 +3,12 @@
 //
 
 #include "RESTAPI_systemEndpoints_handler.h"
-#include "../Daemon.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
 
     void RESTAPI_systemEndpoints_handler::DoGet() {
-        auto Services = Daemon()->GetServices();
+        auto Services = MicroService::instance().GetServices();
         SecurityObjects::SystemEndpointList L;
         for(const auto &i:Services) {
             SecurityObjects::SystemEndpoint S{
