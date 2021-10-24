@@ -52,14 +52,20 @@ include_directories(/usr/local/include  /usr/local/opt/openssl/include src inclu
 
 add_executable( owsec
         build
-        src/APIServers.cpp
-        src/Daemon.h src/Daemon.cpp
+        src/framework/CountryCodes.h
+        src/framework/KafkaTopics.h
         src/framework/MicroService.h
+        src/framework/OpenWifiTypes.h
+        src/framework/orm.h
+        src/framework/RESTAPI_errors.h
+        src/framework/RESTAPI_protocol.h
+        src/framework/StorageClass.h
+        src/framework/uCentral_Protocol.h
+        src/RESTObjects/RESTAPI_SecurityObjects.h src/RESTObjects/RESTAPI_SecurityObjects.cpp
+        src/RESTObjects/RESTAPI_ProvObjects.cpp src/RESTObjects/RESTAPI_ProvObjects.h
+        src/RESTObjects/RESTAPI_GWobjects.h src/RESTObjects/RESTAPI_GWobjects.cpp
+        src/RESTObjects/RESTAPI_FMSObjects.h src/RESTObjects/RESTAPI_FMSObjects.cpp
         src/RESTAPI/RESTAPI_oauth2Handler.h src/RESTAPI/RESTAPI_oauth2Handler.cpp
-        src/RESTObjects/RESTAPI_SecurityObjects.cpp src/RESTObjects/RESTAPI_SecurityObjects.h
-        src/AuthService.h src/AuthService.cpp
-        src/StorageService.cpp src/StorageService.h
-        src/SMTPMailerService.cpp src/SMTPMailerService.h
         src/RESTAPI/RESTAPI_users_handler.cpp src/RESTAPI/RESTAPI_users_handler.h
         src/RESTAPI/RESTAPI_user_handler.cpp src/RESTAPI/RESTAPI_user_handler.h
         src/RESTAPI/RESTAPI_action_links.cpp src/RESTAPI/RESTAPI_action_links.h
@@ -67,16 +73,16 @@ add_executable( owsec
         src/RESTAPI/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI/RESTAPI_systemEndpoints_handler.h
         src/RESTAPI/RESTAPI_AssetServer.cpp src/RESTAPI/RESTAPI_AssetServer.h
         src/RESTAPI/RESTAPI_avatarHandler.cpp src/RESTAPI/RESTAPI_avatarHandler.h
-        src/storage/storage_avatar.cpp src/storage/storage_avatar.h src/storage/storage_users.h
         src/RESTAPI/RESTAPI_email_handler.cpp src/RESTAPI/RESTAPI_email_handler.h
-        src/storage/storage_tables.cpp
-        src/framework/RESTAPI_protocol.h
-        src/framework/OpenWifiTypes.h
-        src/storage/storage_users.cpp
-        src/storage/storage_tokens.cpp
-        src/framework/RESTAPI_errors.h
-        src/SMSSender.cpp src/SMSSender.h
         src/RESTAPI/RESTAPI_sms_handler.cpp src/RESTAPI/RESTAPI_sms_handler.h
+        src/storage/storage_avatar.cpp src/storage/storage_avatar.h src/storage/storage_users.h
+        src/storage/storage_tables.cpp src/storage/storage_users.cpp src/storage/storage_tokens.cpp
+        src/APIServers.cpp
+        src/Daemon.h src/Daemon.cpp
+        src/AuthService.h src/AuthService.cpp
+        src/StorageService.cpp src/StorageService.h
+        src/SMTPMailerService.cpp src/SMTPMailerService.h
+        src/SMSSender.cpp src/SMSSender.h
         src/MFAServer.cpp src/MFAServer.h
         src/SMS_provider_aws.cpp src/SMS_provider_aws.h
         src/SMS_provider.cpp src/SMS_provider.h

@@ -7,7 +7,6 @@
 //
 
 #include "StorageService.h"
-#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
