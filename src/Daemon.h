@@ -41,7 +41,7 @@ namespace OpenWifi {
                         const SubSystemVec & SubSystems) :
                 MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
-        void initialize(Poco::Util::Application &self) override;
+        void initialize();
         static Daemon *instance();
         inline const std::string & AssetDir() { return AssetDir_; }
         inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }

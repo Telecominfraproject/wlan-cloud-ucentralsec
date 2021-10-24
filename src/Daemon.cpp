@@ -51,14 +51,15 @@ namespace OpenWifi {
         return instance_;
     }
 
-    void Daemon::initialize(Poco::Util::Application &self) {
-        MicroService::initialize(*this);
+    void Daemon::initialize() {
         AssetDir_ = MicroService::instance().ConfigPath("openwifi.restapi.wwwassets");
         AccessPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
         PasswordPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
-
         std::cout << AssetDir_ << " .. " << AccessPolicy_ << " .. " << PasswordPolicy_ << std::endl;
+    }
 
+    void MicroServicePostInitialization() {
+        Daemon()->initialize();
     }
 }
 
