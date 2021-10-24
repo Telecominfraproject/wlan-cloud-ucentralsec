@@ -8,11 +8,11 @@
 
 #include "Poco/JSON/Parser.h"
 
+#include "Daemon.h"
 #include "AuthService.h"
 #include "RESTAPI_oauth2Handler.h"
-#include "framework/RESTAPI_protocol.h"
-#include "RESTAPI_server.h"
 #include "MFAServer.h"
+#include "framework/RESTAPI_protocol.h"
 #include "framework/MicroService.h"
 
 namespace OpenWifi {
@@ -57,8 +57,8 @@ namespace OpenWifi {
             Logger_.information(Poco::format("POLICY-REQUEST(%s): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
-            Answer.set(RESTAPI::Protocol::ACCESSPOLICY, RESTAPI_Server()->GetAccessPolicy());
-            Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, RESTAPI_Server()->GetPasswordPolicy());
+            Answer.set(RESTAPI::Protocol::ACCESSPOLICY, Daemon()->GetAccessPolicy());
+            Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, Daemon()->GetPasswordPolicy());
             return ReturnObject(Answer);
         }
 

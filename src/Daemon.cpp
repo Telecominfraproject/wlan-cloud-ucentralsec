@@ -27,9 +27,7 @@
 #include <aws/s3/model/GetBucketAclRequest.h>
 
 #include "StorageService.h"
-#include "RESTAPI/RESTAPI_server.h"
 #include "SMTPMailerService.h"
-#include "RESTAPI/RESTAPI_InternalServer.h"
 #include "AuthService.h"
 #include "SMSSender.h"
 
@@ -46,8 +44,6 @@ namespace OpenWifi {
                                    SubSystemVec{
                                            StorageService(),
                                            SMSSender(),
-                                           RESTAPI_Server(),
-                                           RESTAPI_InternalServer(),
                                            SMTPMailerService(),
                                            AuthService()
                                    });
@@ -57,6 +53,9 @@ namespace OpenWifi {
 
     void Daemon::initialize(Poco::Util::Application &self) {
         MicroService::initialize(*this);
+        AsserDir_ = MicroService::instance().ConfigPath("openwifi.restapi.wwwassets");
+        AccessPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
+        PasswordPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
     }
 }
 
