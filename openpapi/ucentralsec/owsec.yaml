@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: uCentral Security API
-  description: A process to manage security logins
+  description: A process to manage security logins.
   version: 2.0.0
   license:
     name: BSD3
@@ -719,7 +719,7 @@ paths:
     get:
       tags:
         - Authentication
-      summary: retrieve the system layout
+      summary: Retrieve the system layout.
       operationId: getSystemInfo
       responses:
         200:
@@ -784,7 +784,7 @@ paths:
       tags:
         - User Management
       operationId: getUser
-      summary: Retrieve the information for a single user
+      summary: Retrieve the information for a single user.
       parameters:
         - in: path
           name: id
@@ -804,7 +804,7 @@ paths:
       tags:
         - User Management
       operationId: deleteUser
-      summary: Delete s single user
+      summary: Delete a single user.
       parameters:
         - in: path
           name: id
@@ -824,7 +824,7 @@ paths:
       tags:
         - User Management
       operationId: createUser
-      summary: Create a single user
+      summary: Create a single user.
       parameters:
         - in: path
           name: id
@@ -856,7 +856,7 @@ paths:
       tags:
         - User Management
       operationId: updateUser
-      summary: Modifying a single user
+      summary: Modify a single user.
       parameters:
         - in: path
           name: id
@@ -888,7 +888,7 @@ paths:
       tags:
         - Avatar
       operationId: getAvatar
-      summary: Retrieve teh avatar associated with a user ID
+      summary: Retrieve the avatar associated with a user ID.
       parameters:
         - in: path
           name: id
@@ -922,7 +922,7 @@ paths:
       tags:
         - Avatar
       operationId: deleteAvatar
-      summary: Remove an Avatar associated with a user ID
+      summary: Remove an avatar associated with a user ID.
       parameters:
         - in: path
           name: id
@@ -942,7 +942,7 @@ paths:
       tags:
         - Avatar
       operationId: createAvatar
-      summary: Create an Avatar associated with a user ID
+      summary: Create an avatar associated with a user ID.
       parameters:
         - in: path
           name: id
@@ -978,8 +978,8 @@ paths:
   /email:
     post:
       tags:
-        - EMail
-      summary: Send test email with the system
+        - Email
+      summary: Send test email with the system.
       operationId: Send a test email
       requestBody:
         description: The requested message
@@ -1009,8 +1009,8 @@ paths:
   /sms:
     post:
       tags:
-        - EMail
-      summary: Send test email with the system
+        - Email
+      summary: Send test email with the system.
       operationId: Send a test SMS
       parameters:
         - in: query
@@ -1062,7 +1062,7 @@ paths:
     get:
       tags:
         - Security
-      summary: Retrieve the list of security profiles for a specific service type
+      summary: Retrieve the list of security profiles for a specific service type.
       operationId: getSecurituProfiles
       parameters:
         - in: query
@@ -1132,7 +1132,7 @@ paths:
     post:
       tags:
         - System Commands
-      summary: Perform some systeme wide commands
+      summary: Perform some system wide commands.
       operationId: systemCommand
       requestBody:
         description: Command details
@@ -1147,7 +1147,7 @@ paths:
                 - $ref: '#/components/schemas/SystemCommandGetSubsystemNames'
       responses:
         200:
-          description: Successfull command execution
+          description: Successful command execution
           content:
             application/json:
               schema:
@@ -1176,7 +1176,7 @@ paths:
 
       responses:
         200:
-          description: Successfull command execution
+          description: Successful command execution
           content:
             application/json:
               schema:
