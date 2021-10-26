@@ -125,37 +125,12 @@ namespace OpenWifi {
 
             St1 = "INSERT INTO Users (" + AllUsersFieldsForSelect + ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             Poco::Data::Statement Statement(Sess);
+
+            UserInfoRecord  R;
+            Convert(NewUser, R);
+
             Statement << ConvertParams(St1),
-                    Poco::Data::Keywords::use(NewUser.Id),
-                    Poco::Data::Keywords::use(NewUser.name),
-                    Poco::Data::Keywords::use(NewUser.description),
-                    Poco::Data::Keywords::use(NewUser.avatar),
-                    Poco::Data::Keywords::use(NewUser.email),
-                    Poco::Data::Keywords::use(NewUser.validated),
-                    Poco::Data::Keywords::use(NewUser.validationEmail),
-                    Poco::Data::Keywords::use(NewUser.validationDate),
-                    Poco::Data::Keywords::use(NewUser.creationDate),
-                    Poco::Data::Keywords::use(NewUser.validationURI),
-                    Poco::Data::Keywords::use(NewUser.changePassword),
-                    Poco::Data::Keywords::use(NewUser.lastLogin),
-                    Poco::Data::Keywords::use(NewUser.currentLoginURI),
-                    Poco::Data::Keywords::use(NewUser.lastPasswordChange),
-                    Poco::Data::Keywords::use(NewUser.lastEmailCheck),
-                    Poco::Data::Keywords::use(NewUser.waitingForEmailCheck),
-                    Poco::Data::Keywords::use(NewUser.locale),
-                    Poco::Data::Keywords::use(Notes),
-                    Poco::Data::Keywords::use(NewUser.location),
-                    Poco::Data::Keywords::use(NewUser.owner),
-                    Poco::Data::Keywords::use(NewUser.suspended),
-                    Poco::Data::Keywords::use(NewUser.blackListed),
-                    Poco::Data::Keywords::use(UserType),
-                    Poco::Data::Keywords::use(userTypeProprietaryInfo),
-                    Poco::Data::Keywords::use(NewUser.securityPolicy),
-                    Poco::Data::Keywords::use(NewUser.securityPolicyChange),
-                    Poco::Data::Keywords::use(NewUser.currentPassword),
-                    Poco::Data::Keywords::use(OldPasswords),
-                    Poco::Data::Keywords::use(NewUser.oauthType),
-                    Poco::Data::Keywords::use(NewUser.oauthUserInfo);
+                    Poco::Data::Keywords::use(R);
             Statement.execute();
             return true;
 
@@ -257,37 +232,10 @@ namespace OpenWifi {
             auto UserType = SecurityObjects::UserTypeToString(UInfo.userRole);
             auto OldPasswords = RESTAPI_utils::to_string(UInfo.lastPasswords);
             auto userTypeProprietaryInfo = RESTAPI_utils::to_string(UInfo.userTypeProprietaryInfo);
+            UserInfoRecord R;
+            Convert(UInfo, R);
             Update << ConvertParams(St1),
-                    Poco::Data::Keywords::use(UInfo.Id),
-                    Poco::Data::Keywords::use(UInfo.name),
-                    Poco::Data::Keywords::use(UInfo.description),
-                    Poco::Data::Keywords::use(UInfo.avatar),
-                    Poco::Data::Keywords::use(UInfo.email),
-                    Poco::Data::Keywords::use(UInfo.validated),
-                    Poco::Data::Keywords::use(UInfo.validationEmail),
-                    Poco::Data::Keywords::use(UInfo.validationDate),
-                    Poco::Data::Keywords::use(UInfo.creationDate),
-                    Poco::Data::Keywords::use(UInfo.validationURI),
-                    Poco::Data::Keywords::use(UInfo.changePassword),
-                    Poco::Data::Keywords::use(UInfo.lastLogin),
-                    Poco::Data::Keywords::use(UInfo.currentLoginURI),
-                    Poco::Data::Keywords::use(UInfo.lastPasswordChange),
-                    Poco::Data::Keywords::use(UInfo.lastEmailCheck),
-                    Poco::Data::Keywords::use(UInfo.waitingForEmailCheck),
-                    Poco::Data::Keywords::use(UInfo.locale),
-                    Poco::Data::Keywords::use(Notes),
-                    Poco::Data::Keywords::use(UInfo.location),
-                    Poco::Data::Keywords::use(UInfo.owner),
-                    Poco::Data::Keywords::use(UInfo.suspended),
-                    Poco::Data::Keywords::use(UInfo.blackListed),
-                    Poco::Data::Keywords::use(UserType),
-                    Poco::Data::Keywords::use(userTypeProprietaryInfo),
-                    Poco::Data::Keywords::use(UInfo.securityPolicy),
-                    Poco::Data::Keywords::use(UInfo.securityPolicyChange),
-                    Poco::Data::Keywords::use(UInfo.currentPassword),
-                    Poco::Data::Keywords::use(OldPasswords),
-                    Poco::Data::Keywords::use(UInfo.oauthType),
-                    Poco::Data::Keywords::use(UInfo.oauthUserInfo),
+                    Poco::Data::Keywords::use(R),
                     Poco::Data::Keywords::use(UInfo.Id);
             Update.execute();
             return true;

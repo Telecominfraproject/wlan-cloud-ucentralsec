@@ -5,6 +5,9 @@
 #ifndef UCENTRALSEC_STORAGE_USERS_H
 #define UCENTRALSEC_STORAGE_USERS_H
 
+#include <string>
+#include <vector>
+
 namespace OpenWifi {
     static const std::string AllUsersFieldsForCreation{
         " Id             varchar(36) UNIQUE PRIMARY KEY,"
@@ -115,9 +118,6 @@ namespace OpenWifi {
             "completed      bigint,"
             "canceled       bigint"
     };
-
-
-
 
     typedef Poco::Tuple <
         std::string,    // Id = 0;
