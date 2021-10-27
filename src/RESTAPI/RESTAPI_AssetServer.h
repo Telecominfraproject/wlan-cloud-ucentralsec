@@ -19,7 +19,7 @@ namespace OpenWifi {
                                           Poco::Net::HTTPRequest::HTTP_DELETE,
                                           Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                           Server,
-                                          Internal) {}
+                                          Internal, false) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/wwwassets/{id}" ,
                                                                                          "/favicon.ico"}; };
         void DoGet() final;
