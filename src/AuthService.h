@@ -69,7 +69,7 @@ namespace OpenWifi{
         [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UserInfo  );
         [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
-        void Logout(const std::string &token);
+        void Logout(const std::string &token, bool EraseFromCache=true);
 
         bool ValidatePassword(const std::string &pwd);
 

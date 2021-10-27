@@ -103,7 +103,7 @@ namespace OpenWifi {
 
         for(auto i=UserCache_.begin();i!=UserCache_.end();) {
             if (i->second.userinfo.email==UserName) {
-                Logout(i->first);
+                Logout(i->first, false);
                 i = UserCache_.erase(i);
             } else {
                 ++i;
@@ -120,10 +120,11 @@ namespace OpenWifi {
         return std::regex_match(Password, PasswordValidation_);
     }
 
-    void AuthService::Logout(const std::string &token) {
+    void AuthService::Logout(const std::string &token, bool EraseFromCache) {
 		std::lock_guard		Guard(Mutex_);
 
-		UserCache_.erase(token);
+		if(EraseFromCache)
+		    UserCache_.erase(token);
 
         try {
             Poco::JSON::Object Obj;

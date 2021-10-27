@@ -1262,7 +1262,7 @@ namespace OpenWifi {
 	    RESTAPIHandler(BindingMap map, Poco::Logger &l, std::vector<std::string> Methods, RESTAPI_GenericServer & Server, bool Internal=false, bool AlwaysAuthorize=true)
 	    : Bindings_(std::move(map)), Logger_(l), Methods_(std::move(Methods)), Server_(Server), Internal_(Internal), AlwaysAuthorize_(AlwaysAuthorize) {}
 
-	    inline bool RoleIsAuthorized(std::string & Reason) {
+	    inline bool RoleIsAuthorized(const std::string & Path, const std::string & Method, std::string & Reason) {
 	        return true;
 	    }
 
@@ -1280,7 +1280,7 @@ namespace OpenWifi {
 	            }
 
 	            std::string Reason;
-	            if(!RoleIsAuthorized(Reason)) {
+	            if(!RoleIsAuthorized(RequestIn.getURI(), Request->getMethod(), Reason)) {
                     UnAuthorized(Reason);
                     return;
 	            }
@@ -3094,15 +3094,6 @@ namespace OpenWifi {
                                                   Server,
                                                   Internal) {}
                                                   static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/system"};}
-
-        bool RoleIsAuthorized(std::string & Reason) {
-	        if( UserInfo_.userinfo.userRole != SecurityObjects::USER_ROLE::ROOT &&
-	            UserInfo_.userinfo.userRole != SecurityObjects::USER_ROLE::ADMIN ) {
-	            Reason = "User must be ADMIN/ROOT to perform this operation.";
-	            return false;
-	        }
-	        return true;
-	    }
 
         inline void DoGet() {
 	        std::string Arg;
