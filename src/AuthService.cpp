@@ -141,7 +141,13 @@ namespace OpenWifi {
         }
     }
 
-    std::string AuthService::GenerateToken(const std::string & Identity, ACCESS_TYPE Type) {
+    [[nodiscard]] std::string AuthService::GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type) {
+        std::string Identity(UserName + ":" + Poco::format("%d",(int)std::time(nullptr)));
+        HMAC_.update(Identity);
+        return Poco::DigestEngine::digestToHex(HMAC_.digest());
+    }
+
+    std::string AuthService::GenerateTokenJWT(const std::string & Identity, ACCESS_TYPE Type) {
         std::lock_guard		Guard(Mutex_);
 
 		Poco::JWT::Token	T;
@@ -163,7 +169,6 @@ namespace OpenWifi {
 
 	bool AuthService::ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo  ) {
         std::lock_guard		Guard(Mutex_);
-		Poco::JWT::Token	DecryptedToken;
 
 		try {
             auto E = UserCache_.find(SessionToken);
@@ -194,9 +199,9 @@ namespace OpenWifi {
         UInfo.webtoken.expires_in_ = TokenAging_ ;
         UInfo.webtoken.idle_timeout_ = 5 * 60;
         UInfo.webtoken.token_type_ = "Bearer";
-        UInfo.webtoken.access_token_ = GenerateToken(UInfo.userinfo.Id,USERNAME);
-        UInfo.webtoken.id_token_ = GenerateToken(UInfo.userinfo.Id,USERNAME);
-        UInfo.webtoken.refresh_token_ = GenerateToken(UInfo.userinfo.Id,CUSTOM);
+        UInfo.webtoken.access_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
+        UInfo.webtoken.id_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
+        UInfo.webtoken.refresh_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,CUSTOM);
         UInfo.webtoken.created_ = time(nullptr);
         UInfo.webtoken.username_ = UserName;
         UInfo.webtoken.errorCode = 0;
@@ -274,6 +279,7 @@ namespace OpenWifi {
             UInfo.userinfo.email = DefaultUserName_;
             UInfo.userinfo.currentPassword = DefaultPassword_;
             UInfo.userinfo.name = DefaultUserName_;
+            UInfo.userinfo.userRole = SecurityObjects::ROOT;
             CreateToken(UserName, UInfo );
             return SUCCESS;
         }

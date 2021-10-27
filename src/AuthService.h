@@ -16,6 +16,8 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/JWT/Signer.h"
 #include "Poco/SHA2Engine.h"
+#include "Poco/Crypto/DigestEngine.h"
+#include "Poco/HMACEngine.h"
 
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
@@ -73,7 +75,8 @@ namespace OpenWifi{
 
         [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo);
         [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
-        [[nodiscard]] std::string GenerateToken(const std::string & UserName, ACCESS_TYPE Type);
+        [[nodiscard]] std::string GenerateTokenJWT(const std::string & UserName, ACCESS_TYPE Type);
+        [[nodiscard]] std::string GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  );
         [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
@@ -97,6 +100,25 @@ namespace OpenWifi{
 		std::regex          PasswordValidation_;
 		uint64_t            TokenAging_ = 30 * 24 * 60 * 60;
         uint64_t            HowManyOldPassword_=5;
+
+        class SHA256Engine : public Poco::Crypto::DigestEngine
+                {
+                public:
+                    enum
+                    {
+                        BLOCK_SIZE = 64,
+                        DIGEST_SIZE = 32
+                    };
+
+                    SHA256Engine()
+                    : DigestEngine("SHA256")
+                    {
+                    }
+
+                };
+
+        Poco::HMACEngine<SHA256Engine> HMAC_{"tipopenwifi"};
+
         AuthService() noexcept:
             SubSystemServer("Authentication", "AUTH-SVR", "authentication")
         {
