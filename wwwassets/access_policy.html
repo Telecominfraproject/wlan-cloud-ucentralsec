@@ -29,9 +29,38 @@
             opacity: 0.8;
         }
 
-        .imgcontainer {
+        .img-container {
+            width: 100%;
+            margin-top: 5%;
             text-align: center;
-            margin: 24px 0 12px 0;
+            display: block;
+        }
+
+        .info-card {
+            padding: 30px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            display: block;
+            width: 50%;
+            border: 1em;
+            background-color: white;
+            width: 40%;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: auto;
+            margin-top: 50px;
+            position: relative;
+        }
+        
+        .info-list {
+            width: 80%;
+            margin: auto;
+        }
+
+        .info-title {
+            padding-bottom: 20px;
+            width: 80%;
+            margin: auto;
         }
 
         img.avatar {
@@ -48,6 +77,10 @@
             padding-top: 16px;
         }
 
+        body {
+            background-color: #ebedef;
+        }
+
         /* Change styles for span and cancel button on extra small screens */
         @media screen and (max-width: 300px) {
             span.password1 {
@@ -62,13 +95,13 @@
 </head>
 <body>
 
-<div class="imgcontainer">
-    <img src="open-wifi.svg" alt="OpenWifi">
+<div class="img-container">
+    <img src="the_logo.png" alt="OpenWifi">
 </div>
 
-<div>
-    <p>Site access rules:</p>
-    <ul>
+<div class="info-card">
+    <h2 class="info-title">Site Access rules</h2>
+    <ul class="info-list">
         <li>Must be a TIP Member.</li>
     </ul>
 </div>
