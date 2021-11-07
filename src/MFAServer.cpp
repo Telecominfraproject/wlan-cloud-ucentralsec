@@ -6,6 +6,7 @@
 #include "SMSSender.h"
 #include "SMTPMailerService.h"
 #include "framework/MicroService.h"
+#include "AuthService.h"
 
 namespace OpenWifi {
 
@@ -47,7 +48,7 @@ namespace OpenWifi {
         if(Method=="email" && SMTPMailerService()->Enabled() && !UInfo.userinfo.email.empty()) {
             MessageAttributes Attrs;
             Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
-            Attrs[LOGO] = "logo.jpg";
+            Attrs[LOGO] = AuthService::GetLogoAssetURI();
             Attrs[SUBJECT] = "Login validation code";
             Attrs[CHALLENGE_CODE] = Challenge;
             return SMTPMailerService()->SendMessage(UInfo.userinfo.email, "verification_code.txt", Attrs);

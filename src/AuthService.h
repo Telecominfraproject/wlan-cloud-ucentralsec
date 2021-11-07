@@ -66,7 +66,6 @@ namespace OpenWifi{
         [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo );
         [[nodiscard]] AUTH_ERROR Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo );
         void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
-        [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UserInfo  );
         [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
         void Logout(const std::string &token, bool EraseFromCache=true);
@@ -77,7 +76,6 @@ namespace OpenWifi{
         [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
         [[nodiscard]] std::string GenerateTokenJWT(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] std::string GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type);
-        [[nodiscard]] bool ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::WebToken & UserInfo  );
         [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
@@ -86,6 +84,14 @@ namespace OpenWifi{
         [[nodiscard]] static bool SendEmailToUser(std::string &Email, EMAIL_REASON Reason);
         [[nodiscard]] bool DeleteUserFromCache(const std::string &UserName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
+
+        [[nodiscard]] static inline const std::string GetLogoAssetURI() {
+            return MicroService::instance().PublicEndPoint() + "/wwwassets/the_logo.png";
+        }
+
+        [[nodiscard]] static inline const std::string GetLogoAssetFileName() {
+            return MicroService::instance().DataDir() + "/wwwassets/the_logo.png";
+        }
 
     private:
 		static AuthService *instance_;

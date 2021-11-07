@@ -65,36 +65,41 @@ namespace OpenWifi {
         if(!Secure_)
             return true;
 
-        std::lock_guard		Guard(Mutex_);
-
-		std::string CallToken;
-
+        std::lock_guard	Guard(Mutex_);
 		try {
-			Poco::Net::OAuth20Credentials Auth(Request);
-
-			if (Auth.getScheme() == "Bearer") {
-				CallToken = Auth.getBearerToken();
-			}
-		} catch(const Poco::Exception &E) {
-		}
-
-		if(!CallToken.empty()) {
-		    if(StorageService()->IsTokenRevoked(CallToken))
-		        return false;
-		    auto Client = UserCache_.find(CallToken);
-		    if( Client == UserCache_.end() )
-		        return ValidateToken(CallToken, CallToken, UInfo);
-
-		    if((Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr)) {
-		        SessionToken = CallToken;
-		        UInfo = Client->second ;
-		        return true;
+		    std::string CallToken;
+		    Poco::Net::OAuth20Credentials Auth(Request);
+		    if (Auth.getScheme() == "Bearer") {
+		        CallToken = Auth.getBearerToken();
 		    }
-		    UserCache_.erase(CallToken);
-		    StorageService()->RevokeToken(CallToken);
-		    return false;
-		}
 
+		    if(!CallToken.empty()) {
+		        if(StorageService()->IsTokenRevoked(CallToken))
+		            return false;
+		        auto Client = UserCache_.find(CallToken);
+		        if( Client == UserCache_.end() ) {
+		            if(StorageService()->GetToken(SessionToken,UInfo)) {
+		                if(StorageService()->GetUserById(UInfo.userinfo.email,UInfo.userinfo)) {
+		                    UserCache_[UInfo.webtoken.access_token_] = UInfo;
+		                    return true;
+		                }
+		            }
+		            return false;
+		        }
+
+		        if((Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr)) {
+		            SessionToken = CallToken;
+		            UInfo = Client->second ;
+		            return true;
+		        }
+
+		        UserCache_.erase(Client);
+		        StorageService()->RevokeToken(CallToken);
+		        return false;
+		    }
+		} catch(const Poco::Exception &E) {
+		    Logger_.log(E);
+		}
 		return false;
     }
 
@@ -167,28 +172,6 @@ namespace OpenWifi {
 
 		return JWT;
     }
-
-	bool AuthService::ValidateToken(const std::string & Token, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo  ) {
-        std::lock_guard		Guard(Mutex_);
-
-		try {
-            auto E = UserCache_.find(SessionToken);
-            if(E == UserCache_.end()) {
-                if(StorageService()->GetToken(SessionToken,UInfo)) {
-                    if(StorageService()->GetUserById(UInfo.userinfo.email,UInfo.userinfo)) {
-                        UserCache_[UInfo.webtoken.access_token_] = UInfo;
-                        return true;
-                    }
-                }
-            } else {
-                UInfo = E->second;
-                return true;
-            }
-		} catch (const Poco::Exception &E ) {
-			Logger_.log(E);
-		}
-		return false;
-	}
 
     void AuthService::CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo)
     {
@@ -298,26 +281,23 @@ namespace OpenWifi {
 
         if(StorageService()->GetUserByEmail(Email,UInfo)) {
             switch (Reason) {
+
                 case FORGOT_PASSWORD: {
                         MessageAttributes Attrs;
-
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
-                        Attrs[LOGO] = "logo.jpg";
+                        Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "Password reset link";
-                        Attrs[ACTION_LINK] =
-                                MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + UInfo.Id ;
+                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + UInfo.Id ;
                         SMTPMailerService()->SendMessage(UInfo.email, "password_reset.txt", Attrs);
                     }
                     break;
 
                 case EMAIL_VERIFICATION: {
                         MessageAttributes Attrs;
-
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
-                        Attrs[LOGO] = "logo.jpg";
+                        Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "EMail Address Verification";
-                        Attrs[ACTION_LINK] =
-                                MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
+                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
                         SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
                         UInfo.waitingForEmailCheck = true;
                     }
@@ -334,7 +314,7 @@ namespace OpenWifi {
         MessageAttributes Attrs;
 
         Attrs[RECIPIENT_EMAIL] = UInfo.email;
-        Attrs[LOGO] = "logo.jpg";
+        Attrs[LOGO] = GetLogoAssetURI();
         Attrs[SUBJECT] = "EMail Address Verification";
         Attrs[ACTION_LINK] =
                 MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;

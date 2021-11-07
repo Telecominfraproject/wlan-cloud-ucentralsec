@@ -18,6 +18,7 @@
 
 #include "SMTPMailerService.h"
 #include "framework/MicroService.h"
+#include "AuthService.h"
 
 namespace OpenWifi {
 
@@ -147,7 +148,7 @@ namespace OpenWifi {
 
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
-                Poco::File  LogoFile(TemplateDir_ + "/" + Logo->second);
+                Poco::File  LogoFile(AuthService::GetLogoAssetFileName());
                 std::ifstream   IF(LogoFile.path());
                 std::ostringstream   OS;
                 Poco::StreamCopier::copyStream(IF, OS);
