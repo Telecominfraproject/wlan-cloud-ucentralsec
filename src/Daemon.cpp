@@ -47,7 +47,7 @@ namespace OpenWifi {
                                            SMSSender(),
                                            ActionLinkManager(),
                                            SMTPMailerService(),
-                                           RESTAPI_RateLimiter(),
+//                                           RESTAPI_RateLimiter(),
                                            AuthService()
                                    });
         }
