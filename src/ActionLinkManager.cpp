@@ -42,6 +42,7 @@ namespace OpenWifi {
                     break;
 
                 if(i.action==OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD) {
+                    std::cout << " actionmgr - ID=" << i.id << std::endl;
                     if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::FORGOT_PASSWORD)) {
                         Logger_.information(Poco::format("Send password reset link to %s",i.userId));
                     }
