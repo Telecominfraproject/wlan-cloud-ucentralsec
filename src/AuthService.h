@@ -50,14 +50,14 @@ namespace OpenWifi{
             EMAIL_VERIFICATION
         };
 
+        inline static std::map<int,std::string> EMailReasons{ {FORGOT_PASSWORD, "forgot_password"} , { EMAIL_VERIFICATION, "email_verification"}};
+
         static ACCESS_TYPE IntToAccessType(int C);
         static int AccessTypeToInt(ACCESS_TYPE T);
 
         static AuthService *instance() {
-            if (instance_ == nullptr) {
-                instance_ = new AuthService;
-            }
-            return instance_;
+            static AuthService instance;
+            return &instance;
         }
 
         int Start() override;
@@ -76,12 +76,15 @@ namespace OpenWifi{
         [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
         [[nodiscard]] std::string GenerateTokenJWT(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] std::string GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type);
-        [[nodiscard]] std::string ComputePasswordHash(const std::string &UserName, const std::string &Password);
+
+        [[nodiscard]] std::string ComputeNewPasswordHash(const std::string &UserName, const std::string &Password);
+        [[nodiscard]] bool ValidatePasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword);
+
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
 
         [[nodiscard]] static bool VerifyEmail(SecurityObjects::UserInfo &UInfo);
-        [[nodiscard]] static bool SendEmailToUser(std::string &Email, EMAIL_REASON Reason);
+        [[nodiscard]] static bool SendEmailToUser(std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
         [[nodiscard]] bool DeleteUserFromCache(const std::string &UserName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
 
@@ -94,7 +97,6 @@ namespace OpenWifi{
         }
 
     private:
-		static AuthService *instance_;
 		bool    			Secure_ = false ;
 		std::string     	DefaultUserName_;
 		std::string			DefaultPassword_;

@@ -22,8 +22,6 @@
 
 namespace OpenWifi {
 
-    class SMTPMailerService * SMTPMailerService::instance_ = nullptr;
-
     void SMTPMailerService::LoadMyConfig() {
         MailHost_ = MicroService::instance().ConfigGetString("mailer.hostname");
         SenderLoginUserName_ = MicroService::instance().ConfigGetString("mailer.username");

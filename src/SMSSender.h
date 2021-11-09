@@ -25,10 +25,8 @@ namespace OpenWifi {
     class SMSSender : public SubSystemServer {
         public:
             static SMSSender *instance() {
-                if (instance_ == nullptr) {
-                    instance_ = new SMSSender;
-                }
-                return instance_;
+                static SMSSender instance;
+                return &instance;
             }
 
             int  Start() final;
@@ -39,7 +37,6 @@ namespace OpenWifi {
             bool IsNumberValid(const std::string &Number, const std::string &UserName);
             [[nodiscard]] bool Send(const std::string &PhoneNumber, const std::string &Message);
         private:
-            static SMSSender * instance_;
             std::string         Provider_;
             bool                Enabled_=false;
             std::vector<SMSValidationCacheEntry>    Cache_;

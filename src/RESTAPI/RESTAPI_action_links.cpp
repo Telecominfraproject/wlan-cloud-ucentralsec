@@ -11,15 +11,20 @@
 #include "Daemon.h"
 
 namespace OpenWifi {
+
     void RESTAPI_action_links::DoGet() {
 
         auto Action = GetParameter("action","");
         auto Id = GetParameter("id","");
 
+        SecurityObjects::ActionLink Link;
+        if(!Storage().GetActionLink(Id,Link))
+            return DoReturnA404();
+
         if(Action=="password_reset")
-            return RequestResetPassword(Id);
+            return RequestResetPassword(Link);
         else if(Action=="email_verification")
-            return DoEmailVerification(Id);
+            return DoEmailVerification(Link);
         else
             return DoReturnA404();
     }
@@ -28,29 +33,37 @@ namespace OpenWifi {
         auto Action = GetParameter("action","");
         auto Id = GetParameter("id","");
 
-        Logger_.information(Poco::format("COMPLETE-PASSWORD-RESET(%s): For ID=%s", Request->clientAddress().toString(), Id));
+        SecurityObjects::ActionLink Link;
+        if(!Storage().GetActionLink(Id,Link))
+            return DoReturnA404();
+
+        Logger_.information(Poco::format("COMPLETE-PASSWORD-RESET(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
         if(Action=="password_reset")
-            CompleteResetPassword(Id);
+            return CompleteResetPassword(Link);
         else
-            DoReturnA404();
+            return DoReturnA404();
     }
 
-    void RESTAPI_action_links::RequestResetPassword(std::string &Id) {
-        Logger_.information(Poco::format("REQUEST-PASSWORD-RESET(%s): For ID=%s", Request->clientAddress().toString(), Id));
+    void RESTAPI_action_links::RequestResetPassword(SecurityObjects::ActionLink &Link) {
+        Logger_.information(Poco::format("REQUEST-PASSWORD-RESET(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
         Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset.html"};
-        Types::StringPairVec    FormVars{ {"UUID", Id},
+        Types::StringPairVec    FormVars{ {"UUID", Link.id},
                                           {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
         SendHTMLFileBack(FormFile,FormVars);
     }
 
-    void RESTAPI_action_links::CompleteResetPassword(std::string &Id) {
+    void RESTAPI_action_links::CompleteResetPassword(SecurityObjects::ActionLink &Link) {
         //  form has been posted...
         RESTAPI_PartHandler PartHandler;
         Poco::Net::HTMLForm Form(*Request, Request->stream(), PartHandler);
         if (!Form.empty()) {
             auto Password1 = Form.get("password1","bla");
             auto Password2 = Form.get("password1","blu");
-            Id = Form.get("id","");
+            auto Id = Form.get("id","");
+
+            if(Id!=Link.id)
+                return DoReturnA404();
+
             if(Password1!=Password2 || !AuthService()->ValidatePassword(Password2) || !AuthService()->ValidatePassword(Password1)) {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
@@ -62,7 +75,7 @@ namespace OpenWifi {
             }
 
             SecurityObjects::UserInfo   UInfo;
-            if(!StorageService()->GetUserById(Id,UInfo)) {
+            if(!StorageService()->GetUserByEmail(Link.userId,UInfo)) {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
@@ -93,12 +106,12 @@ namespace OpenWifi {
         }
     }
 
-    void RESTAPI_action_links::DoEmailVerification(std::string &Id) {
+    void RESTAPI_action_links::DoEmailVerification(SecurityObjects::ActionLink &Link) {
         SecurityObjects::UserInfo UInfo;
 
-        Logger_.information(Poco::format("EMAIL-VERIFICATION(%s): For ID=%s", Request->clientAddress().toString(), Id));
-        if (!StorageService()->GetUserById(Id, UInfo)) {
-            Types::StringPairVec FormVars{{"UUID",       Id},
+        Logger_.information(Poco::format("EMAIL-VERIFICATION(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
+        if (!StorageService()->GetUserByEmail(Link.userId, UInfo)) {
+            Types::StringPairVec FormVars{{"UUID",       Link.id},
                                           {"ERROR_TEXT", "This does not appear to be a valid email verification link.."}};
             Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_error.html"};
             return SendHTMLFileBack(FormFile, FormVars);
@@ -108,8 +121,8 @@ namespace OpenWifi {
         UInfo.validated = true;
         UInfo.lastEmailCheck = std::time(nullptr);
         UInfo.validationDate = std::time(nullptr);
-        StorageService()->UpdateUserInfo(UInfo.email, Id, UInfo);
-        Types::StringPairVec FormVars{{"UUID",     Id},
+        StorageService()->UpdateUserInfo(UInfo.email, Link.userId, UInfo);
+        Types::StringPairVec FormVars{{"UUID",     Link.id},
                                       {"USERNAME", UInfo.email},
                                       {"ACTION_LINK",MicroService::instance().GetUIURI()}};
         Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_success.html"};

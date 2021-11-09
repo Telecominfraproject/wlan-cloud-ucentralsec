@@ -1,5 +1,6 @@
 
-#include "../StorageService.h"
+#include "StorageService.h"
+#include "storage/storage_tokens.h"
 
 namespace OpenWifi {
 
@@ -22,7 +23,7 @@ namespace OpenWifi {
             uint64_t Z = 0;
 
             std::string St2{
-                "INSERT INTO Tokens (Token, RefreshToken, TokenType, Username, Created, Expires, IdleTimeOut, RevocationDate) VALUES(?,?,?,?,?,?,?,?)"};
+                "INSERT INTO Tokens (" + AllTokensFieldsForSelect + ") VALUES(" + AllTokensValuesForSelect + ")"};
 
             Insert << ConvertParams(St2),
                 Poco::Data::Keywords::use(Token),
@@ -49,7 +50,7 @@ namespace OpenWifi {
 
             uint32_t RevocationDate = 0 ;
 
-            std::string St2{"SELECT Token, RefreshToken, TokenType, Username, Created, Expires, IdleTimeOut, RevocationDate From Tokens WHERE Token=?"};
+            std::string St2{"SELECT " + AllTokensValuesForSelect + " From Tokens WHERE Token=?"};
             Select << ConvertParams(St2),
                 Poco::Data::Keywords::into(UInfo.webtoken.access_token_),
                 Poco::Data::Keywords::into(UInfo.webtoken.refresh_token_),

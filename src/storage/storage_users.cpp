@@ -111,7 +111,7 @@ namespace OpenWifi {
             if(NewUser.currentPassword.empty()) {
 
             } else {
-                NewUser.currentPassword = AuthService()->ComputePasswordHash(NewUser.email,NewUser.currentPassword);
+                NewUser.currentPassword = AuthService()->ComputeNewPasswordHash(NewUser.email,NewUser.currentPassword);
                 NewUser.lastPasswords.clear();
                 NewUser.lastPasswords.push_back(NewUser.currentPassword);
                 NewUser.lastPasswordChange = std::time(nullptr);

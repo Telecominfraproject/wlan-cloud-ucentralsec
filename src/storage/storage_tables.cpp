@@ -5,6 +5,8 @@
 #include "StorageService.h"
 #include "storage_users.h"
 #include "storage_avatar.h"
+#include "storage_actionLinks.h"
+#include "storage_tokens.h"
 
 namespace OpenWifi {
 
@@ -12,6 +14,7 @@ namespace OpenWifi {
         Create_UserTable();
         Create_AvatarTable();
         Create_TokensTable();
+        Create_ActionLinkTable();
         return 0;
     }
 
@@ -40,83 +43,51 @@ namespace OpenWifi {
         return 1;
     }
 
+    int Storage::Create_ActionLinkTable() {
+        try {
+            Poco::Data::Session Sess = Pool_->get();
+
+            Sess << "CREATE TABLE IF NOT EXISTS ActionLinks ( "
+                    + AllActionLinksFieldsForCreation + " ) ",
+            Poco::Data::Keywords::now;
+            return 0;
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        return 1;
+    }
+
     int Storage::Create_AvatarTable() {
             try {
                 Poco::Data::Session Sess = Pool_->get();
 
                 if(dbType_==sqlite) {
-                    Sess << "CREATE TABLE IF NOT EXISTS Avatars ("
-                            "Id			    VARCHAR(36) PRIMARY KEY, "
-                            "Type			VARCHAR, "
-                            "Created 		BIGINT, "
-                            "Name           VARCHAR, "
-                            "Avatar     	BLOB"
+                    Sess << "CREATE TABLE IF NOT EXISTS Avatars (" + AllAvatarFieldsForCreation_sqlite +
                             ") ", Poco::Data::Keywords::now;
                 } else if(dbType_==mysql) {
-                    Sess << "CREATE TABLE IF NOT EXISTS Avatars ("
-                            "Id			    VARCHAR(36) PRIMARY KEY, "
-                            "Type			VARCHAR, "
-                            "Created 		BIGINT, "
-                            "Name           VARCHAR, "
-                            "Avatar     	LONGBLOB"
+                    Sess << "CREATE TABLE IF NOT EXISTS Avatars (" + AllAvatarFieldsForCreation_mysql +
                             ") ", Poco::Data::Keywords::now;
                 } else if(dbType_==pgsql) {
-                    Sess << "CREATE TABLE IF NOT EXISTS Avatars ("
-                            "Id			    VARCHAR(36) PRIMARY KEY, "
-                            "Type			VARCHAR, "
-                            "Created 		BIGINT, "
-                            "Name           VARCHAR, "
-                            "Avatar     	BYTEA"
+                    Sess << "CREATE TABLE IF NOT EXISTS Avatars (" + AllAvatarFieldsForCreation_pgsql +
                             ") ", Poco::Data::Keywords::now;
                 }
                 return 0;
             } catch(const Poco::Exception &E) {
                 Logger_.log(E);
             }
-            return 0;
+            return 1;
         }
 
         int Storage::Create_TokensTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
-            if(dbType_==sqlite) {
-                Sess << "CREATE TABLE IF NOT EXISTS Tokens ("
-                        "Token			    TEXT PRIMARY KEY, "
-                        "RefreshToken       TEXT, "
-                        "TokenType          TEXT, "
-                        "UserName           TEXT, "
-                        "Created 		    BIGINT, "
-                        "Expires 		    BIGINT, "
-                        "IdleTimeOut        BIGINT, "
-                        "RevocationDate 	BIGINT "
+                Sess << "CREATE TABLE IF NOT EXISTS Tokens (" +
+                            AllUsersFieldsForCreation +
                         ") ", Poco::Data::Keywords::now;
-            } else if(dbType_==mysql) {
-                Sess << "CREATE TABLE IF NOT EXISTS Tokens ("
-                        "Token			    TEXT PRIMARY KEY, "
-                        "RefreshToken       TEXT, "
-                        "TokenType          TEXT, "
-                        "UserName           TEXT, "
-                        "Created 		    BIGINT, "
-                        "Expires 		    BIGINT, "
-                        "IdleTimeOut        BIGINT, "
-                        "RevocationDate 	BIGINT "
-                        ") ", Poco::Data::Keywords::now;
-            } else if(dbType_==pgsql) {
-                Sess << "CREATE TABLE IF NOT EXISTS Tokens ("
-                        "Token			    TEXT PRIMARY KEY, "
-                        "RefreshToken       TEXT, "
-                        "TokenType          TEXT, "
-                        "UserName           TEXT, "
-                        "Created 		    BIGINT, "
-                        "Expires 		    BIGINT, "
-                        "IdleTimeOut        BIGINT, "
-                        "RevocationDate 	BIGINT "
-                        ") ", Poco::Data::Keywords::now;
-            }
             return 0;
         } catch(const Poco::Exception &E) {
             Logger_.log(E);
         }
-        return 0;
+        return 1;
     }
 }

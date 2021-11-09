@@ -16,11 +16,14 @@ namespace OpenWifi {
             Poco::JSON::Array ArrayObj;
             Poco::JSON::Object Answer;
             if (StorageService()->GetUsers(QB_.Offset, QB_.Limit, Users)) {
-                for (const auto &i : Users) {
+                for (auto &i : Users) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
                         ArrayObj.add(i.Id);
                     } else {
+                        i.currentPassword.clear();
+                        i.lastPasswords.clear();
+                        i.oauthType.clear();
                         i.to_json(Obj);
                         ArrayObj.add(Obj);
                     }
@@ -38,6 +41,9 @@ namespace OpenWifi {
                     if (IdOnly) {
                         ArrayObj.add(UInfo.Id);
                     } else {
+                        UInfo.currentPassword.clear();
+                        UInfo.lastPasswords.clear();
+                        UInfo.oauthType.clear();
                         UInfo.to_json(Obj);
                         ArrayObj.add(Obj);
                     }

@@ -30,6 +30,7 @@
 #include "SMTPMailerService.h"
 #include "AuthService.h"
 #include "SMSSender.h"
+#include "ActionLinkManager.h"
 
 namespace OpenWifi {
     class Daemon *Daemon::instance_ = nullptr;
@@ -44,7 +45,9 @@ namespace OpenWifi {
                                    SubSystemVec{
                                            StorageService(),
                                            SMSSender(),
+                                           ActionLinkManager(),
                                            SMTPMailerService(),
+                                           RESTAPI_RateLimiter(),
                                            AuthService()
                                    });
         }

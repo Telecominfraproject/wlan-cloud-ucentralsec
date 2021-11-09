@@ -11,6 +11,7 @@
 #include "Poco/Net/OAuth20Credentials.h"
 #include "Poco/JWT/Token.h"
 #include "Poco/JWT/Signer.h"
+#include "Poco/StringTokenizer.h"
 
 #include "framework/MicroService.h"
 #include "StorageService.h"
@@ -21,7 +22,6 @@
 #include "MFAServer.h"
 
 namespace OpenWifi {
-    class AuthService *AuthService::instance_ = nullptr;
 
     AuthService::ACCESS_TYPE AuthService::IntToAccessType(int C) {
 		switch (C) {
@@ -198,19 +198,66 @@ namespace OpenWifi {
     }
 
     bool AuthService::SetPassword(const std::string &NewPassword, SecurityObjects::UserInfo & UInfo) {
-        auto NewPasswordHash = ComputePasswordHash(UInfo.email, NewPassword);
-        for (auto const &i:UInfo.lastPasswords) {
-            if (i == NewPasswordHash) {
-                return false;
+        std::lock_guard     G(Mutex_);
+
+        Poco::toLowerInPlace(UInfo.email);
+        for (const auto &i:UInfo.lastPasswords) {
+            auto Tokens = Poco::StringTokenizer(i,"|");
+            if(Tokens.count()==2) {
+                const auto & Salt = Tokens[0];
+                for(const auto &j:UInfo.lastPasswords) {
+                    auto OldTokens = Poco::StringTokenizer(j,"|");
+                    if(OldTokens.count()==2) {
+                        SHA2_.update(Salt+NewPassword+UInfo.email);
+                        if(OldTokens[1]==Utils::ToHex(SHA2_.digest()))
+                            return false;
+                    }
+                }
+            } else {
+                SHA2_.update(NewPassword+UInfo.email);
+                if(Tokens[0]==Utils::ToHex(SHA2_.digest()))
+                    return false;
             }
         }
+
         if(UInfo.lastPasswords.size()==HowManyOldPassword_) {
             UInfo.lastPasswords.erase(UInfo.lastPasswords.begin());
         }
-        UInfo.lastPasswords.push_back(NewPasswordHash);
-        UInfo.currentPassword = NewPasswordHash;
+
+        auto NewHash = ComputeNewPasswordHash(UInfo.email,NewPassword);
+        UInfo.lastPasswords.push_back(NewHash);
+        UInfo.currentPassword = NewHash;
         UInfo.changePassword = false;
         return true;
+    }
+
+    static std::string GetMeSomeSalt() {
+        auto start = std::chrono::high_resolution_clock::now();
+        return std::to_string(start.time_since_epoch().count());
+    }
+
+    std::string AuthService::ComputeNewPasswordHash(const std::string &UserName, const std::string &Password) {
+        std::string UName = Poco::trim(Poco::toLower(UserName));
+        auto Salt = GetMeSomeSalt();
+        SHA2_.update(Salt + Password + UName );
+        return Salt + "|" + Utils::ToHex(SHA2_.digest());
+    }
+
+    bool AuthService::ValidatePasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword) {
+        std::lock_guard G(Mutex_);
+
+        std::string UName = Poco::trim(Poco::toLower(UserName));
+        auto Tokens = Poco::StringTokenizer(StoredPassword,"|");
+        if(Tokens.count()==1) {
+            SHA2_.update(Password+UName);
+            if(Tokens[0]==Utils::ToHex(SHA2_.digest()))
+                return true;
+        } else if (Tokens.count()==2) {
+            SHA2_.update(Tokens[0]+Password+UName);
+            if(Tokens[1]==Utils::ToHex(SHA2_.digest()))
+                return true;
+        }
+        return false;
     }
 
     AuthService::AUTH_ERROR AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
@@ -219,14 +266,13 @@ namespace OpenWifi {
         SecurityObjects::AclTemplate	ACL;
 
         Poco::toLowerInPlace(UserName);
-        auto PasswordHash = ComputePasswordHash(UserName, Password);
 
         if(StorageService()->GetUserByEmail(UserName,UInfo.userinfo)) {
             if(UInfo.userinfo.waitingForEmailCheck) {
                 return USERNAME_PENDING_VERIFICATION;
             }
 
-            if(PasswordHash != UInfo.userinfo.currentPassword) {
+            if(!ValidatePasswordHash(UserName,Password,UInfo.userinfo.currentPassword)) {
                 return INVALID_CREDENTIALS;
             }
 
@@ -256,7 +302,7 @@ namespace OpenWifi {
             return SUCCESS;
         }
 
-        if(((UserName == DefaultUserName_) && (DefaultPassword_== ComputePasswordHash(UserName,Password))) || !Secure_)
+        if(((UserName == DefaultUserName_) && (ValidatePasswordHash(UserName,Password,DefaultPassword_))) || !Secure_)
         {
             ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
             UInfo.webtoken.acl_template_ = ACL;
@@ -270,13 +316,7 @@ namespace OpenWifi {
         return INVALID_CREDENTIALS;
     }
 
-    std::string AuthService::ComputePasswordHash(const std::string &UserName, const std::string &Password) {
-        std::string UName = Poco::trim(Poco::toLower(UserName));
-        SHA2_.update(Password + UName);
-        return Utils::ToHex(SHA2_.digest());
-    }
-
-    bool AuthService::SendEmailToUser(std::string &Email, EMAIL_REASON Reason) {
+    bool AuthService::SendEmailToUser(std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
 
         if(StorageService()->GetUserByEmail(Email,UInfo)) {
@@ -287,7 +327,7 @@ namespace OpenWifi {
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "Password reset link";
-                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + UInfo.Id ;
+                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
                         SMTPMailerService()->SendMessage(UInfo.email, "password_reset.txt", Attrs);
                     }
                     break;
@@ -297,7 +337,7 @@ namespace OpenWifi {
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "EMail Address Verification";
-                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
+                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
                         SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
                         UInfo.waitingForEmailCheck = true;
                     }
@@ -306,19 +346,20 @@ namespace OpenWifi {
                 default:
                     break;
             }
+            return true;
         }
         return false;
     }
 
     bool AuthService::VerifyEmail(SecurityObjects::UserInfo &UInfo) {
-        MessageAttributes Attrs;
+        SecurityObjects::ActionLink A;
 
-        Attrs[RECIPIENT_EMAIL] = UInfo.email;
-        Attrs[LOGO] = GetLogoAssetURI();
-        Attrs[SUBJECT] = "EMail Address Verification";
-        Attrs[ACTION_LINK] =
-                MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + UInfo.Id ;
-        SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
+        A.action = EMailReasons[EMAIL_VERIFICATION];
+        A.userId = UInfo.email;
+        A.id = MicroService::instance().CreateUUID();
+        A.created = std::time(nullptr);
+        A.expires = A.created + 24*60*60;
+        Storage().CreateAction(A);
         UInfo.waitingForEmailCheck = true;
         return true;
     }

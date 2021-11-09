@@ -24,24 +24,21 @@ namespace OpenWifi {
         int Start() override;
         void Stop() override;
         static MFAServer *instance() {
-            if (instance_ == nullptr) {
-                instance_ = new MFAServer;
-            }
-            return instance_;
+            static MFAServer instance;
+            return &instance;
         }
 
         bool StartMFAChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, Poco::JSON::Object &Challenge);
         bool CompleteMFAChallenge(Poco::JSON::Object::Ptr &ChallengeResponse, SecurityObjects::UserInfoAndPolicy &UInfo);
-        bool MethodEnabled(const std::string &Method);
+        static bool MethodEnabled(const std::string &Method);
         bool ResendCode(const std::string &uuid);
-        bool SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge);
+        static bool SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge);
 
         static inline std::string MakeChallenge() {
             return std::to_string(rand() % 999999);
         }
 
     private:
-        static MFAServer *  instance_;
         MFAChallengeCache   Cache_;
         MFAServer() noexcept:
             SubSystemServer("MFServer", "MFA-SVR", "mfa")

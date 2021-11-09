@@ -10,8 +10,6 @@
 
 namespace OpenWifi {
 
-    class MFAServer * MFAServer::instance_ = nullptr;
-
     int MFAServer::Start() {
         return 0;
     }

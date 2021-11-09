@@ -14,7 +14,6 @@
 #include "framework/MicroService.h"
 
 namespace OpenWifi {
-    class SMSSender * SMSSender::instance_ = nullptr;
 
     int SMSSender::Start() {
         Provider_ = MicroService::instance().ConfigGetString("sms.provider","aws");

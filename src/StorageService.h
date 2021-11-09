@@ -15,34 +15,6 @@
 
 namespace OpenWifi {
 
-    static const std::string AllActionLinksFieldsForSelect {
-            "Id, "
-            "Action,"
-            "UserId,"
-            "template,"
-            "locale,"
-            "message,"
-            "sent,"
-            "created,"
-            "expires,"
-            "completed,"
-            "canceled"
-    };
-
-    static const std::string AllActionLinksFieldsForUpdate {
-            "Id=?, "
-            "Action=?,"
-            "UserId=?,"
-            "template=?,"
-            "locale=?,"
-            "message=?,"
-            "sent=?,"
-            "created=?,"
-            "expires=?,"
-            "completed=?,"
-            "canceled=?"
-    };
-
     static const std::string AllEmailTemplatesFieldsForCreation {
 
     };
@@ -90,7 +62,7 @@ namespace OpenWifi {
             return UNKNOWN;
         }
 
-        static const std::string from_userType(USER_TYPE U) {
+        static std::string from_userType(USER_TYPE U) {
             switch(U) {
                 case ROOT: return "root";
                 case ADMIN: return "admin";
@@ -104,10 +76,8 @@ namespace OpenWifi {
         }
 
         static Storage *instance() {
-            if (instance_ == nullptr) {
-                instance_ = new Storage;
-            }
-            return instance_;
+            static Storage instance;
+            return &instance;
         }
 
         int 	Start() override;
@@ -143,18 +113,20 @@ namespace OpenWifi {
         /*
          *  All ActionLinks functions
          */
-        bool CreateAction(std::string &ActionId, std::string &Action, USER_ID_TYPE & Id, Types::StringPairVec & Elements );
+        bool CreateAction( SecurityObjects::ActionLink & A);
         bool DeleteAction(std::string &ActionId);
         bool CompleteAction(std::string &ActionId);
         bool CancelAction(std::string &ActionId);
+        bool SentAction(std::string &ActionId);
+        bool GetActionLink(std::string &ActionId, SecurityObjects::ActionLink &A);
+        bool GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max=200);
 
 	  private:
-		static Storage      							*instance_;
-
         int Create_Tables();
         int Create_UserTable();
         int Create_AvatarTable();
         int Create_TokensTable();
+        int Create_ActionLinkTable();
    };
 
     inline Storage * StorageService() { return Storage::instance(); };

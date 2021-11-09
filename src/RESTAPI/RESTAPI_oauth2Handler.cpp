@@ -14,6 +14,7 @@
 #include "MFAServer.h"
 #include "framework/RESTAPI_protocol.h"
 #include "framework/MicroService.h"
+#include "StorageService.h"
 
 namespace OpenWifi {
 	void RESTAPI_oauth2Handler::DoGet() {
@@ -65,11 +66,18 @@ namespace OpenWifi {
         if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
             //  Send an email to the userId
             Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
-            SecurityObjects::UserInfoAndPolicy UInfo;
-            if(AuthService::SendEmailToUser(userId,AuthService::FORGOT_PASSWORD))
-                Logger_.information(Poco::format("Send password reset link to %s",userId));
-            UInfo.webtoken.userMustChangePassword=true;
+            SecurityObjects::ActionLink NewLink;
+
+            NewLink.action = AuthService::EMailReasons[AuthService::FORGOT_PASSWORD];
+            NewLink.id = MicroService::instance().CreateUUID();
+            NewLink.userId = userId;
+            NewLink.created = std::time(nullptr);
+            NewLink.expires = NewLink.created + (24*60*60);
+            Storage().CreateAction(NewLink);
+
             Poco::JSON::Object ReturnObj;
+            SecurityObjects::UserInfoAndPolicy UInfo;
+            UInfo.webtoken.userMustChangePassword = true;
             UInfo.webtoken.to_json(ReturnObj);
             return ReturnObject(ReturnObj);
         }

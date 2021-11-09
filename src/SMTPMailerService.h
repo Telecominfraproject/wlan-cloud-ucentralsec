@@ -59,10 +59,8 @@ namespace OpenWifi {
     class SMTPMailerService : public SubSystemServer, Poco::Runnable {
         public:
            static SMTPMailerService *instance() {
-                if (instance_ == nullptr) {
-                    instance_ = new SMTPMailerService;
-                }
-                return instance_;
+               static SMTPMailerService     instance;
+               return & instance;
             }
 
             struct MessageEvent {
@@ -88,7 +86,6 @@ namespace OpenWifi {
             void reinitialize(Poco::Util::Application &self) override;
             bool Enabled() const { return Enabled_; }
         private:
-            static SMTPMailerService * instance_;
             std::string             MailHost_;
             std::string             Sender_;
             int                     MailHostPort_=25;

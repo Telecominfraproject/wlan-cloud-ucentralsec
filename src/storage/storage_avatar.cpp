@@ -35,8 +35,7 @@ namespace OpenWifi {
 
             uint64_t Now = std::time(nullptr);
 
-            std::string St2{
-                    "INSERT INTO Avatars (Id,Type,Created,Name,Avatar) VALUES(?,?,?,?,?)"};
+            std::string St2{"INSERT INTO Avatars (" + AllAvatarFieldsForSelect + ") VALUES( " + AllAvatarValuesForSelect + " )"};
 
             Insert << ConvertParams(St2),
                     Poco::Data::Keywords::use(Id),
@@ -58,13 +57,19 @@ namespace OpenWifi {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Select(Sess);
 
-            std::string St2{"SELECT Avatar, Type, Name FROM Avatars WHERE Id=?"};
+            std::string St2{"SELECT " + AllAvatarFieldsForSelect + " FROM Avatars WHERE Id=?"};
 
             Poco::Data::Statement Select2(Sess);
+
+            std::string TId;
+            uint64_t    Created;
+
             Select2 << ConvertParams(St2),
-                    Poco::Data::Keywords::into(L),
+                    Poco::Data::Keywords::into(TId),
                     Poco::Data::Keywords::into(Type),
+                    Poco::Data::Keywords::into(Created),
                     Poco::Data::Keywords::into(Name),
+                    Poco::Data::Keywords::into(L),
                     Poco::Data::Keywords::use(Id);
             Select2.execute();
 

@@ -105,20 +105,6 @@ namespace OpenWifi {
             "oauthType=?, "
             "oauthUserInfo=? "};
 
-    static const std::string AllActionLinksFieldsForCreation{
-            "Id          varchar(36),"
-            "Action         varchar,"
-            "UserId         varchar,"
-            "template       varchar,"
-            "locale         varchar,"
-            "message        text,"
-            "sent           bigint,"
-            "created        bigint,"
-            "expires        bigint,"
-            "completed      bigint,"
-            "canceled       bigint"
-    };
-
     typedef Poco::Tuple <
         std::string,    // Id = 0;
         std::string,    // name;
