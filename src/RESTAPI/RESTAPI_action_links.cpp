@@ -31,15 +31,9 @@ namespace OpenWifi {
 
     void RESTAPI_action_links::DoPost() {
         auto Action = GetParameter("action","");
-        auto Id = GetParameter("id","");
 
-        SecurityObjects::ActionLink Link;
-        if(!StorageService()->GetActionLink(Id,Link))
-            return DoReturnA404();
-
-        Logger_.information(Poco::format("COMPLETE-PASSWORD-RESET(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
         if(Action=="password_reset")
-            return CompleteResetPassword(Link);
+            return CompleteResetPassword();
         else
             return DoReturnA404();
     }
@@ -52,16 +46,18 @@ namespace OpenWifi {
         SendHTMLFileBack(FormFile,FormVars);
     }
 
-    void RESTAPI_action_links::CompleteResetPassword(SecurityObjects::ActionLink &Link) {
+    void RESTAPI_action_links::CompleteResetPassword() {
         //  form has been posted...
         RESTAPI_PartHandler PartHandler;
         Poco::Net::HTMLForm Form(*Request, Request->stream(), PartHandler);
         if (!Form.empty()) {
+
             auto Password1 = Form.get("password1","bla");
             auto Password2 = Form.get("password1","blu");
             auto Id = Form.get("id","");
 
-            if(Id!=Link.id)
+            SecurityObjects::ActionLink Link;
+            if(!StorageService()->GetActionLink(Id,Link))
                 return DoReturnA404();
 
             if(Password1!=Password2 || !AuthService()->ValidatePassword(Password2) || !AuthService()->ValidatePassword(Password1)) {
