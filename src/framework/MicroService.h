@@ -1764,10 +1764,10 @@ namespace OpenWifi {
                                      const Types::StringPairVec & FormVars) {
 	        Response->set("Pragma", "private");
 	        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
-	        Response->set("Content-Length", std::to_string(File.getSize()));
-	        AddCORS();
-	        auto FormContent = Utils::LoadFile(File.path());
+	        std::string FormContent = Utils::LoadFile(File.path());
 	        Utils::ReplaceVariables(FormContent, FormVars);
+	        Response->set("Content-Length", std::to_string(FormContent.size()));
+	        AddCORS();
 	        Response->setChunkedTransferEncoding(true);
 	        Response->setContentType("text/html");
 	        std::ostream& ostr = Response->send();
