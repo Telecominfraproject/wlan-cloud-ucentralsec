@@ -354,7 +354,7 @@ namespace OpenWifi {
     bool AuthService::VerifyEmail(SecurityObjects::UserInfo &UInfo) {
         SecurityObjects::ActionLink A;
 
-        A.action = EMailReasons[EMAIL_VERIFICATION];
+        A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
         A.userId = UInfo.email;
         A.id = MicroService::instance().CreateUUID();
         A.created = std::time(nullptr);

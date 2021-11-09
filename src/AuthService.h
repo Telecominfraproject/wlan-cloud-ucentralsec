@@ -50,8 +50,6 @@ namespace OpenWifi{
             EMAIL_VERIFICATION
         };
 
-        inline static std::map<int,std::string> EMailReasons{ {FORGOT_PASSWORD, "forgot_password"} , { EMAIL_VERIFICATION, "email_verification"}};
-
         static ACCESS_TYPE IntToAccessType(int C);
         static int AccessTypeToInt(ACCESS_TYPE T);
 

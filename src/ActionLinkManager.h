@@ -11,6 +11,12 @@ namespace OpenWifi {
 
     class ActionLinkManager : public SubSystemServer, Poco::Runnable {
     public:
+
+        enum Actions {
+            FORGOT_PASSWORD,
+            VERIFY_EMAIL
+        };
+
         static ActionLinkManager * instance() {
             static ActionLinkManager instance;
             return &instance;

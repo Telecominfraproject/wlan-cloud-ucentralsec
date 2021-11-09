@@ -11,8 +11,8 @@
 
 namespace OpenWifi {
     static const std::string AllActionLinksFieldsForCreation{
-        "Id          varchar(36),"
-        "Action         text,"
+        "Id             varchar(36),"
+        "Action         bigint,"
         "UserId         text,"
         "template       text,"
         "variables      text,"
@@ -59,7 +59,7 @@ namespace OpenWifi {
 
     typedef Poco::Tuple <
                 std::string,    // id
-                std::string,    // action
+                uint64_t,       // action
                 std::string,    // userId
                 std::string,    // actionTemplate
                 std::string,    // variables

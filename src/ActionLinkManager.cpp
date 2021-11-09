@@ -41,12 +41,12 @@ namespace OpenWifi {
                 if(!Running_)
                     break;
 
-                if(i.action=="forgot_password") {
+                if(i.action==OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD) {
                     if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::FORGOT_PASSWORD)) {
                         Logger_.information(Poco::format("Send password reset link to %s",i.userId));
                     }
                     StorageService()->SentAction(i.id);
-                } else if (i.action=="email_verification") {
+                } else if (i.action==OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) {
                     if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::EMAIL_VERIFICATION)) {
                         Logger_.information(Poco::format("Send password reset link to %s",i.userId));
                     }

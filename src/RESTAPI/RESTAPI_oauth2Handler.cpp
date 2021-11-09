@@ -68,7 +68,7 @@ namespace OpenWifi {
             Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
             SecurityObjects::ActionLink NewLink;
 
-            NewLink.action = AuthService::EMailReasons[AuthService::FORGOT_PASSWORD];
+            NewLink.action = OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD;
             NewLink.id = MicroService::instance().CreateUUID();
             NewLink.userId = userId;
             NewLink.created = std::time(nullptr);
