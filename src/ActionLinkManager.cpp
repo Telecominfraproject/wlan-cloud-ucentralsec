@@ -10,7 +10,6 @@ namespace OpenWifi {
     int ActionLinkManager::Start() {
         if(!Running_)
             Thr_.start(*this);
-
         return 0;
     }
 
@@ -26,24 +25,30 @@ namespace OpenWifi {
         Running_ = true ;
 
         while(Running_) {
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Poco::Thread::trySleep(2000);
-
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             if(!Running_)
                 break;
-
+std::cout << __func__ << ":" << __LINE__ << std::endl;
             std::vector<SecurityObjects::ActionLink>    Links;
             {
                 std::lock_guard G(Mutex_);
                 Storage().GetActions(Links);
             }
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
 
             if(Links.empty())
                 continue;
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
 
             for(auto &i:Links) {
+                std::cout << __func__ << ":" << __LINE__ << std::endl;
+
                 if(!Running_)
                     break;
 
+                std::cout << __func__ << ":" << __LINE__ << std::endl;
                 if(i.action=="forgot_password") {
                     if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::FORGOT_PASSWORD)) {
                         Logger_.information(Poco::format("Send password reset link to %s",i.userId));

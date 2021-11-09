@@ -80,8 +80,8 @@ namespace OpenWifi {
                 Convert(i,L);
                 Links.emplace_back(L);
             }
-
             return true;
+
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
         }
