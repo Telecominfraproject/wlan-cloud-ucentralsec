@@ -72,22 +72,30 @@ namespace OpenWifi {
 
     bool Storage::GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max) {
         try {
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Poco::Data::Session Sess = Pool_->get();
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Poco::Data::Statement Select(Sess);
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
 
             ActionLinkRecordList ARL;
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
 
             std::string St2{
                 "SELECT " + AllActionLinksFieldsForSelect + " From ActionLinks where sent=0 and canceled=0"};
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Select << ConvertParams(St2),
                 Poco::Data::Keywords::into(ARL);
             Select.execute();
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
 
             for(const auto &i:ARL) {
+                std::cout << __func__ << ":" << __LINE__ << std::endl;
                 SecurityObjects::ActionLink L;
                 Convert(i,L);
                 Links.emplace_back(L);
             }
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             return true;
 
         } catch (const Poco::Exception &E) {
