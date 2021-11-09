@@ -21,7 +21,7 @@ namespace OpenWifi {
                                                       Poco::Net::HTTPRequest::HTTP_GET,
 													  Poco::Net::HTTPRequest::HTTP_OPTIONS},
 													  Server,
-													  Internal, false, true ) {}
+													  Internal, false, true , RateLimit{.Interval=2000,.MaxCalls=2}) {}
 		static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/oauth2/{token}","/api/v1/oauth2"}; };
 		void DoGet() final;
 		void DoPost() final;
