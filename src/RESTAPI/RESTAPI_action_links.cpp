@@ -18,7 +18,7 @@ namespace OpenWifi {
         auto Id = GetParameter("id","");
 
         SecurityObjects::ActionLink Link;
-        if(!Storage().GetActionLink(Id,Link))
+        if(!StorageService()->GetActionLink(Id,Link))
             return DoReturnA404();
 
         if(Action=="password_reset")
@@ -34,7 +34,7 @@ namespace OpenWifi {
         auto Id = GetParameter("id","");
 
         SecurityObjects::ActionLink Link;
-        if(!Storage().GetActionLink(Id,Link))
+        if(!StorageService()->GetActionLink(Id,Link))
             return DoReturnA404();
 
         Logger_.information(Poco::format("COMPLETE-PASSWORD-RESET(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));

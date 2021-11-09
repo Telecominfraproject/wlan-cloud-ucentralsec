@@ -359,7 +359,7 @@ namespace OpenWifi {
         A.id = MicroService::instance().CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
-        Storage().CreateAction(A);
+        StorageService()->CreateAction(A);
         UInfo.waitingForEmailCheck = true;
         return true;
     }

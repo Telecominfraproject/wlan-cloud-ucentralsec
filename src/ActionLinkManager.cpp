@@ -48,7 +48,7 @@ namespace OpenWifi {
                     StorageService()->SentAction(i.id);
                 } else if (i.action==OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) {
                     if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::EMAIL_VERIFICATION)) {
-                        Logger_.information(Poco::format("Send password reset link to %s",i.userId));
+                        Logger_.information(Poco::format("Send email verification link to %s",i.userId));
                     }
                     StorageService()->SentAction(i.id);
                 } else {
