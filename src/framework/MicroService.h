@@ -1414,7 +1414,7 @@ namespace OpenWifi {
 
 	    struct RateLimit {
 	        int64_t     Interval=1000;
-	        int64_t     MaxCalls=100;
+	        int64_t     MaxCalls=10;
 	    };
 
 	    RESTAPIHandler( BindingMap map,
