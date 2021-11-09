@@ -46,15 +46,23 @@ namespace OpenWifi {
 
     bool Storage::CreateAction( SecurityObjects::ActionLink & A) {
         try {
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Poco::Data::Session Sess = Pool_->get();
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Poco::Data::Statement Insert(Sess);
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             std::string St2{
                 "INSERT INTO ActionLinks (" + AllActionLinksFieldsForSelect + ") VALUES(" + AllActionLinksValuesForSelect + ")"};
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             ActionLinkRecord AR;
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Convert(A, AR);
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Insert << ConvertParams(St2),
                 Poco::Data::Keywords::use(AR);
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Insert.execute();
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             return true;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
