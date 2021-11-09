@@ -30,11 +30,11 @@ namespace OpenWifi {
             std::cout << __func__ << ":" << __LINE__ << std::endl;
             if(!Running_)
                 break;
-std::cout << __func__ << ":" << __LINE__ << std::endl;
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             std::vector<SecurityObjects::ActionLink>    Links;
             {
                 std::lock_guard G(Mutex_);
-                Storage().GetActions(Links);
+                StorageService()->GetActions(Links);
             }
             std::cout << __func__ << ":" << __LINE__ << std::endl;
 
@@ -53,14 +53,14 @@ std::cout << __func__ << ":" << __LINE__ << std::endl;
                     if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::FORGOT_PASSWORD)) {
                         Logger_.information(Poco::format("Send password reset link to %s",i.userId));
                     }
-                    Storage().SentAction(i.id);
+                    StorageService()->SentAction(i.id);
                 } else if (i.action=="email_verification") {
                     if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::EMAIL_VERIFICATION)) {
                         Logger_.information(Poco::format("Send password reset link to %s",i.userId));
                     }
-                    Storage().SentAction(i.id);
+                    StorageService()->SentAction(i.id);
                 } else {
-                    Storage().SentAction(i.id);
+                    StorageService()->SentAction(i.id);
                 }
             }
         }
