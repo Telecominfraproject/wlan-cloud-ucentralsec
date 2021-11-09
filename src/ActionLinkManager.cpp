@@ -34,7 +34,7 @@ std::cout << __func__ << ":" << __LINE__ << std::endl;
             std::vector<SecurityObjects::ActionLink>    Links;
             {
                 std::lock_guard G(Mutex_);
-                Storage().GetActions(Links);
+                Storage()->GetActions(Links);
             }
             std::cout << __func__ << ":" << __LINE__ << std::endl;
 
