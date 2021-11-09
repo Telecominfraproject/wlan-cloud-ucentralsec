@@ -45,7 +45,7 @@ namespace OpenWifi {
                                    SubSystemVec{
                                            StorageService(),
                                            SMSSender(),
-                                           ActionLinkManager(),
+//                                           ActionLinkManager(),
                                            SMTPMailerService(),
 //                                           RESTAPI_RateLimiter(),
                                            AuthService()
