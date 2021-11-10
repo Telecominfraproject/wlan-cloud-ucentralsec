@@ -82,7 +82,7 @@ namespace OpenWifi {
         try {
             Poco::Data::Session Sess = Pool_->get();
                 Sess << "CREATE TABLE IF NOT EXISTS Tokens (" +
-                            AllUsersFieldsForCreation +
+                            AllTokensFieldsForCreation +
                         ") ", Poco::Data::Keywords::now;
             return 0;
         } catch(const Poco::Exception &E) {
