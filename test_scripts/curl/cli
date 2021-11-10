@@ -372,6 +372,7 @@ case "$1" in
     "getsubsystemnames") login; getsubsystemnames; logout ;;
     "reloadsubsystem") login; reloadsubsystem "$2"; logout ;;
     "systeminfo") login; systeminfo ; logout;;
+    "testburst") login; login; login; login; login; login; login; login; login; login; login; login; login; login; login; login;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
