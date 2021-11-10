@@ -4,6 +4,7 @@
 
 #include "ActionLinkManager.h"
 #include "StorageService.h"
+#include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
 
@@ -41,15 +42,20 @@ namespace OpenWifi {
                 if(!Running_)
                     break;
 
+                SecurityObjects::UserInfo UInfo;
+                if(!StorageService()->GetUserById(i.userId,UInfo)) {
+                    StorageService()->CancelAction(i.id);
+                    continue;
+                }
+
                 if(i.action==OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD) {
-                    std::cout << " actionmgr - ID=" << i.id << std::endl;
-                    if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::FORGOT_PASSWORD)) {
-                        Logger_.information(Poco::format("Send password reset link to %s",i.userId));
+                    if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
+                        Logger_.information(Poco::format("Send password reset link to %s",UInfo.email));
                     }
                     StorageService()->SentAction(i.id);
                 } else if (i.action==OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) {
-                    if(AuthService::SendEmailToUser(i.id, i.userId, AuthService::EMAIL_VERIFICATION)) {
-                        Logger_.information(Poco::format("Send email verification link to %s",i.userId));
+                    if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::EMAIL_VERIFICATION)) {
+                        Logger_.information(Poco::format("Send email verification link to %s",UInfo.email));
                     }
                     StorageService()->SentAction(i.id);
                 } else {

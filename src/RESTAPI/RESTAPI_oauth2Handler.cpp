@@ -63,14 +63,23 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
+        SecurityObjects::UserInfo UInfo1;
+        if(!StorageService()->GetUserByEmail(userId,UInfo1)) {
+            Logger_.warning(Poco::format("FORGOT-PASSWORD(%s): invalid e-mail from '%s'", userId, Request->clientAddress().toString()));
+            Poco::JSON::Object ReturnObj;
+            SecurityObjects::UserInfoAndPolicy UInfo;
+            UInfo.webtoken.userMustChangePassword = true;
+            UInfo.webtoken.to_json(ReturnObj);
+            return ReturnObject(ReturnObj);
+        }
+
         if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
-            //  Send an email to the userId
             Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
             SecurityObjects::ActionLink NewLink;
 
             NewLink.action = OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD;
             NewLink.id = MicroService::instance().CreateUUID();
-            NewLink.userId = userId;
+            NewLink.userId = UInfo1.Id;
             NewLink.created = std::time(nullptr);
             NewLink.expires = NewLink.created + (24*60*60);
             StorageService()->CreateAction(NewLink);
@@ -88,7 +97,6 @@ namespace OpenWifi {
                 auto uuid = Obj->get("uuid").toString();
                 if(MFAServer().ResendCode(uuid))
                     return OK();
-                return UnAuthorized("Unrecognized credentials (username/password).");
             }
             return UnAuthorized("Unrecognized credentials (username/password).");
         }

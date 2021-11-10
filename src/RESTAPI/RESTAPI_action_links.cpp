@@ -77,7 +77,7 @@ namespace OpenWifi {
             }
 
             SecurityObjects::UserInfo   UInfo;
-            if(!StorageService()->GetUserByEmail(Link.userId,UInfo)) {
+            if(!StorageService()->GetUserById(Link.userId,UInfo)) {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
@@ -97,7 +97,7 @@ namespace OpenWifi {
                                                   {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
                 return SendHTMLFileBack(FormFile,FormVars);
             }
-            StorageService()->UpdateUserInfo(UInfo.email,Id,UInfo);
+            StorageService()->UpdateUserInfo(UInfo.email,Link.userId,UInfo);
             Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_success.html"};
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email},
@@ -118,14 +118,14 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo UInfo;
-        Logger_.information(Poco::format("EMAIL-VERIFICATION(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
-        if (!StorageService()->GetUserByEmail(Link.userId, UInfo)) {
+        if (!StorageService()->GetUserById(Link.userId, UInfo)) {
             Types::StringPairVec FormVars{{"UUID",       Link.id},
                                           {"ERROR_TEXT", "This does not appear to be a valid email verification link.."}};
             Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_error.html"};
             return SendHTMLFileBack(FormFile, FormVars);
         }
 
+        Logger_.information(Poco::format("EMAIL-VERIFICATION(%s): For ID=%s", Request->clientAddress().toString(), UInfo.email));
         UInfo.waitingForEmailCheck = false;
         UInfo.validated = true;
         UInfo.lastEmailCheck = std::time(nullptr);
