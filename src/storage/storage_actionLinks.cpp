@@ -69,9 +69,9 @@ namespace OpenWifi {
 
             ActionLinkRecordList ARL;
 
-            std::string St2{
-                "SELECT " + AllActionLinksFieldsForSelect + " From ActionLinks where sent=0 and canceled=0"};
-            Select << ConvertParams(St2),
+            std::string S{
+                "SELECT " + AllActionLinksFieldsForSelect + " From ActionLinks where sent=0 and canceled=0 and completed=0"};
+            Select << ConvertParams(S),
                 Poco::Data::Keywords::into(ARL);
             Select.execute();
 

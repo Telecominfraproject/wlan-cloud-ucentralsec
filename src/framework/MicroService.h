@@ -1726,7 +1726,7 @@ namespace OpenWifi {
 	        Response->set("Cache-Control", "private");
 	        Response->set("Pragma", "private");
 	        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
-	        Response->set("Content-Length", std::to_string(File.getSize()));
+	        Response->setContentLength(File.getSize());
 	        AddCORS();
 	        Response->sendFile(File.path(),"application/octet-stream");
 	    }
@@ -1766,7 +1766,7 @@ namespace OpenWifi {
 	        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
 	        std::string FormContent = Utils::LoadFile(File.path());
 	        Utils::ReplaceVariables(FormContent, FormVars);
-	        Response->set("Content-Length", std::to_string(FormContent.size()));
+	        Response->setContentLength(FormContent.size());
 	        AddCORS();
 	        Response->setChunkedTransferEncoding(true);
 	        Response->setContentType("text/html");
@@ -3275,7 +3275,8 @@ namespace OpenWifi {
 	                        auto InsertResult = CertNames.insert(CertFileName);
 	                        if(InsertResult.second) {
 	                            Poco::JSON::Object  Inner;
-	                            Inner.set("filename", CertFileName);
+	                            Poco::Path  F(CertFileName);
+	                            Inner.set("filename", F.getFileName());
 	                            Poco::Crypto::X509Certificate   C(CertFileName);
 	                            auto ExpiresOn = C.expiresOn();
 	                            Inner.set("expiresOn",ExpiresOn.timestamp().epochTime());

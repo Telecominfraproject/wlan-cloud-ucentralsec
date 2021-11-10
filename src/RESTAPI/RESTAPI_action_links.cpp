@@ -55,10 +55,16 @@ namespace OpenWifi {
             auto Password1 = Form.get("password1","bla");
             auto Password2 = Form.get("password1","blu");
             auto Id = Form.get("id","");
+            auto Now = std::time(nullptr);
 
             SecurityObjects::ActionLink Link;
             if(!StorageService()->GetActionLink(Id,Link))
                 return DoReturnA404();
+
+            if(Now > Link.expires) {
+                StorageService()->CancelAction(Id);
+                return DoReturnA404();
+            }
 
             if(Password1!=Password2 || !AuthService()->ValidatePassword(Password2) || !AuthService()->ValidatePassword(Password1)) {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
@@ -96,6 +102,7 @@ namespace OpenWifi {
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email},
                                               {"ACTION_LINK",MicroService::instance().GetUIURI()}};
+            StorageService()->CompleteAction(Id);
             SendHTMLFileBack(FormFile,FormVars);
         } else {
             DoReturnA404();
@@ -103,8 +110,14 @@ namespace OpenWifi {
     }
 
     void RESTAPI_action_links::DoEmailVerification(SecurityObjects::ActionLink &Link) {
-        SecurityObjects::UserInfo UInfo;
+        auto Now = std::time(nullptr);
 
+        if(Now > Link.expires) {
+            StorageService()->CancelAction(Link.id);
+            return DoReturnA404();
+        }
+
+        SecurityObjects::UserInfo UInfo;
         Logger_.information(Poco::format("EMAIL-VERIFICATION(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
         if (!StorageService()->GetUserByEmail(Link.userId, UInfo)) {
             Types::StringPairVec FormVars{{"UUID",       Link.id},
@@ -122,6 +135,7 @@ namespace OpenWifi {
                                       {"USERNAME", UInfo.email},
                                       {"ACTION_LINK",MicroService::instance().GetUIURI()}};
         Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_success.html"};
+        StorageService()->CompleteAction(Link.id);
         SendHTMLFileBack(FormFile, FormVars);
     }
 
