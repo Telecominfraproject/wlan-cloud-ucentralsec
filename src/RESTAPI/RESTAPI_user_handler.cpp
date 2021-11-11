@@ -166,26 +166,27 @@ namespace OpenWifi {
         }
 
         if(RawObject->has("userTypeProprietaryInfo")) {
+            bool ChangingMFA = NewUser.userTypeProprietaryInfo.mfa.enabled && !Existing.userTypeProprietaryInfo.mfa.enabled;
+
             Existing.userTypeProprietaryInfo.mfa.enabled = NewUser.userTypeProprietaryInfo.mfa.enabled;
-            if(NewUser.userTypeProprietaryInfo.mfa.method=="sms") {
+
+            auto PropInfo = RawObject->get("userTypeProprietaryInfo");
+            auto PInfo = PropInfo.extract<Poco::JSON::Object::Ptr>();
+
+            if(PInfo->isArray("mobiles")) {
+                Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
+            }
+
+            if(ChangingMFA && !NewUser.userTypeProprietaryInfo.mobiles.empty() && !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number,UserInfo_.userinfo.email)){
+                return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+            }
+
+            if(NewUser.userTypeProprietaryInfo.mfa.method=="sms" && Existing.userTypeProprietaryInfo.mobiles.empty()) {
+                return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+            }
+
+            if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
                 Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
-                auto MobileStruct = RawObject->get("userTypeProprietaryInfo");
-                auto Info = MobileStruct.extract<Poco::JSON::Object::Ptr>();
-                if(Info->isArray("mobiles")) {
-                    Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
-                }
-                if(!NewUser.userTypeProprietaryInfo.mobiles.empty() && !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number,UserInfo_.userinfo.email)){
-                    return BadRequest(RESTAPI::Errors::NeedMobileNumber);
-                }
-                if(NewUser.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mobiles.empty()) {
-                    return BadRequest(RESTAPI::Errors::NeedMobileNumber);
-                }
-            } else if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
-                Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
-            } else {
-                if(NewUser.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mfa.method.empty()) {
-                    return BadRequest(RESTAPI::Errors::BadMFAMethod);
-                }
             }
         }
 
