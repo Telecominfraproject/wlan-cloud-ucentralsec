@@ -108,7 +108,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser) {
+    bool Storage::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
         try {
             Poco::Data::Session Sess = Pool_->get();
 
@@ -139,11 +139,13 @@ namespace OpenWifi {
             if(NewUser.currentPassword.empty()) {
 
             } else {
-                NewUser.currentPassword = AuthService()->ComputeNewPasswordHash(NewUser.email,NewUser.currentPassword);
-                NewUser.lastPasswords.clear();
-                NewUser.lastPasswords.push_back(NewUser.currentPassword);
-                NewUser.lastPasswordChange = std::time(nullptr);
-                NewUser.validated = true;
+                if(!PasswordHashedAlready) {
+                    NewUser.currentPassword = AuthService()->ComputeNewPasswordHash(NewUser.email,NewUser.currentPassword);
+                    NewUser.lastPasswords.clear();
+                    NewUser.lastPasswords.push_back(NewUser.currentPassword);
+                    NewUser.lastPasswordChange = std::time(nullptr);
+                    NewUser.validated = true;
+                }
             }
 
             auto Notes = RESTAPI_utils::to_string(NewUser.notes);

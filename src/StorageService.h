@@ -87,7 +87,7 @@ namespace OpenWifi {
          *  All user management functions
          */
         bool InitializeDefaultUser();
-        bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser);
+        bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false);
         bool GetUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
         bool GetUserById(USER_ID_TYPE & Id, SecurityObjects::UserInfo & User);
         bool DeleteUser(const std::string & Admin, USER_ID_TYPE & Id);
