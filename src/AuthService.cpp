@@ -46,10 +46,6 @@ namespace OpenWifi {
 		Signer_.setRSAKey(MicroService::instance().Key());
 		Signer_.addAllAlgorithms();
 		Logger_.notice("Starting...");
-        Secure_ = MicroService::instance().ConfigGetBool("authentication.enabled",true);
-        DefaultPassword_ = MicroService::instance().ConfigGetString("authentication.default.password","");
-        DefaultUserName_ = MicroService::instance().ConfigGetString("authentication.default.username","");
-        Mechanism_ = MicroService::instance().ConfigGetString("authentication.service.type","internal");
         PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
@@ -62,9 +58,6 @@ namespace OpenWifi {
 
 	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
-        if(!Secure_)
-            return true;
-
         std::lock_guard	Guard(Mutex_);
 		try {
 		    std::string CallToken;
@@ -263,7 +256,6 @@ namespace OpenWifi {
     AuthService::AUTH_ERROR AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
         std::lock_guard		Guard(Mutex_);
-        SecurityObjects::AclTemplate	ACL;
 
         Poco::toLowerInPlace(UserName);
 
@@ -302,21 +294,10 @@ namespace OpenWifi {
             return SUCCESS;
         }
 
-        if(((UserName == DefaultUserName_) && (ValidatePasswordHash(UserName,Password,DefaultPassword_))) || !Secure_)
-        {
-            ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
-            UInfo.webtoken.acl_template_ = ACL;
-            UInfo.userinfo.email = DefaultUserName_;
-            UInfo.userinfo.currentPassword = DefaultPassword_;
-            UInfo.userinfo.name = DefaultUserName_;
-            UInfo.userinfo.userRole = SecurityObjects::ROOT;
-            CreateToken(UserName, UInfo );
-            return SUCCESS;
-        }
         return INVALID_CREDENTIALS;
     }
 
-    bool AuthService::SendEmailToUser(std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
+    bool AuthService::SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
 
         if(StorageService()->GetUserByEmail(Email,UInfo)) {

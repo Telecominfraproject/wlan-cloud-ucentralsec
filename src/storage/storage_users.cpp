@@ -80,6 +80,34 @@ namespace OpenWifi {
         return true;
     }
 
+    std::string DefaultUseridStockUUID{"DEFAULT-USER-UUID-SHOULD-BE-DELETED!!!"};
+
+    //  if we do not find a default user, then we need to create one based on the
+    //  property file. We must set its flag to "must change password", this user has root privilege.
+    //  if the "DEFAULT-USER-UUID", we keep the UUID of that user. We want to hide the UUID of the default root user
+    bool Storage::InitializeDefaultUser() {
+        SecurityObjects::UserInfo   U;
+        bool DefaultUserCreated = false;
+
+        AppServiceRegistry().Get("defaultusercreated",DefaultUserCreated);
+        if(!GetUserById(DefaultUseridStockUUID,U) && !DefaultUserCreated) {
+            U.currentPassword = MicroService::instance().ConfigGetString("authentication.default.password","");
+            U.lastPasswords.push_back(U.currentPassword);
+            U.email = MicroService::instance().ConfigGetString("authentication.default.username","");
+            U.Id = DefaultUseridStockUUID;
+            U.userRole = SecurityObjects::ROOT;
+            U.creationDate = std::time(nullptr);
+            U.validated = true;
+            U.name = "Default User";
+            U.description = "Default user should be deleted.";
+            U.changePassword = true;
+            CreateUser("SYSTEM",U);
+            AppServiceRegistry().Set("defaultusercreated",true);
+            return true;
+        }
+        return false;
+    }
+
     bool Storage::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser) {
         try {
             Poco::Data::Session Sess = Pool_->get();

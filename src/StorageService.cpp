@@ -15,6 +15,7 @@ namespace OpenWifi {
 
 		StorageClass::Start();
 		Create_Tables();
+		InitializeDefaultUser();
 		return 0;
     }
 

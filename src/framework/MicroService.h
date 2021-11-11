@@ -67,6 +67,73 @@ using namespace std::chrono_literals;
 #include "framework/RESTAPI_errors.h"
 #include "framework/uCentral_Protocol.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "nlohmann/json.hpp"
+
+namespace OpenWifi {
+	class AppServiceRegistry {
+	  public:
+		inline AppServiceRegistry();
+
+		static AppServiceRegistry & instance() {
+			static AppServiceRegistry instance;
+			return instance;
+		}
+
+		inline ~AppServiceRegistry() {
+			Save();
+		}
+
+		inline void Save() {
+			std::istringstream  IS( to_string(Registry_));
+			std::ofstream       OF;
+			OF.open(FileName,std::ios::binary | std::ios::trunc);
+			Poco::StreamCopier::copyStream(IS, OF);
+		}
+
+		inline void Set(const char *Key, uint64_t Value ) {
+			Registry_[Key] = Value;
+			Save();
+		}
+
+		inline void Set(const char *Key, const std::string &Value ) {
+			Registry_[Key] = Value;
+			Save();
+		}
+
+		inline void Set(const char *Key, bool Value ) {
+			Registry_[Key] = Value;
+			Save();
+		}
+
+		inline bool Get(const char *Key, bool & Value ) {
+			if(Registry_[Key].is_boolean()) {
+				Value = Registry_[Key].get<bool>();
+				return true;
+			}
+			return false;
+		}
+
+		inline bool Get(const char *Key, uint64_t & Value ) {
+			if(Registry_[Key].is_number_unsigned()) {
+				Value = Registry_[Key].get<uint64_t>();
+				return true;
+			}
+			return false;
+		}
+
+		inline bool Get(const char *Key, std::string & Value ) {
+			if(Registry_[Key].is_string()) {
+				Value = Registry_[Key].get<std::string>();
+				return true;
+			}
+			return false;
+		}
+
+	  private:
+		std::string         FileName;
+		nlohmann::json      Registry_;
+	};
+}
 
 namespace OpenWifi::RESTAPI_utils {
 
@@ -766,16 +833,13 @@ namespace OpenWifi::Utils {
         return Result;
     }
 
-    inline void SaveSystemId(uint64_t Id);
-
     [[nodiscard]] inline uint64_t InitializeSystemId() {
         std::random_device	RDev;
         std::srand(RDev());
         std::chrono::high_resolution_clock	Clock;
         auto Now = Clock.now().time_since_epoch().count();
         auto S = (GetDefaultMacAsInt64() + std::rand() + Now)  ;
-        SaveSystemId(S);
-        std::cout << "ID: " << S << std::endl;
+		OpenWifi::AppServiceRegistry().Set("systemid",S);
         return S;
     }
 
@@ -923,6 +987,7 @@ namespace OpenWifi {
     static const std::string uSERVICE_OWLS{ "owls"};
     static const std::string uSERVICE_SUBCRIBER{ "owsub"};
     static const std::string uSERVICE_INSTALLER{ "owinst"};
+
 
 	class MyErrorHandler : public Poco::ErrorHandler {
 	  public:
@@ -2454,6 +2519,8 @@ namespace OpenWifi {
 		uint64_t 		LastUpdate=0;
 	};
 
+
+
 	class SubSystemServer;
 	typedef std::map<uint64_t, MicroServiceMeta>	MicroServiceMetaMap;
 	typedef std::vector<MicroServiceMeta>			MicroServiceMetaVec;
@@ -3013,6 +3080,22 @@ namespace OpenWifi {
 	    }
 
 	    return Application::EXIT_OK;
+	}
+
+	AppServiceRegistry::AppServiceRegistry() {
+		FileName = MicroService::instance().DataDir() + "/registry.json";
+		Poco::File F(FileName);
+
+		try {
+			if(F.exists()) {
+				std::ostringstream  OS;
+				std::ifstream       IF(FileName);
+				Poco::StreamCopier::copyStream(IF, OS);
+				Registry_ = nlohmann::json::parse(OS.str());
+			}
+		} catch (...) {
+			Registry_ = nlohmann::json::parse("{}");
+		}
 	}
 
 	inline void SubSystemServer::initialize(Poco::Util::Application &self) {
@@ -3585,40 +3668,14 @@ namespace OpenWifi {
 }
 
 namespace OpenWifi::Utils {
-        inline void SaveSystemId(uint64_t Id) {
-            try {
-                std::ofstream O;
-                O.open(MicroService::instance().DataDir() + "/system.id",std::ios::binary | std::ios::trunc);
-                O << Id;
-                O.close();
-            } catch (...)
-            {
-                std::cout << "Could not save system ID" << std::endl;
-            }
-        }
-
-        [[nodiscard]] inline uint64_t GetSystemId() {
-            uint64_t ID=0;
-
-            // if the system ID file exists, open and read it.
-            Poco::File	SID( MicroService::instance().DataDir() + "/system.id");
-            try {
-                if (SID.exists()) {
-                    std::ifstream I;
-                    I.open(SID.path());
-                    I >> ID;
-                    I.close();
-                    if (ID == 0)
-                        return InitializeSystemId();
-                    return ID;
-                } else {
-                    return InitializeSystemId();
-                }
-            } catch (...) {
-                return InitializeSystemId();
-            }
-        }
-    }
+	[[nodiscard]] inline uint64_t GetSystemId() {
+		uint64_t ID=0;
+		if(!AppServiceRegistry().Get("systemid",ID)) {
+			return InitializeSystemId();
+		}
+		return ID;
+	}
+}
 
 namespace OpenWifi::CIDR {
 

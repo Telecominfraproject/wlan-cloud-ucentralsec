@@ -82,7 +82,7 @@ namespace OpenWifi{
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
 
         [[nodiscard]] static bool VerifyEmail(SecurityObjects::UserInfo &UInfo);
-        [[nodiscard]] static bool SendEmailToUser(std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
+        [[nodiscard]] static bool SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
         [[nodiscard]] bool DeleteUserFromCache(const std::string &UserName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
 
@@ -95,14 +95,10 @@ namespace OpenWifi{
         }
 
     private:
-		bool    			Secure_ = false ;
-		std::string     	DefaultUserName_;
-		std::string			DefaultPassword_;
-		std::string     	Mechanism_;
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
 		SecurityObjects::UserInfoCache UserCache_;
-        std::string          PasswordValidationStr_;
+        std::string         PasswordValidationStr_;
 		std::regex          PasswordValidation_;
 		uint64_t            TokenAging_ = 30 * 24 * 60 * 60;
         uint64_t            HowManyOldPassword_=5;

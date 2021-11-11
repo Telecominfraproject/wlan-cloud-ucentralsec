@@ -42,7 +42,7 @@ find_package(Boost REQUIRED system)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(AWSSDK     REQUIRED COMPONENTS sns)
-
+find_package(nlohmann_json  REQUIRED)
 find_package(CppKafka REQUIRED)
 find_package(PostgreSQL REQUIRED)
 find_package(MySQL REQUIRED)
@@ -86,7 +86,10 @@ add_executable( owsec
         src/MFAServer.cpp src/MFAServer.h
         src/SMS_provider_aws.cpp src/SMS_provider_aws.h
         src/SMS_provider.cpp src/SMS_provider.h
-        src/SMS_provider_twilio.cpp src/SMS_provider_twilio.h src/storage/storage_actionLinks.cpp src/storage/storage_actionLinks.h src/storage/storage_tokens.h src/ActionLinkManager.cpp src/ActionLinkManager.h
+        src/SMS_provider_twilio.cpp src/SMS_provider_twilio.h
+        src/storage/storage_actionLinks.cpp src/storage/storage_actionLinks.h
+        src/storage/storage_tokens.h
+        src/ActionLinkManager.cpp src/ActionLinkManager.h
         )
 
 if(NOT SMALL_BUILD)
