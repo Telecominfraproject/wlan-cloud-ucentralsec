@@ -101,7 +101,7 @@ namespace OpenWifi {
             U.name = "Default User";
             U.description = "Default user should be deleted.";
             U.changePassword = true;
-            CreateUser("SYSTEM",U);
+            CreateUser("SYSTEM",U, true);
             AppServiceRegistry().Set("defaultusercreated",true);
             return true;
         }
