@@ -131,8 +131,10 @@ namespace OpenWifi {
             if(!Records.empty())
                 return false;
 
-            NewUser.Id = MicroService::instance().CreateUUID();
-            NewUser.creationDate = std::time(nullptr);
+            if(!PasswordHashedAlready) {
+                NewUser.Id = MicroService::instance().CreateUUID();
+                NewUser.creationDate = std::time(nullptr);
+            }
 
             //  if there is a password, we assume that we do not want email verification,
             //  if there is no password, we will do email verification
