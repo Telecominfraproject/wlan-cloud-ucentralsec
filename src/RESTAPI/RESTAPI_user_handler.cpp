@@ -40,9 +40,17 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
+        if(UserInfo_.userinfo.userRole!= SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
+            return UnAuthorized("Not sufficient access.", ACCESS_DENIED);
+        }
+
         SecurityObjects::UserInfo UInfo;
         if(!StorageService()->GetUserById(Id,UInfo)) {
             return NotFound();
+        }
+
+        if(UInfo.userRole==SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ROOT) {
+            return UnAuthorized("Not sufficient access.", ACCESS_DENIED);
         }
 
         if(!StorageService()->DeleteUser(UserInfo_.userinfo.email,Id)) {
@@ -69,6 +77,14 @@ namespace OpenWifi {
 
         if(UInfo.userRole == SecurityObjects::UNKNOWN) {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
+        }
+
+        if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
+            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+        }
+
+        if(UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && UInfo.userRole == SecurityObjects::ROOT) {
+            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
         Poco::toLowerInPlace(UInfo.email);
@@ -118,6 +134,14 @@ namespace OpenWifi {
         SecurityObjects::UserInfo   Existing;
         if(!StorageService()->GetUserById(Id,Existing)) {
             return NotFound();
+        }
+
+        if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
+            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+        }
+
+        if(UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && Existing.userRole == SecurityObjects::ROOT) {
+            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
         SecurityObjects::UserInfo   NewUser;
