@@ -40,21 +40,33 @@ namespace OpenWifi {
     }
 
     bool SMS_provider_aws::Send(const std::string &PhoneNumber, const std::string &Message) {
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         if(!Running_)
             return false;
 
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         Aws::SNS::SNSClient sns(AwsCreds_,AwsConfig_);
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         Aws::SNS::Model::PublishRequest psms_req;
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         psms_req.SetMessage(Message.c_str());
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         psms_req.SetPhoneNumber(PhoneNumber.c_str());
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
 
         auto psms_out = sns.Publish(psms_req);
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         if (psms_out.IsSuccess()) {
+            std::cout << __func__ << " : " << __LINE__ << std::endl;
             Logger_.debug(Poco::format("SMS sent to %s",PhoneNumber));
+            std::cout << __func__ << " : " << __LINE__ << std::endl;
             return true;
         }
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         std::string ErrMsg{psms_out.GetError().GetMessage()};
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         Logger_.debug(Poco::format("SMS NOT sent to %s: %s",PhoneNumber, ErrMsg));
+        std::cout << __func__ << " : " << __LINE__ << std::endl;
         return false;
     }
 

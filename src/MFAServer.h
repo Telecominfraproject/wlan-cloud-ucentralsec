@@ -35,7 +35,7 @@ namespace OpenWifi {
         static bool SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge);
 
         static inline std::string MakeChallenge() {
-            return std::to_string(rand() % 999999);
+            return std::to_string(MicroService::instance().Random(1,999999));
         }
 
     private:

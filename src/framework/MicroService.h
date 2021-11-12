@@ -2554,6 +2554,7 @@ namespace OpenWifi {
 			DAEMON_BUS_TIMER(BusTimer),
 			SubSystems_(std::move(Subsystems)) {
 		    instance_ = this;
+		    RandomEngine_.seed(std::chrono::steady_clock::now().time_since_epoch().count());
 		}
 
 		[[nodiscard]] std::string Version() { return Version_; }
@@ -2572,6 +2573,13 @@ namespace OpenWifi {
 		static inline uint64_t GetPID() { return Poco::Process::id(); };
 		[[nodiscard]] inline const std::string GetPublicAPIEndPoint() { return MyPublicEndPoint_ + "/api/v1"; };
 		[[nodiscard]] inline const std::string & GetUIURI() const { return UIURI_;};
+		[[nodiscard]] inline uint64_t Random(uint64_t ceiling) {
+		    return (RandomEngine_() % ceiling);
+		}
+
+		[[nodiscard]] inline uint64_t Random(uint64_t min, uint64_t max) {
+		    return ((RandomEngine_() % (max-min)) + min);
+		}
 
 		inline void Exit(int Reason);
 		inline void BusMessageReceived(const std::string &Key, const std::string & Message);
@@ -2639,6 +2647,7 @@ namespace OpenWifi {
 		std::string 				Version_{std::string(APP_VERSION) + "("+ BUILD_NUMBER + ")"};
 		BusEventManager				BusEventManager_;
 		std::mutex 					InfraMutex_;
+		std::default_random_engine  RandomEngine_;
 
 		std::string DAEMON_PROPERTIES_FILENAME;
 		std::string DAEMON_ROOT_ENV_VAR;
