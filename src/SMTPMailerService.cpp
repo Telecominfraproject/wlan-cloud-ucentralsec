@@ -9,12 +9,9 @@
 #include "Poco/Net/SMTPClientSession.h"
 #include "Poco/Net/SecureSMTPClientSession.h"
 #include "Poco/Net/StringPartSource.h"
-#include "Poco/Path.h"
 #include "Poco/Exception.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Context.h"
-#include "Poco/Net/InvalidCertificateHandler.h"
-#include "Poco/Net/AcceptCertificateHandler.h"
 
 #include "SMTPMailerService.h"
 #include "framework/MicroService.h"
