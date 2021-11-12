@@ -54,24 +54,6 @@ namespace OpenWifi {
     bool SMTPMailerService::SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
         std::lock_guard G(Mutex_);
 
-        /*
-        uint64_t Now = std::time(nullptr);
-        std::string RecipientLower = Poco::toLower(Recipient);
-        auto CE = Cache_.find(RecipientLower);
-        if(CE!=Cache_.end()) {
-            // only allow messages to the same user within 2 minutes
-            if(!((CE->second.LastRequest-Now)<30 && CE->second.HowManyRequests<10))
-                return false;
-            if(CE->second.LastRequest-Now>30) {
-                CE->second.LastRequest = Now;
-                CE->second.HowManyRequests=0;
-            } else {
-                CE->second.HowManyRequests++;
-            }
-        } else {
-            Cache_[RecipientLower] = MessageCacheEntry{.LastRequest=Now, .HowManyRequests=0};
-        }
-*/
         Messages_.push_back(MessageEvent{.Posted=(uint64_t )std::time(nullptr),
                                             .LastTry=0,
                                             .Sent=0,
