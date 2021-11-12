@@ -41,7 +41,11 @@ namespace OpenWifi {
         }
 
         if(UserInfo_.userinfo.userRole!= SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
-            return UnAuthorized("Not sufficient access.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+        }
+
+        if(UserInfo_.userinfo.Id == Id) {
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
         SecurityObjects::UserInfo UInfo;
@@ -50,7 +54,7 @@ namespace OpenWifi {
         }
 
         if(UInfo.userRole==SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ROOT) {
-            return UnAuthorized("Not sufficient access.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
         if(!StorageService()->DeleteUser(UserInfo_.userinfo.email,Id)) {
@@ -137,11 +141,11 @@ namespace OpenWifi {
         }
 
         if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
-            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
         if(UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && Existing.userRole == SecurityObjects::ROOT) {
-            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
         SecurityObjects::UserInfo   NewUser;
@@ -165,8 +169,19 @@ namespace OpenWifi {
         AssignIfPresent(RawObject,"suspended", Existing.suspended);
         AssignIfPresent(RawObject,"blackListed", Existing.blackListed);
 
-        if(RawObject->has("userRole"))
-            Existing.userRole = SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString());
+        if(RawObject->has("userRole")) {
+            auto NewRole = SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString());
+            if(NewRole!=Existing.userRole) {
+                if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && NewRole==SecurityObjects::ROOT) {
+                    return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+                }
+                if(Id==UserInfo_.userinfo.Id) {
+                    return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+                }
+                Existing.userRole = NewRole;
+            }
+        }
+
         if(RawObject->has("notes")) {
             SecurityObjects::NoteInfoVec NIV;
             NIV = RESTAPI_utils::to_object_array<SecurityObjects::NoteInfo>(RawObject->get("notes").toString());
