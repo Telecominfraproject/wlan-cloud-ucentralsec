@@ -20,39 +20,26 @@ namespace OpenWifi {
     bool MFAServer::StartMFAChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, Poco::JSON::Object &ChallengeStart) {
         std::lock_guard G(Mutex_);
 
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
         CleanCache();
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
 
         if(!MethodEnabled(UInfo.userinfo.userTypeProprietaryInfo.mfa.method))
             return false;
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
 
         std::string Challenge = MakeChallenge();
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
         std::string uuid = MicroService::instance().CreateUUID();
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
         uint64_t Created = std::time(nullptr);
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
 
         ChallengeStart.set("uuid",uuid);
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
         ChallengeStart.set("created", Created);
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
         ChallengeStart.set("method", UInfo.userinfo.userTypeProprietaryInfo.mfa.method);
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
 
         Cache_[uuid] = MFACacheEntry{ .UInfo = UInfo, .Answer=Challenge, .Created=Created, .Method=UInfo.userinfo.userTypeProprietaryInfo.mfa.method };
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
         return SendChallenge(UInfo, UInfo.userinfo.userTypeProprietaryInfo.mfa.method, Challenge);
     }
 
     bool MFAServer::SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge) {
-        std::cout << __func__ << " : " << __LINE__ << std::endl;
         if(Method=="sms" && SMSSender()->Enabled() && !UInfo.userinfo.userTypeProprietaryInfo.mobiles.empty()) {
-            std::cout << __func__ << " : " << __LINE__ << std::endl;
             std::string Message = "This is your login code: " + Challenge + " Please enter this in your login screen.";
-            std::cout << __func__ << " : " << __LINE__ << std::endl;
             return SMSSender()->Send(UInfo.userinfo.userTypeProprietaryInfo.mobiles[0].number, Message);
         }
 
