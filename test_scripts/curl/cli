@@ -58,8 +58,8 @@ testlogin() {
     curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2" \
         -H "Content-Type: application/json" \
         -d "$payload" > ${result_file}
-    userMustChangePassword=$(cat ${result_file} | jq -r '.userMustChangePassword')
-    if [[ ${userMustChangePassword} == "true" ]]
+    userMustChangePassword=$(cat ${result_file} | jq -r '.ErrorCode')
+    if [[ ${userMustChangePassword} == "1" ]]
     then
         echo "User must change password to login..."
         if [[ "$3" == "" ]]
@@ -78,7 +78,10 @@ testlogin() {
         curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2" \
                 -H "Content-Type: application/json" \
                 -d "$payload" > ${result_file}
-        jq < ${result_file}
+        token=$(cat ${result_file} | jq -r '.access_token')
+    else
+        payload="{ \"userId\" : \"$1\" , \"password\" : \"$2\" }"
+        token=$(curl ${FLAGS} -X POST -H "Content-Type: application/json" -d "$payload" "https://${OWSEC}/api/v1/oauth2" | jq -r '.access_token')
     fi
     jq < ${result_file}
 }

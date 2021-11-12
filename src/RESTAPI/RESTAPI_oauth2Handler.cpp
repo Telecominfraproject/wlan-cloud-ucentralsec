@@ -19,7 +19,7 @@
 namespace OpenWifi {
 	void RESTAPI_oauth2Handler::DoGet() {
         if (!IsAuthorized()) {
-            return UnAuthorized("Not authorized.");
+            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
         if(GetMe) {
@@ -28,7 +28,7 @@ namespace OpenWifi {
             UserInfo_.userinfo.to_json(Me);
             return ReturnObject(Me);
         }
-        BadRequest("Ill-formed request. Please consult documentation.");
+        BadRequest(RESTAPI::Errors::UnrecognizedRequest);
 	}
 
     void RESTAPI_oauth2Handler::DoDelete() {
@@ -93,17 +93,17 @@ namespace OpenWifi {
 
         if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE,false)) {
             Logger_.information(Poco::format("RESEND-MFA-CODE(%s): Request for %s", Request->clientAddress().toString(), userId));
-            if(Obj->has("uuid")) {
-                auto uuid = Obj->get("uuid").toString();
+            if(Obj->has(RESTAPI::Protocol::UUID)) {
+                auto uuid = Obj->get(RESTAPI::Protocol::UUID).toString();
                 if(MFAServer().ResendCode(uuid))
                     return OK();
             }
-            return UnAuthorized("Unrecognized credentials (username/password).");
+            return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
         }
 
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
             Logger_.information(Poco::format("COMPLETE-MFA-CHALLENGE(%s): Request for %s", Request->clientAddress().toString(), userId));
-            if(Obj->has("uuid")) {
+            if(Obj->has(RESTAPI::Protocol::UUID)) {
                 SecurityObjects::UserInfoAndPolicy UInfo;
                 if(MFAServer().CompleteMFAChallenge(Obj,UInfo)) {
                     Poco::JSON::Object ReturnObj;
@@ -111,7 +111,7 @@ namespace OpenWifi {
                     return ReturnObject(ReturnObj);
                 }
             }
-            return UnAuthorized("Unrecognized credentials (username/password).");
+            return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
         }
 
         SecurityObjects::UserInfoAndPolicy UInfo;
@@ -122,19 +122,25 @@ namespace OpenWifi {
                 if(MFAServer().StartMFAChallenge(UInfo, ReturnObj)) {
                     return ReturnObject(ReturnObj);
                 }
-                Logger_.warning("MFA Seems ot be broken. Please fix. Disabling MFA checking for now.");
+                Logger_.warning("MFA Seems to be broken. Please fix. Disabling MFA checking for now.");
             }
             UInfo.webtoken.to_json(ReturnObj);
             return ReturnObject(ReturnObj);
         } else {
 
             switch(Code) {
-                case INVALID_CREDENTIALS: return UnAuthorized("Unrecognized credentials (username/password).", Code); break;
-                case PASSWORD_INVALID: return UnAuthorized("Invalid password.", Code); break;
-                case PASSWORD_ALREADY_USED: return UnAuthorized("Password already used previously.", Code); break;
-                case USERNAME_PENDING_VERIFICATION: return UnAuthorized("User access pending email verification.", Code); break;
-                case PASSWORD_CHANGE_REQUIRED: return UnAuthorized("Password change expected.", Code); break;
-                default: return UnAuthorized("Unrecognized credentials (username/password)."); break;
+                case INVALID_CREDENTIALS:
+                    return UnAuthorized(RESTAPI::Errors::InvalidCredentials, Code);
+                case PASSWORD_INVALID:
+                    return UnAuthorized(RESTAPI::Errors::InvalidPassword, Code);
+                case PASSWORD_ALREADY_USED:
+                    return UnAuthorized(RESTAPI::Errors::PasswordRejected, Code);
+                case USERNAME_PENDING_VERIFICATION:
+                    return UnAuthorized(RESTAPI::Errors::UserPendingVerification, Code);
+                case PASSWORD_CHANGE_REQUIRED:
+                    return UnAuthorized(RESTAPI::Errors::PasswordMustBeChanged, Code);
+                default:
+                    return UnAuthorized(RESTAPI::Errors::InvalidCredentials); break;
             }
             return;
         }
