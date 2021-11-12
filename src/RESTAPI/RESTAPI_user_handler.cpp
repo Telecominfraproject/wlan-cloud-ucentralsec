@@ -224,8 +224,15 @@ namespace OpenWifi {
                 return BadRequest(RESTAPI::Errors::NeedMobileNumber);
             }
 
-            if(NewUser.userTypeProprietaryInfo.mfa.method=="email") {
+            if(!NewUser.userTypeProprietaryInfo.mfa.method.empty()) {
+                if(NewUser.userTypeProprietaryInfo.mfa.method!="email" && NewUser.userTypeProprietaryInfo.mfa.method!="sms" ) {
+                    return BadRequest("Unknown MFA method");
+                }
                 Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
+            }
+
+            if(Existing.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mfa.method.empty()) {
+                return BadRequest("Illegal MFA method");
             }
         }
 
