@@ -98,6 +98,38 @@ to get a sample. The default is
 ### `authentication.oldpasswords`
 The number of older passwords to keep. Default is 5.
 
+### Changing default password
+
+On the first startup of the service new user will be created with the default credentials from properties `authentication.default.username` and `authentication.default.password`, but **you will have to change the password** before making any real requests. To do that you may run the following script:
+
+```
+export OWSEC=openwifi.wlan.local:16001 # endpoint to your owsec RESTAPI endpoint
+#export FLAGS="-k" # uncomment and add curl flags that you would like to pass for the request (for example '-k' may be used to pass errors with self-signed certificates)
+export OWSEC_DEFAULT_USERNAME=root@system.com # default username that you've set in property 'authentication.default.username'
+export OWSEC_DEFAULT_PASSWORD=weLoveWifi # default password __in cleartext__ from property 'authentication.default.password'
+export OWSEC_NEW_PASSWORD=NewPass123% # new password that must be set for the user (must comply with 'authentication.validation.expression')
+test_scripts/curl/cli testlogin $OWSEC_DEFAULT_USERNAME $OWSEC_DEFAULT_PASSWORD $OWSEC_NEW_PASSWORD
+```
+
+CLI is also included in Docker image if you want to run it this way:
+
+```
+export OWSEC=openwifi.wlan.local:16001
+#export FLAGS="-k"
+export OWSEC_DEFAULT_USERNAME=root@system.com
+export OWSEC_DEFAULT_PASSWORD=weLoveWifi
+export OWSEC_NEW_PASSWORD=NewPass123%
+docker run --rm -ti \
+  --network=host \
+  --env OWSEC \
+  --env FLAGS \
+  --env OWSEC_DEFAULT_USERNAME \
+  --env OWSEC_DEFAULT_PASSWORD \
+  --env OWSEC_NEW_PASSWORD \
+  tip-tip-wlan-cloud-ucentral.jfrog.io/owsec:main \
+  /cli testlogin $OWSEC_DEFAULT_USERNAME $OWSEC_DEFAULT_PASSWORD $OWSEC_NEW_PASSWORD
+```
+
 ### Kafka integration
 This security service uses Kafka to coordinate security with other services that are part of the system. You must have a Kafka service running
 in order to use this. You can find several examples of Kafka services available with Docker. Here are the values you need to configure.
