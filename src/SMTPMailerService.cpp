@@ -146,15 +146,18 @@ namespace OpenWifi {
 
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
-                Poco::File  LogoFile(AuthService::GetLogoAssetFileName());
-                std::ifstream   IF(LogoFile.path());
-                std::ostringstream   OS;
-                Poco::StreamCopier::copyStream(IF, OS);
-                Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/jpeg"));
+                try {
+                    Poco::File          LogoFile(AuthService::GetLogoAssetFileName());
+                    std::ifstream       IF(LogoFile.path());
+                    std::ostringstream  OS;
+                    Poco::StreamCopier::copyStream(IF, OS);
+                    Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
+                } catch (...) {
+                    Logger_.warning(Poco::format("Cannot add '%s' logo in email",AuthService::GetLogoAssetFileName()));
+                }
             }
 
             Poco::Net::SecureSMTPClientSession session(MailHost_,MailHostPort_);
-            Poco::Net::Context::Params P;
             auto ptrContext = Poco::AutoPtr<Poco::Net::Context>
                     (new Poco::Net::Context(Poco::Net::Context::CLIENT_USE, "", "", "",
                                                             Poco::Net::Context::VERIFY_RELAXED, 9, true,

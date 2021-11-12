@@ -81,7 +81,7 @@ namespace OpenWifi{
         }
 
         [[nodiscard]] static inline const std::string GetLogoAssetFileName() {
-            return MicroService::instance().DataDir() + "/wwwassets/the_logo.png";
+            return MicroService::instance().WWWAssetsDir() + "/the_logo.png";
         }
 
     private:

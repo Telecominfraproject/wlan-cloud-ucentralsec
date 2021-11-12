@@ -2559,6 +2559,7 @@ namespace OpenWifi {
 		[[nodiscard]] std::string Version() { return Version_; }
 		[[nodiscard]] const Poco::SharedPtr<Poco::Crypto::RSAKey> & Key() { return AppKey_; }
 		[[nodiscard]] inline const std::string & DataDir() { return DataDir_; }
+		[[nodiscard]] inline const std::string & WWWAssetsDir() { return WWWAssetsDir_; }
 		[[nodiscard]] bool Debug() const { return DebugMode_; }
 		[[nodiscard]] uint64_t ID() const { return ID_; }
 		[[nodiscard]] std::string Hash() const { return MyHash_; };
@@ -2625,6 +2626,7 @@ namespace OpenWifi {
 		Poco::SharedPtr<Poco::Crypto::RSAKey>	AppKey_ = nullptr;
 		bool                        DebugMode_ = false;
 		std::string 				DataDir_;
+		std::string                 WWWAssetsDir_;
 		SubSystemVec			    SubSystems_;
 		Poco::Crypto::CipherFactory & CipherFactory_ = Poco::Crypto::CipherFactory::defaultFactory();
 		Poco::Crypto::Cipher        * Cipher_ = nullptr;
@@ -2813,6 +2815,9 @@ namespace OpenWifi {
 	            logger().log(E);
 	        }
 	    }
+	    WWWAssetsDir_ = ConfigPath("openwifi.restapi.wwwassets","");
+	    if(WWWAssetsDir_.empty())
+	        WWWAssetsDir_ = DataDir_;
 
 	    LoadMyConfig();
 
