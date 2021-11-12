@@ -66,28 +66,22 @@ namespace OpenWifi {
     bool MFAServer::CompleteMFAChallenge(Poco::JSON::Object::Ptr &ChallengeResponse, SecurityObjects::UserInfoAndPolicy &UInfo) {
         std::lock_guard G(Mutex_);
 
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         if(!ChallengeResponse->has("uuid") || !ChallengeResponse->has("answer"))
             return false;
 
         auto uuid = ChallengeResponse->get("uuid").toString();
         auto Hint = Cache_.find(uuid);
-        std::cout << __func__ << ":" << __LINE__ << "UUID:" << uuid << std::endl;
         if(Hint == end(Cache_)) {
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
             return false;
         }
 
         auto answer = ChallengeResponse->get("answer").toString();
-        std::cout << __func__ << ":" << __LINE__ << Hint->second.Answer << " == " << answer << std::endl;
         if(Hint->second.Answer!=answer) {
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
             return false;
         }
 
         UInfo = Hint->second.UInfo;
         Cache_.erase(Hint);
-        std::cout << __func__ << ":" << __LINE__ << std::endl;
         return true;
     }
 
