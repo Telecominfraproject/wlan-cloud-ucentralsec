@@ -101,16 +101,27 @@ namespace OpenWifi {
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
         }
 
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
+
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             Logger_.information(Poco::format("COMPLETE-MFA-CHALLENGE(%s): Request for %s", Request->clientAddress().toString(), userId));
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             if(Obj->has(RESTAPI::Protocol::UUID)) {
+                std::cout << __func__ << ":" << __LINE__ << std::endl;
                 SecurityObjects::UserInfoAndPolicy UInfo;
+                std::cout << __func__ << ":" << __LINE__ << std::endl;
                 if(MFAServer().CompleteMFAChallenge(Obj,UInfo)) {
+                    std::cout << __func__ << ":" << __LINE__ << std::endl;
                     Poco::JSON::Object ReturnObj;
+                    std::cout << __func__ << ":" << __LINE__ << std::endl;
                     UInfo.webtoken.to_json(ReturnObj);
+                    std::cout << __func__ << ":" << __LINE__ << std::endl;
                     return ReturnObject(ReturnObj);
                 }
+                std::cout << __func__ << ":" << __LINE__ << std::endl;
             }
+            std::cout << __func__ << ":" << __LINE__ << std::endl;
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
         }
 
