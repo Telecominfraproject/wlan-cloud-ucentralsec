@@ -91,6 +91,7 @@ RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentr
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
 
 COPY readiness_check /readiness_check
+COPY test_scripts/curl/cli /cli
 
 EXPOSE 16001 17001 16101
 
