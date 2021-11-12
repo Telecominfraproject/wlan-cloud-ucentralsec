@@ -35,16 +35,6 @@ namespace OpenWifi{
             CUSTOM
         };
 
-        enum AUTH_ERROR {
-            SUCCESS,
-            PASSWORD_CHANGE_REQUIRED,
-            INVALID_CREDENTIALS,
-            PASSWORD_ALREADY_USED,
-            USERNAME_PENDING_VERIFICATION,
-            PASSWORD_INVALID,
-            INTERNAL_ERROR
-        };
-
         enum EMAIL_REASON {
             FORGOT_PASSWORD,
             EMAIL_VERIFICATION
@@ -62,7 +52,7 @@ namespace OpenWifi{
         void Stop() override;
 
         [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo );
-        [[nodiscard]] AUTH_ERROR Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo );
+        [[nodiscard]] UNAUTHORIZED_REASON Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo );
         void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};

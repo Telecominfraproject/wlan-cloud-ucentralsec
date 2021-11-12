@@ -70,6 +70,19 @@ using namespace std::chrono_literals;
 #include "nlohmann/json.hpp"
 
 namespace OpenWifi {
+
+    enum UNAUTHORIZED_REASON {
+        SUCCESS=0,
+        PASSWORD_CHANGE_REQUIRED,
+        INVALID_CREDENTIALS,
+        PASSWORD_ALREADY_USED,
+        USERNAME_PENDING_VERIFICATION,
+        PASSWORD_INVALID,
+        INTERNAL_ERROR,
+        ACCESS_DENIED,
+        INVALID_TOKEN
+    };
+
 	class AppServiceRegistry {
 	  public:
 		inline AppServiceRegistry();
@@ -1522,7 +1535,7 @@ namespace OpenWifi {
 
 	            std::string Reason;
 	            if(!RoleIsAuthorized(RequestIn.getURI(), Request->getMethod(), Reason)) {
-                    UnAuthorized(Reason);
+                    UnAuthorized(Reason, ACCESS_DENIED);
                     return;
 	            }
 
@@ -1743,10 +1756,10 @@ namespace OpenWifi {
 	        Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	    }
 
-	    inline void UnAuthorized(const std::string & Reason = "") {
+	    inline void UnAuthorized(const std::string & Reason = "", int Code = INVALID_CREDENTIALS ) {
 	        PrepareResponse(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 	        Poco::JSON::Object	ErrorObject;
-	        ErrorObject.set("ErrorCode",403);
+	        ErrorObject.set("ErrorCode",Code);
 	        ErrorObject.set("ErrorDetails",Request->getMethod());
 	        ErrorObject.set("ErrorDescription",Reason.empty() ? "No access allowed." : Reason) ;
 	        std::ostream &Answer = Response->send();
@@ -3658,7 +3671,7 @@ namespace OpenWifi {
                                                Utils::FormatIPv6(Request->clientAddress().toString()),
                                                Request->getMethod(), Request->getURI()));
                 }
-                UnAuthorized();
+                UnAuthorized("Invalid token", INVALID_TOKEN);
             }
             return false;
         }

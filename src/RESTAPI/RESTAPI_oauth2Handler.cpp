@@ -116,7 +116,7 @@ namespace OpenWifi {
 
         SecurityObjects::UserInfoAndPolicy UInfo;
         auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo);
-        if (Code==AuthService::SUCCESS) {
+        if (Code==SUCCESS) {
             Poco::JSON::Object ReturnObj;
             if(AuthService()->RequiresMFA(UInfo)) {
                 if(MFAServer().StartMFAChallenge(UInfo, ReturnObj)) {
@@ -127,12 +127,13 @@ namespace OpenWifi {
             UInfo.webtoken.to_json(ReturnObj);
             return ReturnObject(ReturnObj);
         } else {
+
             switch(Code) {
-                case AuthService::INVALID_CREDENTIALS: return UnAuthorized("Unrecognized credentials (username/password)."); break;
-                case AuthService::PASSWORD_INVALID: return UnAuthorized("Invalid password."); break;
-                case AuthService::PASSWORD_ALREADY_USED: return UnAuthorized("Password already used previously."); break;
-                case AuthService::USERNAME_PENDING_VERIFICATION: return UnAuthorized("User access pending email verification."); break;
-                case AuthService::PASSWORD_CHANGE_REQUIRED: return UnAuthorized("Password change expected."); break;
+                case INVALID_CREDENTIALS: return UnAuthorized("Unrecognized credentials (username/password).", Code); break;
+                case PASSWORD_INVALID: return UnAuthorized("Invalid password.", Code); break;
+                case PASSWORD_ALREADY_USED: return UnAuthorized("Password already used previously.", Code); break;
+                case USERNAME_PENDING_VERIFICATION: return UnAuthorized("User access pending email verification.", Code); break;
+                case PASSWORD_CHANGE_REQUIRED: return UnAuthorized("Password change expected.", Code); break;
                 default: return UnAuthorized("Unrecognized credentials (username/password)."); break;
             }
             return;

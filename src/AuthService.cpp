@@ -253,7 +253,7 @@ namespace OpenWifi {
         return false;
     }
 
-    AuthService::AUTH_ERROR AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
+    UNAUTHORIZED_REASON AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
     {
         std::lock_guard		Guard(Mutex_);
 
