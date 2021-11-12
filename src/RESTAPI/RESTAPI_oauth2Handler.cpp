@@ -93,8 +93,8 @@ namespace OpenWifi {
 
         if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE,false)) {
             Logger_.information(Poco::format("RESEND-MFA-CODE(%s): Request for %s", Request->clientAddress().toString(), userId));
-            if(Obj->has(RESTAPI::Protocol::UUID)) {
-                auto uuid = Obj->get(RESTAPI::Protocol::UUID).toString();
+            if(Obj->has("uuid")) {
+                auto uuid = Obj->get("uuid").toString();
                 if(MFAServer().ResendCode(uuid))
                     return OK();
             }
@@ -107,7 +107,7 @@ namespace OpenWifi {
             std::cout << __func__ << ":" << __LINE__ << std::endl;
             Logger_.information(Poco::format("COMPLETE-MFA-CHALLENGE(%s): Request for %s", Request->clientAddress().toString(), userId));
             std::cout << __func__ << ":" << __LINE__ << std::endl;
-            if(Obj->has(RESTAPI::Protocol::UUID)) {
+            if(Obj->has("uuid")) {
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
                 SecurityObjects::UserInfoAndPolicy UInfo;
                 std::cout << __func__ << ":" << __LINE__ << std::endl;
