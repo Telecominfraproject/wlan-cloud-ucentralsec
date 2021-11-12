@@ -11,7 +11,7 @@ RUN apk add --update --no-cache \
 
 RUN git clone https://github.com/stephb9959/poco /poco
 RUN git clone https://github.com/stephb9959/cppkafka /cppkafka
-RUN git clone https://https://github.com/nlohmann/json /json
+RUN git clone https://github.com/nlohmann/json /json
 RUN git clone https://github.com/pboettch/json-schema-validator /json-schema-validator
 RUN git clone --recurse-submodules https://github.com/aws/aws-sdk-cpp /aws-sdk-cpp
 
