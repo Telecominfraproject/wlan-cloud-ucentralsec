@@ -18,3 +18,4 @@ _deps
 *.csr
 /cmake-build/
 /smake-build-debug/
+test_scripts/curl/result.json
