@@ -13,6 +13,8 @@
 #include "framework/StorageClass.h"
 #include "AuthService.h"
 
+#include "Poco/Timer.h"
+
 namespace OpenWifi {
 
     static const std::string AllEmailTemplatesFieldsForCreation {
@@ -25,6 +27,12 @@ namespace OpenWifi {
 
     static const std::string AllEmailTemplatesFieldsForUpdate {
 
+    };
+
+    class Archiver {
+    public:
+        void onTimer(Poco::Timer & timer);
+    private:
     };
 
     class Storage : public StorageClass {
@@ -128,6 +136,10 @@ namespace OpenWifi {
         int Create_AvatarTable();
         int Create_TokensTable();
         int Create_ActionLinkTable();
+
+        Poco::Timer                     Timer_;
+        Archiver                        Archiver_;
+        std::unique_ptr<Poco::TimerCallback<Archiver>>   Archivercallback_;
 
         /// This is to support a mistake that was deployed...
         void ReplaceOldDefaultUUID();

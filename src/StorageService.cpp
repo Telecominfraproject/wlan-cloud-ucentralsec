@@ -16,12 +16,24 @@ namespace OpenWifi {
 		StorageClass::Start();
 		Create_Tables();
 		InitializeDefaultUser();
+
+		Archivercallback_ = std::make_unique<Poco::TimerCallback<Archiver>>(Archiver_,&Archiver::onTimer);
+		Timer_.setStartInterval( 30 * 1000);  // first run in 5 minutes
+		Timer_.setPeriodicInterval(60 * 1000); // 1 hours
+		Timer_.start(*Archivercallback_);
+
 		return 0;
     }
 
     void Storage::Stop() {
         Logger_.notice("Stopping.");
+        Timer_.stop();
         StorageClass::Stop();
     }
+
+    void Archiver::onTimer(Poco::Timer &timer) {
+        std::cout << "Timer fired..." << std::endl;
+    }
+
 }
 // namespace
