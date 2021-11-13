@@ -18,8 +18,8 @@ namespace OpenWifi {
 		InitializeDefaultUser();
 
 		Archivercallback_ = std::make_unique<Poco::TimerCallback<Archiver>>(Archiver_,&Archiver::onTimer);
-		Timer_.setStartInterval( 30 * 1000);  // first run in 5 minutes
-		Timer_.setPeriodicInterval(60 * 1000); // 1 hours
+		Timer_.setStartInterval( 5 * 60 * 1000);  // first run in 5 minutes
+		Timer_.setPeriodicInterval(1 * 60 * 60 * 1000); // 1 hours
 		Timer_.start(*Archivercallback_);
 
 		return 0;
@@ -32,7 +32,9 @@ namespace OpenWifi {
     }
 
     void Archiver::onTimer(Poco::Timer &timer) {
-        std::cout << "Timer fired..." << std::endl;
+        Poco::Logger &logger = Poco::Logger::get("STORAGE-ARCHIVER");
+        logger.information("Squiggy the DB");
+        StorageService()->CleanExpiredTokens();
     }
 
 }

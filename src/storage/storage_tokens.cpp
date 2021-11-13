@@ -116,15 +116,15 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::CleanRevokedTokens(uint64_t Oldest) {
+    bool Storage::CleanExpiredTokens() {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);
             uint64_t Now = std::time(nullptr);
 
-            std::string St2{"DELETE From Tokens WHERE Created <= ?"};
+            std::string St2{"DELETE From Tokens WHERE (Created+Expires) <= ?"};
             Delete << ConvertParams(St2),
-                Poco::Data::Keywords::use(Oldest);
+                Poco::Data::Keywords::use(Now);
             Delete.execute();
             return true;
         } catch (const Poco::Exception &E) {

@@ -115,7 +115,7 @@ namespace OpenWifi {
         bool AddToken(std::string &UserName, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut);
         bool RevokeToken( std::string & Token );
         bool IsTokenRevoked( std::string & Token );
-        bool CleanRevokedTokens( uint64_t Oldest );
+        bool CleanExpiredTokens();
         bool RevokeAllTokens( std::string & UserName );
         bool GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo);
 
