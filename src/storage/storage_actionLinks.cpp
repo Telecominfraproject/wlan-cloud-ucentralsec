@@ -183,4 +183,19 @@ namespace OpenWifi {
         return false;
     }
 
+    void Storage::CleanOldActionLinks() {
+        try {
+            Poco::Data::Session     Sess = Pool_->get();
+            Poco::Data::Statement   Delete(Sess);
+
+            uint64_t CutOff = std::time(nullptr) - (30 * 24 * 60 * 60);
+            std::string St{"DELETE from ActionLinks where Created<=?"};
+            Delete << ConvertParams(St),
+                Poco::Data::Keywords::use(CutOff);
+            Delete.execute();
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+    }
+
 }

@@ -57,6 +57,9 @@ namespace OpenWifi {
         if(AuthService()->DeleteUserFromCache(UInfo.email)) {
             // nothing to do
         }
+
+        StorageService()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+
         Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
         StorageService()->RevokeAllTokens(UInfo.email);
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));

@@ -129,6 +129,7 @@ namespace OpenWifi {
         bool SentAction(std::string &ActionId);
         bool GetActionLink(std::string &ActionId, SecurityObjects::ActionLink &A);
         bool GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max=200);
+        void CleanOldActionLinks();
 
 	  private:
         int Create_Tables();

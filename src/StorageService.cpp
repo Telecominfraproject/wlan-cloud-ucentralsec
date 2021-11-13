@@ -33,8 +33,10 @@ namespace OpenWifi {
 
     void Archiver::onTimer(Poco::Timer &timer) {
         Poco::Logger &logger = Poco::Logger::get("STORAGE-ARCHIVER");
-        logger.information("Squiggy the DB");
+        logger.information("Squiggy the DB: removing old tokens.");
         StorageService()->CleanExpiredTokens();
+        logger.information("Squiggy the DB: removing old actionLinks.");
+        StorageService()->CleanOldActionLinks();
     }
 
 }
