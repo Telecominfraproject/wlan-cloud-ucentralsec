@@ -13,7 +13,8 @@ namespace OpenWifi {
             if (i.first == "token") {
                 //  can we find this token?
                 SecurityObjects::UserInfoAndPolicy SecObj;
-                if (AuthService()->IsValidToken(i.second, SecObj.webtoken, SecObj.userinfo)) {
+                bool Expired = false;
+                if (AuthService()->IsValidToken(i.second, SecObj.webtoken, SecObj.userinfo, Expired)) {
                     Poco::JSON::Object Obj;
                     SecObj.to_json(Obj);
                     return ReturnObject(Obj);

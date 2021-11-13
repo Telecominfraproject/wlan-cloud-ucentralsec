@@ -18,7 +18,10 @@
 
 namespace OpenWifi {
 	void RESTAPI_oauth2Handler::DoGet() {
-        if (!IsAuthorized()) {
+	    bool Expired = false;
+        if (!IsAuthorized(Expired)) {
+            if(Expired)
+                return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
             return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
@@ -32,9 +35,12 @@ namespace OpenWifi {
 	}
 
     void RESTAPI_oauth2Handler::DoDelete() {
-        if (!IsAuthorized()) {
-            return UnAuthorized("Not authorized.");
-        }
+	    bool Expired = false;
+	    if (!IsAuthorized(Expired)) {
+	        if(Expired)
+	            return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
+	        return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
+	    }
 
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
         if (Token == SessionToken_) {
@@ -115,7 +121,8 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfoAndPolicy UInfo;
-        auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo);
+        bool Expired=false;
+        auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo, Expired);
         if (Code==SUCCESS) {
             Poco::JSON::Object ReturnObj;
             if(AuthService()->RequiresMFA(UInfo)) {

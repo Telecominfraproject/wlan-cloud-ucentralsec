@@ -51,8 +51,8 @@ namespace OpenWifi{
         int Start() override;
         void Stop() override;
 
-        [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo );
-        [[nodiscard]] UNAUTHORIZED_REASON Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo );
+        [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired);
+        [[nodiscard]] UNAUTHORIZED_REASON Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired );
         void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
@@ -60,8 +60,7 @@ namespace OpenWifi{
 
         bool ValidatePassword(const std::string &pwd);
 
-        [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo);
-        [[nodiscard]] bool IsValidAPIKEY(const Poco::Net::HTTPServerRequest &Request);
+        [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired);
         [[nodiscard]] std::string GenerateTokenJWT(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] std::string GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type);
 
@@ -119,8 +118,8 @@ namespace OpenWifi{
 
     inline AuthService * AuthService() { return AuthService::instance(); }
 
-    [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo ) {
-        return AuthService()->IsAuthorized(Request, SessionToken, UInfo );
+    [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired) {
+        return AuthService()->IsAuthorized(Request, SessionToken, UInfo, Expired );
     }
 
 } // end of namespace

@@ -56,7 +56,7 @@ namespace OpenWifi {
 		Logger_.notice("Stopping...");
     }
 
-	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo )
+	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
     {
         std::lock_guard	Guard(Mutex_);
 		try {
@@ -80,7 +80,9 @@ namespace OpenWifi {
 		            return false;
 		        }
 
-		        if((Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr)) {
+		        Expired = (Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr);
+
+		        if(!Expired) {
 		            SessionToken = CallToken;
 		            UInfo = Client->second ;
 		            return true;
@@ -253,7 +255,7 @@ namespace OpenWifi {
         return false;
     }
 
-    UNAUTHORIZED_REASON AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo )
+    UNAUTHORIZED_REASON AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired )
     {
         std::lock_guard		Guard(Mutex_);
 
@@ -345,16 +347,17 @@ namespace OpenWifi {
         return true;
     }
 
-    bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo) {
+    bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
         std::lock_guard G(Mutex_);
-        auto It = UserCache_.find(Token);
+        auto Client = UserCache_.find(Token);
 
-        std::cout << "Checking token: " << Token << std::endl;
-
-        if(It==UserCache_.end())
+        if(Client==UserCache_.end())
             return false;
-        WebToken = It->second.webtoken;
-        UserInfo = It->second.userinfo;
+
+        Expired = (Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr);
+        WebToken = Client->second.webtoken;
+        UserInfo = Client->second.userinfo;
+
         return true;
     }
 
