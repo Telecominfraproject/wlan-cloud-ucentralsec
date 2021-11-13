@@ -80,7 +80,23 @@ namespace OpenWifi {
         return true;
     }
 
-    std::string DefaultUseridStockUUID{"DEFAULT-USER-UUID-SHOULD-BE-DELETED!!!"};
+    std::string OldDefaultUseridStockUUID{"DEFAULT-USER-UUID-SHOULD-BE-DELETED!!!"};
+    std::string NewDefaultUseridStockUUID{"11111111-0000-0000-6666-999999999999"};
+
+    void Storage::ReplaceOldDefaultUUID() {
+        try {
+            Poco::Data::Session Sess = Pool_->get();
+            std::string St1{"update users set id=? where id=?"};
+
+            Poco::Data::Statement Update(Sess);
+            Update << ConvertParams(St1),
+                Poco::Data::Keywords::use(NewDefaultUseridStockUUID),
+                Poco::Data::Keywords::use(OldDefaultUseridStockUUID);
+            Update.execute();
+        } catch (...) {
+
+        }
+    }
 
     //  if we do not find a default user, then we need to create one based on the
     //  property file. We must set its flag to "must change password", this user has root privilege.
@@ -89,12 +105,13 @@ namespace OpenWifi {
         SecurityObjects::UserInfo   U;
         bool DefaultUserCreated = false;
 
+        ReplaceOldDefaultUUID();
         AppServiceRegistry().Get("defaultusercreated",DefaultUserCreated);
-        if(!GetUserById(DefaultUseridStockUUID,U) && !DefaultUserCreated) {
+        if(!GetUserById(NewDefaultUseridStockUUID,U) && !DefaultUserCreated) {
             U.currentPassword = MicroService::instance().ConfigGetString("authentication.default.password","");
             U.lastPasswords.push_back(U.currentPassword);
             U.email = MicroService::instance().ConfigGetString("authentication.default.username","");
-            U.Id = DefaultUseridStockUUID;
+            U.Id = NewDefaultUseridStockUUID;
             U.userRole = SecurityObjects::ROOT;
             U.creationDate = std::time(nullptr);
             U.validated = true;

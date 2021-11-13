@@ -128,6 +128,9 @@ namespace OpenWifi {
         int Create_AvatarTable();
         int Create_TokensTable();
         int Create_ActionLinkTable();
+
+        /// This is to support a mistake that was deployed...
+        void ReplaceOldDefaultUUID();
    };
 
     inline Storage * StorageService() { return Storage::instance(); };
