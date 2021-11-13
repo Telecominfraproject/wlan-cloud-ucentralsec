@@ -7,6 +7,7 @@
 #include "Poco/JSON/Parser.h"
 #include "framework/RESTAPI_errors.h"
 #include "SMSSender.h"
+#include "ACLProcessor.h"
 
 namespace OpenWifi {
     void RESTAPI_user_handler::DoGet() {
@@ -40,20 +41,12 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
-        if(UserInfo_.userinfo.userRole!= SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
-        }
-
-        if(UserInfo_.userinfo.Id == Id) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
-        }
-
         SecurityObjects::UserInfo UInfo;
         if(!StorageService()->GetUserById(Id,UInfo)) {
             return NotFound();
         }
 
-        if(UInfo.userRole==SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ROOT) {
+        if(!ACLProcessor::Can(UserInfo_.userinfo, UInfo,ACLProcessor::DELETE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
@@ -83,11 +76,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
-        if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
-            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
-        }
-
-        if(UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && UInfo.userRole == SecurityObjects::ROOT) {
+        if(!ACLProcessor::Can(UserInfo_.userinfo,UInfo,ACLProcessor::CREATE)) {
             return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
@@ -140,12 +129,8 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
-        }
-
-        if(UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && Existing.userRole == SecurityObjects::ROOT) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+        if(!ACLProcessor::Can(UserInfo_.userinfo,Existing,ACLProcessor::MODIFY)) {
+            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
         SecurityObjects::UserInfo   NewUser;

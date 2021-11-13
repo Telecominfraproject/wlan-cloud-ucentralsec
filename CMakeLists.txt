@@ -90,7 +90,7 @@ add_executable( owsec
         src/storage/storage_actionLinks.cpp src/storage/storage_actionLinks.h
         src/storage/storage_tokens.h
         src/ActionLinkManager.cpp src/ActionLinkManager.h
-        )
+        src/ACLProcessor.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
