@@ -15,7 +15,7 @@ namespace OpenWifi {
     "RevocationDate 	BIGINT "
 */
 
-    bool Storage::AddToken(std::string &UserName, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
+    bool Storage::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Insert(Sess);
@@ -29,7 +29,7 @@ namespace OpenWifi {
                 Poco::Data::Keywords::use(Token),
                 Poco::Data::Keywords::use(RefreshToken),
                 Poco::Data::Keywords::use(TokenType),
-                Poco::Data::Keywords::use(UserName),
+                Poco::Data::Keywords::use(UserID),
                 Poco::Data::Keywords::use(Now),
                 Poco::Data::Keywords::use(Expires),
                 Poco::Data::Keywords::use(TimeOut),
@@ -55,7 +55,7 @@ namespace OpenWifi {
                 Poco::Data::Keywords::into(UInfo.webtoken.access_token_),
                 Poco::Data::Keywords::into(UInfo.webtoken.refresh_token_),
                 Poco::Data::Keywords::into(UInfo.webtoken.token_type_),
-                Poco::Data::Keywords::into(UInfo.userinfo.email),
+                Poco::Data::Keywords::into(UInfo.userinfo.Id),
                 Poco::Data::Keywords::into(UInfo.webtoken.created_),
                 Poco::Data::Keywords::into(UInfo.webtoken.expires_in_),
                 Poco::Data::Keywords::into(UInfo.webtoken.idle_timeout_),
@@ -133,14 +133,14 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::RevokeAllTokens(std::string & username) {
+    bool Storage::RevokeAllTokens(std::string & UserId) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);
 
             std::string St2{"DELETE From Tokens WHERE Username=?"};
             Delete << ConvertParams(St2),
-                Poco::Data::Keywords::use(username);
+            Poco::Data::Keywords::use(UserId);
             Delete.execute();
             return true;
         } catch(const Poco::Exception &E) {

@@ -194,7 +194,7 @@ namespace OpenWifi {
         UInfo.webtoken.userMustChangePassword = false;
         UserCache_.update(UInfo.webtoken.access_token_,UInfo);
         StorageService()->SetLastLogin(UInfo.userinfo.Id);
-        StorageService()->AddToken(UInfo.webtoken.username_, UInfo.webtoken.access_token_,
+        StorageService()->AddToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
                             UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                 UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
@@ -300,6 +300,7 @@ namespace OpenWifi {
             UInfo.userinfo.lastLogin=std::time(nullptr);
             StorageService()->SetLastLogin(UInfo.userinfo.Id);
             CreateToken(UserName, UInfo );
+
             return SUCCESS;
         }
 
