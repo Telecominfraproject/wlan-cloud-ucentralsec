@@ -77,7 +77,7 @@ namespace OpenWifi {
 		                std::cout << "Fetching token from disk and updating cache: " << CallToken << "   >" <<__LINE__<< std::endl;
 		                if(RevocationDate!=0)
 		                    return false;
-		                Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < time(nullptr);
+		                Expired = (UInfo2.webtoken.created_ + UInfo2.webtoken.expires_in_) < time(nullptr);
 		                std::cout << "Fetching token from disk and updating cache: " << CallToken << "   >" <<__LINE__<< std::endl;
 		                if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
 		                    std::cout << "Fetching token from disk and updating cache: " << CallToken << "   >" <<__LINE__<< std::endl;

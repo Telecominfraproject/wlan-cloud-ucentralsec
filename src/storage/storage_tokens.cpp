@@ -47,11 +47,8 @@ namespace OpenWifi {
 
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Select(Sess);
-            std::cout << __func__ << " : " << __LINE__ << std::endl;
             RevocationDate = 0 ;
-            std::cout << __func__ << " : " << __LINE__ << std::endl;
             std::string St2{"SELECT " + AllTokensFieldsForSelect + " From Tokens WHERE Token=?"};
-            std::cout << __func__ << " : " << __LINE__ << std::endl;
             Select << ConvertParams(St2),
                 Poco::Data::Keywords::into(UInfo.webtoken.access_token_),
                 Poco::Data::Keywords::into(UInfo.webtoken.refresh_token_),
@@ -62,9 +59,7 @@ namespace OpenWifi {
                 Poco::Data::Keywords::into(UInfo.webtoken.idle_timeout_),
                 Poco::Data::Keywords::into(RevocationDate),
                 Poco::Data::Keywords::use(Token);
-            std::cout << __func__ << " : " << __LINE__ << std::endl;
             Select.execute();
-            std::cout << __func__ << " : " << __LINE__ << " Rev:" << RevocationDate << std::endl;
             return true;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
