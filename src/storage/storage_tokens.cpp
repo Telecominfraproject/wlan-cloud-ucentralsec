@@ -50,7 +50,7 @@ namespace OpenWifi {
             std::cout << __func__ << " : " << __LINE__ << std::endl;
             RevocationDate = 0 ;
             std::cout << __func__ << " : " << __LINE__ << std::endl;
-            std::string St2{"SELECT " + AllTokensValuesForSelect + " From Tokens WHERE Token=?"};
+            std::string St2{"SELECT " + AllTokensFieldsForSelect + " From Tokens WHERE Token=?"};
             std::cout << __func__ << " : " << __LINE__ << std::endl;
             Select << ConvertParams(St2),
                 Poco::Data::Keywords::into(UInfo.webtoken.access_token_),
