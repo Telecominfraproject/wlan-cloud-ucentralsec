@@ -20,7 +20,7 @@ namespace OpenWifi {
                                         Server,
                                         Internal,
                                         false,
-                                        true, RateLimit{.Interval=1000,.MaxCalls=5}) {}
+                                        true, RateLimit{.Interval=1000,.MaxCalls=10}) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/actionLink"}; };
         void RequestResetPassword(SecurityObjects::ActionLink &Link);
         void CompleteResetPassword();
