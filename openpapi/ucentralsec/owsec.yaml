@@ -62,6 +62,7 @@ components:
                   - 7     # ACCESS_DENIED,
                   - 8     # INVALID_TOKEN
                   - 9     # expired token
+                  - 10    # rate limit exceeded
               ErrorDetails:
                 type: string
               ErrorDescription:

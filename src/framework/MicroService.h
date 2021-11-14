@@ -81,7 +81,8 @@ namespace OpenWifi {
         INTERNAL_ERROR,
         ACCESS_DENIED,
         INVALID_TOKEN,
-        EXPIRED_TOKEN
+        EXPIRED_TOKEN,
+        RATE_LIMIT_EXCEEDED
     };
 
 	class AppServiceRegistry {
@@ -1524,8 +1525,9 @@ namespace OpenWifi {
 	            Request = &RequestIn;
 	            Response = &ResponseIn;
 
-	            if(RateLimited_ && RESTAPI_RateLimiter()->IsRateLimited(RequestIn,MyRates_.Interval, MyRates_.MaxCalls))
-	                return;
+	            if(RateLimited_ && RESTAPI_RateLimiter()->IsRateLimited(RequestIn,MyRates_.Interval, MyRates_.MaxCalls)) {
+	                return UnAuthorized("Rate limit exceeded.",RATE_LIMIT_EXCEEDED);
+	            }
 
 	            if (!ContinueProcessing())
 	                return;
