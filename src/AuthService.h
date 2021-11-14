@@ -18,6 +18,7 @@
 #include "Poco/SHA2Engine.h"
 #include "Poco/Crypto/DigestEngine.h"
 #include "Poco/HMACEngine.h"
+#include "Poco/ExpireLRUCache.h"
 
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
@@ -86,7 +87,8 @@ namespace OpenWifi{
     private:
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
-		SecurityObjects::UserInfoCache UserCache_;
+		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    UserCache_{2048,1200000};
+		// SecurityObjects::UserInfoCache UserCache_;
         std::string         PasswordValidationStr_;
 		std::regex          PasswordValidation_;
 		uint64_t            TokenAging_ = 30 * 24 * 60 * 60;

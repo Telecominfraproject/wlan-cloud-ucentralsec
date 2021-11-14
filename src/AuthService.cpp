@@ -59,6 +59,7 @@ namespace OpenWifi {
 	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
     {
         std::lock_guard	Guard(Mutex_);
+        Expired = false;
 		try {
 		    std::string CallToken;
 		    Poco::Net::OAuth20Credentials Auth(Request);
@@ -69,26 +70,25 @@ namespace OpenWifi {
 		    if(!CallToken.empty()) {
 		        if(StorageService()->IsTokenRevoked(CallToken))
 		            return false;
-		        auto Client = UserCache_.find(CallToken);
-		        if( Client == UserCache_.end() ) {
+		        auto Client = UserCache_.get(CallToken);
+		        if( Client.isNull() ) {
 		            if(StorageService()->GetToken(SessionToken,UInfo)) {
-		                if(StorageService()->GetUserById(UInfo.userinfo.email,UInfo.userinfo)) {
-		                    UserCache_[UInfo.webtoken.access_token_] = UInfo;
+		                Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < time(nullptr);
+		                if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
+		                    UserCache_.update(UInfo.webtoken.access_token_, UInfo);
 		                    return true;
 		                }
 		            }
 		            return false;
 		        }
 
-		        Expired = (Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr);
-
 		        if(!Expired) {
 		            SessionToken = CallToken;
-		            UInfo = Client->second ;
+		            UInfo = *Client ;
 		            return true;
 		        }
 
-		        UserCache_.erase(Client);
+		        UserCache_.remove(CallToken);
 		        StorageService()->RevokeToken(CallToken);
 		        return false;
 		    }
@@ -101,13 +101,16 @@ namespace OpenWifi {
     bool AuthService::DeleteUserFromCache(const std::string &UserName) {
         std::lock_guard		Guard(Mutex_);
 
-        for(auto i=UserCache_.begin();i!=UserCache_.end();) {
-            if (i->second.userinfo.email==UserName) {
-                Logout(i->first, false);
-                i = UserCache_.erase(i);
-            } else {
-                ++i;
-            }
+        std::vector<std::string>    OldTokens;
+
+        UserCache_.forEach([&OldTokens,UserName](const std::string &token, const SecurityObjects::UserInfoAndPolicy& O) -> void
+        { if(O.userinfo.email==UserName)
+            OldTokens.push_back(token);
+        });
+
+        for(const auto &i:OldTokens) {
+            Logout(i,false);
+            UserCache_.remove(i);
         }
         return true;
     }
@@ -122,9 +125,6 @@ namespace OpenWifi {
 
     void AuthService::Logout(const std::string &token, bool EraseFromCache) {
 		std::lock_guard		Guard(Mutex_);
-
-		if(EraseFromCache)
-		    UserCache_.erase(token);
 
         try {
             Poco::JSON::Object Obj;
@@ -185,7 +185,7 @@ namespace OpenWifi {
         UInfo.webtoken.username_ = UserName;
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
-        UserCache_[UInfo.webtoken.access_token_] = UInfo;
+        UserCache_.update(UInfo.webtoken.access_token_,UInfo);
         StorageService()->SetLastLogin(UInfo.userinfo.Id);
         StorageService()->AddToken(UInfo.webtoken.username_, UInfo.webtoken.access_token_,
                             UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
@@ -349,16 +349,27 @@ namespace OpenWifi {
 
     bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
         std::lock_guard G(Mutex_);
-        auto Client = UserCache_.find(Token);
 
-        if(Client==UserCache_.end())
-            return false;
+        auto Client = UserCache_.get(Token);
+        if(!Client.isNull()) {
+            Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < std::time(nullptr);
+            WebToken = Client->webtoken;
+            UserInfo = Client->userinfo;
+            return true;
+        }
 
-        Expired = (Client->second.webtoken.created_ + Client->second.webtoken.expires_in_) > time(nullptr);
-        WebToken = Client->second.webtoken;
-        UserInfo = Client->second.userinfo;
-
-        return true;
+        //  get the token from disk...
+        std::string TToken{Token};
+        SecurityObjects::UserInfoAndPolicy UInfo;
+        if(StorageService()->GetToken(TToken, UInfo)) {
+            Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
+            if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
+                WebToken = UInfo.webtoken;
+                UserCache_.update(UInfo.webtoken.access_token_, UInfo);
+                return true;
+            }
+        }
+        return false;
     }
 
 
