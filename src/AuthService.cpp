@@ -73,11 +73,12 @@ namespace OpenWifi {
 		        auto Client = UserCache_.get(CallToken);
 		        if( Client.isNull() ) {
 		            std::cout << "Fetching token from disk and updating cache: " << __LINE__<< std::endl;
-		            if(StorageService()->GetToken(SessionToken,UInfo)) {
+		            if(StorageService()->GetToken(CallToken,UInfo)) {
 		                Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < time(nullptr);
 		                if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
 		                    std::cout << "Fetching token from disk and updating cache: " << __LINE__<< std::endl;
 		                    UserCache_.update(UInfo.webtoken.access_token_, UInfo);
+		                    SessionToken = CallToken;
 		                    return true;
 		                }
 		            }
