@@ -100,7 +100,9 @@ The number of older passwords to keep. Default is 5.
 
 ### Changing default password
 
-On the first startup of the service new user will be created with the default credentials from properties `authentication.default.username` and `authentication.default.password`, but **you will have to change the password** before making any real requests. To do that you may run the following script:
+On the first startup of the service new user will be created with the default credentials from properties `authentication.default.username` and `authentication.default.password`, but **you will have to change the password** before making any real requests.
+
+You can this using [owgw-ui](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw-ui/) on first login or using the following script:
 
 ```
 export OWSEC=openwifi.wlan.local:16001 # endpoint to your owsec RESTAPI endpoint
