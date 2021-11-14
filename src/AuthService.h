@@ -75,6 +75,7 @@ namespace OpenWifi{
         [[nodiscard]] static bool SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
         [[nodiscard]] bool DeleteUserFromCache(const std::string &UserName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
+        void RevokeToken(std::string & Token);
 
         [[nodiscard]] static inline const std::string GetLogoAssetURI() {
             return MicroService::instance().PublicEndPoint() + "/wwwassets/the_logo.png";

@@ -75,6 +75,7 @@ namespace OpenWifi {
 		            if(StorageService()->GetToken(SessionToken,UInfo)) {
 		                Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < time(nullptr);
 		                if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
+		                    std::cout << "Fetching token from disk and updating cache" << std::endl;
 		                    UserCache_.update(UInfo.webtoken.access_token_, UInfo);
 		                    return true;
 		                }
@@ -88,14 +89,19 @@ namespace OpenWifi {
 		            return true;
 		        }
 
-		        UserCache_.remove(CallToken);
-		        StorageService()->RevokeToken(CallToken);
+                RevokeToken(CallToken);
+
 		        return false;
 		    }
 		} catch(const Poco::Exception &E) {
 		    Logger_.log(E);
 		}
 		return false;
+    }
+
+    void AuthService::RevokeToken(std::string & Token) {
+        UserCache_.remove(Token);
+        StorageService()->RevokeToken(Token);
     }
 
     bool AuthService::DeleteUserFromCache(const std::string &UserName) {
@@ -134,7 +140,7 @@ namespace OpenWifi {
             std::stringstream ResultText;
             Poco::JSON::Stringifier::stringify(Obj, ResultText);
             std::string Tmp{token};
-            StorageService()->RevokeToken(Tmp);
+            RevokeToken(Tmp);
             KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroService::instance().PrivateEndPoint(), ResultText.str(),
                                         false);
         } catch (const Poco::Exception &E) {
@@ -350,6 +356,8 @@ namespace OpenWifi {
     bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
         std::lock_guard G(Mutex_);
 
+        Expired = false;
+
         auto Client = UserCache_.get(Token);
         if(!Client.isNull()) {
             Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < std::time(nullptr);
@@ -358,14 +366,19 @@ namespace OpenWifi {
             return true;
         }
 
-        //  get the token from disk...
         std::string TToken{Token};
+        if(StorageService()->IsTokenRevoked(TToken)) {
+            return false;
+        }
+
+        //  get the token from disk...
         SecurityObjects::UserInfoAndPolicy UInfo;
         if(StorageService()->GetToken(TToken, UInfo)) {
             Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
             if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
                 WebToken = UInfo.webtoken;
                 UserCache_.update(UInfo.webtoken.access_token_, UInfo);
+                std::cout << "Fetching token from disk and updating cache" << std::endl;
                 return true;
             }
         }
