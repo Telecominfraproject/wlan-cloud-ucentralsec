@@ -117,7 +117,7 @@ namespace OpenWifi {
         bool IsTokenRevoked( std::string & Token );
         bool CleanExpiredTokens();
         bool RevokeAllTokens( std::string & UserName );
-        bool GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo);
+        bool GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo, uint64_t &RevocationDate);
 
         /*
          *  All ActionLinks functions

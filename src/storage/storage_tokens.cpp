@@ -42,14 +42,13 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo) {
+    bool Storage::GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo, uint64_t &RevocationDate) {
         try {
 
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Select(Sess);
 
-            uint32_t RevocationDate = 0 ;
-
+            RevocationDate = 0 ;
             std::string St2{"SELECT " + AllTokensValuesForSelect + " From Tokens WHERE Token=?"};
             Select << ConvertParams(St2),
                 Poco::Data::Keywords::into(UInfo.webtoken.access_token_),

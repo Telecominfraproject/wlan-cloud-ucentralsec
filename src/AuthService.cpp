@@ -68,16 +68,21 @@ namespace OpenWifi {
 		    }
 
 		    if(!CallToken.empty()) {
-		        if(StorageService()->IsTokenRevoked(CallToken))
-		            return false;
 		        auto Client = UserCache_.get(CallToken);
 		        if( Client.isNull() ) {
 		            std::cout << "Fetching token from disk and updating cache: " << CallToken << "   >" <<__LINE__<< std::endl;
-		            if(StorageService()->GetToken(CallToken,UInfo)) {
+		            SecurityObjects::UserInfoAndPolicy UInfo2;
+		            uint64_t RevocationDate=0;
+		            if(StorageService()->GetToken(CallToken,UInfo2,RevocationDate)) {
+		                std::cout << "Fetching token from disk and updating cache: " << CallToken << "   >" <<__LINE__<< std::endl;
+		                if(RevocationDate!=0)
+		                    return false;
 		                Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < time(nullptr);
+		                std::cout << "Fetching token from disk and updating cache: " << CallToken << "   >" <<__LINE__<< std::endl;
 		                if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
 		                    std::cout << "Fetching token from disk and updating cache: " << CallToken << "   >" <<__LINE__<< std::endl;
-		                    UserCache_.update(UInfo.webtoken.access_token_, UInfo);
+		                    UInfo.webtoken = UInfo2.webtoken;
+		                    UserCache_.update(CallToken, UInfo);
 		                    SessionToken = CallToken;
 		                    return true;
 		                }
@@ -376,7 +381,10 @@ namespace OpenWifi {
 
         //  get the token from disk...
         SecurityObjects::UserInfoAndPolicy UInfo;
-        if(StorageService()->GetToken(TToken, UInfo)) {
+        uint64_t RevocationDate=0;
+        if(StorageService()->GetToken(TToken, UInfo, RevocationDate)) {
+            if(RevocationDate!=0)
+                return false;
             Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
             std::cout << "Fetching token from disk and updating cache: " << __LINE__<< std::endl;
             if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
