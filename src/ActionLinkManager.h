@@ -18,8 +18,8 @@ namespace OpenWifi {
         };
 
         static ActionLinkManager * instance() {
-            static ActionLinkManager instance;
-            return &instance;
+            static auto * instance_ = new ActionLinkManager;
+            return instance_;
         }
 
         int Start() final;

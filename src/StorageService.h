@@ -84,8 +84,8 @@ namespace OpenWifi {
         }
 
         static Storage *instance() {
-            static Storage instance;
-            return &instance;
+            static auto * instance_ = new Storage;
+            return instance_;
         }
 
         int 	Start() override;

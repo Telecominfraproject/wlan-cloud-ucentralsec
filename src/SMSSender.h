@@ -25,8 +25,8 @@ namespace OpenWifi {
     class SMSSender : public SubSystemServer {
         public:
             static SMSSender *instance() {
-                static SMSSender instance;
-                return &instance;
+                static auto *instance_ = new SMSSender;
+                return instance_;
             }
 
             int  Start() final;

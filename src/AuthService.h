@@ -45,8 +45,8 @@ namespace OpenWifi{
         static int AccessTypeToInt(ACCESS_TYPE T);
 
         static AuthService *instance() {
-            static AuthService instance;
-            return &instance;
+            static auto * instance_ = new AuthService;
+            return instance_;
         }
 
         int Start() override;

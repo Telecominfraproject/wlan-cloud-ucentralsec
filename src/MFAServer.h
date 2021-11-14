@@ -24,8 +24,8 @@ namespace OpenWifi {
         int Start() override;
         void Stop() override;
         static MFAServer *instance() {
-            static MFAServer instance;
-            return &instance;
+            static auto * instance_ = new MFAServer;
+            return instance_;
         }
 
         bool StartMFAChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, Poco::JSON::Object &Challenge);

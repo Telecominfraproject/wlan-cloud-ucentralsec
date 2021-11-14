@@ -59,8 +59,8 @@ namespace OpenWifi {
     class SMTPMailerService : public SubSystemServer, Poco::Runnable {
         public:
            static SMTPMailerService *instance() {
-               static SMTPMailerService     instance;
-               return & instance;
+               static auto * instance_ = new SMTPMailerService;
+               return instance_;
             }
 
             struct MessageEvent {
