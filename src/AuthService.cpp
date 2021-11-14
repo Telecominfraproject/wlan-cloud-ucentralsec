@@ -72,10 +72,11 @@ namespace OpenWifi {
 		            return false;
 		        auto Client = UserCache_.get(CallToken);
 		        if( Client.isNull() ) {
+		            std::cout << "Fetching token from disk and updating cache: " << __LINE__<< std::endl;
 		            if(StorageService()->GetToken(SessionToken,UInfo)) {
 		                Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < time(nullptr);
 		                if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
-		                    std::cout << "Fetching token from disk and updating cache" << std::endl;
+		                    std::cout << "Fetching token from disk and updating cache: " << __LINE__<< std::endl;
 		                    UserCache_.update(UInfo.webtoken.access_token_, UInfo);
 		                    return true;
 		                }
@@ -375,10 +376,11 @@ namespace OpenWifi {
         SecurityObjects::UserInfoAndPolicy UInfo;
         if(StorageService()->GetToken(TToken, UInfo)) {
             Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
+            std::cout << "Fetching token from disk and updating cache: " << __LINE__<< std::endl;
             if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
                 WebToken = UInfo.webtoken;
                 UserCache_.update(UInfo.webtoken.access_token_, UInfo);
-                std::cout << "Fetching token from disk and updating cache" << std::endl;
+                std::cout << "Fetching token from disk and updating cache: " << __LINE__<< std::endl;
                 return true;
             }
         }
