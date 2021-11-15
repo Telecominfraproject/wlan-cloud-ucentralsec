@@ -27,6 +27,8 @@ namespace OpenWifi {
         LoginMethod_ = MicroService::instance().ConfigGetString("mailer.loginmethod");
         MailHostPort_ = (int) MicroService::instance().ConfigGetInt("mailer.port");
         TemplateDir_ = MicroService::instance().ConfigPath("mailer.templates", MicroService::instance().DataDir());
+        MailRetry_ = (int) MicroService::instance().ConfigGetInt("mailer.retry",2*60);
+        MailAbandon_ = (int) MicroService::instance().ConfigGetInt("mailer.abandon",2*60*60);
         Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
     }
 
@@ -50,39 +52,46 @@ namespace OpenWifi {
 
     bool SMTPMailerService::SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
         std::lock_guard G(Mutex_);
-
-        Messages_.push_back(MessageEvent{.Posted=(uint64_t )std::time(nullptr),
+        PendingMessages_.push_back(MessageEvent{.Posted=(uint64_t )std::time(nullptr),
                                             .LastTry=0,
                                             .Sent=0,
                                             .File=Poco::File(TemplateDir_ + "/" +Name),
                                             .Attrs=Attrs});
-
         return true;
     }
 
     void SMTPMailerService::run() {
-
         Running_ = true;
         while(Running_) {
+
             Poco::Thread::trySleep(10000);
             if(!Running_)
                 break;
+
             {
                 std::lock_guard G(Mutex_);
+                Messages_.splice(Messages_.end(),PendingMessages_);
+            }
 
+            for(auto i=Messages_.begin();i!=Messages_.end();) {
+                if(!Running_)
+                    break;
+                auto Recipient = i->Attrs.find(RECIPIENT_EMAIL)->second;
                 uint64_t Now = std::time(nullptr);
-
-                for(auto &i:Messages_) {
-                    if(i.Sent==0 && (i.LastTry==0 || (Now-i.LastTry)>120)) {
-                        if (SendIt(i)) {
-                            i.LastTry = i.Sent = std::time(nullptr);
-                        } else
-                            i.LastTry = std::time(nullptr);
+                if((i->LastTry==0 || (Now-i->LastTry)>MailRetry_)) {
+                    if (SendIt(*i)) {
+                        Logger_.information(Poco::format("Attempting to deliver for mail '%s'.", Recipient));
+                        i = Messages_.erase(i);
+                    } else {
+                        i->LastTry = Now;
+                        ++i;
                     }
+                } else if ((Now-i->Posted)>MailAbandon_) {
+                    Logger_.information(Poco::format("Mail for '%s' has timed out and will not be sent.", Recipient));
+                    i = Messages_.erase(i);
+                } else {
+                    ++i;
                 }
-
-                //  Clean the list
-                std::remove_if(Messages_.begin(),Messages_.end(),[Now](MessageEvent &E){ return (E.Sent!=0 || ((Now-E.LastTry)>(15*60)));});
             }
         }
     }

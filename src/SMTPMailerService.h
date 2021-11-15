@@ -71,31 +71,28 @@ namespace OpenWifi {
                MessageAttributes    Attrs;
             };
 
-            struct MessageCacheEntry {
-               uint64_t         LastRequest=0;
-               uint64_t         HowManyRequests=0;
-            };
-
             void run() override;
-
             int Start() override;
             void Stop() override;
+
             bool SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs);
             bool SendIt(const MessageEvent &Msg);
             void LoadMyConfig();
             void reinitialize(Poco::Util::Application &self) override;
             bool Enabled() const { return Enabled_; }
+
         private:
             std::string             MailHost_;
             std::string             Sender_;
             int                     MailHostPort_=25;
+            int                     MailRetry_=2*60;
+            int                     MailAbandon_=2*60*20;
             std::string             SenderLoginUserName_;
             std::string             SenderLoginPassword_;
             std::string             LoginMethod_ = "login";
-            std::string             LogoFileName_;
             std::string             TemplateDir_;
             std::list<MessageEvent> Messages_;
-            std::map<std::string,MessageCacheEntry> Cache_;
+            std::list<MessageEvent> PendingMessages_;
             Poco::Thread            SenderThr_;
             std::atomic_bool        Running_=false;
             bool                    Enabled_=false;
