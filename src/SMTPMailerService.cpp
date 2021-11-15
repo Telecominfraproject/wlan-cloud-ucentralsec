@@ -94,10 +94,12 @@ namespace OpenWifi {
     }
 
     bool SMTPMailerService::SendIt(const MessageEvent &Msg) {
+        std::string             Recipient;
+
         try
         {
             Poco::Net::MailMessage  Message;
-            std::string             Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
+            Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
 
             auto H1 = Msg.Attrs.find(SENDER);
             std::string TheSender;
@@ -158,6 +160,9 @@ namespace OpenWifi {
         catch (const Poco::Exception& E)
         {
             Logger_.log(E);
+        }
+        catch (const std::exception &E) {
+            Logger_.warning(Poco::format("Cannot send message to:%s, error: %s",Recipient, E.what()));
         }
         return false;
     }
