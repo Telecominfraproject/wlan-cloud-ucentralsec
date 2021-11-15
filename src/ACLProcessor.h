@@ -27,7 +27,7 @@ namespace OpenWifi {
             if(User.Id == Target.Id)
                 return true;
 
-            if((User.userRole!=SecurityObjects::ADMIN && Target.userRole!=SecurityObjects::ROOT) && Op!=READ)
+            if(User.userRole!=SecurityObjects::ADMIN && User.userRole!=SecurityObjects::ROOT && Op!=READ)
                 return false;
 
             if(Target.userRole==SecurityObjects::ROOT && Op!=READ)
