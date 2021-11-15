@@ -77,52 +77,52 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::IdMustBe0);
         }
 
-        SecurityObjects::UserInfo   UInfo;
-        RESTAPI_utils::from_request(UInfo,*Request);
+        SecurityObjects::UserInfo   NewUser;
+        RESTAPI_utils::from_request(NewUser,*Request);
 
-        if(UInfo.userRole == SecurityObjects::UNKNOWN) {
+        if(NewUser.userRole == SecurityObjects::UNKNOWN) {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
-        if(!ACLProcessor::Can(UserInfo_.userinfo,UInfo,ACLProcessor::CREATE)) {
+        if(!ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
             return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
-        Poco::toLowerInPlace(UInfo.email);
-        if(!Utils::ValidEMailAddress(UInfo.email)) {
+        Poco::toLowerInPlace(NewUser.email);
+        if(!Utils::ValidEMailAddress(NewUser.email)) {
             return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
         }
 
-        if(!UInfo.currentPassword.empty()) {
-            if(!AuthService()->ValidatePassword(UInfo.currentPassword)) {
+        if(!NewUser.currentPassword.empty()) {
+            if(!AuthService()->ValidatePassword(NewUser.currentPassword)) {
                 return BadRequest(RESTAPI::Errors::InvalidPassword);
             }
         }
 
-        if(UInfo.name.empty())
-            UInfo.name = UInfo.email;
+        if(NewUser.name.empty())
+            NewUser.name = NewUser.email;
 
-        if(!StorageService()->CreateUser(UInfo.email,UInfo)) {
-            Logger_.information(Poco::format("Could not add user '%s'.",UInfo.email));
+        if(!StorageService()->CreateUser(NewUser.email,NewUser)) {
+            Logger_.information(Poco::format("Could not add user '%s'.",NewUser.email));
             return BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
 
         if(GetParameter("email_verification","false")=="true") {
-            if(AuthService::VerifyEmail(UInfo))
-                Logger_.information(Poco::format("Verification e-mail requested for %s",UInfo.email));
-            StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,UInfo.Id,UInfo);
+            if(AuthService::VerifyEmail(NewUser))
+                Logger_.information(Poco::format("Verification e-mail requested for %s",NewUser.email));
+            StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,NewUser.Id,NewUser);
         }
 
-        if(!StorageService()->GetUserByEmail(UInfo.email, UInfo)) {
-            Logger_.information(Poco::format("User '%s' but not retrieved.",UInfo.email));
+        if(!StorageService()->GetUserByEmail(NewUser.email, NewUser)) {
+            Logger_.information(Poco::format("User '%s' but not retrieved.",NewUser.email));
             return NotFound();
         }
 
         Poco::JSON::Object  UserInfoObject;
-        FilterCredentials(UInfo);
-        UInfo.to_json(UserInfoObject);
+        FilterCredentials(NewUser);
+        NewUser.to_json(UserInfoObject);
         ReturnObject(UserInfoObject);
-        Logger_.information(Poco::format("User '%s' has been added by '%s')",UInfo.email, UserInfo_.userinfo.email));
+        Logger_.information(Poco::format("User '%s' has been added by '%s')",NewUser.email, UserInfo_.userinfo.email));
     }
 
     void RESTAPI_user_handler::DoPut() {
