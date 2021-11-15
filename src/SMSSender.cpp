@@ -16,13 +16,16 @@
 namespace OpenWifi {
 
     int SMSSender::Start() {
-        Provider_ = MicroService::instance().ConfigGetString("sms.provider","aws");
-        if(Provider_=="aws") {
-            ProviderImpl_ = std::make_unique<SMS_provider_aws>(Logger_);
-        } else if(Provider_=="twilio") {
-            ProviderImpl_ = std::make_unique<SMS_provider_twilio>(Logger_);
+        Enabled_ = MicroService::instance().ConfigGetBool("sms.enabled",false);
+        if(Enabled_) {
+            Provider_ = MicroService::instance().ConfigGetString("sms.provider","aws");
+            if(Provider_=="aws") {
+                ProviderImpl_ = std::make_unique<SMS_provider_aws>(Logger_);
+            } else if(Provider_=="twilio") {
+                ProviderImpl_ = std::make_unique<SMS_provider_twilio>(Logger_);
+            }
+            Enabled_ = ProviderImpl_->Initialize();
         }
-        Enabled_ = ProviderImpl_->Initialize();
         return 0;
     }
 

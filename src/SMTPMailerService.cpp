@@ -20,16 +20,19 @@
 namespace OpenWifi {
 
     void SMTPMailerService::LoadMyConfig() {
-        MailHost_ = MicroService::instance().ConfigGetString("mailer.hostname");
-        SenderLoginUserName_ = MicroService::instance().ConfigGetString("mailer.username");
-        SenderLoginPassword_ = MicroService::instance().ConfigGetString("mailer.password");
-        Sender_ = MicroService::instance().ConfigGetString("mailer.sender");
-        LoginMethod_ = MicroService::instance().ConfigGetString("mailer.loginmethod");
-        MailHostPort_ = (int) MicroService::instance().ConfigGetInt("mailer.port");
-        TemplateDir_ = MicroService::instance().ConfigPath("mailer.templates", MicroService::instance().DataDir());
-        MailRetry_ = (int) MicroService::instance().ConfigGetInt("mailer.retry",2*60);
-        MailAbandon_ = (int) MicroService::instance().ConfigGetInt("mailer.abandon",2*60*60);
-        Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
+        Enabled_ = MicroService::instance().ConfigGetBool("mailer.enabled",false);
+        if(Enabled_) {
+            MailHost_ = MicroService::instance().ConfigGetString("mailer.hostname");
+            SenderLoginUserName_ = MicroService::instance().ConfigGetString("mailer.username");
+            SenderLoginPassword_ = MicroService::instance().ConfigGetString("mailer.password");
+            Sender_ = MicroService::instance().ConfigGetString("mailer.sender");
+            LoginMethod_ = MicroService::instance().ConfigGetString("mailer.loginmethod");
+            MailHostPort_ = (int) MicroService::instance().ConfigGetInt("mailer.port");
+            TemplateDir_ = MicroService::instance().ConfigPath("mailer.templates", MicroService::instance().DataDir());
+            MailRetry_ = (int) MicroService::instance().ConfigGetInt("mailer.retry",2*60);
+            MailAbandon_ = (int) MicroService::instance().ConfigGetInt("mailer.abandon",2*60*60);
+            Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
+        }
     }
 
     int SMTPMailerService::Start() {

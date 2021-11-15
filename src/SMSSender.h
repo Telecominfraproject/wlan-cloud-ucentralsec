@@ -18,8 +18,8 @@ namespace OpenWifi {
         std::string Number;
         std::string Code;
         std::string UserName;
-        uint64_t    Created;
-        bool        Validated=false;
+        uint64_t    Created = std::time(nullptr);
+        bool        Validated = false;
     };
 
     class SMSSender : public SubSystemServer {
@@ -37,8 +37,8 @@ namespace OpenWifi {
             bool IsNumberValid(const std::string &Number, const std::string &UserName);
             [[nodiscard]] bool Send(const std::string &PhoneNumber, const std::string &Message);
         private:
-            std::string         Provider_;
-            bool                Enabled_=false;
+            std::string                             Provider_;
+            bool                                    Enabled_=false;
             std::vector<SMSValidationCacheEntry>    Cache_;
             std::unique_ptr<SMS_provider>           ProviderImpl_;
 
