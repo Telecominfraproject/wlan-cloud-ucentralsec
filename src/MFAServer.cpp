@@ -26,7 +26,7 @@ namespace OpenWifi {
             return false;
 
         std::string Challenge = MakeChallenge();
-        std::string uuid = MicroService::instance().CreateUUID();
+        std::string uuid = MicroService::CreateUUID();
         uint64_t Created = std::time(nullptr);
 
         ChallengeStart.set("uuid",uuid);

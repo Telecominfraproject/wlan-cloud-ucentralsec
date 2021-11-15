@@ -346,7 +346,7 @@ namespace OpenWifi {
 
         A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
         A.userId = UInfo.email;
-        A.id = MicroService::instance().CreateUUID();
+        A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
         StorageService()->CreateAction(A);

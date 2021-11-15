@@ -86,7 +86,7 @@ namespace OpenWifi {
                 SecurityObjects::ActionLink NewLink;
 
                 NewLink.action = OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD;
-                NewLink.id = MicroService::instance().CreateUUID();
+                NewLink.id = MicroService::CreateUUID();
                 NewLink.userId = UInfo1.Id;
                 NewLink.created = std::time(nullptr);
                 NewLink.expires = NewLink.created + (24*60*60);

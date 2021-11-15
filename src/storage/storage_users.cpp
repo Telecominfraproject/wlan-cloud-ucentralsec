@@ -149,7 +149,7 @@ namespace OpenWifi {
                 return false;
 
             if(!PasswordHashedAlready) {
-                NewUser.Id = MicroService::instance().CreateUUID();
+                NewUser.Id = MicroService::CreateUUID();
                 NewUser.creationDate = std::time(nullptr);
             }
 
