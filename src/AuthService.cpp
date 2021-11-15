@@ -76,7 +76,7 @@ namespace OpenWifi {
 		                if(RevocationDate!=0)
 		                    return false;
 		                Expired = (UInfo2.webtoken.created_ + UInfo2.webtoken.expires_in_) < time(nullptr);
-		                if(StorageService()->GetUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
+		                if(StorageService()->GetUserById(UInfo2.userinfo.Id,UInfo.userinfo)) {
 		                    UInfo.webtoken = UInfo2.webtoken;
 		                    UserCache_.update(CallToken, UInfo);
 		                    SessionToken = CallToken;
