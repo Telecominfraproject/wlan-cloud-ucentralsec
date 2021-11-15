@@ -98,110 +98,64 @@ namespace OpenWifi {
 
         try
         {
-            std::cout << __LINE__ << std::endl;
             Poco::Net::MailMessage  Message;
-            std::cout << __LINE__ << std::endl;
             Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
-            std::cout << __LINE__ << std::endl;
 
             auto H1 = Msg.Attrs.find(SENDER);
-            std::cout << __LINE__ << std::endl;
             std::string TheSender;
-            std::cout << __LINE__ << std::endl;
             if(H1!=Msg.Attrs.end()) {
-                std::cout << __LINE__ << std::endl;
                 TheSender = H1->second ;
             } else {
-                std::cout << __LINE__ << std::endl;
                 TheSender = Sender_ ;
             }
-            std::cout << __LINE__ << std::endl;
             Message.setSender( TheSender );
-            std::cout << __LINE__ << std::endl;
             Logger_.information(Poco::format("Sending message to:%s from %s",Recipient,TheSender));
-            std::cout << __LINE__ << std::endl;
-
-            std::cout << __LINE__ << std::endl;
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
-            std::cout << __LINE__ << std::endl;
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
-            std::cout << __LINE__ << std::endl;
 
             if(Msg.Attrs.find(TEXT) != Msg.Attrs.end()) {
-                std::cout << __LINE__ << std::endl;
                 std::string Content = Msg.Attrs.find(TEXT)->second;
-                std::cout << __LINE__ << std::endl;
                 Message.addContent(new Poco::Net::StringPartSource(Content));
-                std::cout << __LINE__ << std::endl;
             } else {
-                std::cout << __LINE__ << std::endl;
                 std::string Content = Utils::LoadFile(Msg.File);
-                std::cout << __LINE__ << std::endl;
                 Types::StringPairVec    Variables;
-                std::cout << __LINE__ << std::endl;
                 FillVariables(Msg.Attrs, Variables);
-                std::cout << __LINE__ << std::endl;
                 Utils::ReplaceVariables(Content, Variables);
-                std::cout << __LINE__ << std::endl;
                 Message.addContent(new Poco::Net::StringPartSource(Content));
-                std::cout << __LINE__ << std::endl;
             }
 
-            std::cout << __LINE__ << std::endl;
             auto Logo = Msg.Attrs.find(LOGO);
-            std::cout << __LINE__ << std::endl;
             if(Logo!=Msg.Attrs.end()) {
-                std::cout << __LINE__ << std::endl;
                 try {
-                    std::cout << __LINE__ << std::endl;
                     Poco::File          LogoFile(AuthService::GetLogoAssetFileName());
-                    std::cout << __LINE__ << std::endl;
                     std::ifstream       IF(LogoFile.path());
-                    std::cout << __LINE__ << std::endl;
                     std::ostringstream  OS;
-                    std::cout << __LINE__ << std::endl;
                     Poco::StreamCopier::copyStream(IF, OS);
-                    std::cout << __LINE__ << std::endl;
-                    std::cout << __LINE__ << std::endl;
                     Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
-                    std::cout << __LINE__ << std::endl;
                 } catch (...) {
-                    std::cout << __LINE__ << std::endl;
                     Logger_.warning(Poco::format("Cannot add '%s' logo in email",AuthService::GetLogoAssetFileName()));
-                    std::cout << __LINE__ << std::endl;
                 }
             }
 
-//            Poco::SharedPtr<Poco::Net::PrivateKeyPassphraseHandler> pConsoleHandler = new KeyConsoleHandler;
-//            Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
             Poco::SharedPtr<Poco::Net::AcceptCertificateHandler>  ptrHandler_ = new Poco::Net::AcceptCertificateHandler(false);
 
-            std::cout << __LINE__ << std::endl;
             Poco::Net::SecureSMTPClientSession session(MailHost_,MailHostPort_);
-            std::cout << __LINE__ << std::endl;
             auto ptrContext = Poco::AutoPtr<Poco::Net::Context>
                     (new Poco::Net::Context(Poco::Net::Context::CLIENT_USE, "", "", "",
                                                             Poco::Net::Context::VERIFY_RELAXED, 9, true,
                                                             "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"));
-            std::cout << __LINE__ << std::endl;
             Poco::Net::SSLManager::instance().initializeClient(nullptr,
                                                                ptrHandler_,
                                                                ptrContext);
-            std::cout << __LINE__ << std::endl;
             session.login();
-            std::cout << __LINE__ << std::endl;
             session.startTLS(ptrContext);
-            std::cout << __LINE__ << std::endl;
             session.login(MailHost_,
                           Poco::Net::SecureSMTPClientSession::AUTH_LOGIN,
                           SenderLoginUserName_,
                           SenderLoginPassword_
             );
-            std::cout << __LINE__ << std::endl;
             session.sendMessage(Message);
-            std::cout << __LINE__ << std::endl;
             session.close();
-            std::cout << __LINE__ << std::endl;
             return true;
         }
         catch (const Poco::Exception& E)
