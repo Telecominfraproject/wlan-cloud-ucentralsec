@@ -10,6 +10,13 @@
 #include "ACLProcessor.h"
 
 namespace OpenWifi {
+
+    static void FilterCredentials(SecurityObjects::UserInfo & U) {
+        U.currentPassword.clear();
+        U.lastPasswords.clear();
+        U.oauthType.clear();
+    }
+
     void RESTAPI_user_handler::DoGet() {
         std::string Id = GetBinding("id", "");
         if(Id.empty()) {
@@ -28,9 +35,7 @@ namespace OpenWifi {
         }
 
         Poco::JSON::Object  UserInfoObject;
-        UInfo.currentPassword.clear();
-        UInfo.lastPasswords.clear();
-        UInfo.oauthType.clear();
+        FilterCredentials(UInfo);
         UInfo.to_json(UserInfoObject);
         ReturnObject(UserInfoObject);
     }
@@ -114,10 +119,9 @@ namespace OpenWifi {
         }
 
         Poco::JSON::Object  UserInfoObject;
+        FilterCredentials(UInfo);
         UInfo.to_json(UserInfoObject);
-
         ReturnObject(UserInfoObject);
-
         Logger_.information(Poco::format("User '%s' has been added by '%s')",UInfo.email, UserInfo_.userinfo.email));
     }
 
@@ -228,6 +232,7 @@ namespace OpenWifi {
             SecurityObjects::UserInfo   NewUserInfo;
             StorageService()->GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
             Poco::JSON::Object  ModifiedObject;
+            FilterCredentials(NewUserInfo);
             NewUserInfo.to_json(ModifiedObject);
             return ReturnObject(ModifiedObject);
         }
