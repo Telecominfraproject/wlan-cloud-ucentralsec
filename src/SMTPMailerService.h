@@ -99,13 +99,10 @@ namespace OpenWifi {
             Poco::Thread            SenderThr_;
             std::atomic_bool        Running_=false;
             bool                    Enabled_=false;
-            Poco::Net::AcceptCertificateHandler  ptrHandler_;
 
             SMTPMailerService() noexcept:
-                SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer"),
-                ptrHandler_(false)
+                SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer")
             {
-                std::string E{"SHA512"};
             }
     };
 

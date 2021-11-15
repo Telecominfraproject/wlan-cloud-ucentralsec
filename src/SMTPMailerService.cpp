@@ -172,6 +172,10 @@ namespace OpenWifi {
                 }
             }
 
+//            Poco::SharedPtr<Poco::Net::PrivateKeyPassphraseHandler> pConsoleHandler = new KeyConsoleHandler;
+//            Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
+            Poco::SharedPtr<Poco::Net::AcceptCertificateHandler>  ptrHandler_ = new Poco::Net::AcceptCertificateHandler(false);
+
             std::cout << __LINE__ << std::endl;
             Poco::Net::SecureSMTPClientSession session(MailHost_,MailHostPort_);
             std::cout << __LINE__ << std::endl;
@@ -181,7 +185,7 @@ namespace OpenWifi {
                                                             "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"));
             std::cout << __LINE__ << std::endl;
             Poco::Net::SSLManager::instance().initializeClient(nullptr,
-                                                               &ptrHandler_,
+                                                               ptrHandler_,
                                                                ptrContext);
             std::cout << __LINE__ << std::endl;
             session.login();
