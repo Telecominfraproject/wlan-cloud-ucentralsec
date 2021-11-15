@@ -30,7 +30,7 @@ namespace OpenWifi {
             if((User.userRole!=SecurityObjects::ADMIN && Target.userRole!=SecurityObjects::ROOT) && Op!=READ)
                 return false;
 
-            if(User.userRole==SecurityObjects::ADMIN && Target.userRole==SecurityObjects::ROOT && Op!=READ)
+            if(Target.userRole==SecurityObjects::ROOT && Op!=READ)
                 return false;
 
             return true;
