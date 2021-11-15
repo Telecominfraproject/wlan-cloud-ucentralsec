@@ -17,6 +17,13 @@
 #include "StorageService.h"
 
 namespace OpenWifi {
+
+    static void FilterCredentials(SecurityObjects::UserInfo & U) {
+        U.currentPassword.clear();
+        U.lastPasswords.clear();
+        U.oauthType.clear();
+    }
+
 	void RESTAPI_oauth2Handler::DoGet() {
 	    bool Expired = false;
         if (!IsAuthorized(Expired)) {
@@ -28,7 +35,9 @@ namespace OpenWifi {
         if(GetMe) {
             Logger_.information(Poco::format("REQUEST-ME(%s): Request for %s", Request->clientAddress().toString(), UserInfo_.userinfo.email));
             Poco::JSON::Object Me;
-            UserInfo_.userinfo.to_json(Me);
+            SecurityObjects::UserInfo   ReturnedUser = UserInfo_.userinfo;
+            FilterCredentials(ReturnedUser);
+            ReturnedUser.to_json(Me);
             return ReturnObject(Me);
         }
         BadRequest(RESTAPI::Errors::UnrecognizedRequest);
