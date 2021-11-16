@@ -141,11 +141,17 @@ configProperties:
   authentication.default.access: master
   authentication.service.type: internal
   # Mailer
+  mailer.enabled: "false"
   mailer.hostname: smtp.gmail.com
   mailer.sender: OpenWIFI
   mailer.loginmethod: login
   mailer.port: 587
   mailer.templates: $OWSEC_ROOT/persist/templates
+  # SMS
+  smssender.enabled: "false"
+  smssender.provider: "aws"
+  #smssender.aws.region: ""
+  #smssender.twilio.phonenumber: ""
   # ALB
   alb.enable: "true"
   alb.port: 16101
@@ -212,6 +218,12 @@ configProperties:
   # Mailer
   mailer.username: no-reply@arilia.com
   mailer.password: "**************************"
+  # SMS
+  #smssender.aws.secretkey: ""
+  #smssender.aws.accesskey: ""
+  #smssender.twilio.sid: ""
+  #smssender.twilio.token: ""
+  #
   # Storage
   ## PostgreSQL
   storage.type.postgresql.username: stephb
