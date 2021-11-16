@@ -64,6 +64,7 @@ namespace OpenWifi {
         }
 
         StorageService()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+        StorageService()->DeletePreferences(UserInfo_.userinfo.email,Id);
 
         Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
         StorageService()->RevokeAllTokens(UInfo.email);

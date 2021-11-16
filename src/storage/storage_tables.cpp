@@ -7,6 +7,7 @@
 #include "storage_avatar.h"
 #include "storage_actionLinks.h"
 #include "storage_tokens.h"
+#include "storage_preferences.h"
 
 namespace OpenWifi {
 
@@ -15,6 +16,7 @@ namespace OpenWifi {
         Create_AvatarTable();
         Create_TokensTable();
         Create_ActionLinkTable();
+        Create_Preferences();
         return 0;
     }
 
@@ -78,12 +80,26 @@ namespace OpenWifi {
             return 1;
         }
 
-        int Storage::Create_TokensTable() {
+    int Storage::Create_TokensTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
                 Sess << "CREATE TABLE IF NOT EXISTS Tokens (" +
                             AllTokensFieldsForCreation +
                         ") ", Poco::Data::Keywords::now;
+            return 0;
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        return 1;
+    }
+
+    int Storage::Create_Preferences() {
+        try {
+            Poco::Data::Session Sess = Pool_->get();
+
+            Sess << "CREATE TABLE IF NOT EXISTS Preferences (" +
+                AllPreferencesFieldsForCreation +
+            ") ", Poco::Data::Keywords::now;
             return 0;
         } catch(const Poco::Exception &E) {
             Logger_.log(E);

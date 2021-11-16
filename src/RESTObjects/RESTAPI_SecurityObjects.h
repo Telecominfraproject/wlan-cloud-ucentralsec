@@ -244,6 +244,14 @@ namespace OpenWifi::SecurityObjects {
         void to_json(Poco::JSON::Object &Obj) const;
 	    bool from_json(Poco::JSON::Object::Ptr &Obj);
 	};
+
+	struct Preferences {
+	    std::string                         id;
+	    uint64_t                            modified;
+	    Types::StringPairVec                data;
+	    void to_json(Poco::JSON::Object &Obj) const;
+	    bool from_json(Poco::JSON::Object::Ptr &Obj);
+	};
 }
 
 #endif //UCENTRAL_RESTAPI_SECURITYOBJECTS_H

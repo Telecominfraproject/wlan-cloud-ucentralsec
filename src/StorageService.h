@@ -12,6 +12,7 @@
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "framework/StorageClass.h"
 #include "AuthService.h"
+#include "framework/OpenWifiTypes.h"
 
 #include "Poco/Timer.h"
 
@@ -131,12 +132,17 @@ namespace OpenWifi {
         bool GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max=200);
         void CleanOldActionLinks();
 
+        bool GetPreferences(std::string &Id, SecurityObjects::Preferences &P);
+        bool SetPreferences(SecurityObjects::Preferences &P);
+        bool DeletePreferences(const std::string &AdminId, std::string & Id);
+
 	  private:
         int Create_Tables();
         int Create_UserTable();
         int Create_AvatarTable();
         int Create_TokensTable();
         int Create_ActionLinkTable();
+        int Create_Preferences();
 
         Poco::Timer                     Timer_;
         Archiver                        Archiver_;
