@@ -13,7 +13,7 @@ namespace OpenWifi {
 
     static const std::string AllPreferencesFieldsForCreation{
         "Id          varchar(36) UNIQUE PRIMARY KEY,"
-        "modified       bigint"
+        "modified       bigint,"
         "data           text"};
 
     static const std::string AllPreferencesFieldsForSelect{
