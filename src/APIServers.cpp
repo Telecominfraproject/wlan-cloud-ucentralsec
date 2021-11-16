@@ -14,6 +14,7 @@
 #include "RESTAPI/RESTAPI_email_handler.h"
 #include "RESTAPI/RESTAPI_sms_handler.h"
 #include "RESTAPI/RESTAPI_validateToken_handler.h"
+#include "RESTAPI/RESTAPI_preferences.h"
 
 namespace OpenWifi {
 
@@ -29,7 +30,8 @@ namespace OpenWifi {
             RESTAPI_action_links,
             RESTAPI_avatarHandler,
             RESTAPI_email_handler,
-            RESTAPI_sms_handler
+            RESTAPI_sms_handler,
+            RESTAPI_preferences
         >(Path, Bindings, L, S);
     }
 
