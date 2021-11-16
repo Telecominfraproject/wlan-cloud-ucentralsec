@@ -263,7 +263,7 @@ sendsms() {
 }
 
 setpreferences() {
-    payload="{ \"data\" : [ { \"name\" : \"$1\" , \"value\" : \"$2\" }] }"
+    payload="{ \"data\" : [ [ \"$1\" , \"$2\" ] ] }"
     curl ${FLAGS} -X PUT "https://${OWSEC}/api/v1/preferences" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
@@ -274,7 +274,7 @@ setpreferences() {
 getpreferences() {
     curl ${FLAGS} -X GET "https://${OWSEC}/api/v1/preferences" \
     -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" ${result_file}
+    -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
