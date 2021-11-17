@@ -450,11 +450,12 @@ namespace OpenWifi::RESTAPI_utils {
         try {
             Poco::JSON::Parser P;
             auto Object = P.parse(S).template extract<Poco::JSON::Array::Ptr>();
-            for (auto const &i : *Object) {
+            for (const auto &i : *Object) {
                 auto InnerObject = i.template extract<Poco::JSON::Array::Ptr>();
                 if(InnerObject->size()==2) {
-                    Types::StringPair P{InnerObject->get(0).toString(), InnerObject->get(1).toString()};
-                    R.push_back(P);
+                    auto S1 = InnerObject->getElement<std::string>(0);
+                    auto S2 = InnerObject->getElement<std::string>(1);
+                    R.push_back(std::make_pair(S1,S2));
                 }
             }
         } catch (...) {

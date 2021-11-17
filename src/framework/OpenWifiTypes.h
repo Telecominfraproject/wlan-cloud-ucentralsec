@@ -54,6 +54,7 @@ namespace OpenWifi::Types {
         return SS.str();
     }
 
+/*
     inline std::string to_string( const StringPairVec &V) {
         Poco::JSON::Array   O;
         for(const auto &i:V) {
@@ -75,9 +76,9 @@ namespace OpenWifi::Types {
 
             for(const auto &i:*O) {
                 auto Inner = i.extract<Poco::JSON::Array::Ptr>();
-                for(const auto &j:*Inner) {
-                    auto S1 = i[0].toString();
-                    auto S2 = i[1].toString();
+                if(Inner->size()==2) {
+                    auto S1 = Inner->getElement<std::string>(0);
+                    auto S2 = Inner->getElement<std::string>(1);
                     V.push_back(std::make_pair(S1,S2));
                 }
             }
@@ -85,6 +86,7 @@ namespace OpenWifi::Types {
 
         }
     }
+*/
 
     inline void from_string(const std::string &S, StringVec &V) {
         try {

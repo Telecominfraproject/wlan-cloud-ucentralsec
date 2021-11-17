@@ -9,13 +9,13 @@ namespace OpenWifi {
     void Convert(const PreferencesRecord &R,SecurityObjects::Preferences &P ) {
         P.id = R.get<0>();
         P.modified = R.get<1>();
-        OpenWifi::Types::from_string(R.get<2>(), P.data);
+        P.data = OpenWifi::RESTAPI_utils::to_stringpair_array(R.get<2>());
     }
 
     void Convert(const SecurityObjects::Preferences &P, PreferencesRecord &R ) {
         R.set<0>(P.id);
         R.set<1>(P.modified);
-        R.set<2>(OpenWifi::Types::to_string(P.data));
+        R.set<2>(OpenWifi::RESTAPI_utils::to_string(P.data));
     }
 
     bool Storage::GetPreferences(std::string &Id, SecurityObjects::Preferences &P) {
@@ -27,11 +27,11 @@ namespace OpenWifi {
             std::string St2{"SELECT " + AllPreferencesFieldsForSelect + " From Preferences WHERE Id=?"};
 
             PreferencesRecord   R;
-
             Select << ConvertParams(St2),
                 Poco::Data::Keywords::into(R),
                 Poco::Data::Keywords::use(Id);
             Select.execute();
+
             Convert(R,P);
             return true;
         } catch (const Poco::Exception &E) {
@@ -51,7 +51,7 @@ namespace OpenWifi {
             };
 
             P.modified = time(nullptr);
-            std::string     Data = OpenWifi::Types::to_string(P.data);
+            std::string     Data = OpenWifi::RESTAPI_utils::to_string(P.data);
 
             InsertOrUpdate << 	ConvertParams(InsertOrReplace),
                 Poco::Data::Keywords::use(P.id),
