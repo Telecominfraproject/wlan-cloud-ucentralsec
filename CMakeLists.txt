@@ -55,7 +55,6 @@ add_executable( owsec
         src/framework/CountryCodes.h
         src/framework/KafkaTopics.h
         src/framework/MicroService.h
-        src/framework/OpenWifiTypes.h
         src/framework/orm.h
         src/framework/RESTAPI_errors.h
         src/framework/RESTAPI_protocol.h
@@ -90,7 +89,7 @@ add_executable( owsec
         src/storage/storage_actionLinks.cpp src/storage/storage_actionLinks.h
         src/storage/storage_tokens.h
         src/ActionLinkManager.cpp src/ActionLinkManager.h
-        src/ACLProcessor.h src/RESTAPI/RESTAPI_preferences.cpp src/RESTAPI/RESTAPI_preferences.h src/storage/storage_preferences.cpp src/storage/storage_preferences.h)
+        src/ACLProcessor.h src/RESTAPI/RESTAPI_preferences.cpp src/RESTAPI/RESTAPI_preferences.h src/storage/storage_preferences.cpp src/storage/storage_preferences.h src/framework/OpenWifiTypes.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

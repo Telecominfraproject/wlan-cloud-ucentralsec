@@ -263,7 +263,8 @@ sendsms() {
 }
 
 setpreferences() {
-    payload="{ \"data\" : [ [ \"$1\" , \"$2\" ] ] }"
+    payload="{ \"data\" : [  { \"tag\" :  \"${1}\" , \"value\" : \"${2}\" } ] }"
+    echo ${payload}
     curl ${FLAGS} -X PUT "https://${OWSEC}/api/v1/preferences" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \

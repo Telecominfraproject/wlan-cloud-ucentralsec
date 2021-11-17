@@ -6,8 +6,7 @@
 //	Arilia Wireless Inc.
 //
 
-#ifndef OPENWIFI_MICROSERVICE_H
-#define OPENWIFI_MICROSERVICE_H
+#pragma once
 
 #include <array>
 #include <iostream>
@@ -20,6 +19,7 @@
 #include <regex>
 #include <random>
 #include <iomanip>
+#include <queue>
 
 using namespace std::chrono_literals;
 
@@ -58,10 +58,12 @@ using namespace std::chrono_literals;
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/ExpireLRUCache.h"
+#include "Poco/JSON/Object.h"
+#include "Poco/JSON/Parser.h"
+#include "Poco/StringTokenizer.h"
 
 #include "cppkafka/cppkafka.h"
 
-#include "framework/OpenWifiTypes.h"
 #include "framework/KafkaTopics.h"
 #include "framework/RESTAPI_protocol.h"
 #include "framework/RESTAPI_errors.h"
@@ -168,7 +170,7 @@ namespace OpenWifi::RESTAPI_utils {
         Obj.set(Field,S);
     }
 
-    inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const std::vector<Types::StringPair> & S) {
+    inline void field_to_json(Poco::JSON::Object &Obj, const char *Field, const Types::StringPairVec & S) {
         Poco::JSON::Array   Array;
         for(const auto &i:S) {
             Poco::JSON::Object  O;
@@ -240,6 +242,7 @@ namespace OpenWifi::RESTAPI_utils {
         if(Obj->has(Field))
             V = (Obj->get(Field).toString() == "true");
     }
+
 
     inline void field_from_json(Poco::JSON::Object::Ptr Obj, const char *Field, Types::StringPairVec &Vec) {
         if(Obj->isArray(Field)) {
@@ -3898,5 +3901,3 @@ namespace OpenWifi::CIDR {
         return std::all_of(cbegin(Ranges), cend(Ranges), ValidateRange);
     }
 }
-
-#endif // UCENTRALGW_MICROSERVICE_H

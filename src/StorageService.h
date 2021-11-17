@@ -12,7 +12,6 @@
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "framework/StorageClass.h"
 #include "AuthService.h"
-#include "framework/OpenWifiTypes.h"
 
 #include "Poco/Timer.h"
 

@@ -9,7 +9,6 @@
 
 
 #include "RESTAPI_SecurityObjects.h"
-#include "framework/OpenWifiTypes.h"
 
 namespace OpenWifi::FMSObjects {
 

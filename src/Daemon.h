@@ -20,7 +20,6 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 
-#include "framework/OpenWifiTypes.h"
 #include "framework/MicroService.h"
 
 namespace OpenWifi {

@@ -17,8 +17,8 @@ namespace OpenWifi {
 
     void RESTAPI_preferences::DoPut() {
         SecurityObjects::Preferences    P;
-        auto RawObject = ParseStream();
 
+        auto RawObject = ParseStream();
         if(!P.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
