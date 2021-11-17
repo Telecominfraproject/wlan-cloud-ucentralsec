@@ -176,6 +176,7 @@ namespace OpenWifi::RESTAPI_utils {
             Poco::JSON::Object  O;
             O.set("tag",i.first);
             O.set("value", i.second);
+            Array.add(O);
         }
         Obj.set(Field,Array);
     }
