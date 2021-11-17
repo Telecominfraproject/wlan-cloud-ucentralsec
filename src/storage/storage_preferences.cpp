@@ -36,6 +36,8 @@ namespace OpenWifi {
 
             Convert(R,P);
 
+            std::cout << "Size: " << P.data.size() << std::endl;
+
             return true;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
