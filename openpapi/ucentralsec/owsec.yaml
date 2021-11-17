@@ -660,7 +660,7 @@ components:
           items:
             type: object
             properties:
-              name:
+              tag:
                 type: string
               value:
                 type: string
