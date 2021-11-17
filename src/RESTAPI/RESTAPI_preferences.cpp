@@ -11,6 +11,7 @@ namespace OpenWifi {
         SecurityObjects::Preferences    P;
         Poco::JSON::Object  Answer;
         StorageService()->GetPreferences(UserInfo_.userinfo.Id, P);
+        std::cout << "SIZE: " << P.data.size() << std::endl;
         P.to_json(Answer);
         ReturnObject(Answer);
     }
