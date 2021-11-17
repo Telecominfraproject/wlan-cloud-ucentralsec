@@ -213,7 +213,6 @@ namespace OpenWifi::RESTAPI_utils {
         Obj.set(Field,A);
     }
 
-
     template<typename T> void field_to_json(Poco::JSON::Object &Obj,
             const char *Field,
             const T &V,

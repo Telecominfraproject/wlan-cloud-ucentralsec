@@ -32,7 +32,10 @@ namespace OpenWifi {
                 Poco::Data::Keywords::use(Id);
             Select.execute();
 
+            std::cout << " 1:" << R.get<0>() << "   2:" << R.get<1>() <<  "   3:" << R.get<2>() << std::endl;
+
             Convert(R,P);
+
             return true;
         } catch (const Poco::Exception &E) {
             Logger_.log(E);
@@ -51,7 +54,10 @@ namespace OpenWifi {
             };
 
             P.modified = time(nullptr);
+
             std::string     Data = OpenWifi::RESTAPI_utils::to_string(P.data);
+
+            std::cout << " >>> " << Data << std::endl;
 
             InsertOrUpdate << 	ConvertParams(InsertOrReplace),
                 Poco::Data::Keywords::use(P.id),
