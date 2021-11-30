@@ -40,9 +40,21 @@ openwifi.system.commandchannel = /tmp/app.ucentralsec
 openwifi.service.key = ${SERVICE_KEY}
 openwifi.service.key.password = ${SERVICE_KEY_PASSWORD}
 
+smssender.enabled = ${SMSSENDER_ENABLED}
+smssender.provider = ${SMSSENDER_PROVIDER}
+
+smssender.aws.secretkey = ${SMSSENDER_AWS_SECRETKEY}
+smssender.aws.accesskey = ${SMSSENDER_AWS_ACCESSKEY}
+smssender.aws.region = ${SMSSENDER_AWS_REGION}
+
+smssender.twilio.sid = ${SMSSENDER_TWILIO_SID}
+smssender.twilio.token = ${SMSSENDER_TWILIO_TOKEN}
+smssender.twilio.phonenumber = ${SMSSENDER_TWILIO_PHONENUMBER}
+
 #
 # Security Microservice Specific Section
 #
+mailer.enabled = ${MAILER_ENABLED}
 mailer.hostname = ${MAILER_HOSTNAME}
 mailer.username = ${MAILER_USERNAME}
 mailer.password = ${MAILER_PASSWORD}
