@@ -35,7 +35,7 @@ fi
 token=""
 result_file=result.json
 username="script.runner@arilia.com"
-password="NoMoreN00bs!"
+password="NoMoreN00bs#"
 browser_list=(firefox sensible-browser xdg-open w3m links links2 lynx youtube-dl)
 browser=""
 
@@ -175,6 +175,15 @@ createuser() {
     jq < ${result_file}
 }
 
+createsub() {
+    payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : false, \"userRole\" : \"subscriber\" }"
+            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/subuser/0" \
+            -H "accept: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"  > ${result_file}
+            jq < ${result_file}
+}
+
 createuser_v() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
     curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0?email_verification=true" \
@@ -192,8 +201,24 @@ deleteuser() {
     jq < ${result_file}
 }
 
+deletesub() {
+    curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/subuser/$1" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
+
 getuser() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/user/$1" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
+
+getsub() {
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/subuser/$1" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -208,8 +233,24 @@ getuserbyemail() {
     jq < ${result_file}
 }
 
+getsubbyemail() {
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/subuser/${1}?byEmail=true" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
+
 listusers() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/users" \
+    -H "accept: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    -d "$payload"  > ${result_file}
+    jq < ${result_file}
+}
+
+listsubs() {
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/subusers" \
     -H "accept: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
@@ -367,11 +408,17 @@ shopt -s nocasematch
 
 case "$1" in
     "createuser") login; createuser "$2" "$3"; logout;;
+    "createsub") login; createsub "$2" "$3"; logout;;
     "createuser_v") login; createuser_v "$2" "$3"; logout;;
+    "createsub_v") login; createsub_v "$2" "$3"; logout;;
     "deleteuser") login; deleteuser "$2" ; logout;;
+    "deletesub") login; deletesub "$2" ; logout;;
     "getuser") login; getuser "$2" ; logout;;
+    "getsub") login; getsub "$2" ; logout;;
     "getuserbyemail") login; getuserbyemail "$2" ; logout;;
+    "getsubbyemail") login; getsubbyemail "$2" ; logout;;
     "listusers") login; listusers ; logout ;;
+    "listsubs") login; listsubs ; logout ;;
     "me") login; me ; logout ;;
     "listendpoints") login; listendpoints ; logout ;;
     "testlogin") testlogin "$2" "$3" "$4";;

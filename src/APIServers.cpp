@@ -52,6 +52,7 @@ namespace OpenWifi {
             RESTAPI_sms_handler,
             RESTAPI_suboauth2_handler,
             RESTAPI_subuser_handler,
+            RESTAPI_suboauth2_handler,
             RESTAPI_subusers_handler
         >(Path, Bindings, L, S);
     }
