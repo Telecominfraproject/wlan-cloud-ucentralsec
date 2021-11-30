@@ -61,6 +61,8 @@ namespace OpenWifi {
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
         auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
 
+        Logger_.information("Doing post");
+
         Poco::toLowerInPlace(userId);
 
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
