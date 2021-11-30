@@ -47,6 +47,7 @@ namespace OpenWifi {
 		Signer_.addAllAlgorithms();
 		Logger_.notice("Starting...");
         PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.subvalidation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
         return 0;
@@ -99,9 +100,57 @@ namespace OpenWifi {
 		return false;
     }
 
+    bool AuthService::IsSubAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
+    {
+        std::lock_guard	Guard(Mutex_);
+        Expired = false;
+        try {
+            std::string CallToken;
+            Poco::Net::OAuth20Credentials Auth(Request);
+            if (Auth.getScheme() == "Bearer") {
+                CallToken = Auth.getBearerToken();
+            }
+
+            if(!CallToken.empty()) {
+                auto Client = SubUserCache_.get(CallToken);
+                if( Client.isNull() ) {
+                    SecurityObjects::UserInfoAndPolicy UInfo2;
+                    uint64_t RevocationDate=0;
+                    if(StorageService()->GetSubToken(CallToken,UInfo2,RevocationDate)) {
+                        if(RevocationDate!=0)
+                            return false;
+                        Expired = (UInfo2.webtoken.created_ + UInfo2.webtoken.expires_in_) < time(nullptr);
+                        if(StorageService()->GetSubUserById(UInfo2.userinfo.Id,UInfo.userinfo)) {
+                            UInfo.webtoken = UInfo2.webtoken;
+                            SubUserCache_.update(CallToken, UInfo);
+                            SessionToken = CallToken;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                if(!Expired) {
+                    SessionToken = CallToken;
+                    UInfo = *Client ;
+                    return true;
+                }
+                RevokeSubToken(CallToken);
+                return false;
+            }
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        return false;
+    }
+
     void AuthService::RevokeToken(std::string & Token) {
         UserCache_.remove(Token);
         StorageService()->RevokeToken(Token);
+    }
+
+    void AuthService::RevokeSubToken(std::string & Token) {
+        UserCache_.remove(Token);
+        StorageService()->RevokeSubToken(Token);
     }
 
     bool AuthService::DeleteUserFromCache(const std::string &UserName) {
@@ -121,12 +170,33 @@ namespace OpenWifi {
         return true;
     }
 
+    bool AuthService::DeleteSubUserFromCache(const std::string &UserName) {
+        std::lock_guard		Guard(Mutex_);
+
+        std::vector<std::string>    OldTokens;
+
+        SubUserCache_.forEach([&OldTokens,UserName](const std::string &token, const SecurityObjects::UserInfoAndPolicy& O) -> void
+        { if(O.userinfo.email==UserName)
+            OldTokens.push_back(token);
+        });
+
+        for(const auto &i:OldTokens) {
+            SubLogout(i,false);
+            SubUserCache_.remove(i);
+        }
+        return true;
+    }
+
     bool AuthService::RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo) {
         return (UInfo.userinfo.userTypeProprietaryInfo.mfa.enabled && MFAServer().MethodEnabled(UInfo.userinfo.userTypeProprietaryInfo.mfa.method));
     }
 
     bool AuthService::ValidatePassword(const std::string &Password) {
         return std::regex_match(Password, PasswordValidation_);
+    }
+
+    bool AuthService::ValidateSubPassword(const std::string &Password) {
+        return std::regex_match(Password, SubPasswordValidation_);
     }
 
     void AuthService::Logout(const std::string &token, bool EraseFromCache) {
@@ -141,6 +211,25 @@ namespace OpenWifi {
             Poco::JSON::Stringifier::stringify(Obj, ResultText);
             std::string Tmp{token};
             RevokeToken(Tmp);
+            KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroService::instance().PrivateEndPoint(), ResultText.str(),
+                                        false);
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+    }
+
+    void AuthService::SubLogout(const std::string &token, bool EraseFromCache) {
+        std::lock_guard		Guard(Mutex_);
+
+        try {
+            Poco::JSON::Object Obj;
+            Obj.set("event", "remove-token");
+            Obj.set("id", MicroService::instance().ID());
+            Obj.set("token", token);
+            std::stringstream ResultText;
+            Poco::JSON::Stringifier::stringify(Obj, ResultText);
+            std::string Tmp{token};
+            RevokeSubToken(Tmp);
             KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroService::instance().PrivateEndPoint(), ResultText.str(),
                                         false);
         } catch (const Poco::Exception &E) {
@@ -198,7 +287,65 @@ namespace OpenWifi {
                                 UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
 
+    void AuthService::CreateSubToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo)
+    {
+        std::lock_guard		Guard(Mutex_);
+
+        SecurityObjects::AclTemplate	ACL;
+        ACL.PortalLogin_ = ACL.Read_ = ACL.ReadWrite_ = ACL.ReadWriteCreate_ = ACL.Delete_ = true;
+        UInfo.webtoken.acl_template_ = ACL;
+        UInfo.webtoken.expires_in_ = TokenAging_ ;
+        UInfo.webtoken.idle_timeout_ = 5 * 60;
+        UInfo.webtoken.token_type_ = "Bearer";
+        UInfo.webtoken.access_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
+        UInfo.webtoken.id_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
+        UInfo.webtoken.refresh_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,CUSTOM);
+        UInfo.webtoken.created_ = time(nullptr);
+        UInfo.webtoken.username_ = UserName;
+        UInfo.webtoken.errorCode = 0;
+        UInfo.webtoken.userMustChangePassword = false;
+        SubUserCache_.update(UInfo.webtoken.access_token_,UInfo);
+        StorageService()->SetSubLastLogin(UInfo.userinfo.Id);
+        StorageService()->AddSubToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
+                                   UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
+                                   UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
+    }
+
     bool AuthService::SetPassword(const std::string &NewPassword, SecurityObjects::UserInfo & UInfo) {
+        std::lock_guard     G(Mutex_);
+
+        Poco::toLowerInPlace(UInfo.email);
+        for (const auto &i:UInfo.lastPasswords) {
+            auto Tokens = Poco::StringTokenizer(i,"|");
+            if(Tokens.count()==2) {
+                const auto & Salt = Tokens[0];
+                for(const auto &j:UInfo.lastPasswords) {
+                    auto OldTokens = Poco::StringTokenizer(j,"|");
+                    if(OldTokens.count()==2) {
+                        SHA2_.update(Salt+NewPassword+UInfo.email);
+                        if(OldTokens[1]==Utils::ToHex(SHA2_.digest()))
+                            return false;
+                    }
+                }
+            } else {
+                SHA2_.update(NewPassword+UInfo.email);
+                if(Tokens[0]==Utils::ToHex(SHA2_.digest()))
+                    return false;
+            }
+        }
+
+        if(UInfo.lastPasswords.size()==HowManyOldPassword_) {
+            UInfo.lastPasswords.erase(UInfo.lastPasswords.begin());
+        }
+
+        auto NewHash = ComputeNewPasswordHash(UInfo.email,NewPassword);
+        UInfo.lastPasswords.push_back(NewHash);
+        UInfo.currentPassword = NewHash;
+        UInfo.changePassword = false;
+        return true;
+    }
+
+    bool AuthService::SetSubPassword(const std::string &NewPassword, SecurityObjects::UserInfo & UInfo) {
         std::lock_guard     G(Mutex_);
 
         Poco::toLowerInPlace(UInfo.email);
@@ -261,6 +408,23 @@ namespace OpenWifi {
         return false;
     }
 
+    bool AuthService::ValidateSubPasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword) {
+        std::lock_guard G(Mutex_);
+
+        std::string UName = Poco::trim(Poco::toLower(UserName));
+        auto Tokens = Poco::StringTokenizer(StoredPassword,"|");
+        if(Tokens.count()==1) {
+            SHA2_.update(Password+UName);
+            if(Tokens[0]==Utils::ToHex(SHA2_.digest()))
+                return true;
+        } else if (Tokens.count()==2) {
+            SHA2_.update(Tokens[0]+Password+UName);
+            if(Tokens[1]==Utils::ToHex(SHA2_.digest()))
+                return true;
+        }
+        return false;
+    }
+
     UNAUTHORIZED_REASON AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired )
     {
         std::lock_guard		Guard(Mutex_);
@@ -306,6 +470,51 @@ namespace OpenWifi {
         return INVALID_CREDENTIALS;
     }
 
+    UNAUTHORIZED_REASON AuthService::AuthorizeSub( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired )
+    {
+        std::lock_guard		Guard(Mutex_);
+
+        Poco::toLowerInPlace(UserName);
+
+        if(StorageService()->GetSubUserByEmail(UserName,UInfo.userinfo)) {
+            if(UInfo.userinfo.waitingForEmailCheck) {
+                return USERNAME_PENDING_VERIFICATION;
+            }
+
+            if(!ValidateSubPasswordHash(UserName,Password,UInfo.userinfo.currentPassword)) {
+                return INVALID_CREDENTIALS;
+            }
+
+            if(UInfo.userinfo.changePassword && NewPassword.empty()) {
+                UInfo.webtoken.userMustChangePassword = true ;
+                return PASSWORD_CHANGE_REQUIRED;
+            }
+
+            if(!NewPassword.empty() && !ValidateSubPassword(NewPassword)) {
+                return PASSWORD_INVALID;
+            }
+
+            if(UInfo.userinfo.changePassword || !NewPassword.empty()) {
+                if(!SetSubPassword(NewPassword,UInfo.userinfo)) {
+                    UInfo.webtoken.errorCode = 1;
+                    return PASSWORD_ALREADY_USED;
+                }
+                UInfo.userinfo.lastPasswordChange = std::time(nullptr);
+                UInfo.userinfo.changePassword = false;
+                StorageService()->UpdateSubUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
+            }
+
+            //  so we have a good password, password up date has taken place if need be, now generate the token.
+            UInfo.userinfo.lastLogin=std::time(nullptr);
+            StorageService()->SetSubLastLogin(UInfo.userinfo.Id);
+            CreateSubToken(UserName, UInfo );
+
+            return SUCCESS;
+        }
+
+        return INVALID_CREDENTIALS;
+    }
+
     bool AuthService::SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
 
@@ -341,7 +550,55 @@ namespace OpenWifi {
         return false;
     }
 
+    bool AuthService::SendEmailToSubUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
+        SecurityObjects::UserInfo   UInfo;
+
+        if(StorageService()->GetSubUserByEmail(Email,UInfo)) {
+            switch (Reason) {
+
+                case FORGOT_PASSWORD: {
+                    MessageAttributes Attrs;
+                    Attrs[RECIPIENT_EMAIL] = UInfo.email;
+                    Attrs[LOGO] = GetLogoAssetURI();
+                    Attrs[SUBJECT] = "Password reset link";
+                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, "password_reset.txt", Attrs);
+                }
+                break;
+
+                case EMAIL_VERIFICATION: {
+                    MessageAttributes Attrs;
+                    Attrs[RECIPIENT_EMAIL] = UInfo.email;
+                    Attrs[LOGO] = GetLogoAssetURI();
+                    Attrs[SUBJECT] = "EMail Address Verification";
+                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
+                    UInfo.waitingForEmailCheck = true;
+                }
+                break;
+
+                default:
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
+
     bool AuthService::VerifyEmail(SecurityObjects::UserInfo &UInfo) {
+        SecurityObjects::ActionLink A;
+
+        A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
+        A.userId = UInfo.email;
+        A.id = MicroService::CreateUUID();
+        A.created = std::time(nullptr);
+        A.expires = A.created + 24*60*60;
+        StorageService()->CreateAction(A);
+        UInfo.waitingForEmailCheck = true;
+        return true;
+    }
+
+    bool AuthService::VerifySubEmail(SecurityObjects::UserInfo &UInfo) {
         SecurityObjects::ActionLink A;
 
         A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
@@ -388,5 +645,38 @@ namespace OpenWifi {
         return false;
     }
 
+    bool AuthService::IsValidSubToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
+        std::lock_guard G(Mutex_);
+
+        Expired = false;
+
+        auto Client = SubUserCache_.get(Token);
+        if(!Client.isNull()) {
+            Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < std::time(nullptr);
+            WebToken = Client->webtoken;
+            UserInfo = Client->userinfo;
+            return true;
+        }
+
+        std::string TToken{Token};
+        if(StorageService()->IsSubTokenRevoked(TToken)) {
+            return false;
+        }
+
+        //  get the token from disk...
+        SecurityObjects::UserInfoAndPolicy UInfo;
+        uint64_t RevocationDate=0;
+        if(StorageService()->GetSubToken(TToken, UInfo, RevocationDate)) {
+            if(RevocationDate!=0)
+                return false;
+            Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
+            if(StorageService()->GetSubUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
+                WebToken = UInfo.webtoken;
+                SubUserCache_.update(UInfo.webtoken.access_token_, UInfo);
+                return true;
+            }
+        }
+        return false;
+    }
 
 }  // end of namespace

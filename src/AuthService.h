@@ -59,23 +59,42 @@ namespace OpenWifi{
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
         void Logout(const std::string &token, bool EraseFromCache=true);
 
+        [[nodiscard]] bool IsSubAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired);
+        [[nodiscard]] UNAUTHORIZED_REASON AuthorizeSub( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired );
+        void CreateSubToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
+        [[nodiscard]] bool SetSubPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
+        [[nodiscard]] const std:: string & SubPasswordValidationExpression() const { return PasswordValidationStr_;};
+        void SubLogout(const std::string &token, bool EraseFromCache=true);
+
         bool ValidatePassword(const std::string &pwd);
+        bool ValidateSubPassword(const std::string &pwd);
 
         [[nodiscard]] bool IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired);
+        [[nodiscard]] bool IsValidSubToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired);
         [[nodiscard]] std::string GenerateTokenJWT(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] std::string GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type);
 
         [[nodiscard]] std::string ComputeNewPasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool ValidatePasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword);
+        [[nodiscard]] bool ValidateSubPasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword);
 
         [[nodiscard]] bool UpdatePassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
         [[nodiscard]] std::string ResetPassword(const std::string &Admin, const std::string &UserName);
 
+        [[nodiscard]] bool UpdateSubPassword(const std::string &Admin, const std::string &UserName, const std::string & OldPassword, const std::string &NewPassword);
+        [[nodiscard]] std::string ResetSubPassword(const std::string &Admin, const std::string &UserName);
+
         [[nodiscard]] static bool VerifyEmail(SecurityObjects::UserInfo &UInfo);
+        [[nodiscard]] static bool VerifySubEmail(SecurityObjects::UserInfo &UInfo);
+
         [[nodiscard]] static bool SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
+        [[nodiscard]] static bool SendEmailToSubUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
         [[nodiscard]] bool DeleteUserFromCache(const std::string &UserName);
+        [[nodiscard]] bool DeleteSubUserFromCache(const std::string &UserName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
+
         void RevokeToken(std::string & Token);
+        void RevokeSubToken(std::string & Token);
 
         [[nodiscard]] static inline const std::string GetLogoAssetURI() {
             return MicroService::instance().PublicEndPoint() + "/wwwassets/the_logo.png";
@@ -88,11 +107,16 @@ namespace OpenWifi{
     private:
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
-		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    UserCache_{2048,1200000};
-		// SecurityObjects::UserInfoCache UserCache_;
-        std::string         PasswordValidationStr_;
-		std::regex          PasswordValidation_;
-		uint64_t            TokenAging_ = 30 * 24 * 60 * 60;
+
+		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    UserCache_{256,1200000};
+		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    SubUserCache_{4096,1200000};
+
+		std::string         PasswordValidationStr_;
+        std::string         SubPasswordValidationStr_;
+        std::regex          PasswordValidation_;
+        std::regex          SubPasswordValidation_;
+
+        uint64_t            TokenAging_ = 30 * 24 * 60 * 60;
         uint64_t            HowManyOldPassword_=5;
 
         class SHA256Engine : public Poco::Crypto::DigestEngine
@@ -121,8 +145,11 @@ namespace OpenWifi{
 
     inline AuthService * AuthService() { return AuthService::instance(); }
 
-    [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired) {
-        return AuthService()->IsAuthorized(Request, SessionToken, UInfo, Expired );
+    [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired, bool Sub ) {
+        if(Sub)
+            return AuthService()->IsSubAuthorized(Request, SessionToken, UInfo, Expired );
+        else
+            return AuthService()->IsAuthorized(Request, SessionToken, UInfo, Expired );
     }
 
 } // end of namespace

@@ -2,13 +2,13 @@
 // Created by stephane bourque on 2021-07-10.
 //
 
-#include "RESTAPI_AssetServer.h"
+#include "RESTAPI_asset_server.h"
 #include "Poco/File.h"
 #include "framework/RESTAPI_protocol.h"
 #include "Daemon.h"
 
 namespace OpenWifi {
-    void RESTAPI_AssetServer::DoGet() {
+    void RESTAPI_asset_server::DoGet() {
         Poco::File  AssetFile;
 
         if(Request->getURI().find("/favicon.ico") != std::string::npos) {

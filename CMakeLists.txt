@@ -64,18 +64,27 @@ add_executable( owsec
         src/RESTObjects/RESTAPI_ProvObjects.cpp src/RESTObjects/RESTAPI_ProvObjects.h
         src/RESTObjects/RESTAPI_GWobjects.h src/RESTObjects/RESTAPI_GWobjects.cpp
         src/RESTObjects/RESTAPI_FMSObjects.h src/RESTObjects/RESTAPI_FMSObjects.cpp
-        src/RESTAPI/RESTAPI_oauth2Handler.h src/RESTAPI/RESTAPI_oauth2Handler.cpp
+        src/RESTAPI/RESTAPI_oauth2_handler.h src/RESTAPI/RESTAPI_oauth2_handler.cpp
         src/RESTAPI/RESTAPI_users_handler.cpp src/RESTAPI/RESTAPI_users_handler.h
         src/RESTAPI/RESTAPI_user_handler.cpp src/RESTAPI/RESTAPI_user_handler.h
         src/RESTAPI/RESTAPI_action_links.cpp src/RESTAPI/RESTAPI_action_links.h
-        src/RESTAPI/RESTAPI_validateToken_handler.cpp src/RESTAPI/RESTAPI_validateToken_handler.h
-        src/RESTAPI/RESTAPI_systemEndpoints_handler.cpp src/RESTAPI/RESTAPI_systemEndpoints_handler.h
-        src/RESTAPI/RESTAPI_AssetServer.cpp src/RESTAPI/RESTAPI_AssetServer.h
-        src/RESTAPI/RESTAPI_avatarHandler.cpp src/RESTAPI/RESTAPI_avatarHandler.h
+        src/RESTAPI/RESTAPI_validate_token_handler.cpp src/RESTAPI/RESTAPI_validate_token_handler.h
+        src/RESTAPI/RESTAPI_system_endpoints_handler.cpp src/RESTAPI/RESTAPI_system_endpoints_handler.h
+        src/RESTAPI/RESTAPI_asset_server.cpp src/RESTAPI/RESTAPI_asset_server.h
+        src/RESTAPI/RESTAPI_avatar_handler.cpp src/RESTAPI/RESTAPI_avatar_handler.h
         src/RESTAPI/RESTAPI_email_handler.cpp src/RESTAPI/RESTAPI_email_handler.h
         src/RESTAPI/RESTAPI_sms_handler.cpp src/RESTAPI/RESTAPI_sms_handler.h
-        src/storage/storage_avatar.cpp src/storage/storage_avatar.h src/storage/storage_users.h
-        src/storage/storage_tables.cpp src/storage/storage_users.cpp src/storage/storage_tokens.cpp
+        src/storage/storage_avatar.cpp src/storage/storage_avatar.h
+        src/storage/storage_users.h src/storage/storage_users.cpp
+        src/storage/storage_actionLinks.cpp src/storage/storage_actionLinks.h
+        src/storage/storage_tokens.h src/storage/storage_tokens.cpp
+        src/storage/storage_subtokens.h src/storage/storage_subtokens.cpp
+        src/storage/storage_preferences.cpp src/storage/storage_preferences.h
+        src/storage/storage_subscribers.cpp src/storage/storage_subscribers.h
+        src/storage/storage_tables.cpp
+        src/RESTAPI/RESTAPI_suboauth2_handler.h src/RESTAPI/RESTAPI_suboauth2_handler.cpp
+        src/RESTAPI/RESTAPI_subuser_handler.h src/RESTAPI/RESTAPI_subuser_handler.cpp
+        src/RESTAPI/RESTAPI_subusers_handler.h src/RESTAPI/RESTAPI_subusers_handler.cpp
         src/APIServers.cpp
         src/Daemon.h src/Daemon.cpp
         src/AuthService.h src/AuthService.cpp
@@ -86,10 +95,9 @@ add_executable( owsec
         src/SMS_provider_aws.cpp src/SMS_provider_aws.h
         src/SMS_provider.cpp src/SMS_provider.h
         src/SMS_provider_twilio.cpp src/SMS_provider_twilio.h
-        src/storage/storage_actionLinks.cpp src/storage/storage_actionLinks.h
-        src/storage/storage_tokens.h
         src/ActionLinkManager.cpp src/ActionLinkManager.h
-        src/ACLProcessor.h src/RESTAPI/RESTAPI_preferences.cpp src/RESTAPI/RESTAPI_preferences.h src/storage/storage_preferences.cpp src/storage/storage_preferences.h src/framework/OpenWifiTypes.h)
+        src/ACLProcessor.h src/RESTAPI/RESTAPI_preferences.cpp src/RESTAPI/RESTAPI_preferences.h
+        src/framework/OpenWifiTypes.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

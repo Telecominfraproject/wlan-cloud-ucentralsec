@@ -2,9 +2,7 @@
 // Created by stephane bourque on 2021-10-09.
 //
 
-#ifndef OWSEC_RESTAPI_SMS_HANDLER_H
-#define OWSEC_RESTAPI_SMS_HANDLER_H
-
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -24,5 +22,3 @@ namespace OpenWifi {
         void DoPut() final {};
     };
 }
-
-#endif //OWSEC_RESTAPI_SMS_HANDLER_H

@@ -2,11 +2,7 @@
 // Created by stephane bourque on 2021-07-15.
 //
 
-#ifndef UCENTRALSEC_STORAGE_USERS_H
-#define UCENTRALSEC_STORAGE_USERS_H
-
-#include <string>
-#include <vector>
+#pragma once
 
 namespace OpenWifi {
     static const std::string AllUsersFieldsForCreation{
@@ -140,4 +136,3 @@ namespace OpenWifi {
     typedef std::vector <UserInfoRecord> UserInfoRecordList;
 }
 
-#endif //UCENTRALSEC_STORAGE_USERS_H

@@ -1,10 +1,7 @@
 //
 // Created by stephane bourque on 2021-07-15.
 //
-
-#ifndef UCENTRALSEC_RESTAPI_AVATARHANDLER_H
-#define UCENTRALSEC_RESTAPI_AVATARHANDLER_H
-
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -31,9 +28,9 @@ namespace OpenWifi {
         Poco::TemporaryFile &TempFile_;
     };
 
-    class RESTAPI_avatarHandler : public RESTAPIHandler {
+    class RESTAPI_avatar_handler : public RESTAPIHandler {
     public:
-        RESTAPI_avatarHandler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
+        RESTAPI_avatar_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
                 : RESTAPIHandler(bindings, L,
                                  std::vector<std::string>{
                                          Poco::Net::HTTPRequest::HTTP_GET,
@@ -51,4 +48,3 @@ namespace OpenWifi {
 
     };
 }
-#endif //UCENTRALSEC_RESTAPI_AVATARHANDLER_H

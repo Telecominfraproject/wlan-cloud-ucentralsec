@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "RESTAPI_avatarHandler.h"
+#include "RESTAPI_avatar_handler.h"
 #include "StorageService.h"
 #include "Poco/Net/HTMLForm.h"
 #include "framework/RESTAPI_protocol.h"
@@ -27,7 +27,7 @@ namespace OpenWifi {
         Length_ = InputStream.chars();
     };
 
-    void RESTAPI_avatarHandler::DoPost() {
+    void RESTAPI_avatar_handler::DoPost() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
         SecurityObjects::UserInfo UInfo;
 
@@ -57,7 +57,7 @@ namespace OpenWifi {
         ReturnObject(Answer);
     }
 
-    void RESTAPI_avatarHandler::DoGet() {
+    void RESTAPI_avatar_handler::DoGet() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
         if (Id.empty()) {
             return NotFound();
@@ -70,7 +70,7 @@ namespace OpenWifi {
         SendFile(TempAvatar, Type, Name);
     }
 
-    void RESTAPI_avatarHandler::DoDelete() {
+    void RESTAPI_avatar_handler::DoDelete() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
         if (Id.empty()) {
             return NotFound();

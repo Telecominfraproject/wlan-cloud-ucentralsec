@@ -2,15 +2,14 @@
 // Created by stephane bourque on 2021-07-10.
 //
 
-#ifndef UCENTRALSEC_RESTAPI_ASSETSERVER_H
-#define UCENTRALSEC_RESTAPI_ASSETSERVER_H
+#pragma once
 
 #include "../framework/MicroService.h"
 
 namespace OpenWifi {
-    class RESTAPI_AssetServer : public RESTAPIHandler {
+    class RESTAPI_asset_server : public RESTAPIHandler {
     public:
-        RESTAPI_AssetServer(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
+        RESTAPI_asset_server(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
                 : RESTAPIHandler(bindings, L,
                                  std::vector<std::string>
                                          {Poco::Net::HTTPRequest::HTTP_POST,
@@ -32,5 +31,3 @@ namespace OpenWifi {
     };
 }
 
-
-#endif //UCENTRALSEC_RESTAPI_ASSETSERVER_H

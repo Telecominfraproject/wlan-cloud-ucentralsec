@@ -730,7 +730,90 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /suboauth2:
+    post:
+      tags:
+        - Authentication
+      summary: Get access token - to be used as Bearer token header for all other API requests.
+      operationId: getAccessToken
+      parameters:
+        - in: query
+          name: newPassword
+          description: used when a user is trying to change her password. This will be the new password.
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: forgotPassword
+          description: A user forgot her password. She needs to present her e-mail address in the userId and set this to true
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: requirements
+          description: A user forgot her password. She needs to present her e-mail address in the userId and set this to true
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: resendMFACode
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: completeMFAChallenge
+          schema:
+            type: boolean
+          required: false
+      requestBody:
+        description: User id and password
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/WebTokenRequest'
+                - $ref: '#/components/schemas/MFAChallengeResponse'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WebTokenResult'
+                  - $ref: '#/components/schemas/MFAChallengeRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /oauth2/{token}:
+    delete:
+      tags:
+        - Authentication
+      summary: Revoke a token.
+      operationId: removeAccessToken
+      parameters:
+        - in: path
+          name: token
+          schema:
+            type:
+              string
+          required: true
+      responses:
+        204:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /suboauth2/{token}:
     delete:
       tags:
         - Authentication
@@ -819,7 +902,157 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /subusers:
+    get:
+      tags:
+        - User Management
+      summary: Retrieve a list of existing users as well as some information about them.
+      operationId: getUsers
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            format: int64
+          required: false
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            format: int64
+          required: false
+        - in: query
+          description: Selecting this option means the newest record will be returned. Use limit to select how many.
+          name: filter
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: Return only the ids.
+          name: idOnly
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          description: Return only the ids.
+          name: select
+          schema:
+            type: string
+            example: id1,id2,id3,id4,id5
+          required: false
+      responses:
+        200:
+          $ref: '#/components/schemas/UserList'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /user/{id}:
+    get:
+      tags:
+        - User Management
+      operationId: getUser
+      summary: Retrieve the information for a single user.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/UserInfo'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - User Management
+      operationId: deleteUser
+      summary: Delete a single user.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        204:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - User Management
+      operationId: createUser
+      summary: Create a single user.
+      parameters:
+        - in: path
+          name: id
+          #must be set to 0 for user creation
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - in: query
+          name: email_verification
+          schema:
+            type: boolean
+          required: false
+      requestBody:
+        description: User details (some fields are ignored during creation)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/UserInfo'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - User Management
+      operationId: updateUser
+      summary: Modify a single user.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - in: query
+          name: email_verification
+          schema:
+            type: boolean
+          required: false
+      requestBody:
+        description: User details (some fields are ignored during update)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfo'
+      responses:
+        200:
+          $ref: '#/components/schemas/UserInfo'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /subuser/{id}:
     get:
       tags:
         - User Management
@@ -1177,6 +1410,26 @@ paths:
           $ref: '#/components/responses/NotFound'
 
   /validateToken:
+    get:
+      tags:
+        - Security
+      summary: Allows any microservice to validate a token and get security policy for a specific user.
+      operationId: validateToken
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/TokenValidationResult'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /validateSubToken:
     get:
       tags:
         - Security

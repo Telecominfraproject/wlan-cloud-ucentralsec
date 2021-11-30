@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-06-21.
 //
 
-#ifndef UCENTRALSEC_RESTAPI_USER_HANDLER_H
-#define UCENTRALSEC_RESTAPI_USER_HANDLER_H
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -29,6 +28,3 @@ namespace OpenWifi {
 
     };
 }
-
-
-#endif //UCENTRALSEC_RESTAPI_USER_HANDLER_H

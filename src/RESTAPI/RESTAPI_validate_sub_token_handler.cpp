@@ -1,12 +1,12 @@
 //
-// Created by stephane bourque on 2021-07-01.
+// Created by stephane bourque on 2021-11-30.
 //
 
-#include "RESTAPI_validateToken_handler.h"
+#include "RESTAPI_validate_sub_token_handler.h"
 #include "AuthService.h"
 
 namespace OpenWifi {
-    void RESTAPI_validateToken_handler::DoGet() {
+    void RESTAPI_validate_sub_token_handler::DoGet() {
         Poco::URI URI(Request->getURI());
         auto Parameters = URI.getQueryParameters();
         for(auto const &i:Parameters) {
@@ -14,7 +14,7 @@ namespace OpenWifi {
                 //  can we find this token?
                 SecurityObjects::UserInfoAndPolicy SecObj;
                 bool Expired = false;
-                if (AuthService()->IsValidToken(i.second, SecObj.webtoken, SecObj.userinfo, Expired)) {
+                if (AuthService()->IsValidSubToken(i.second, SecObj.webtoken, SecObj.userinfo, Expired)) {
                     Poco::JSON::Object Obj;
                     SecObj.to_json(Obj);
                     return ReturnObject(Obj);

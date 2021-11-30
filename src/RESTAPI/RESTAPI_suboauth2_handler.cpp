@@ -1,16 +1,10 @@
 //
-//	License type: BSD 3-Clause License
-//	License copy: https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/LICENSE
-//
-//	Created by Stephane Bourque on 2021-03-04.
-//	Arilia Wireless Inc.
+// Created by stephane bourque on 2021-11-30.
 //
 
-#include "Poco/JSON/Parser.h"
-
+#include "RESTAPI_suboauth2_handler.h"
 #include "Daemon.h"
 #include "AuthService.h"
-#include "RESTAPI_oauth2Handler.h"
 #include "MFAServer.h"
 #include "framework/RESTAPI_protocol.h"
 #include "framework/MicroService.h"
@@ -24,9 +18,9 @@ namespace OpenWifi {
         U.oauthType.clear();
     }
 
-	void RESTAPI_oauth2Handler::DoGet() {
-	    bool Expired = false;
-        if (!IsAuthorized(Expired)) {
+    void RESTAPI_suboauth2_handler::DoGet() {
+        bool Expired = false;
+        if (!IsAuthorized(Expired, true)) {
             if(Expired)
                 return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
             return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
@@ -41,15 +35,15 @@ namespace OpenWifi {
             return ReturnObject(Me);
         }
         BadRequest(RESTAPI::Errors::UnrecognizedRequest);
-	}
+    }
 
-    void RESTAPI_oauth2Handler::DoDelete() {
-	    bool Expired = false;
-	    if (!IsAuthorized(Expired)) {
-	        if(Expired)
-	            return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
-	        return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
-	    }
+    void RESTAPI_suboauth2_handler::DoDelete() {
+        bool Expired = false;
+        if (!IsAuthorized(Expired, true)) {
+            if(Expired)
+                return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
+            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
+        }
 
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
         if (Token == SessionToken_) {
@@ -59,9 +53,9 @@ namespace OpenWifi {
 
         Logger_.information(Poco::format("BAD-LOGOUT(%s): Request for %s", Request->clientAddress().toString(), UserInfo_.userinfo.email));
         NotFound();
-	}
+    }
 
-	void RESTAPI_oauth2Handler::DoPost() {
+    void RESTAPI_suboauth2_handler::DoPost() {
         auto Obj = ParseStream();
         auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
@@ -72,7 +66,7 @@ namespace OpenWifi {
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
             Logger_.information(Poco::format("POLICY-REQUEST(%s): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
-            Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
+            Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->SubPasswordValidationExpression());
             Answer.set(RESTAPI::Protocol::ACCESSPOLICY, Daemon()->GetAccessPolicy());
             Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, Daemon()->GetPasswordPolicy());
             return ReturnObject(Answer);
@@ -80,7 +74,7 @@ namespace OpenWifi {
 
         if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
             SecurityObjects::UserInfo UInfo1;
-            auto UserExists = StorageService()->GetUserByEmail(userId,UInfo1);
+            auto UserExists = StorageService()->GetSubUserByEmail(userId,UInfo1);
             if(UserExists) {
                 Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
                 SecurityObjects::ActionLink NewLink;
@@ -131,7 +125,7 @@ namespace OpenWifi {
 
         SecurityObjects::UserInfoAndPolicy UInfo;
         bool Expired=false;
-        auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo, Expired);
+        auto Code=AuthService()->AuthorizeSub(userId, password, newPassword, UInfo, Expired);
         if (Code==SUCCESS) {
             Poco::JSON::Object ReturnObj;
             if(AuthService()->RequiresMFA(UInfo)) {
@@ -143,7 +137,6 @@ namespace OpenWifi {
             UInfo.webtoken.to_json(ReturnObj);
             return ReturnObject(ReturnObj);
         } else {
-
             switch(Code) {
                 case INVALID_CREDENTIALS:
                     return UnAuthorized(RESTAPI::Errors::InvalidCredentials, Code);
@@ -160,5 +153,5 @@ namespace OpenWifi {
             }
             return;
         }
-	}
+    }
 }

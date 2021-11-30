@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-11-16.
 //
 
-#ifndef OWSEC_RESTAPI_PREFERENCES_H
-#define OWSEC_RESTAPI_PREFERENCES_H
+#pragma once
 
 #include "framework/MicroService.h"
 
@@ -25,5 +24,3 @@ namespace OpenWifi {
         void DoDelete() final {};
     };
 }
-
-#endif //OWSEC_RESTAPI_PREFERENCES_H

@@ -17,6 +17,8 @@ namespace OpenWifi {
         Create_TokensTable();
         Create_ActionLinkTable();
         Create_Preferences();
+        Create_SubTokensTable();
+        Create_SubscriberTable();
         return 0;
     }
 
@@ -37,6 +39,31 @@ namespace OpenWifi {
                         Poco::Data::Keywords::now;
                 Sess << "CREATE INDEX IF NOT EXISTS emailindex ON Users (email ASC)", Poco::Data::Keywords::now;
                 Sess << "CREATE INDEX IF NOT EXISTS nameindex ON Users (name ASC)", Poco::Data::Keywords::now;
+            }
+            return 0;
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        return 1;
+    }
+
+    int Storage::Create_SubscriberTable() {
+        Poco::Data::Session Sess = Pool_->get();
+
+        try {
+            if (dbType_ == mysql) {
+                Sess << "CREATE TABLE IF NOT EXISTS Subscribers (" +
+                AllUsersFieldsForCreation +
+                " ,INDEX emailindex (email ASC)"
+                " ,INDEX nameindex (name ASC))",
+                Poco::Data::Keywords::now;
+            } else {
+                Sess << "CREATE TABLE IF NOT EXISTS Subscribers (" +
+                AllUsersFieldsForCreation +
+                ")",
+                Poco::Data::Keywords::now;
+                Sess << "CREATE INDEX IF NOT EXISTS emailindex ON Subscribers (email ASC)", Poco::Data::Keywords::now;
+                Sess << "CREATE INDEX IF NOT EXISTS nameindex ON Subscribers (name ASC)", Poco::Data::Keywords::now;
             }
             return 0;
         } catch (const Poco::Exception &E) {
@@ -86,6 +113,19 @@ namespace OpenWifi {
                 Sess << "CREATE TABLE IF NOT EXISTS Tokens (" +
                             AllTokensFieldsForCreation +
                         ") ", Poco::Data::Keywords::now;
+            return 0;
+        } catch(const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        return 1;
+    }
+
+    int Storage::Create_SubTokensTable() {
+        try {
+            Poco::Data::Session Sess = Pool_->get();
+            Sess << "CREATE TABLE IF NOT EXISTS SubTokens (" +
+            AllTokensFieldsForCreation +
+            ") ", Poco::Data::Keywords::now;
             return 0;
         } catch(const Poco::Exception &E) {
             Logger_.log(E);

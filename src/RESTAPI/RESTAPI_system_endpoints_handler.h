@@ -2,15 +2,14 @@
 // Created by stephane bourque on 2021-07-01.
 //
 
-#ifndef UCENTRALSEC_RESTAPI_SYSTEMENDPOINTS_HANDLER_H
-#define UCENTRALSEC_RESTAPI_SYSTEMENDPOINTS_HANDLER_H
+#pragma once
 
 #include "../framework/MicroService.h"
 
 namespace OpenWifi {
-    class RESTAPI_systemEndpoints_handler : public RESTAPIHandler {
+    class RESTAPI_system_endpoints_handler : public RESTAPIHandler {
     public:
-        RESTAPI_systemEndpoints_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
+        RESTAPI_system_endpoints_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
                 : RESTAPIHandler(bindings, L,
                                  std::vector<std::string>{Poco::Net::HTTPRequest::HTTP_GET,
                                                           Poco::Net::HTTPRequest::HTTP_OPTIONS},
@@ -23,5 +22,3 @@ namespace OpenWifi {
         void DoPut() final {};
     };
 }
-
-#endif //UCENTRALSEC_RESTAPI_SYSTEMENDPOINTS_HANDLER_H

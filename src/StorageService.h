@@ -95,6 +95,7 @@ namespace OpenWifi {
          *  All user management functions
          */
         bool InitializeDefaultUser();
+
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false);
         bool GetUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
         bool GetUserById(USER_ID_TYPE & Id, SecurityObjects::UserInfo & User);
@@ -108,6 +109,19 @@ namespace OpenWifi {
         bool GetUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
         bool SetLastLogin(USER_ID_TYPE & Id);
 
+        bool CreateSubUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false);
+        bool GetSubUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
+        bool GetSubUserById(USER_ID_TYPE & Id, SecurityObjects::UserInfo & User);
+        bool DeleteSubUser(const std::string & Admin, USER_ID_TYPE & Id);
+        bool SetSubOwner(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Owner);
+        bool SetSubLocation(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Location);
+        AUTH_ERROR ChangeSubPassword(const std::string & Admin, USER_ID_TYPE & Id, const std::string &OldPassword, const std::string &NewPassword);
+        bool AddSubNotes(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Notes);
+        bool SetSubPolicyChange(const std::string & Admin, USER_ID_TYPE & Id, const std::string &NewPolicy);
+        bool UpdateSubUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
+        bool GetSubUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
+        bool SetSubLastLogin(USER_ID_TYPE & Id);
+
         bool SetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
         bool GetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
         bool DeleteAvatar(const std::string & Admin, std::string &Id);
@@ -118,6 +132,13 @@ namespace OpenWifi {
         bool CleanExpiredTokens();
         bool RevokeAllTokens( std::string & UserName );
         bool GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo, uint64_t &RevocationDate);
+
+        bool AddSubToken(std::string &UserId, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut);
+        bool RevokeSubToken( std::string & Token );
+        bool IsSubTokenRevoked( std::string & Token );
+        bool CleanExpiredSubTokens();
+        bool RevokeAllSubTokens( std::string & UserName );
+        bool GetSubToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo, uint64_t &RevocationDate);
 
         /*
          *  All ActionLinks functions
@@ -142,6 +163,8 @@ namespace OpenWifi {
         int Create_TokensTable();
         int Create_ActionLinkTable();
         int Create_Preferences();
+        int Create_SubTokensTable();
+        int Create_SubscriberTable();
 
         Poco::Timer                     Timer_;
         Archiver                        Archiver_;
