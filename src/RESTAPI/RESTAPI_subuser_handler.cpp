@@ -46,12 +46,16 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
-        SecurityObjects::UserInfo UInfo;
-        if(!StorageService()->GetUserById(Id,UInfo)) {
+        SecurityObjects::UserInfo TargetUser;
+        if(!StorageService()->GetUserById(Id,TargetUser)) {
             return NotFound();
         }
 
-        if(!ACLProcessor::Can(UserInfo_.userinfo, UInfo,ACLProcessor::DELETE)) {
+        if(TargetUser.userRole != SecurityObjects::SUBSCRIBER) {
+            return BadRequest(RESTAPI::Errors::InvalidUserRole);
+        }
+
+        if(!ACLProcessor::Can(UserInfo_.userinfo, TargetUser,ACLProcessor::DELETE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
@@ -59,12 +63,12 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        if(AuthService()->DeleteSubUserFromCache(UInfo.email)) {
+        if(AuthService()->DeleteSubUserFromCache(TargetUser.email)) {
             // nothing to do
         }
 
         Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
-        StorageService()->RevokeAllSubTokens(UInfo.email);
+        StorageService()->RevokeAllSubTokens(TargetUser.email);
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
         OK();
     }
@@ -77,8 +81,7 @@ namespace OpenWifi {
 
         SecurityObjects::UserInfo   NewUser;
         RESTAPI_utils::from_request(NewUser,*Request);
-
-        if(NewUser.userRole == SecurityObjects::UNKNOWN) {
+        if(NewUser.userRole == SecurityObjects::UNKNOWN || NewUser.userRole != SecurityObjects::SUBSCRIBER) {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
@@ -145,7 +148,9 @@ namespace OpenWifi {
         }
 
         // some basic validations
-        if(RawObject->has("userRole") && SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString())==SecurityObjects::UNKNOWN) {
+        if(RawObject->has("userRole") &&
+            (SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString())==SecurityObjects::UNKNOWN ||
+            SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString())==SecurityObjects::SUBSCRIBER)) {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
