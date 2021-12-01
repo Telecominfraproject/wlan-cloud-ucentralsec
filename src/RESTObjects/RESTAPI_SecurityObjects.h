@@ -6,8 +6,7 @@
 //	Arilia Wireless Inc.
 //
 
-#ifndef UCENTRAL_RESTAPI_SECURITYOBJECTS_H
-#define UCENTRAL_RESTAPI_SECURITYOBJECTS_H
+#pragma once
 
 #include "framework/OpenWifiTypes.h"
 #include "Poco/JSON/Object.h"
@@ -224,7 +223,9 @@ namespace OpenWifi::SecurityObjects {
 
 	enum LinkActions {
 	    FORGOT_PASSWORD=1,
-	    VERIFY_EMAIL
+	    VERIFY_EMAIL,
+	    SUB_FORGOT_PASSWORD,
+	    SUB_VERIFY_EMAIL
 	};
 
 	struct ActionLink {
@@ -253,5 +254,3 @@ namespace OpenWifi::SecurityObjects {
 	    bool from_json(Poco::JSON::Object::Ptr &Obj);
 	};
 }
-
-#endif //UCENTRAL_RESTAPI_SECURITYOBJECTS_H

@@ -56,8 +56,6 @@ namespace OpenWifi {
 
     void Daemon::initialize() {
         AssetDir_ = MicroService::instance().ConfigPath("openwifi.restapi.wwwassets");
-        AccessPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.access", "/wwwassets/access_policy.html");
-        PasswordPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.password", "/wwwassets/password_policy.html");
     }
 
     void MicroServicePostInitialization() {

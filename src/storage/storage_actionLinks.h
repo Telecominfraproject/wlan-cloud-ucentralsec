@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-11-08.
 //
 
-#ifndef OWSEC_STORAGE_ACTIONLINKS_H
-#define OWSEC_STORAGE_ACTIONLINKS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -74,6 +73,3 @@ namespace OpenWifi {
     typedef std::vector <ActionLinkRecord> ActionLinkRecordList;
 
 }
-
-
-#endif //OWSEC_STORAGE_ACTIONLINKS_H

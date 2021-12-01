@@ -47,7 +47,7 @@ namespace OpenWifi {
 
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
         if (Token == SessionToken_) {
-            AuthService()->Logout(Token);
+            AuthService()->SubLogout(Token);
             return ReturnStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, true);
         }
 
@@ -61,16 +61,14 @@ namespace OpenWifi {
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
         auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
 
-        Logger_.information("Doing post");
-
         Poco::toLowerInPlace(userId);
 
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
             Logger_.information(Poco::format("POLICY-REQUEST(%s): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->SubPasswordValidationExpression());
-            Answer.set(RESTAPI::Protocol::ACCESSPOLICY, Daemon()->GetAccessPolicy());
-            Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, Daemon()->GetPasswordPolicy());
+            Answer.set(RESTAPI::Protocol::ACCESSPOLICY, AuthService()->GetSubAccessPolicy());
+            Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, AuthService()->GetSubPasswordPolicy());
             return ReturnObject(Answer);
         }
 
@@ -81,7 +79,7 @@ namespace OpenWifi {
                 Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
                 SecurityObjects::ActionLink NewLink;
 
-                NewLink.action = OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD;
+                NewLink.action = OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD;
                 NewLink.id = MicroService::CreateUUID();
                 NewLink.userId = UInfo1.Id;
                 NewLink.created = std::time(nullptr);

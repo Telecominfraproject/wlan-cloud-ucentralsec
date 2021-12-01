@@ -73,8 +73,8 @@ namespace OpenWifi {
             Logger_.information(Poco::format("POLICY-REQUEST(%s): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
-            Answer.set(RESTAPI::Protocol::ACCESSPOLICY, Daemon()->GetAccessPolicy());
-            Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, Daemon()->GetPasswordPolicy());
+            Answer.set(RESTAPI::Protocol::ACCESSPOLICY, AuthService()->GetAccessPolicy());
+            Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, AuthService()->GetPasswordPolicy());
             return ReturnObject(Answer);
         }
 

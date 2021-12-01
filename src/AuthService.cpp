@@ -46,10 +46,17 @@ namespace OpenWifi {
 		Signer_.setRSAKey(MicroService::instance().Key());
 		Signer_.addAllAlgorithms();
 		Logger_.notice("Starting...");
-        PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.subvalidation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
+
+        AccessPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.access", "/wwwassets/access_policy.html");
+        PasswordPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.password", "/wwwassets/password_policy.html");
+        PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+
+        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroService::instance().ConfigGetString("subscriber.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        SubAccessPolicy_ = MicroService::instance().ConfigPath("subscriber.policy.access", "/wwwassets/access_policy.html");
+        SubPasswordPolicy_ = MicroService::instance().ConfigPath("subscriber.policy.password", "/wwwassets/password_policy.html");
+
         return 0;
     }
 
@@ -601,7 +608,7 @@ namespace OpenWifi {
     bool AuthService::VerifySubEmail(SecurityObjects::UserInfo &UInfo) {
         SecurityObjects::ActionLink A;
 
-        A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
+        A.action = OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL;
         A.userId = UInfo.email;
         A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);

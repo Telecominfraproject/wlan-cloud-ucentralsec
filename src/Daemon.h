@@ -43,13 +43,9 @@ namespace OpenWifi {
         void initialize();
         static Daemon *instance();
         inline const std::string & AssetDir() { return AssetDir_; }
-        inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }
-        inline const std::string & GetAccessPolicy() const { return AccessPolicy_; }
     private:
         static Daemon 		*instance_;
         std::string         AssetDir_;
-        std::string         PasswordPolicy_;
-        std::string         AccessPolicy_;
     };
 
     inline Daemon * Daemon() { return Daemon::instance(); }

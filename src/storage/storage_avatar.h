@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-07-15.
 //
 
-#ifndef WLAN_CLOUD_UCENTRALSEC_STORAGE_AVATAR_H
-#define WLAN_CLOUD_UCENTRALSEC_STORAGE_AVATAR_H
+#pragma once
 
 namespace OpenWifi {
 
@@ -37,6 +36,3 @@ namespace OpenWifi {
 
 
 }
-
-
-#endif //WLAN_CLOUD_UCENTRALSEC_STORAGE_AVATAR_H

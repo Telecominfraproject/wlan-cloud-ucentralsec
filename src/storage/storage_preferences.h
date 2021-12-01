@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-11-16.
 //
 
-#ifndef OWSEC_STORAGE_PREFERENCES_H
-#define OWSEC_STORAGE_PREFERENCES_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -35,5 +34,3 @@ namespace OpenWifi {
     typedef std::vector <PreferencesRecord> PreferencesRecordList;
 
 }
-
-#endif //OWSEC_STORAGE_PREFERENCES_H

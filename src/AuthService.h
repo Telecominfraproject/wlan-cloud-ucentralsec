@@ -104,6 +104,12 @@ namespace OpenWifi{
             return MicroService::instance().WWWAssetsDir() + "/the_logo.png";
         }
 
+        inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }
+        inline const std::string & GetAccessPolicy() const { return AccessPolicy_; }
+
+        inline const std::string & GetSubPasswordPolicy() const { return SubPasswordPolicy_; }
+        inline const std::string & GetSubAccessPolicy() const { return SubAccessPolicy_; }
+
     private:
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
@@ -111,6 +117,10 @@ namespace OpenWifi{
 		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    UserCache_{256,1200000};
 		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    SubUserCache_{4096,1200000};
 
+		std::string         AccessPolicy_;
+		std::string         PasswordPolicy_;
+		std::string         SubAccessPolicy_;
+		std::string         SubPasswordPolicy_;
 		std::string         PasswordValidationStr_;
         std::string         SubPasswordValidationStr_;
         std::regex          PasswordValidation_;

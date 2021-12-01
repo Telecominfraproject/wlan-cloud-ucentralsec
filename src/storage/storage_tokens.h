@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-11-08.
 //
 
-#ifndef OWSEC_STORAGE_TOKENS_H
-#define OWSEC_STORAGE_TOKENS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -26,5 +25,3 @@ namespace OpenWifi {
 
 
 }
-
-#endif //OWSEC_STORAGE_TOKENS_H
