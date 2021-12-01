@@ -47,7 +47,7 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo TargetUser;
-        if(!StorageService()->GetUserById(Id,TargetUser)) {
+        if(!StorageService()->GetSubUserById(Id,TargetUser)) {
             return NotFound();
         }
 
