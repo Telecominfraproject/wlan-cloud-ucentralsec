@@ -405,6 +405,24 @@ components:
         answer:
           type: string
 
+    SubMfaConfig:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+            - disabled
+            - sms
+            - email
+        email:
+          type: string
+          format: email
+        sms:
+          type: string
+
     #########################################################################################
     ##
     ## These are endpoints that all services in the uCentral stack must provide
@@ -735,7 +753,7 @@ paths:
       tags:
         - Authentication
       summary: Get access token - to be used as Bearer token header for all other API requests.
-      operationId: getAccessToken
+      operationId: getSubAccessToken
       parameters:
         - in: query
           name: newPassword
@@ -818,7 +836,7 @@ paths:
       tags:
         - Authentication
       summary: Revoke a token.
-      operationId: removeAccessToken
+      operationId: removeSubAccessToken
       parameters:
         - in: path
           name: token
@@ -905,9 +923,9 @@ paths:
   /subusers:
     get:
       tags:
-        - User Management
+        - Subscribers
       summary: Retrieve a list of existing users as well as some information about them.
-      operationId: getUsers
+      operationId: getSubUsers
       parameters:
         - in: query
           name: offset
@@ -1055,8 +1073,8 @@ paths:
   /subuser/{id}:
     get:
       tags:
-        - User Management
-      operationId: getUser
+        - Subscribers
+      operationId: getSubUser
       summary: Retrieve the information for a single user.
       parameters:
         - in: path
@@ -1075,8 +1093,8 @@ paths:
 
     delete:
       tags:
-        - User Management
-      operationId: deleteUser
+        - Subscribers
+      operationId: deleteSubUser
       summary: Delete a single user.
       parameters:
         - in: path
@@ -1095,8 +1113,8 @@ paths:
 
     post:
       tags:
-        - User Management
-      operationId: createUser
+        - Subscribers
+      operationId: createSubUser
       summary: Create a single user.
       parameters:
         - in: path
@@ -1127,8 +1145,8 @@ paths:
 
     put:
       tags:
-        - User Management
-      operationId: updateUser
+        - Subscribers
+      operationId: updateSubUser
       summary: Modify a single user.
       parameters:
         - in: path
@@ -1354,6 +1372,49 @@ paths:
         400:
           $ref: '#/components/responses/BadRequest'
 
+  /submfa:
+    get:
+      tags:
+        - MFA
+      summary: Retrieve the cyrrent setting for MFA
+      operationId: getMFS
+      responses:
+        200:
+          $ref: '#/components/schemas/SubMfaConfig'
+
+    put:
+      tags:
+        - MFA
+      summary: Retrieve the cyrrent setting for MFA
+      operationId: modifyMFS
+      parameters:
+        - in: query
+          name: startValidation
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: completeValidation
+          schema:
+            type: boolean
+          required: false
+        - in: query
+          name: challengeCode
+          schema:
+            type: string
+          required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubMfaConfig'
+      responses:
+        200:
+          $ref: '#/components/schemas/SubMfaConfig'
+        400:
+          $ref: '#/components/responses/BadRequest'
+
+
   #########################################################################################
   ##
   ## These are endpoints that all services in the uCentral stack must provide
@@ -1433,8 +1494,9 @@ paths:
     get:
       tags:
         - Security
+        - Subscribers
       summary: Allows any microservice to validate a token and get security policy for a specific user.
-      operationId: validateToken
+      operationId: validateSubToken
       parameters:
         - in: query
           name: token

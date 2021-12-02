@@ -253,4 +253,15 @@ namespace OpenWifi::SecurityObjects {
 	    void to_json(Poco::JSON::Object &Obj) const;
 	    bool from_json(Poco::JSON::Object::Ptr &Obj);
 	};
+
+	struct SubMfaConfig {
+	    std::string                         id;
+	    std::string                         type;
+	    std::string                         sms;
+	    std::string                         email;
+
+	    void to_json(Poco::JSON::Object &Obj) const;
+	    bool from_json(Poco::JSON::Object::Ptr &Obj);
+	};
+
 }

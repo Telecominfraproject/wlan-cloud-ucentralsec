@@ -98,7 +98,7 @@ add_executable( owsec
         src/SMS_provider_twilio.cpp src/SMS_provider_twilio.h
         src/ActionLinkManager.cpp src/ActionLinkManager.h
         src/ACLProcessor.h src/RESTAPI/RESTAPI_preferences.cpp src/RESTAPI/RESTAPI_preferences.h
-        src/framework/OpenWifiTypes.h)
+        src/framework/OpenWifiTypes.h src/RESTAPI/RESTAPI_submfa_handler.cpp src/RESTAPI/RESTAPI_submfa_handler.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

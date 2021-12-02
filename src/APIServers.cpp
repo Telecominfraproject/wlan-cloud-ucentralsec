@@ -19,6 +19,7 @@
 #include "RESTAPI/RESTAPI_subuser_handler.h"
 #include "RESTAPI/RESTAPI_subusers_handler.h"
 #include "RESTAPI/RESTAPI_validate_sub_token_handler.h"
+#include "RESTAPI/RESTAPI_submfa_handler.h"
 
 namespace OpenWifi {
 
@@ -55,7 +56,8 @@ namespace OpenWifi {
             RESTAPI_suboauth2_handler,
             RESTAPI_subuser_handler,
             RESTAPI_suboauth2_handler,
-            RESTAPI_subusers_handler
+            RESTAPI_subusers_handler,
+            RESTAPI_submfa_handler
         >(Path, Bindings, L, S);
     }
 }
