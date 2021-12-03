@@ -81,5 +81,5 @@ jobs:
         owner: Telecominfraproject
         workflow_file_name: ow_docker-compose.yml
         ref: master
-        waiting_interval: 30
-        inputs: '{"owgw_version": "$GITHUB_BASE_REF", "owgwui_version": "$GITHUB_BASE_REF", "owsec_version": "${{ github.sha }}", "owfms_version": "$GITHUB_BASE_REF", "owprov_version": "main", "owprovui_version": "main"}'
+        wait_interval: 30
+        inputs: '{"owgw_version": "${GITHUB_BASE_REF}", "owgwui_version": "${GITHUB_BASE_REF}", "owsec_version": "${{ github.sha }}", "owfms_version": "${GITHUB_BASE_REF}", "owprov_version": "main", "owprovui_version": "main"}'
