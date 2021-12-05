@@ -15,23 +15,23 @@ namespace OpenWifi {
             "description    varchar,"
             "avatar         varchar,"
             "email          varchar,"
-            "validated      int,"
+            "validated      boolean,"
             "validationEmail    varchar,"
             "validationDate bigint,"
             "creationDate   bigint,"
             "validationURI  varchar,"
-            "changePassword int,"
+            "changePassword boolean,"
             "lastLogin      bigint,"
             "currentLoginURI    varchar,"
             "lastPasswordChange bigint,"
             "lastEmailCheck     bigint,"
-            "waitingForEmailCheck   int,"
+            "waitingForEmailCheck   boolean,"
             "locale             varchar,"
             "notes              text,"
             "location           varchar,"
             "owner              varchar,"
-            "suspended          int,"
-            "blackListed        int,"
+            "suspended          boolean,"
+            "blackListed        boolean,"
             "userRole           varchar,"
             "userTypeProprietaryInfo    text,"
             "securityPolicy     text,"
@@ -111,23 +111,23 @@ namespace OpenWifi {
         std::string,    // description;
         std::string,    // avatar;
         std::string,    // email;
-        uint64_t,       // bool validated = false;
+        bool,       // bool validated = false;
         std::string,    // validationEmail;
         uint64_t,       // validationDate = 0;
         uint64_t,       // creationDate = 0;
         std::string,    // validationURI;
-        uint64_t,       // bool changePassword = true;
+        bool,       // bool changePassword = true;
         uint64_t,       // lastLogin = 0;
         std::string,    // currentLoginURI;
         uint64_t,       // lastPasswordChange = 0;
         uint64_t,       // lastEmailCheck = 0;
-        uint64_t,      // bool waitingForEmailCheck = false;
+        bool,      // bool waitingForEmailCheck = false;
         std::string,    // locale;
         std::string,    // notes;
         std::string,    // location;
         std::string,    // owner;
-        uint64_t,       // bool suspended = false;
-        uint64_t,       // bool blackListed = false;
+        bool,       // bool suspended = false;
+        bool,       // bool blackListed = false;
         std::string,    // userRole;
         std::string,    // userTypeProprietaryInfo;
         std::string,    // securityPolicy;
