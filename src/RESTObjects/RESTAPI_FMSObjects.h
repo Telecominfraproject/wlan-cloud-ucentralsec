@@ -9,6 +9,7 @@
 
 
 #include "RESTAPI_SecurityObjects.h"
+#include "framework/OpenWifiTypes.h"
 
 namespace OpenWifi::FMSObjects {
 
@@ -28,7 +29,7 @@ namespace OpenWifi::FMSObjects {
         std::string     location;
         std::string     uploader;
         std::string     digest;
-        bool            latest=false;
+        bool            latest=0;
         SecurityObjects::NoteInfoVec    notes;
         uint64_t        created=0;
 
