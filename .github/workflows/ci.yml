@@ -19,67 +19,78 @@ defaults:
     shell: bash
 
 jobs:
-  docker:
-    runs-on: ubuntu-20.04
-    env:
-      DOCKER_REGISTRY_URL: tip-tip-wlan-cloud-ucentral.jfrog.io
-      DOCKER_REGISTRY_USERNAME: ucentral
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Build Docker image
-      run: docker build -t wlan-cloud-owsec:${{ github.sha }} .
-
-    - name: Tag Docker image
-      run: |
-        TAGS="${{ github.sha }}"
-
-        if [[ ${GITHUB_REF} == "refs/heads/"* ]]
-        then
-          CURRENT_TAG=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-')
-          TAGS="$TAGS $CURRENT_TAG"
-        else
-          if [[ ${GITHUB_REF} == "refs/tags/"* ]]
-          then
-            CURRENT_TAG=$(echo ${GITHUB_REF#refs/tags/} | tr '/' '-')
-            TAGS="$TAGS $CURRENT_TAG"
-          else # PR build
-            CURRENT_TAG=$(echo ${GITHUB_HEAD_REF#refs/heads/} | tr '/' '-')
-            TAGS="$TAGS $CURRENT_TAG"
-          fi
-        fi
-
-        echo "Result tags: $TAGS"
-
-        for tag in $TAGS; do
-          docker tag wlan-cloud-owsec:${{ github.sha }} ${{ env.DOCKER_REGISTRY_URL }}/owsec:$tag
-        done
-
-    - name: Log into Docker registry
-      if: startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/pull/') || github.ref == 'refs/heads/main'
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ env.DOCKER_REGISTRY_URL }}
-        username: ${{ env.DOCKER_REGISTRY_USERNAME }}
-        password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-
-    - name: Push Docker images
-      if: startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/pull/') || github.ref == 'refs/heads/main'
-      run: |
-        docker images | grep ${{ env.DOCKER_REGISTRY_URL }}/owsec | awk -F ' ' '{print $1":"$2}' | xargs -I {} docker push {}
+#  docker:
+#    runs-on: ubuntu-20.04
+#    env:
+#      DOCKER_REGISTRY_URL: tip-tip-wlan-cloud-ucentral.jfrog.io
+#      DOCKER_REGISTRY_USERNAME: ucentral
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    - name: Build Docker image
+#      run: docker build -t wlan-cloud-owsec:${{ github.sha }} .
+#
+#    - name: Tag Docker image
+#      run: |
+#        TAGS="${{ github.sha }}"
+#
+#        if [[ ${GITHUB_REF} == "refs/heads/"* ]]
+#        then
+#          CURRENT_TAG=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-')
+#          TAGS="$TAGS $CURRENT_TAG"
+#        else
+#          if [[ ${GITHUB_REF} == "refs/tags/"* ]]
+#          then
+#            CURRENT_TAG=$(echo ${GITHUB_REF#refs/tags/} | tr '/' '-')
+#            TAGS="$TAGS $CURRENT_TAG"
+#          else # PR build
+#            CURRENT_TAG=$(echo ${GITHUB_HEAD_REF#refs/heads/} | tr '/' '-')
+#            TAGS="$TAGS $CURRENT_TAG"
+#          fi
+#        fi
+#
+#        echo "Result tags: $TAGS"
+#
+#        for tag in $TAGS; do
+#          docker tag wlan-cloud-owsec:${{ github.sha }} ${{ env.DOCKER_REGISTRY_URL }}/owsec:$tag
+#        done
+#
+#    - name: Log into Docker registry
+#      if: startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/pull/') || github.ref == 'refs/heads/main'
+#      uses: docker/login-action@v1
+#      with:
+#        registry: ${{ env.DOCKER_REGISTRY_URL }}
+#        username: ${{ env.DOCKER_REGISTRY_USERNAME }}
+#        password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+#
+#    - name: Push Docker images
+#      if: startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/pull/') || github.ref == 'refs/heads/main'
+#      run: |
+#        docker images | grep ${{ env.DOCKER_REGISTRY_URL }}/owsec | awk -F ' ' '{print $1":"$2}' | xargs -I {} docker push {}
 
   trigger-testing:
     if: startsWith(github.ref, 'refs/pull/')
     runs-on: ubuntu-latest
-    needs: docker
+#    needs: docker
     steps:
-    - name: Trigger testing of OpenWifi Docker Compose deployment and wait for result
-      uses: convictional/trigger-workflow-and-wait@v1.5.0
-      with:
-        github_token: ${{ secrets.WLAN_TESTING_PAT }}
-        repo: wlan-testing
-        owner: Telecominfraproject
-        workflow_file_name: ow_docker-compose.yml
-        ref: master
-        wait_interval: 30
-        inputs: '{"owgw_version": "${GITHUB_BASE_REF}", "owgwui_version": "${GITHUB_BASE_REF}", "owsec_version": "${{ github.sha }}", "owfms_version": "${GITHUB_BASE_REF}", "owprov_version": "main", "owprovui_version": "main"}'
+    - name: Get base branch name and set as output
+      id: get_base_branch
+      run: |
+        echo ::set-output name=branch::$(echo "${GITHUB_BASE_REF##*/}")
+
+    - name: Echo base branch name
+      env:
+        BASE_BRANCH: ${{ steps.get_base_branch.outputs.branch }}
+      run: |
+        echo $BASE_BRANCH
+
+#    - name: Trigger testing of OpenWifi Docker Compose deployment and wait for result
+#      uses: convictional/trigger-workflow-and-wait@v1.5.0
+#      with:
+#        github_token: ${{ secrets.WLAN_TESTING_PAT }}
+#        repo: wlan-testing
+#        owner: Telecominfraproject
+#        workflow_file_name: ow_docker-compose.yml
+#        ref: master
+#        wait_interval: 60
+#        inputs: '{"owgw_version": "${ GITHUB_BASE_REF }}", "owgwui_version": "${GITHUB_BASE_REF}", "owsec_version": "${{ github.sha }}", "owfms_version": "${GITHUB_BASE_REF}", "owprov_version": "main", "owprovui_version": "main"}'
