@@ -89,4 +89,4 @@ jobs:
         workflow_file_name: ow_docker-compose.yml
         ref: master
         wait_interval: 60
-        inputs: '{"owgw_version": "$BASE_BRANCH", "owgwui_version": "$BASE_BRANCH", "owsec_version": "${{ github.sha }}", "owfms_version": "$BASE_BRANCH", "owprov_version": "main", "owprovui_version": "main"}'
+        inputs: '{"owgw_version": "${{ env.BASE_BRANCH }}", "owgwui_version": "${{ env.BASE_BRANCH }}", "owsec_version": "${{ github.sha }}", "owfms_version": "${{ env.BASE_BRANCH }}", "owprov_version": "main", "owprovui_version": "main"}'
