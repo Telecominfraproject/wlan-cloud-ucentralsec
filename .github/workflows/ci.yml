@@ -76,8 +76,8 @@ jobs:
     - name: Get base branch name and set as output
       id: get_base_branch
       run: |
-        echo ::set-output name=branch::$(echo "${GITHUB_BASE_REF##*/}")
-        echo ::set-output name=owgw_branch::$(echo "${GITHUB_BASE_REF##*/} | sed 's/main/master/g'")
+        echo ::set-output name=branch::$(echo ${GITHUB_BASE_REF##*/})
+        echo ::set-output name=owgw_branch::$(echo ${GITHUB_BASE_REF##*/} | sed 's/main/master/g')
 
     - name: Trigger testing of OpenWifi Docker Compose deployment and wait for result
       env:
