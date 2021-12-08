@@ -15,7 +15,7 @@ namespace OpenWifi {
                                                   Poco::Net::HTTPRequest::HTTP_GET,
                                                   Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                                   Server,
-                                                  Internal, false, false , RateLimit{.Interval=1000,.MaxCalls=10},
+                                                  Internal, true, false , RateLimit{.Interval=1000,.MaxCalls=10},
                                                   true) {}
                                                   static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/submfa"}; };
         void DoGet() final;

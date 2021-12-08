@@ -39,7 +39,8 @@ namespace OpenWifi {
             RESTAPI_preferences,
             RESTAPI_suboauth2_handler,
             RESTAPI_subuser_handler,
-            RESTAPI_subusers_handler
+            RESTAPI_subusers_handler,
+            RESTAPI_submfa_handler
         >(Path, Bindings, L, S);
     }
 

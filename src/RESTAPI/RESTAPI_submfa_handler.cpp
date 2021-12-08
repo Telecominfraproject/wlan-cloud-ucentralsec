@@ -32,6 +32,9 @@ namespace OpenWifi {
     }
 
     void RESTAPI_submfa_handler::DoPut() {
+
+        std::cout << "DoPut..." << std::endl;
+
         auto Body = ParseStream();
         SecurityObjects::SubMfaConfig   MFC;
 
