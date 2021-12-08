@@ -56,6 +56,7 @@ RUN make install
 ADD CMakeLists.txt build /owsec/
 ADD cmake /owsec/cmake
 ADD src /owsec/src
+ADD .git /owgw/.git
 
 WORKDIR /owsec
 RUN mkdir cmake-build
