@@ -36,88 +36,96 @@ namespace OpenWifi {
 
         std::cout << "DoPut..." << std::endl;
 
-        auto Body = ParseStream();
-        SecurityObjects::SubMfaConfig   MFC;
-
-        DBGLINE
-
-        if(!MFC.from_json(Body)) {
+        try {
             DBGLINE
-            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-        }
+            auto Body = ParseStream();
+            DBGLINE
 
-        if(MFC.type=="disabled") {
-            DBGLINE
-            SecurityObjects::UserInfo   User;
-            StorageService()->GetUserById(UserInfo_.userinfo.Id,User);
-            User.userTypeProprietaryInfo.mfa.enabled = false;
-            StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,UserInfo_.userinfo.Id,User);
+            SecurityObjects::SubMfaConfig MFC;
 
-            Poco::JSON::Object  Answer;
-            MFC.to_json(Answer);
             DBGLINE
-            return ReturnObject(Answer);
-        } else if (MFC.type=="email") {
-            DBGLINE
-            SecurityObjects::UserInfo   User;
 
-            StorageService()->GetUserById(UserInfo_.userinfo.Id,User);
-            User.userTypeProprietaryInfo.mfa.enabled = true;
-            User.userTypeProprietaryInfo.mfa.method = "email";
-            StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,UserInfo_.userinfo.Id,User);
-
-            Poco::JSON::Object  Answer;
-            MFC.to_json(Answer);
-            DBGLINE
-            return ReturnObject(Answer);
-        } else if (MFC.type=="sms") {
-            DBGLINE
-            if(GetBoolParameter("startValidation",false)) {
+            if (!MFC.from_json(Body)) {
                 DBGLINE
-                if(MFC.sms.empty()) {
-                    return BadRequest("Missing phone number");
-                }
+                return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+            }
+
+            if (MFC.type == "disabled") {
                 DBGLINE
+                SecurityObjects::UserInfo User;
+                StorageService()->GetUserById(UserInfo_.userinfo.Id, User);
+                User.userTypeProprietaryInfo.mfa.enabled = false;
+                StorageService()->UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
-                if(SMSSender()->StartValidation(MFC.sms, UserInfo_.userinfo.email)) {
-                    return OK();
-                } else {
-                    return InternalError("SMS could not be sent. Verify the number or try again later.");
-                }
+                Poco::JSON::Object Answer;
+                MFC.to_json(Answer);
                 DBGLINE
-            } else if(GetBoolParameter("completeValidation",false)) {
-                auto ChallengeCode = GetParameter("challengeCode","");
-                if(ChallengeCode.empty()) {
+                return ReturnObject(Answer);
+            } else if (MFC.type == "email") {
+                DBGLINE
+                SecurityObjects::UserInfo User;
+
+                StorageService()->GetUserById(UserInfo_.userinfo.Id, User);
+                User.userTypeProprietaryInfo.mfa.enabled = true;
+                User.userTypeProprietaryInfo.mfa.method = "email";
+                StorageService()->UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+
+                Poco::JSON::Object Answer;
+                MFC.to_json(Answer);
+                DBGLINE
+                return ReturnObject(Answer);
+            } else if (MFC.type == "sms") {
+                DBGLINE
+                if (GetBoolParameter("startValidation", false)) {
                     DBGLINE
-                    return BadRequest("Missing 'challengeCode'");
-                }
-                if(MFC.sms.empty()) {
-                    DBGLINE
-                    return BadRequest("Missing phone number");
-                }
-                if(SMSSender()->CompleteValidation(MFC.sms, ChallengeCode, UserInfo_.userinfo.email)) {
-                    SecurityObjects::UserInfo   User;
+                    if (MFC.sms.empty()) {
+                        return BadRequest("Missing phone number");
+                    }
                     DBGLINE
 
-                    StorageService()->GetUserById(UserInfo_.userinfo.Id,User);
-                    User.userTypeProprietaryInfo.mfa.method = "sms";
-                    SecurityObjects::MobilePhoneNumber  PhoneNumber;
-                    PhoneNumber.number = MFC.sms;
-                    PhoneNumber.primary = true;
-                    PhoneNumber.verified = true;
-                    User.userTypeProprietaryInfo.mfa.enabled = true;
-                    User.userTypeProprietaryInfo.mobiles.clear();
-                    User.userTypeProprietaryInfo.mobiles.push_back(PhoneNumber);
-                    StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,UserInfo_.userinfo.Id,User);
-
-                    Poco::JSON::Object  Answer;
-                    MFC.to_json(Answer);
-                    return ReturnObject(Answer);
-                } else {
+                    if (SMSSender()->StartValidation(MFC.sms, UserInfo_.userinfo.email)) {
+                        return OK();
+                    } else {
+                        return InternalError("SMS could not be sent. Verify the number or try again later.");
+                    }
                     DBGLINE
-                    return InternalError("SMS could not be sent. Verify the number or try again later.");
+                } else if (GetBoolParameter("completeValidation", false)) {
+                    auto ChallengeCode = GetParameter("challengeCode", "");
+                    if (ChallengeCode.empty()) {
+                        DBGLINE
+                        return BadRequest("Missing 'challengeCode'");
+                    }
+                    if (MFC.sms.empty()) {
+                        DBGLINE
+                        return BadRequest("Missing phone number");
+                    }
+                    if (SMSSender()->CompleteValidation(MFC.sms, ChallengeCode, UserInfo_.userinfo.email)) {
+                        SecurityObjects::UserInfo User;
+                        DBGLINE
+
+                        StorageService()->GetUserById(UserInfo_.userinfo.Id, User);
+                        User.userTypeProprietaryInfo.mfa.method = "sms";
+                        SecurityObjects::MobilePhoneNumber PhoneNumber;
+                        PhoneNumber.number = MFC.sms;
+                        PhoneNumber.primary = true;
+                        PhoneNumber.verified = true;
+                        User.userTypeProprietaryInfo.mfa.enabled = true;
+                        User.userTypeProprietaryInfo.mobiles.clear();
+                        User.userTypeProprietaryInfo.mobiles.push_back(PhoneNumber);
+                        StorageService()->UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+
+                        Poco::JSON::Object Answer;
+                        MFC.to_json(Answer);
+                        return ReturnObject(Answer);
+                    } else {
+                        DBGLINE
+                        return InternalError("SMS could not be sent. Verify the number or try again later.");
+                    }
                 }
             }
+        } catch (const Poco::Exception &E) {
+            DBGLINE
+            Logger_.log(E);
         }
         DBGLINE
         return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
