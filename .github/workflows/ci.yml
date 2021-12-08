@@ -89,6 +89,6 @@ jobs:
         repo: wlan-testing
         owner: Telecominfraproject
         event_type: openwifi-sdk-pr
-        client_payload: '{"owgw_version": "${{ env.OWGW_BASE_BRANCH }}", "owgwui_version": "${{ env.BASE_BRANCH }}", "owsec_version": "${{ github.sha }}", "owfms_version": "${{ env.BASE_BRANCH }}", "owprov_version": "main", "owprovui_version": "main"}'
+        client_payload: '{"owgw_tag": "${{ env.OWGW_BASE_BRANCH }}", "owgwui_tag": "${{ env.BASE_BRANCH }}", "owsec_tag": "${{ github.sha }}", "owfms_tag": "${{ env.BASE_BRANCH }}", "owprov_tag": "main", "owprovui_tag": "main"}'
         wait_time: 60
         max_time: 2700
