@@ -11,7 +11,8 @@ namespace OpenWifi {
     void RESTAPI_submfa_handler::DoGet() {
         SecurityObjects::UserInfo   User;
 
-        if (StorageService()->GetUserById(UserInfo_.userinfo.Id,User)) {
+        std::cout << "submfa get " << UserInfo_.userinfo.Id << "   user:" << UserInfo_.userinfo.email << std::endl;
+        if (StorageService()->GetSubUserById(UserInfo_.userinfo.Id,User)) {
             Poco::JSON::Object              Answer;
             SecurityObjects::SubMfaConfig   MFC;
 
@@ -44,9 +45,9 @@ namespace OpenWifi {
 
             if (MFC.type == "disabled") {
                 SecurityObjects::UserInfo User;
-                StorageService()->GetUserById(UserInfo_.userinfo.Id, User);
+                StorageService()->GetSubUserById(UserInfo_.userinfo.Id, User);
                 User.userTypeProprietaryInfo.mfa.enabled = false;
-                StorageService()->UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+                StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
                 Poco::JSON::Object Answer;
                 MFC.to_json(Answer);
@@ -54,10 +55,10 @@ namespace OpenWifi {
             } else if (MFC.type == "email") {
                 SecurityObjects::UserInfo User;
 
-                StorageService()->GetUserById(UserInfo_.userinfo.Id, User);
+                StorageService()->GetSubUserById(UserInfo_.userinfo.Id, User);
                 User.userTypeProprietaryInfo.mfa.enabled = true;
                 User.userTypeProprietaryInfo.mfa.method = "email";
-                StorageService()->UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+                StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
                 Poco::JSON::Object Answer;
                 MFC.to_json(Answer);
@@ -84,7 +85,7 @@ namespace OpenWifi {
                     if (SMSSender()->CompleteValidation(MFC.sms, ChallengeCode, UserInfo_.userinfo.email)) {
                         SecurityObjects::UserInfo User;
 
-                        StorageService()->GetUserById(UserInfo_.userinfo.Id, User);
+                        StorageService()->GetSubUserById(UserInfo_.userinfo.Id, User);
                         User.userTypeProprietaryInfo.mfa.enabled = true;
                         User.userTypeProprietaryInfo.mfa.method = "sms";
                         SecurityObjects::MobilePhoneNumber PhoneNumber;
@@ -93,7 +94,7 @@ namespace OpenWifi {
                         PhoneNumber.verified = true;
                         User.userTypeProprietaryInfo.mobiles.clear();
                         User.userTypeProprietaryInfo.mobiles.push_back(PhoneNumber);
-                        StorageService()->UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+                        StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
                         Poco::JSON::Object Answer;
                         MFC.to_json(Answer);
