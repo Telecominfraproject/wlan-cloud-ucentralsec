@@ -31,6 +31,7 @@ namespace OpenWifi {
 
         ChallengeStart.set("uuid",uuid);
         ChallengeStart.set("created", Created);
+        ChallengeStart.set("question", "mfa challenge");
         ChallengeStart.set("method", UInfo.userinfo.userTypeProprietaryInfo.mfa.method);
 
         Cache_[uuid] = MFACacheEntry{ .UInfo = UInfo, .Answer=Challenge, .Created=Created, .Method=UInfo.userinfo.userTypeProprietaryInfo.mfa.method };
