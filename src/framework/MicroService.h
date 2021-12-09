@@ -74,6 +74,8 @@ using namespace std::chrono_literals;
 
 #include "ow_version.h"
 
+#define _OWDBG_ std::cout << __FILE__ << " : " << __LINE__ << std::endl;
+
 namespace OpenWifi {
 
     enum UNAUTHORIZED_REASON {
