@@ -9,13 +9,14 @@
 namespace OpenWifi {
     class RESTAPI_action_links : public RESTAPIHandler {
     public:
-        RESTAPI_action_links(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
+        RESTAPI_action_links(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, uint64_t TransactionId, bool Internal)
                 : RESTAPIHandler(bindings, L,
              std::vector<std::string>{
                                         Poco::Net::HTTPRequest::HTTP_GET,
                                         Poco::Net::HTTPRequest::HTTP_POST,
                                         Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                         Server,
+                                        TransactionId,
                                         Internal,
                                         false,
                                         true, RateLimit{.Interval=1000,.MaxCalls=10}) {}

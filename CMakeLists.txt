@@ -102,7 +102,7 @@ add_executable( owsec
         src/RESTAPI/RESTAPI_subuser_handler.h src/RESTAPI/RESTAPI_subuser_handler.cpp
         src/RESTAPI/RESTAPI_subusers_handler.h src/RESTAPI/RESTAPI_subusers_handler.cpp
         src/RESTAPI/RESTAPI_validate_sub_token_handler.cpp src/RESTAPI/RESTAPI_validate_sub_token_handler.h
-        src/APIServers.cpp
+        src/RESTAPI/RESTAPI_Routers.cpp
         src/Daemon.h src/Daemon.cpp
         src/AuthService.h src/AuthService.cpp
         src/StorageService.cpp src/StorageService.h

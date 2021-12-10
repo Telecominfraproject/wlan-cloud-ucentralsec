@@ -94,10 +94,17 @@ namespace OpenWifi {
                         PhoneNumber.verified = true;
                         User.userTypeProprietaryInfo.mobiles.clear();
                         User.userTypeProprietaryInfo.mobiles.push_back(PhoneNumber);
+
                         StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+
+                        MFC.sms = MFC.sms;
+                        MFC.type = "sms";
+                        MFC.email = UserInfo_.userinfo.email;
+                        MFC.id = MicroService::instance().CreateUUID();
 
                         Poco::JSON::Object Answer;
                         MFC.to_json(Answer);
+
                         return ReturnObject(Answer);
 
                     } else {

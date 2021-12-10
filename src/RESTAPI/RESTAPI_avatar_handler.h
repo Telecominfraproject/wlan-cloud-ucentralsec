@@ -30,7 +30,7 @@ namespace OpenWifi {
 
     class RESTAPI_avatar_handler : public RESTAPIHandler {
     public:
-        RESTAPI_avatar_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
+        RESTAPI_avatar_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, uint64_t TransactionId, bool Internal)
                 : RESTAPIHandler(bindings, L,
                                  std::vector<std::string>{
                                          Poco::Net::HTTPRequest::HTTP_GET,
@@ -38,6 +38,7 @@ namespace OpenWifi {
                                          Poco::Net::HTTPRequest::HTTP_DELETE,
                                          Poco::Net::HTTPRequest::HTTP_OPTIONS},
                                          Server,
+                                         TransactionId,
                                          Internal) {}
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/avatar/{id}"}; };
 

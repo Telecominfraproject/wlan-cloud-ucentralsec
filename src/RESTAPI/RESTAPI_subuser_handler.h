@@ -9,7 +9,7 @@
 namespace OpenWifi {
     class RESTAPI_subuser_handler : public RESTAPIHandler {
     public:
-        RESTAPI_subuser_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, bool Internal)
+        RESTAPI_subuser_handler(const RESTAPIHandler::BindingMap &bindings, Poco::Logger &L, RESTAPI_GenericServer &Server, uint64_t TransactionId, bool Internal)
         : RESTAPIHandler(bindings, L,
                          std::vector<std::string>
                          {Poco::Net::HTTPRequest::HTTP_POST,
@@ -18,6 +18,7 @@ namespace OpenWifi {
                           Poco::Net::HTTPRequest::HTTP_DELETE,
                           Poco::Net::HTTPRequest::HTTP_OPTIONS},
                           Server,
+                          TransactionId,
                           Internal) {}
                           static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/subuser/{id}"}; };
         void DoGet() final;

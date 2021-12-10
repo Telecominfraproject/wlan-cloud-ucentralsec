@@ -23,8 +23,8 @@
 
 namespace OpenWifi {
 
-    Poco::Net::HTTPRequestHandler * RESTAPI_external_server(const char *Path, RESTAPIHandler::BindingMap &Bindings,
-                                                            Poco::Logger & L, RESTAPI_GenericServer & S) {
+    Poco::Net::HTTPRequestHandler * RESTAPI_ExtRouter(const char *Path, RESTAPIHandler::BindingMap &Bindings,
+                                                            Poco::Logger & L, RESTAPI_GenericServer & S, uint64_t TransactionId) {
         return RESTAPI_Router<
             RESTAPI_oauth2_handler,
             RESTAPI_users_handler,
@@ -41,11 +41,11 @@ namespace OpenWifi {
             RESTAPI_subuser_handler,
             RESTAPI_subusers_handler,
             RESTAPI_submfa_handler
-        >(Path, Bindings, L, S);
+        >(Path, Bindings, L, S,TransactionId);
     }
 
-    Poco::Net::HTTPRequestHandler * RESTAPI_internal_server(const char *Path, RESTAPIHandler::BindingMap &Bindings,
-                                                            Poco::Logger & L, RESTAPI_GenericServer & S) {
+    Poco::Net::HTTPRequestHandler * RESTAPI_IntRouter(const char *Path, RESTAPIHandler::BindingMap &Bindings,
+                                                            Poco::Logger & L, RESTAPI_GenericServer & S, uint64_t TransactionId) {
         return RESTAPI_Router_I<
             RESTAPI_users_handler,
             RESTAPI_user_handler,
@@ -59,6 +59,6 @@ namespace OpenWifi {
             RESTAPI_suboauth2_handler,
             RESTAPI_subusers_handler,
             RESTAPI_submfa_handler
-        >(Path, Bindings, L, S);
+        >(Path, Bindings, L, S, TransactionId);
     }
 }
