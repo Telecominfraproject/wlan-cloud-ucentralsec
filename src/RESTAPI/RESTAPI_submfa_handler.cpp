@@ -60,9 +60,15 @@ namespace OpenWifi {
                 User.userTypeProprietaryInfo.mfa.method = "email";
                 StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
+                MFC.sms = MFC.sms;
+                MFC.type = "email";
+                MFC.email = UserInfo_.userinfo.email;
+                MFC.id = MicroService::instance().CreateUUID();
+
                 Poco::JSON::Object Answer;
                 MFC.to_json(Answer);
                 return ReturnObject(Answer);
+
             } else if (MFC.type == "sms") {
                 if (GetBoolParameter("startValidation", false)) {
                     if (MFC.sms.empty()) {
