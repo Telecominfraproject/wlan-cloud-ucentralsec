@@ -46,7 +46,7 @@ namespace OpenWifi {
             Insert.execute();
             return true;
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -78,7 +78,7 @@ namespace OpenWifi {
             Poco::StreamCopier::copyStream(IL, f);
             return true;
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -95,7 +95,7 @@ namespace OpenWifi {
             Delete.execute();
             return true;
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }

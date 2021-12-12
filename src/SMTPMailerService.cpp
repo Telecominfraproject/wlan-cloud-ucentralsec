@@ -49,7 +49,7 @@ namespace OpenWifi {
 
     void SMTPMailerService::reinitialize(Poco::Util::Application &self) {
         MicroService::instance().LoadConfigurationFile();
-        Logger_.information("Reinitializing.");
+        Logger().information("Reinitializing.");
         LoadMyConfig();
     }
 
@@ -83,14 +83,14 @@ namespace OpenWifi {
                 uint64_t Now = std::time(nullptr);
                 if((i->LastTry==0 || (Now-i->LastTry)>MailRetry_)) {
                     if (SendIt(*i)) {
-                        Logger_.information(Poco::format("Attempting to deliver for mail '%s'.", Recipient));
+                        Logger().information(Poco::format("Attempting to deliver for mail '%s'.", Recipient));
                         i = Messages_.erase(i);
                     } else {
                         i->LastTry = Now;
                         ++i;
                     }
                 } else if ((Now-i->Posted)>MailAbandon_) {
-                    Logger_.information(Poco::format("Mail for '%s' has timed out and will not be sent.", Recipient));
+                    Logger().information(Poco::format("Mail for '%s' has timed out and will not be sent.", Recipient));
                     i = Messages_.erase(i);
                 } else {
                     ++i;
@@ -121,7 +121,7 @@ namespace OpenWifi {
                 TheSender = Sender_ ;
             }
             Message.setSender( TheSender );
-            Logger_.information(Poco::format("Sending message to:%s from %s",Recipient,TheSender));
+            Logger().information(Poco::format("Sending message to:%s from %s",Recipient,TheSender));
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
 
@@ -145,7 +145,7 @@ namespace OpenWifi {
                     Poco::StreamCopier::copyStream(IF, OS);
                     Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
                 } catch (...) {
-                    Logger_.warning(Poco::format("Cannot add '%s' logo in email",AuthService::GetLogoAssetFileName()));
+                    Logger().warning(Poco::format("Cannot add '%s' logo in email",AuthService::GetLogoAssetFileName()));
                 }
             }
 
@@ -172,10 +172,10 @@ namespace OpenWifi {
         }
         catch (const Poco::Exception& E)
         {
-            Logger_.log(E);
+            Logger().log(E);
         }
         catch (const std::exception &E) {
-            Logger_.warning(Poco::format("Cannot send message to:%s, error: %s",Recipient, E.what()));
+            Logger().warning(Poco::format("Cannot send message to:%s, error: %s",Recipient, E.what()));
         }
         return false;
     }

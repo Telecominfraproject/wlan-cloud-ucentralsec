@@ -56,7 +56,7 @@ namespace OpenWifi {
                 switch(i.action) {
                     case OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
-                                Logger_.information(Poco::format("Send password reset link to %s",UInfo.email));
+                                Logger().information(Poco::format("Send password reset link to %s",UInfo.email));
                             }
                             StorageService()->SentAction(i.id);
                         }
@@ -64,7 +64,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::EMAIL_VERIFICATION)) {
-                                Logger_.information(Poco::format("Send email verification link to %s",UInfo.email));
+                                Logger().information(Poco::format("Send email verification link to %s",UInfo.email));
                             }
                             StorageService()->SentAction(i.id);
                         }
@@ -72,7 +72,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
-                                Logger_.information(Poco::format("Send subscriber password reset link to %s",UInfo.email));
+                                Logger().information(Poco::format("Send subscriber password reset link to %s",UInfo.email));
                             }
                             StorageService()->SentAction(i.id);
                         }
@@ -80,7 +80,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL: {
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::EMAIL_VERIFICATION)) {
-                                Logger_.information(Poco::format("Send subscriber email verification link to %s",UInfo.email));
+                                Logger().information(Poco::format("Send subscriber email verification link to %s",UInfo.email));
                             }
                             StorageService()->SentAction(i.id);
                         }

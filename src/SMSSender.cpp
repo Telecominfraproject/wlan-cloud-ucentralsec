@@ -20,9 +20,9 @@ namespace OpenWifi {
         if(Enabled_) {
             Provider_ = MicroService::instance().ConfigGetString("smssender.provider","aws");
             if(Provider_=="aws") {
-                ProviderImpl_ = std::make_unique<SMS_provider_aws>(Logger_);
+                ProviderImpl_ = std::make_unique<SMS_provider_aws>(Logger());
             } else if(Provider_=="twilio") {
-                ProviderImpl_ = std::make_unique<SMS_provider_twilio>(Logger_);
+                ProviderImpl_ = std::make_unique<SMS_provider_twilio>(Logger());
             }
             Enabled_ = ProviderImpl_->Initialize();
         }
@@ -76,7 +76,7 @@ namespace OpenWifi {
 
     bool SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
         if(!Enabled_) {
-            Logger_.information("SMS has not been enabled. Messages cannot be sent.");
+            Logger().information("SMS has not been enabled. Messages cannot be sent.");
             return false;
         }
         return ProviderImpl_->Send(PhoneNumber,Message);

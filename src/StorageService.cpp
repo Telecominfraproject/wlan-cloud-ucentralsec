@@ -26,7 +26,7 @@ namespace OpenWifi {
     }
 
     void Storage::Stop() {
-        Logger_.notice("Stopping.");
+        Logger().notice("Stopping.");
         Timer_.stop();
         StorageClass::Stop();
     }

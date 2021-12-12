@@ -17,7 +17,7 @@ namespace OpenWifi {
         Region_ = MicroService::instance().ConfigGetString("smssender.aws.region","");
 
         if(SecretKey_.empty() || AccessKey_.empty() || Region_.empty()) {
-            Logger_.debug("SMSSender is disabled. Please provide key, secret, and region.");
+            Logger().debug("SMSSender is disabled. Please provide key, secret, and region.");
             return false;
         }
         Running_=true;
@@ -51,16 +51,16 @@ namespace OpenWifi {
 
             auto psms_out = sns.Publish(psms_req);
             if (psms_out.IsSuccess()) {
-                Logger_.debug(Poco::format("SMS sent to %s",PhoneNumber));
+                Logger().debug(Poco::format("SMS sent to %s",PhoneNumber));
                 return true;
             }
             std::string ErrMsg{psms_out.GetError().GetMessage()};
-            Logger_.debug(Poco::format("SMS NOT sent to %s: %s",PhoneNumber, ErrMsg));
+            Logger().debug(Poco::format("SMS NOT sent to %s: %s",PhoneNumber, ErrMsg));
             return false;
         } catch (...) {
 
         }
-        Logger_.debug(Poco::format("SMS NOT sent to %s: failure in SMS service",PhoneNumber));
+        Logger().debug(Poco::format("SMS NOT sent to %s: failure in SMS service",PhoneNumber));
         return false;
     }
 

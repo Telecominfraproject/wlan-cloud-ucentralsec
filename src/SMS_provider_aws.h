@@ -21,6 +21,7 @@ namespace OpenWifi {
         bool Stop() final ;
         bool Send(const std::string &Number, const std::string &Message) final;
         bool Running() final;
+        inline Poco::Logger & Logger() { return Logger_; }
     private:
         bool                                Running_=false;
         Poco::Logger                        &Logger_;

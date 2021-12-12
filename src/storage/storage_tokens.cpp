@@ -37,7 +37,7 @@ namespace OpenWifi {
             Insert.execute();
             return true;
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -62,7 +62,7 @@ namespace OpenWifi {
             Select.execute();
             return true;
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -86,7 +86,7 @@ namespace OpenWifi {
             return RevocationDate>0 ;
 
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -106,7 +106,7 @@ namespace OpenWifi {
             Update.execute();
             return true;
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -123,7 +123,7 @@ namespace OpenWifi {
             Delete.execute();
             return true;
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -139,7 +139,7 @@ namespace OpenWifi {
             Delete.execute();
             return true;
         } catch(const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }

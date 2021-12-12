@@ -45,7 +45,7 @@ namespace OpenWifi {
     int AuthService::Start() {
 		Signer_.setRSAKey(MicroService::instance().Key());
 		Signer_.addAllAlgorithms();
-		Logger_.notice("Starting...");
+		Logger().notice("Starting...");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
 
@@ -61,7 +61,7 @@ namespace OpenWifi {
     }
 
     void AuthService::Stop() {
-		Logger_.notice("Stopping...");
+		Logger().notice("Stopping...");
     }
 
 	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
@@ -102,7 +102,7 @@ namespace OpenWifi {
 		        return false;
 		    }
 		} catch(const Poco::Exception &E) {
-		    Logger_.log(E);
+		    Logger().log(E);
 		}
 		return false;
     }
@@ -145,7 +145,7 @@ namespace OpenWifi {
                 return false;
             }
         } catch(const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
         return false;
     }
@@ -221,7 +221,7 @@ namespace OpenWifi {
             KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroService::instance().PrivateEndPoint(), ResultText.str(),
                                         false);
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
     }
 
@@ -240,7 +240,7 @@ namespace OpenWifi {
             KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroService::instance().PrivateEndPoint(), ResultText.str(),
                                         false);
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            Logger().log(E);
         }
     }
 
