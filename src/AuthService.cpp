@@ -656,9 +656,11 @@ namespace OpenWifi {
         std::lock_guard G(Mutex_);
 
         Expired = false;
-
+_OWDEBUG_
         auto Client = SubUserCache_.get(Token);
+        _OWDEBUG_
         if(!Client.isNull()) {
+            _OWDEBUG_
             Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < std::time(nullptr);
             WebToken = Client->webtoken;
             UserInfo = Client->userinfo;
@@ -667,22 +669,31 @@ namespace OpenWifi {
 
         std::string TToken{Token};
         if(StorageService()->IsSubTokenRevoked(TToken)) {
+            _OWDEBUG_
             return false;
         }
 
         //  get the token from disk...
         SecurityObjects::UserInfoAndPolicy UInfo;
         uint64_t RevocationDate=0;
+        _OWDEBUG_
         if(StorageService()->GetSubToken(TToken, UInfo, RevocationDate)) {
+            _OWDEBUG_
             if(RevocationDate!=0)
                 return false;
+            _OWDEBUG_
             Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
+            _OWDEBUG_
             if(StorageService()->GetSubUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
+                _OWDEBUG_
                 WebToken = UInfo.webtoken;
                 SubUserCache_.update(UInfo.webtoken.access_token_, UInfo);
+                _OWDEBUG_
                 return true;
             }
+            _OWDEBUG_
         }
+        _OWDEBUG_
         return false;
     }
 
