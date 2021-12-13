@@ -110,16 +110,24 @@ namespace OpenWifi {
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
         }
 
+        _OWDEBUG_
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
+            _OWDEBUG_
             Logger_.information(Poco::format("COMPLETE-MFA-CHALLENGE(%s): Request for %s", Request->clientAddress().toString(), userId));
-            if(Obj->has("uuid")) {
+            _OWDEBUG_
+            if(Obj->has("uuid") && Obj->has("answer")) {
+                _OWDEBUG_
+                std::cout << "UUID:" << Obj->get("uuid").toString() << "  answer:" << Obj->get("answer").toString() << std::endl;
                 SecurityObjects::UserInfoAndPolicy UInfo;
+                _OWDEBUG_
                 if(MFAServer().CompleteMFAChallenge(Obj,UInfo)) {
                     Poco::JSON::Object ReturnObj;
                     UInfo.webtoken.to_json(ReturnObj);
                     return ReturnObject(ReturnObj);
                 }
+                _OWDEBUG_
             }
+            _OWDEBUG_
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
         }
 
