@@ -655,13 +655,9 @@ namespace OpenWifi {
     bool AuthService::IsValidSubToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
         std::lock_guard G(Mutex_);
 
-        std::cout << "Token: '" << Token << "'" << std::endl;
         Expired = false;
-_OWDEBUG_
         auto Client = SubUserCache_.get(Token);
-        _OWDEBUG_
         if(!Client.isNull()) {
-            _OWDEBUG_
             Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < std::time(nullptr);
             WebToken = Client->webtoken;
             UserInfo = Client->userinfo;
@@ -670,32 +666,22 @@ _OWDEBUG_
 
         std::string TToken{Token};
         if(StorageService()->IsSubTokenRevoked(TToken)) {
-            _OWDEBUG_
             return false;
         }
 
         //  get the token from disk...
         SecurityObjects::UserInfoAndPolicy UInfo;
         uint64_t RevocationDate=0;
-        _OWDEBUG_
         if(StorageService()->GetSubToken(TToken, UInfo, RevocationDate)) {
-            _OWDEBUG_
             if(RevocationDate!=0)
                 return false;
-            _OWDEBUG_
-            std::cout << "UInfo:" << UInfo.userinfo.Id << std::endl;
             Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
-            _OWDEBUG_
             if(StorageService()->GetSubUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
-                _OWDEBUG_
                 WebToken = UInfo.webtoken;
                 SubUserCache_.update(UInfo.webtoken.access_token_, UInfo);
-                _OWDEBUG_
                 return true;
             }
-            _OWDEBUG_
         }
-        _OWDEBUG_
         return false;
     }
 
