@@ -619,8 +619,8 @@ namespace OpenWifi {
     }
 
     bool AuthService::IsValidToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
-        std::lock_guard G(Mutex_);
 
+        std::lock_guard G(Mutex_);
         Expired = false;
 
         auto Client = UserCache_.get(Token);
@@ -649,7 +649,7 @@ namespace OpenWifi {
                 return true;
             }
         }
-        return false;
+        return IsValidSubToken(Token, WebToken, UserInfo, Expired);
     }
 
     bool AuthService::IsValidSubToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
