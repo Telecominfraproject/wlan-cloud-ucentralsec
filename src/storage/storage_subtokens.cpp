@@ -63,6 +63,9 @@ namespace OpenWifi {
             Poco::Data::Keywords::into(RevocationDate),
             Poco::Data::Keywords::use(Token);
             Select.execute();
+
+            if(Select.rowsExtracted()!=1)
+                return false;
             return true;
         } catch (const Poco::Exception &E) {
             Logger().log(E);

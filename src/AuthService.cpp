@@ -682,6 +682,7 @@ _OWDEBUG_
             if(RevocationDate!=0)
                 return false;
             _OWDEBUG_
+            std::cout << "UInfo:" << UInfo.userinfo.Id << std::endl;
             Expired = (UInfo.webtoken.created_ + UInfo.webtoken.expires_in_) < std::time(nullptr);
             _OWDEBUG_
             if(StorageService()->GetSubUserById(UInfo.userinfo.Id,UInfo.userinfo)) {
