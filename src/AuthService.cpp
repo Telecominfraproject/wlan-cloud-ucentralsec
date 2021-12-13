@@ -655,6 +655,7 @@ namespace OpenWifi {
     bool AuthService::IsValidSubToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
         std::lock_guard G(Mutex_);
 
+        std::cout << "Token: '" << Token << "'" << std::endl;
         Expired = false;
 _OWDEBUG_
         auto Client = SubUserCache_.get(Token);
