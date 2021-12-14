@@ -11,7 +11,7 @@ namespace OpenWifi {
     void RESTAPI_submfa_handler::DoGet() {
         SecurityObjects::UserInfo   User;
 
-        std::cout << "submfa get " << UserInfo_.userinfo.Id << "   user:" << UserInfo_.userinfo.email << std::endl;
+        // std::cout << "submfa get " << UserInfo_.userinfo.Id << "   user:" << UserInfo_.userinfo.email << std::endl;
         if (StorageService()->GetSubUserById(UserInfo_.userinfo.Id,User)) {
             Poco::JSON::Object              Answer;
             SecurityObjects::SubMfaConfig   MFC;
@@ -20,8 +20,10 @@ namespace OpenWifi {
             if(User.userTypeProprietaryInfo.mfa.enabled) {
                 if(User.userTypeProprietaryInfo.mfa.method == "sms") {
                     MFC.sms = User.userTypeProprietaryInfo.mobiles[0].number;
+                    MFC.type = "sms";
                 } else if(User.userTypeProprietaryInfo.mfa.method == "email") {
                     MFC.email = User.email;
+                    MFC.type = "email";
                 }
             } else {
                 MFC.type = "disabled";
