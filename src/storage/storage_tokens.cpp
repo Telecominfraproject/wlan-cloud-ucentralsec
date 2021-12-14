@@ -42,7 +42,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo, uint64_t &RevocationDate) {
+    bool Storage::GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate) {
         try {
 
             Poco::Data::Session Sess = Pool_->get();
@@ -50,17 +50,21 @@ namespace OpenWifi {
             RevocationDate = 0 ;
             std::string St2{"SELECT " + AllTokensFieldsForSelect + " From Tokens WHERE Token=?"};
             Select << ConvertParams(St2),
-                Poco::Data::Keywords::into(UInfo.webtoken.access_token_),
-                Poco::Data::Keywords::into(UInfo.webtoken.refresh_token_),
-                Poco::Data::Keywords::into(UInfo.webtoken.token_type_),
-                Poco::Data::Keywords::into(UInfo.userinfo.Id),
-                Poco::Data::Keywords::into(UInfo.webtoken.created_),
-                Poco::Data::Keywords::into(UInfo.webtoken.expires_in_),
-                Poco::Data::Keywords::into(UInfo.webtoken.idle_timeout_),
+                Poco::Data::Keywords::into(WT.access_token_),
+                Poco::Data::Keywords::into(WT.refresh_token_),
+                Poco::Data::Keywords::into(WT.token_type_),
+                Poco::Data::Keywords::into(UserId),
+                Poco::Data::Keywords::into(WT.created_),
+                Poco::Data::Keywords::into(WT.expires_in_),
+                Poco::Data::Keywords::into(WT.idle_timeout_),
                 Poco::Data::Keywords::into(RevocationDate),
                 Poco::Data::Keywords::use(Token);
             Select.execute();
+
+            if(Select.rowsExtracted()!=1)
+                return false;
             return true;
+
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }

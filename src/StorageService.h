@@ -131,14 +131,14 @@ namespace OpenWifi {
         bool IsTokenRevoked( std::string & Token );
         bool CleanExpiredTokens();
         bool RevokeAllTokens( std::string & UserName );
-        bool GetToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo, uint64_t &RevocationDate);
+        bool GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate);
 
         bool AddSubToken(std::string &UserId, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut);
         bool RevokeSubToken( std::string & Token );
         bool IsSubTokenRevoked( std::string & Token );
         bool CleanExpiredSubTokens();
         bool RevokeAllSubTokens( std::string & UserName );
-        bool GetSubToken(std::string &Token, SecurityObjects::UserInfoAndPolicy &UInfo, uint64_t &RevocationDate);
+        bool GetSubToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate);
 
         /*
          *  All ActionLinks functions
