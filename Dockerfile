@@ -88,6 +88,7 @@ COPY owsec.properties.tmpl /
 COPY wwwassets /dist/wwwassets
 COPY templates /dist/templates
 COPY docker-entrypoint.sh /
+COPY wait-for-postgres.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
 
