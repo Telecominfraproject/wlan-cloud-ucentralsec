@@ -76,7 +76,7 @@ RUN addgroup -S "$OWSEC_USER" && \
 RUN mkdir /openwifi
 RUN mkdir -p "$OWSEC_ROOT" "$OWSEC_CONFIG" && \
     chown "$OWSEC_USER": "$OWSEC_ROOT" "$OWSEC_CONFIG"
-RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec gettext ca-certificates libcurl curl-dev bash jq curl
+RUN apk add --update --no-cache librdkafka mariadb-connector-c libpq unixodbc su-exec gettext ca-certificates libcurl curl-dev bash jq curl postgresql-client
 COPY --from=builder /owsec/cmake-build/owsec /openwifi/owsec
 COPY --from=builder /cppkafka/cmake-build/src/lib/* /lib/
 COPY --from=builder /poco/cmake-build/lib/* /lib/
