@@ -107,7 +107,7 @@ namespace OpenWifi {
                 if(MFAServer().ResendCode(uuid))
                     return OK();
             }
-            return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
+            return UnAuthorized(RESTAPI::Errors::InvalidCredentials, BAD_MFA_TRANSACTION);
         }
 
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
@@ -120,7 +120,7 @@ namespace OpenWifi {
                     return ReturnObject(ReturnObj);
                 }
             }
-            return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
+            return UnAuthorized(RESTAPI::Errors::InvalidCredentials, MFA_FAILURE);
         }
 
         SecurityObjects::UserInfoAndPolicy UInfo;

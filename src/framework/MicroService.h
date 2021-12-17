@@ -96,7 +96,9 @@ namespace OpenWifi {
         ACCESS_DENIED,
         INVALID_TOKEN,
         EXPIRED_TOKEN,
-        RATE_LIMIT_EXCEEDED
+        RATE_LIMIT_EXCEEDED,
+        BAD_MFA_TRANSACTION,
+        MFA_FAILURE
     };
 
 	class AppServiceRegistry {
@@ -1578,7 +1580,7 @@ namespace OpenWifi {
 	            if (AlwaysAuthorize_ && !IsAuthorized(Expired, SubOnlyService_)) {
 	                if(Expired)
 	                    return UnAuthorized(RESTAPI::Errors::ExpiredToken, EXPIRED_TOKEN);
-	                return UnAuthorized(RESTAPI::Errors::InvalidCredentials, ACCESS_DENIED);
+	                return UnAuthorized(RESTAPI::Errors::InvalidCredentials, INVALID_TOKEN);
 	            }
 
 	            std::string Reason;
@@ -1588,19 +1590,19 @@ namespace OpenWifi {
 
 	            ParseParameters();
 	            if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-	                DoGet();
+	                return DoGet();
 	            else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
-	                DoPost();
+                    return DoPost();
 	            else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE)
-	                DoDelete();
+                    return DoDelete();
 	            else if (Request->getMethod() == Poco::Net::HTTPRequest::HTTP_PUT)
-	                DoPut();
+                    return DoPut();
 	            else
-	                BadRequest(RESTAPI::Errors::UnsupportedHTTPMethod);
+                    return BadRequest(RESTAPI::Errors::UnsupportedHTTPMethod);
 	            return;
 	        } catch (const Poco::Exception &E) {
 	            Logger_.log(E);
-	            BadRequest(RESTAPI::Errors::InternalError);
+	            return BadRequest(RESTAPI::Errors::InternalError);
 	        }
 	    }
 

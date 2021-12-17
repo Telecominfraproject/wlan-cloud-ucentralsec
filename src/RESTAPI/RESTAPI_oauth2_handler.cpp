@@ -29,7 +29,7 @@ namespace OpenWifi {
         if (!IsAuthorized(Expired)) {
             if(Expired)
                 return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
-            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
+            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
         if(GetMe) {
@@ -48,7 +48,7 @@ namespace OpenWifi {
 	    if (!IsAuthorized(Expired)) {
 	        if(Expired)
 	            return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
-	        return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
+	        return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);
 	    }
 
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
@@ -113,7 +113,7 @@ namespace OpenWifi {
                 if(MFAServer().ResendCode(uuid))
                     return OK();
             }
-            return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
+            return UnAuthorized(RESTAPI::Errors::InvalidCredentials, BAD_MFA_TRANSACTION);
         }
 
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
@@ -126,7 +126,7 @@ namespace OpenWifi {
                     return ReturnObject(ReturnObj);
                 }
             }
-            return UnAuthorized(RESTAPI::Errors::InvalidCredentials);
+            return UnAuthorized(RESTAPI::Errors::InvalidCredentials, MFA_FAILURE);
         }
 
         SecurityObjects::UserInfoAndPolicy UInfo;
