@@ -23,7 +23,7 @@ namespace OpenWifi {
         if (!IsAuthorized(Expired, true)) {
             if(Expired)
                 return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
-            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
+            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
         if(GetMe) {
@@ -42,7 +42,7 @@ namespace OpenWifi {
         if (!IsAuthorized(Expired, true)) {
             if(Expired)
                 return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
-            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation);
+            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);
         }
 
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
