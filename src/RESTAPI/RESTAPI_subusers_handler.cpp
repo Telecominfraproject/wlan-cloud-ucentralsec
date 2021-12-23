@@ -33,11 +33,11 @@ namespace OpenWifi {
             }
             return ReturnObject(Answer);
         } else {
-            Types::StringVec IDs = Utils::Split(QB_.Select);
             Poco::JSON::Array ArrayObj;
-            for(auto &i:IDs) {
+            for(auto &i:SelectedRecords()) {
                 SecurityObjects::UserInfo   UInfo;
-                if(StorageService()->GetSubUserById(i,UInfo)) {
+                auto tI{i};
+                if(StorageService()->GetSubUserById(tI,UInfo)) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
                         ArrayObj.add(UInfo.Id);
