@@ -59,7 +59,7 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        if(AuthService()->DeleteUserFromCache(UInfo.email)) {
+        if(AuthService()->DeleteUserFromCache(Id)) {
             // nothing to do
         }
 

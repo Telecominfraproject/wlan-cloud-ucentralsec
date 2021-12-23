@@ -76,7 +76,7 @@ namespace OpenWifi {
 		    }
 
 		    if(!CallToken.empty()) {
-		        auto Client = UserCache_.get(CallToken);
+		        auto Client = UserCacheTokenToSharedID_.get(CallToken);
 		        if( Client.isNull() ) {
 		            SecurityObjects::WebToken   WT;
 		            uint64_t                    RevocationDate=0;
@@ -86,8 +86,9 @@ namespace OpenWifi {
 		                    return false;
 		                Expired = (WT.created_ + WT.expires_in_) < time(nullptr);
 		                if(StorageService()->GetUserById(UserId,UInfo.userinfo)) {
+                            UserCacheTokenToSharedID_.update(CallToken, { WT, UserId});
+                            UserCacheIDToUserInfo_.update(UserId, UInfo.userinfo);
 		                    UInfo.webtoken = WT;
-		                    UserCache_.update(CallToken, UInfo);
 		                    SessionToken = CallToken;
 		                    return true;
 		                }
@@ -96,8 +97,16 @@ namespace OpenWifi {
 		        }
 		        if(!Expired) {
 		            SessionToken = CallToken;
-		            UInfo = *Client ;
-		            return true;
+		            UInfo.webtoken = Client->WT ;
+                    auto UInfoCacheEntry = UserCacheIDToUserInfo_.get(Client->ID);
+                    if(UInfoCacheEntry.isNull()) {
+                        if(!StorageService()->GetUserById(Client->ID,UInfo.userinfo)) {
+                            return false;
+                        }
+                    } else {
+                        UInfo.userinfo = *UInfoCacheEntry;
+                    }
+                    return true;
 		        }
                 RevokeToken(CallToken);
 		        return false;
@@ -120,18 +129,19 @@ namespace OpenWifi {
             }
 
             if(!CallToken.empty()) {
-                auto Client = SubUserCache_.get(CallToken);
+                auto Client = SubUserCacheTokenToSharedID_.get(CallToken);
                 if( Client.isNull() ) {
                     SecurityObjects::WebToken   WT;
                     uint64_t                    RevocationDate=0;
                     std::string                 UserId;
-                    if(StorageService()->GetSubToken(CallToken,WT, UserId, RevocationDate)) {
+                    if(StorageService()->GetSubToken(CallToken, WT, UserId, RevocationDate)) {
                         if(RevocationDate!=0)
                             return false;
                         Expired = (WT.created_ + WT.expires_in_) < time(nullptr);
                         if(StorageService()->GetSubUserById(UserId,UInfo.userinfo)) {
+                            SubUserCacheTokenToSharedID_.update(CallToken, { WT, UserId});
+                            SubUserCacheIDToUserInfo_.update(UserId, UInfo.userinfo);
                             UInfo.webtoken = WT;
-                            SubUserCache_.update(CallToken, UInfo);
                             SessionToken = CallToken;
                             return true;
                         }
@@ -140,7 +150,15 @@ namespace OpenWifi {
                 }
                 if(!Expired) {
                     SessionToken = CallToken;
-                    UInfo = *Client ;
+                    UInfo.webtoken = Client->WT ;
+                    auto UInfoCacheEntry = SubUserCacheIDToUserInfo_.get(Client->ID);
+                    if(UInfoCacheEntry.isNull()) {
+                        if(!StorageService()->GetSubUserById(Client->ID,UInfo.userinfo)) {
+                            return false;
+                        }
+                    } else {
+                        UInfo.userinfo = *UInfoCacheEntry;
+                    }
                     return true;
                 }
                 RevokeSubToken(CallToken);
@@ -153,45 +171,47 @@ namespace OpenWifi {
     }
 
     void AuthService::RevokeToken(std::string & Token) {
-        UserCache_.remove(Token);
+        UserCacheTokenToSharedID_.remove(Token);
         StorageService()->RevokeToken(Token);
     }
 
     void AuthService::RevokeSubToken(std::string & Token) {
-        SubUserCache_.remove(Token);
+        SubUserCacheTokenToSharedID_.remove(Token);
         StorageService()->RevokeSubToken(Token);
     }
 
-    bool AuthService::DeleteUserFromCache(const std::string &UserName) {
+    bool AuthService::DeleteUserFromCache(const std::string &Id) {
         std::lock_guard		Guard(Mutex_);
 
         std::vector<std::string>    OldTokens;
+        UserCacheIDToUserInfo_.remove(Id);
 
-        UserCache_.forEach([&OldTokens,UserName](const std::string &token, const SecurityObjects::UserInfoAndPolicy& O) -> void
-        { if(O.userinfo.email==UserName)
-            OldTokens.push_back(token);
-        });
+        UserCacheTokenToSharedID_.forEach([&OldTokens,Id](const std::string &token, const SharedTokenID & O) -> void
+                                          { if(O.ID==Id)
+                                              OldTokens.push_back(token);
+                                          });
 
         for(const auto &i:OldTokens) {
             Logout(i,false);
-            UserCache_.remove(i);
+            UserCacheTokenToSharedID_.remove(i);
         }
         return true;
     }
 
-    bool AuthService::DeleteSubUserFromCache(const std::string &UserName) {
+    bool AuthService::DeleteSubUserFromCache(const std::string &Id) {
         std::lock_guard		Guard(Mutex_);
 
         std::vector<std::string>    OldTokens;
+        SubUserCacheIDToUserInfo_.remove(Id);
 
-        SubUserCache_.forEach([&OldTokens,UserName](const std::string &token, const SecurityObjects::UserInfoAndPolicy& O) -> void
-        { if(O.userinfo.email==UserName)
-            OldTokens.push_back(token);
-        });
+        SubUserCacheTokenToSharedID_.forEach([&OldTokens,Id](const std::string &token, const SharedTokenID & O) -> void
+                                          { if(O.ID==Id)
+                                              OldTokens.push_back(token);
+                                          });
 
         for(const auto &i:OldTokens) {
-            SubLogout(i,false);
-            SubUserCache_.remove(i);
+            Logout(i,false);
+            SubUserCacheTokenToSharedID_.remove(i);
         }
         return true;
     }
@@ -289,7 +309,8 @@ namespace OpenWifi {
         UInfo.webtoken.username_ = UserName;
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
-        UserCache_.update(UInfo.webtoken.access_token_,UInfo);
+        UserCacheTokenToSharedID_.update(UInfo.webtoken.access_token_,{UInfo.webtoken,UInfo.userinfo.Id});
+        UserCacheIDToUserInfo_.update(UInfo.userinfo.Id, UInfo.userinfo);
         StorageService()->SetLastLogin(UInfo.userinfo.Id);
         StorageService()->AddToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
                             UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
@@ -313,7 +334,8 @@ namespace OpenWifi {
         UInfo.webtoken.username_ = UserName;
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
-        SubUserCache_.update(UInfo.webtoken.access_token_,UInfo);
+        SubUserCacheTokenToSharedID_.update(UInfo.webtoken.access_token_,{UInfo.webtoken,UInfo.userinfo.Id});
+        SubUserCacheIDToUserInfo_.update(UInfo.userinfo.Id, UInfo.userinfo);
         StorageService()->SetSubLastLogin(UInfo.userinfo.Id);
         StorageService()->AddSubToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
                                    UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
@@ -625,61 +647,74 @@ namespace OpenWifi {
         std::lock_guard G(Mutex_);
         Expired = false;
 
-        auto Client = UserCache_.get(Token);
+        auto Client = UserCacheTokenToSharedID_.get(Token);
         if(!Client.isNull()) {
-            Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < std::time(nullptr);
-            WebToken = Client->webtoken;
-            UserInfo = Client->userinfo;
+            Expired = (Client->WT.created_ + Client->WT.expires_in_) < std::time(nullptr);
+            WebToken = Client->WT;
+            auto CachedUserInfo = UserCacheIDToUserInfo_.get(Client->ID);
+            if(!CachedUserInfo.isNull()) {
+                UserInfo = *CachedUserInfo;
+                return true;
+            }
+            if(!StorageService()->GetUserById(Client->ID,UserInfo)) {
+                return false;
+            }
             return true;
         }
 
         std::string TToken{Token}, UserId;
-        SecurityObjects::UserInfoAndPolicy UInfo;
         SecurityObjects::WebToken   WT;
         uint64_t RevocationDate=0;
         if(StorageService()->GetToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
             Expired = (WT.created_ + WT.expires_in_) < std::time(nullptr);
-            if(StorageService()->GetUserById(UserId,UInfo.userinfo)) {
+            if(StorageService()->GetUserById(UserId,UserInfo)) {
                 WebToken = WT;
-                UserCache_.update(UInfo.webtoken.access_token_, UInfo);
+                UserCacheTokenToSharedID_.update(Token, {WebToken, UserId});
+                UserCacheIDToUserInfo_.update(UserId, UserInfo);
                 return true;
             }
             return false;
         }
+
         return IsValidSubToken(Token, WebToken, UserInfo, Expired);
     }
 
     bool AuthService::IsValidSubToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
         std::lock_guard G(Mutex_);
-        auto Now = std::time(nullptr);
-
         Expired = false;
-        auto Client = SubUserCache_.get(Token);
+
+        auto Client = SubUserCacheTokenToSharedID_.get(Token);
         if(!Client.isNull()) {
-            Expired = (Client->webtoken.created_ + Client->webtoken.expires_in_) < Now ;
-            WebToken = Client->webtoken;
-            UserInfo = Client->userinfo;
+            Expired = (Client->WT.created_ + Client->WT.expires_in_) < std::time(nullptr);
+            WebToken = Client->WT;
+            auto CachedUserInfo = SubUserCacheIDToUserInfo_.get(Client->ID);
+            if(!CachedUserInfo.isNull()) {
+                UserInfo = *CachedUserInfo;
+                return true;
+            }
+            if(!StorageService()->GetSubUserById(Client->ID,UserInfo)) {
+                return false;
+            }
             return true;
         }
 
         std::string TToken{Token}, UserId;
-        SecurityObjects::UserInfoAndPolicy UInfo;
         SecurityObjects::WebToken   WT;
-        uint64_t                    RevocationDate=0;
+        uint64_t RevocationDate=0;
         if(StorageService()->GetSubToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
             Expired = (WT.created_ + WT.expires_in_) < std::time(nullptr);
-            if(StorageService()->GetSubUserById(UserId,UInfo.userinfo)) {
+            if(StorageService()->GetSubUserById(UserId,UserInfo)) {
                 WebToken = WT;
-                UserCache_.update(UInfo.webtoken.access_token_, UInfo);
+                SubUserCacheTokenToSharedID_.update(Token, {WebToken, UserId});
+                SubUserCacheIDToUserInfo_.update(UserId, UserInfo);
                 return true;
             }
             return false;
         }
-
         return false;
     }
 

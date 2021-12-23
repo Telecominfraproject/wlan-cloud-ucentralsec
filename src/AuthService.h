@@ -59,6 +59,14 @@ namespace OpenWifi{
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
         void Logout(const std::string &token, bool EraseFromCache=true);
 
+        inline void UpdateUserCache(const SecurityObjects::UserInfo &UI) {
+            UserCacheIDToUserInfo_.update(UI.Id,UI);
+        }
+
+        inline void UpdateSubUserCache(const SecurityObjects::UserInfo &UI) {
+            SubUserCacheIDToUserInfo_.update(UI.Id,UI);
+        }
+
         [[nodiscard]] bool IsSubAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired);
         [[nodiscard]] UNAUTHORIZED_REASON AuthorizeSub( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired );
         void CreateSubToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
@@ -114,8 +122,16 @@ namespace OpenWifi{
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
 
-		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    UserCache_{256,1200000};
-		Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfoAndPolicy>    SubUserCache_{4096,1200000};
+        struct SharedTokenID {
+            SecurityObjects::WebToken   WT;     //  Web token
+            std::string                 ID;     //  user.Id
+        };
+
+        Poco::ExpireLRUCache<std::string,SharedTokenID>                UserCacheTokenToSharedID_{256,1200000};
+        Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>    UserCacheIDToUserInfo_{256,1200000};
+
+        Poco::ExpireLRUCache<std::string,SharedTokenID>                SubUserCacheTokenToSharedID_{4096,1200000};
+        Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>    SubUserCacheIDToUserInfo_{256,1200000};
 
 		std::string         AccessPolicy_;
 		std::string         PasswordPolicy_;
