@@ -4,10 +4,10 @@
 
 #include "RESTAPI_user_handler.h"
 #include "StorageService.h"
-#include "Poco/JSON/Parser.h"
 #include "framework/RESTAPI_errors.h"
 #include "SMSSender.h"
 #include "ACLProcessor.h"
+#include "AuthService.h"
 
 namespace OpenWifi {
 
@@ -232,6 +232,7 @@ namespace OpenWifi {
         if(StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
             SecurityObjects::UserInfo   NewUserInfo;
             StorageService()->GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
+            AuthService()->UpdateUserCache(NewUserInfo);
             Poco::JSON::Object  ModifiedObject;
             FilterCredentials(NewUserInfo);
             NewUserInfo.to_json(ModifiedObject);
