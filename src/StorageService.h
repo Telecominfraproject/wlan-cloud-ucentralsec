@@ -15,19 +15,10 @@
 
 #include "Poco/Timer.h"
 
+#include "storage/orm_users.h"
+#include "storage/orm_tokens.h"
+
 namespace OpenWifi {
-
-    static const std::string AllEmailTemplatesFieldsForCreation {
-
-    };
-
-    static const std::string AllEmailTemplatesFieldsForSelect {
-
-    };
-
-    static const std::string AllEmailTemplatesFieldsForUpdate {
-
-    };
 
     class Archiver {
     public:
@@ -35,110 +26,28 @@ namespace OpenWifi {
     private:
     };
 
-    class Storage : public StorageClass {
+    class StorageService : public StorageClass {
     public:
 
-        enum AUTH_ERROR {
-            SUCCESS,
-            PASSWORD_CHANGE_REQUIRED,
-            PASSWORD_DOES_NOT_MATCH,
-            PASSWORD_ALREADY_USED,
-            USERNAME_PENDING_VERIFICATION,
-            PASSWORD_INVALID,
-            INTERNAL_ERROR
-        };
-
-        enum USER_TYPE {
-            UNKNOWN, ROOT, ADMIN, SUBSCRIBER, CSR, SYSTEM, SPECIAL
-        };
-
-        typedef std::string USER_ID_TYPE;
-
-        static USER_TYPE to_userType(const std::string &U) {
-            if (U=="root")
-                return ROOT;
-            else if (U=="admin")
-                return ADMIN;
-            else if (U=="subscriber")
-                return SUBSCRIBER;
-            else if (U=="csr")
-                return CSR;
-            else if (U=="system")
-                return SYSTEM;
-            else if (U=="SPECIAL")
-                return SPECIAL;
-            return UNKNOWN;
-        }
-
-        static std::string from_userType(USER_TYPE U) {
-            switch(U) {
-                case ROOT: return "root";
-                case ADMIN: return "admin";
-                case SUBSCRIBER: return "subscriber";
-                case CSR: return "csr";
-                case SYSTEM: return "system";
-                case SPECIAL: return "special";
-                case UNKNOWN:
-                default: return "unknown";
-            }
-        }
-
-        static Storage *instance() {
-            static auto * instance_ = new Storage;
+        static auto instance() {
+            static auto instance_ = new StorageService;
             return instance_;
         }
 
         int 	Start() override;
         void 	Stop() override;
 
+        OpenWifi::BaseUserDB & UserDB() { return *UserDB_; }
+        OpenWifi::BaseUserDB & SubDB() { return *SubDB_; }
+        OpenWifi::BaseTokenDB & UserTokenDB() { return *UserTokenDB_; }
+        OpenWifi::BaseTokenDB & SubTokenDB() { return *SubTokenDB_; }
+
         /*
          *  All user management functions
          */
-        bool InitializeDefaultUser();
-
-        bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false);
-        bool GetUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
-        bool GetUserById(USER_ID_TYPE & Id, SecurityObjects::UserInfo & User);
-        bool DeleteUser(const std::string & Admin, USER_ID_TYPE & Id);
-        bool SetOwner(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Owner);
-        bool SetLocation(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Location);
-        AUTH_ERROR ChangePassword(const std::string & Admin, USER_ID_TYPE & Id, const std::string &OldPassword, const std::string &NewPassword);
-        bool AddNotes(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Notes);
-        bool SetPolicyChange(const std::string & Admin, USER_ID_TYPE & Id, const std::string &NewPolicy);
-        bool UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
-        bool GetUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
-        bool SetLastLogin(USER_ID_TYPE & Id);
-
-        bool CreateSubUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false);
-        bool GetSubUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
-        bool GetSubUserById(USER_ID_TYPE & Id, SecurityObjects::UserInfo & User);
-        bool DeleteSubUser(const std::string & Admin, USER_ID_TYPE & Id);
-        bool SetSubOwner(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Owner);
-        bool SetSubLocation(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Location);
-        AUTH_ERROR ChangeSubPassword(const std::string & Admin, USER_ID_TYPE & Id, const std::string &OldPassword, const std::string &NewPassword);
-        bool AddSubNotes(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Notes);
-        bool SetSubPolicyChange(const std::string & Admin, USER_ID_TYPE & Id, const std::string &NewPolicy);
-        bool UpdateSubUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
-        bool GetSubUsers( uint64_t Offset, uint64_t Limit, SecurityObjects::UserInfoVec & Users);
-        bool SetSubLastLogin(USER_ID_TYPE & Id);
-
         bool SetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
         bool GetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
         bool DeleteAvatar(const std::string & Admin, std::string &Id);
-
-        bool AddToken(std::string &UserId, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut);
-        bool RevokeToken( std::string & Token );
-        bool IsTokenRevoked( std::string & Token );
-        bool CleanExpiredTokens();
-        bool RevokeAllTokens( std::string & UserName );
-        bool GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate);
-
-        bool AddSubToken(std::string &UserId, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut);
-        bool RevokeSubToken( std::string & Token );
-        bool IsSubTokenRevoked( std::string & Token );
-        bool CleanExpiredSubTokens();
-        bool RevokeAllSubTokens( std::string & UserName );
-        bool GetSubToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate);
 
         /*
          *  All ActionLinks functions
@@ -166,6 +75,12 @@ namespace OpenWifi {
         int Create_SubTokensTable();
         int Create_SubscriberTable();
 
+        std::unique_ptr<OpenWifi::BaseUserDB>           UserDB_;
+        std::unique_ptr<OpenWifi::BaseUserDB>           SubDB_;
+        std::unique_ptr<OpenWifi::BaseTokenDB>          UserTokenDB_;
+        std::unique_ptr<OpenWifi::BaseTokenDB>          SubTokenDB_;
+
+
         Poco::Timer                     Timer_;
         Archiver                        Archiver_;
         std::unique_ptr<Poco::TimerCallback<Archiver>>   Archivercallback_;
@@ -174,7 +89,7 @@ namespace OpenWifi {
         void ReplaceOldDefaultUUID();
    };
 
-    inline Storage * StorageService() { return Storage::instance(); };
+    inline auto StorageService() { return StorageService::instance(); };
 
 }  // namespace
 

@@ -44,7 +44,7 @@ namespace OpenWifi {
         return true;
     }
 
-    bool Storage::CreateAction( SecurityObjects::ActionLink & A) {
+    bool StorageService::CreateAction( SecurityObjects::ActionLink & A) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Insert(Sess);
@@ -62,7 +62,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max) {
+    bool StorageService::GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Select(Sess);
@@ -88,7 +88,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::GetActionLink(std::string &ActionId, SecurityObjects::ActionLink &A) {
+    bool StorageService::GetActionLink(std::string &ActionId, SecurityObjects::ActionLink &A) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Select(Sess);
@@ -112,7 +112,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::SentAction(std::string &ActionId) {
+    bool StorageService::SentAction(std::string &ActionId) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Update(Sess);
@@ -130,7 +130,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::DeleteAction(std::string &ActionId) {
+    bool StorageService::DeleteAction(std::string &ActionId) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);
@@ -147,7 +147,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::CompleteAction(std::string &ActionId) {
+    bool StorageService::CompleteAction(std::string &ActionId) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Update(Sess);
@@ -165,7 +165,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::CancelAction(std::string &ActionId) {
+    bool StorageService::CancelAction(std::string &ActionId) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Update(Sess);
@@ -183,7 +183,7 @@ namespace OpenWifi {
         return false;
     }
 
-    void Storage::CleanOldActionLinks() {
+    void StorageService::CleanOldActionLinks() {
         try {
             Poco::Data::Session     Sess = Pool_->get();
             Poco::Data::Statement   Delete(Sess);

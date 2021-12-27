@@ -18,7 +18,7 @@ namespace OpenWifi {
         "RevocationDate 	BIGINT "
     */
 
-    bool Storage::AddSubToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
+    bool StorageService::AddSubToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Insert(Sess);
@@ -45,7 +45,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::GetSubToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate) {
+    bool StorageService::GetSubToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate) {
         try {
 
             Poco::Data::Session Sess = Pool_->get();
@@ -73,7 +73,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::IsSubTokenRevoked(std::string &Token) {
+    bool StorageService::IsSubTokenRevoked(std::string &Token) {
         try {
 
             Poco::Data::Session Sess = Pool_->get();
@@ -97,7 +97,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::RevokeSubToken(std::string &Token) {
+    bool StorageService::RevokeSubToken(std::string &Token) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Update(Sess);
@@ -117,7 +117,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::CleanExpiredSubTokens() {
+    bool StorageService::CleanExpiredSubTokens() {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);
@@ -134,7 +134,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::RevokeAllSubTokens(std::string & UserId) {
+    bool StorageService::RevokeAllSubTokens(std::string & UserId) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);

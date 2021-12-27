@@ -776,9 +776,9 @@ namespace ORM {
     protected:
         Poco::Data::SessionPool     &Pool_;
         Poco::Logger                &Logger_;
+        std::string                 DBName_;
     private:
         OpenWifi::DBType            Type_;
-        std::string                 DBName_;
         std::string                 CreateFields_;
         std::string                 SelectFields_;
         std::string                 SelectList_;

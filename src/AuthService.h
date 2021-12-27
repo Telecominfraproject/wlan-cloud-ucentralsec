@@ -131,7 +131,7 @@ namespace OpenWifi{
         Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>    UserCacheIDToUserInfo_{256,1200000};
 
         Poco::ExpireLRUCache<std::string,SharedTokenID>                SubUserCacheTokenToSharedID_{4096,1200000};
-        Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>    SubUserCacheIDToUserInfo_{256,1200000};
+        Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>    SubUserCacheIDToUserInfo_{4096,1200000};
 
 		std::string         AccessPolicy_;
 		std::string         PasswordPolicy_;

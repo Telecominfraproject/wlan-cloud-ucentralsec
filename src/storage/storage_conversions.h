@@ -7,7 +7,7 @@
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
-    inline bool Convert(const UserInfoRecord &T, SecurityObjects::UserInfo &U) {
+    inline bool Convert(const UserInfoRecordTuple &T, SecurityObjects::UserInfo &U) {
         U.Id = T.get<0>();
         U.name = T.get<1>();
         U.description = T.get<2>();

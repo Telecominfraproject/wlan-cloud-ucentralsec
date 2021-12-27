@@ -12,7 +12,7 @@ namespace OpenWifi {
         SecurityObjects::UserInfo   User;
 
         // std::cout << "submfa get " << UserInfo_.userinfo.Id << "   user:" << UserInfo_.userinfo.email << std::endl;
-        if (StorageService()->GetSubUserById(UserInfo_.userinfo.Id,User)) {
+        if (StorageService()->SubDB().GetUserById(UserInfo_.userinfo.Id,User)) {
             Poco::JSON::Object              Answer;
             SecurityObjects::SubMfaConfig   MFC;
 
@@ -47,9 +47,9 @@ namespace OpenWifi {
 
             if (MFC.type == "disabled") {
                 SecurityObjects::UserInfo User;
-                StorageService()->GetSubUserById(UserInfo_.userinfo.Id, User);
+                StorageService()->SubDB().GetUserById(UserInfo_.userinfo.Id, User);
                 User.userTypeProprietaryInfo.mfa.enabled = false;
-                StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+                StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
                 Poco::JSON::Object Answer;
                 MFC.to_json(Answer);
@@ -57,10 +57,10 @@ namespace OpenWifi {
             } else if (MFC.type == "email") {
                 SecurityObjects::UserInfo User;
 
-                StorageService()->GetSubUserById(UserInfo_.userinfo.Id, User);
+                StorageService()->SubDB().GetUserById(UserInfo_.userinfo.Id, User);
                 User.userTypeProprietaryInfo.mfa.enabled = true;
                 User.userTypeProprietaryInfo.mfa.method = "email";
-                StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+                StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
                 MFC.sms = MFC.sms;
                 MFC.type = "email";
@@ -93,7 +93,7 @@ namespace OpenWifi {
                     if (SMSSender()->CompleteValidation(MFC.sms, ChallengeCode, UserInfo_.userinfo.email)) {
                         SecurityObjects::UserInfo User;
 
-                        StorageService()->GetSubUserById(UserInfo_.userinfo.Id, User);
+                        StorageService()->SubDB().GetUserById(UserInfo_.userinfo.Id, User);
                         User.userTypeProprietaryInfo.mfa.enabled = true;
                         User.userTypeProprietaryInfo.mfa.method = "sms";
                         SecurityObjects::MobilePhoneNumber PhoneNumber;
@@ -103,7 +103,7 @@ namespace OpenWifi {
                         User.userTypeProprietaryInfo.mobiles.clear();
                         User.userTypeProprietaryInfo.mobiles.push_back(PhoneNumber);
 
-                        StorageService()->UpdateSubUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
+                        StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email, UserInfo_.userinfo.Id, User);
 
                         MFC.sms = MFC.sms;
                         MFC.type = "sms";

@@ -10,12 +10,23 @@
 
 namespace OpenWifi {
 
-    int Storage::Start() {
+    int StorageService::Start() {
 		std::lock_guard		Guard(Mutex_);
 
 		StorageClass::Start();
 		Create_Tables();
-		InitializeDefaultUser();
+
+        UserDB_ = std::make_unique<OpenWifi::BaseUserDB>("Users", "usr", dbType_,*Pool_, Logger());
+        SubDB_ = std::make_unique<OpenWifi::BaseUserDB>("Subscribers", "sub", dbType_,*Pool_, Logger());
+        UserTokenDB_ = std::make_unique<OpenWifi::BaseTokenDB>("Tokens", "tok", dbType_,*Pool_, Logger());
+        SubTokenDB_ = std::make_unique<OpenWifi::BaseTokenDB>("SubTokens", "stk", dbType_,*Pool_, Logger());
+
+        UserDB_->Create();
+        SubDB_->Create();
+        UserTokenDB_->Create();
+        SubTokenDB_->Create();
+
+		UserDB_->InitializeDefaultUser();
 
 		Archivercallback_ = std::make_unique<Poco::TimerCallback<Archiver>>(Archiver_,&Archiver::onTimer);
 		Timer_.setStartInterval( 5 * 60 * 1000);  // first run in 5 minutes
@@ -25,7 +36,7 @@ namespace OpenWifi {
 		return 0;
     }
 
-    void Storage::Stop() {
+    void StorageService::Stop() {
         Logger().notice("Stopping.");
         Timer_.stop();
         StorageClass::Stop();
@@ -34,7 +45,8 @@ namespace OpenWifi {
     void Archiver::onTimer(Poco::Timer &timer) {
         Poco::Logger &logger = Poco::Logger::get("STORAGE-ARCHIVER");
         logger.information("Squiggy the DB: removing old tokens.");
-        StorageService()->CleanExpiredTokens();
+        StorageService()->SubTokenDB().CleanExpiredTokens();
+        StorageService()->UserTokenDB().CleanExpiredTokens();
         logger.information("Squiggy the DB: removing old actionLinks.");
         StorageService()->CleanOldActionLinks();
     }

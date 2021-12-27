@@ -74,7 +74,7 @@ namespace OpenWifi {
 
         if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
             SecurityObjects::UserInfo UInfo1;
-            auto UserExists = StorageService()->GetSubUserByEmail(userId,UInfo1);
+            auto UserExists = StorageService()->SubDB().GetUserByEmail(userId,UInfo1);
             if(UserExists) {
                 Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
                 SecurityObjects::ActionLink NewLink;

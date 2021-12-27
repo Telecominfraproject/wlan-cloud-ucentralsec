@@ -22,7 +22,7 @@ namespace OpenWifi {
                             "Avatar     	BLOB"
      */
 
-    bool Storage::SetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name) {
+    bool StorageService::SetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Insert(Sess);
@@ -51,7 +51,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::GetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string & Type, std::string & Name) {
+    bool StorageService::GetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string & Type, std::string & Name) {
         try {
             Poco::Data::LOB<char> L;
             Poco::Data::Session Sess = Pool_->get();
@@ -83,7 +83,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::DeleteAvatar(const std::string & Admin, std::string &Id) {
+    bool StorageService::DeleteAvatar(const std::string & Admin, std::string &Id) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);

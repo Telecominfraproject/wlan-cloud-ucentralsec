@@ -27,10 +27,10 @@ namespace OpenWifi {
         std::string Arg;
         SecurityObjects::UserInfo   UInfo;
         if(HasParameter("byEmail",Arg) && Arg=="true") {
-            if(!StorageService()->GetUserByEmail(Id,UInfo)) {
+            if(!StorageService()->UserDB().GetUserByEmail(Id,UInfo)) {
                 return NotFound();
             }
-        } else if(!StorageService()->GetUserById(Id,UInfo)) {
+        } else if(!StorageService()->UserDB().GetUserById(Id,UInfo)) {
             return NotFound();
         }
 
@@ -47,7 +47,7 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo UInfo;
-        if(!StorageService()->GetUserById(Id,UInfo)) {
+        if(!StorageService()->UserDB().GetUserById(Id,UInfo)) {
             return NotFound();
         }
 
@@ -55,7 +55,7 @@ namespace OpenWifi {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
-        if(!StorageService()->DeleteUser(UserInfo_.userinfo.email,Id)) {
+        if(!StorageService()->UserDB().DeleteUser(UserInfo_.userinfo.email,Id)) {
             return NotFound();
         }
 
@@ -67,7 +67,7 @@ namespace OpenWifi {
         StorageService()->DeletePreferences(UserInfo_.userinfo.email,Id);
 
         Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
-        StorageService()->RevokeAllTokens(UInfo.email);
+        StorageService()->UserTokenDB().RevokeAllTokens(UInfo.email);
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
         OK();
     }
@@ -103,7 +103,7 @@ namespace OpenWifi {
         if(NewUser.name.empty())
             NewUser.name = NewUser.email;
 
-        if(!StorageService()->CreateUser(NewUser.email,NewUser)) {
+        if(!StorageService()->UserDB().CreateUser(NewUser.email,NewUser)) {
             Logger_.information(Poco::format("Could not add user '%s'.",NewUser.email));
             return BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
@@ -111,10 +111,10 @@ namespace OpenWifi {
         if(GetParameter("email_verification","false")=="true") {
             if(AuthService::VerifyEmail(NewUser))
                 Logger_.information(Poco::format("Verification e-mail requested for %s",NewUser.email));
-            StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,NewUser.Id,NewUser);
+            StorageService()->UserDB().UpdateUserInfo(UserInfo_.userinfo.email,NewUser.Id,NewUser);
         }
 
-        if(!StorageService()->GetUserByEmail(NewUser.email, NewUser)) {
+        if(!StorageService()->UserDB().GetUserByEmail(NewUser.email, NewUser)) {
             Logger_.information(Poco::format("User '%s' but not retrieved.",NewUser.email));
             return NotFound();
         }
@@ -133,7 +133,7 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo   Existing;
-        if(!StorageService()->GetUserById(Id,Existing)) {
+        if(!StorageService()->UserDB().GetUserById(Id,Existing)) {
             return NotFound();
         }
 
@@ -229,9 +229,9 @@ namespace OpenWifi {
             }
         }
 
-        if(StorageService()->UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
+        if(StorageService()->UserDB().UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
             SecurityObjects::UserInfo   NewUserInfo;
-            StorageService()->GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
+            StorageService()->UserDB().GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
             AuthService()->UpdateUserCache(NewUserInfo);
             Poco::JSON::Object  ModifiedObject;
             FilterCredentials(NewUserInfo);

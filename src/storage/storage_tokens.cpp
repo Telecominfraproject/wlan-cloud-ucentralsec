@@ -15,7 +15,7 @@ namespace OpenWifi {
     "RevocationDate 	BIGINT "
 */
 
-    bool Storage::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
+    bool StorageService::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Insert(Sess);
@@ -42,7 +42,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate) {
+    bool StorageService::GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate) {
         try {
 
             Poco::Data::Session Sess = Pool_->get();
@@ -71,7 +71,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::IsTokenRevoked(std::string &Token) {
+    bool StorageService::IsTokenRevoked(std::string &Token) {
         try {
 
             Poco::Data::Session Sess = Pool_->get();
@@ -95,7 +95,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::RevokeToken(std::string &Token) {
+    bool StorageService::RevokeToken(std::string &Token) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Update(Sess);
@@ -115,7 +115,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::CleanExpiredTokens() {
+    bool StorageService::CleanExpiredTokens() {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);
@@ -132,7 +132,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::RevokeAllTokens(std::string & UserId) {
+    bool StorageService::RevokeAllTokens(std::string & UserId) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Delete(Sess);

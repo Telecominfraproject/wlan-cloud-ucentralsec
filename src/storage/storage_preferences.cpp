@@ -18,7 +18,7 @@ namespace OpenWifi {
         R.set<2>(OpenWifi::RESTAPI_utils::to_string(P.data));
     }
 
-    bool Storage::GetPreferences(std::string &Id, SecurityObjects::Preferences &P) {
+    bool StorageService::GetPreferences(std::string &Id, SecurityObjects::Preferences &P) {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Poco::Data::Statement Select(Sess);
@@ -40,7 +40,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::SetPreferences(SecurityObjects::Preferences &P) {
+    bool StorageService::SetPreferences(SecurityObjects::Preferences &P) {
         try {
             Poco::Data::Session     Sess = Pool_->get();
             Poco::Data::Statement   InsertOrUpdate(Sess);
@@ -70,7 +70,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::DeletePreferences(const std::string &AdminId, std::string & Id) {
+    bool StorageService::DeletePreferences(const std::string &AdminId, std::string & Id) {
         try {
             Poco::Data::Session     Sess = Pool_->get();
             Poco::Data::Statement   Delete(Sess);

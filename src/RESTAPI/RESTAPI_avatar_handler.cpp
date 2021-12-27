@@ -31,7 +31,7 @@ namespace OpenWifi {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
         SecurityObjects::UserInfo UInfo;
 
-        if (Id.empty() || !StorageService()->GetUserById(Id, UInfo)) {
+        if (Id.empty() || !StorageService()->UserDB().GetUserById(Id, UInfo)) {
             return NotFound();
         }
 

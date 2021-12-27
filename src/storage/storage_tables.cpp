@@ -11,18 +11,18 @@
 
 namespace OpenWifi {
 
-    int Storage::Create_Tables() {
-        Create_UserTable();
+    int StorageService::Create_Tables() {
         Create_AvatarTable();
-        Create_TokensTable();
         Create_ActionLinkTable();
         Create_Preferences();
-        Create_SubTokensTable();
-        Create_SubscriberTable();
+        // Create_UserTable();
+        // Create_TokensTable();
+        // Create_SubTokensTable();
+        // Create_SubscriberTable();
         return 0;
     }
 
-    int Storage::Create_UserTable() {
+    int StorageService::Create_UserTable() {
         Poco::Data::Session Sess = Pool_->get();
 
         try {
@@ -47,7 +47,7 @@ namespace OpenWifi {
         return 1;
     }
 
-    int Storage::Create_SubscriberTable() {
+    int StorageService::Create_SubscriberTable() {
         Poco::Data::Session Sess = Pool_->get();
 
         try {
@@ -72,7 +72,7 @@ namespace OpenWifi {
         return 1;
     }
 
-    int Storage::Create_ActionLinkTable() {
+    int StorageService::Create_ActionLinkTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
 
@@ -86,7 +86,7 @@ namespace OpenWifi {
         return 1;
     }
 
-    int Storage::Create_AvatarTable() {
+    int StorageService::Create_AvatarTable() {
             try {
                 Poco::Data::Session Sess = Pool_->get();
 
@@ -107,7 +107,7 @@ namespace OpenWifi {
             return 1;
         }
 
-    int Storage::Create_TokensTable() {
+    int StorageService::Create_TokensTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
                 Sess << "CREATE TABLE IF NOT EXISTS Tokens (" +
@@ -120,7 +120,7 @@ namespace OpenWifi {
         return 1;
     }
 
-    int Storage::Create_SubTokensTable() {
+    int StorageService::Create_SubTokensTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
             Sess << "CREATE TABLE IF NOT EXISTS SubTokens (" +
@@ -133,7 +133,7 @@ namespace OpenWifi {
         return 1;
     }
 
-    int Storage::Create_Preferences() {
+    int StorageService::Create_Preferences() {
         try {
             Poco::Data::Session Sess = Pool_->get();
 

@@ -210,10 +210,10 @@ namespace OpenWifi {
             Poco::Data::Statement Update(Sess);
 
             std::string St1{"update users set " + AllUsersFieldsForUpdate + " where id=?"};
-            auto Notes = RESTAPI_utils::to_string(UInfo.notes);
-            auto UserType = SecurityObjects::UserTypeToString(UInfo.userRole);
-            auto OldPasswords = RESTAPI_utils::to_string(UInfo.lastPasswords);
-            auto userTypeProprietaryInfo = RESTAPI_utils::to_string(UInfo.userTypeProprietaryInfo);
+           //auto Notes = RESTAPI_utils::to_string(UInfo.notes);
+            //auto UserType = SecurityObjects::UserTypeToString(UInfo.userRole);
+            //auto OldPasswords = RESTAPI_utils::to_string(UInfo.lastPasswords);
+            //auto userTypeProprietaryInfo = RESTAPI_utils::to_string(UInfo.userTypeProprietaryInfo);
             UserInfoRecord R;
             Convert(UInfo, R);
             Update << ConvertParams(St1),
@@ -245,30 +245,6 @@ namespace OpenWifi {
         return false;
     }
 
-    bool Storage::SetOwner(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Owner)  {
-        try {
-            Poco::Data::Session Sess = Pool_->get();
-            Poco::Data::Statement Insert(Sess);
-
-            return true;
-        } catch (const Poco::Exception &E) {
-            Logger().log(E);
-        }
-        return false;
-    }
-
-    bool Storage::SetLocation(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Location)  {
-        try {
-            Poco::Data::Session Sess = Pool_->get();
-            Poco::Data::Statement Insert(Sess);
-
-            return true;
-        } catch (const Poco::Exception &E) {
-            Logger().log(E);
-        }
-        return false;
-    }
-
     bool Storage::SetLastLogin(std::string &Id) {
         try {
             Poco::Data::Session Sess = Pool_->get();
@@ -287,41 +263,6 @@ namespace OpenWifi {
         return false;
     }
 
-    Storage::AUTH_ERROR Storage::ChangePassword(const std::string & Admin, USER_ID_TYPE & Id, const std::string &OldPassword, const std::string &NewPassword)  {
-        try {
-            Poco::Data::Session Sess = Pool_->get();
-            Poco::Data::Statement Insert(Sess);
-
-            return SUCCESS;
-        } catch (const Poco::Exception &E) {
-            Logger().log(E);
-        }
-        return INTERNAL_ERROR;
-    }
-
-    bool Storage::AddNotes(const std::string & Admin, USER_ID_TYPE & Id, const std::string &Notes)   {
-        try {
-            Poco::Data::Session Sess = Pool_->get();
-            Poco::Data::Statement Insert(Sess);
-
-            return true;
-        } catch (const Poco::Exception &E) {
-            Logger().log(E);
-        }
-        return false;
-    }
-
-    bool Storage::SetPolicyChange(const std::string & Admin, USER_ID_TYPE & Id, const std::string &NewPolicy) {
-        try {
-            Poco::Data::Session Sess = Pool_->get();
-            Poco::Data::Statement Insert(Sess);
-
-            return true;
-        } catch (const Poco::Exception &E) {
-            Logger().log(E);
-        }
-        return false;
-    }
 
 }
 

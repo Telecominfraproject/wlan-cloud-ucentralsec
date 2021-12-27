@@ -44,11 +44,11 @@ namespace OpenWifi {
 
                 SecurityObjects::UserInfo UInfo;
                 if((i.action==OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD ||
-                    i.action==OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) && !StorageService()->GetUserById(i.userId,UInfo)) {
+                    i.action==OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) && !StorageService()->UserDB().GetUserById(i.userId,UInfo)) {
                     StorageService()->CancelAction(i.id);
                     continue;
                 } else if(( i.action==OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD ||
-                            i.action==OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL) && !StorageService()->GetSubUserById(i.userId,UInfo)) {
+                            i.action==OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL) && !StorageService()->SubDB().GetUserById(i.userId,UInfo)) {
                     StorageService()->CancelAction(i.id);
                     continue;
                 }

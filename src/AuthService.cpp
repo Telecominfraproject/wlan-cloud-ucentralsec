@@ -81,11 +81,11 @@ namespace OpenWifi {
 		            SecurityObjects::WebToken   WT;
 		            uint64_t                    RevocationDate=0;
                     std::string                 UserId;
-		            if(StorageService()->GetToken(CallToken, WT, UserId, RevocationDate)) {
+		            if(StorageService()->UserTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
 		                if(RevocationDate!=0)
 		                    return false;
 		                Expired = (WT.created_ + WT.expires_in_) < time(nullptr);
-		                if(StorageService()->GetUserById(UserId,UInfo.userinfo)) {
+		                if(StorageService()->UserDB().GetUserById(UserId,UInfo.userinfo)) {
                             UserCacheTokenToSharedID_.update(CallToken, { WT, UserId});
                             UserCacheIDToUserInfo_.update(UserId, UInfo.userinfo);
 		                    UInfo.webtoken = WT;
@@ -100,7 +100,7 @@ namespace OpenWifi {
 		            UInfo.webtoken = Client->WT ;
                     auto UInfoCacheEntry = UserCacheIDToUserInfo_.get(Client->ID);
                     if(UInfoCacheEntry.isNull()) {
-                        if(!StorageService()->GetUserById(Client->ID,UInfo.userinfo)) {
+                        if(!StorageService()->UserDB().GetUserById(Client->ID,UInfo.userinfo)) {
                             return false;
                         }
                     } else {
@@ -134,11 +134,11 @@ namespace OpenWifi {
                     SecurityObjects::WebToken   WT;
                     uint64_t                    RevocationDate=0;
                     std::string                 UserId;
-                    if(StorageService()->GetSubToken(CallToken, WT, UserId, RevocationDate)) {
+                    if(StorageService()->SubTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
                         if(RevocationDate!=0)
                             return false;
                         Expired = (WT.created_ + WT.expires_in_) < time(nullptr);
-                        if(StorageService()->GetSubUserById(UserId,UInfo.userinfo)) {
+                        if(StorageService()->SubDB().GetUserById(UserId,UInfo.userinfo)) {
                             SubUserCacheTokenToSharedID_.update(CallToken, { WT, UserId});
                             SubUserCacheIDToUserInfo_.update(UserId, UInfo.userinfo);
                             UInfo.webtoken = WT;
@@ -153,7 +153,7 @@ namespace OpenWifi {
                     UInfo.webtoken = Client->WT ;
                     auto UInfoCacheEntry = SubUserCacheIDToUserInfo_.get(Client->ID);
                     if(UInfoCacheEntry.isNull()) {
-                        if(!StorageService()->GetSubUserById(Client->ID,UInfo.userinfo)) {
+                        if(!StorageService()->SubDB().GetUserById(Client->ID,UInfo.userinfo)) {
                             return false;
                         }
                     } else {
@@ -172,12 +172,12 @@ namespace OpenWifi {
 
     void AuthService::RevokeToken(std::string & Token) {
         UserCacheTokenToSharedID_.remove(Token);
-        StorageService()->RevokeToken(Token);
+        StorageService()->UserTokenDB().RevokeToken(Token);
     }
 
     void AuthService::RevokeSubToken(std::string & Token) {
         SubUserCacheTokenToSharedID_.remove(Token);
-        StorageService()->RevokeSubToken(Token);
+        StorageService()->SubTokenDB().RevokeToken(Token);
     }
 
     bool AuthService::DeleteUserFromCache(const std::string &Id) {
@@ -311,8 +311,8 @@ namespace OpenWifi {
         UInfo.webtoken.userMustChangePassword = false;
         UserCacheTokenToSharedID_.update(UInfo.webtoken.access_token_,{UInfo.webtoken,UInfo.userinfo.Id});
         UserCacheIDToUserInfo_.update(UInfo.userinfo.Id, UInfo.userinfo);
-        StorageService()->SetLastLogin(UInfo.userinfo.Id);
-        StorageService()->AddToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
+        StorageService()->UserDB().SetLastLogin(UInfo.userinfo.Id);
+        StorageService()->UserTokenDB().AddToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
                             UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                 UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
@@ -336,8 +336,8 @@ namespace OpenWifi {
         UInfo.webtoken.userMustChangePassword = false;
         SubUserCacheTokenToSharedID_.update(UInfo.webtoken.access_token_,{UInfo.webtoken,UInfo.userinfo.Id});
         SubUserCacheIDToUserInfo_.update(UInfo.userinfo.Id, UInfo.userinfo);
-        StorageService()->SetSubLastLogin(UInfo.userinfo.Id);
-        StorageService()->AddSubToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
+        StorageService()->SubDB().SetLastLogin(UInfo.userinfo.Id);
+        StorageService()->SubTokenDB().AddToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
                                    UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                    UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
@@ -462,7 +462,7 @@ namespace OpenWifi {
 
         Poco::toLowerInPlace(UserName);
 
-        if(StorageService()->GetUserByEmail(UserName,UInfo.userinfo)) {
+        if(StorageService()->UserDB().GetUserByEmail(UserName,UInfo.userinfo)) {
             if(UInfo.userinfo.waitingForEmailCheck) {
                 return USERNAME_PENDING_VERIFICATION;
             }
@@ -487,12 +487,12 @@ namespace OpenWifi {
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
-                StorageService()->UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
+                StorageService()->UserDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
             UInfo.userinfo.lastLogin=std::time(nullptr);
-            StorageService()->SetLastLogin(UInfo.userinfo.Id);
+            StorageService()->UserDB().SetLastLogin(UInfo.userinfo.Id);
             CreateToken(UserName, UInfo );
 
             return SUCCESS;
@@ -507,7 +507,7 @@ namespace OpenWifi {
 
         Poco::toLowerInPlace(UserName);
 
-        if(StorageService()->GetSubUserByEmail(UserName,UInfo.userinfo)) {
+        if(StorageService()->SubDB().GetUserByEmail(UserName,UInfo.userinfo)) {
             if(UInfo.userinfo.waitingForEmailCheck) {
                 return USERNAME_PENDING_VERIFICATION;
             }
@@ -532,12 +532,12 @@ namespace OpenWifi {
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
-                StorageService()->UpdateSubUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
+                StorageService()->SubDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
             UInfo.userinfo.lastLogin=std::time(nullptr);
-            StorageService()->SetSubLastLogin(UInfo.userinfo.Id);
+            StorageService()->SubDB().SetLastLogin(UInfo.userinfo.Id);
             CreateSubToken(UserName, UInfo );
 
             return SUCCESS;
@@ -549,7 +549,7 @@ namespace OpenWifi {
     bool AuthService::SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
 
-        if(StorageService()->GetUserByEmail(Email,UInfo)) {
+        if(StorageService()->UserDB().GetUserByEmail(Email,UInfo)) {
             switch (Reason) {
 
                 case FORGOT_PASSWORD: {
@@ -584,7 +584,7 @@ namespace OpenWifi {
     bool AuthService::SendEmailToSubUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
 
-        if(StorageService()->GetSubUserByEmail(Email,UInfo)) {
+        if(StorageService()->SubDB().GetUserByEmail(Email,UInfo)) {
             switch (Reason) {
 
                 case FORGOT_PASSWORD: {
@@ -656,7 +656,7 @@ namespace OpenWifi {
                 UserInfo = *CachedUserInfo;
                 return true;
             }
-            if(!StorageService()->GetUserById(Client->ID,UserInfo)) {
+            if(!StorageService()->UserDB().GetUserById(Client->ID,UserInfo)) {
                 return false;
             }
             return true;
@@ -665,11 +665,11 @@ namespace OpenWifi {
         std::string TToken{Token}, UserId;
         SecurityObjects::WebToken   WT;
         uint64_t RevocationDate=0;
-        if(StorageService()->GetToken(TToken, WT, UserId, RevocationDate)) {
+        if(StorageService()->UserTokenDB().GetToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
             Expired = (WT.created_ + WT.expires_in_) < std::time(nullptr);
-            if(StorageService()->GetUserById(UserId,UserInfo)) {
+            if(StorageService()->UserDB().GetUserById(UserId,UserInfo)) {
                 WebToken = WT;
                 UserCacheTokenToSharedID_.update(Token, {WebToken, UserId});
                 UserCacheIDToUserInfo_.update(UserId, UserInfo);
@@ -694,7 +694,7 @@ namespace OpenWifi {
                 UserInfo = *CachedUserInfo;
                 return true;
             }
-            if(!StorageService()->GetSubUserById(Client->ID,UserInfo)) {
+            if(!StorageService()->SubDB().GetUserById(Client->ID,UserInfo)) {
                 return false;
             }
             return true;
@@ -703,11 +703,11 @@ namespace OpenWifi {
         std::string TToken{Token}, UserId;
         SecurityObjects::WebToken   WT;
         uint64_t RevocationDate=0;
-        if(StorageService()->GetSubToken(TToken, WT, UserId, RevocationDate)) {
+        if(StorageService()->SubTokenDB().GetToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
             Expired = (WT.created_ + WT.expires_in_) < std::time(nullptr);
-            if(StorageService()->GetSubUserById(UserId,UserInfo)) {
+            if(StorageService()->SubDB().GetUserById(UserId,UserInfo)) {
                 WebToken = WT;
                 SubUserCacheTokenToSharedID_.update(Token, {WebToken, UserId});
                 SubUserCacheIDToUserInfo_.update(UserId, UserInfo);
