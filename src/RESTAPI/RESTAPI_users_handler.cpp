@@ -36,7 +36,7 @@ namespace OpenWifi {
             for(auto &i:SelectedRecords()) {
                 SecurityObjects::UserInfo   UInfo;
                 auto tI{i};
-                if(StorageService()->UserDB().GetUserById(tI,UInfo)) {
+                if(StorageService()->UserDB().GetUserById(i,UInfo)) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
                         ArrayObj.add(UInfo.Id);

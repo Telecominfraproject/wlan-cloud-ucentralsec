@@ -86,12 +86,12 @@ namespace OpenWifi {
         void ReplaceOldDefaultUUID();
         bool InitializeDefaultUser();
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false );
-        bool GetUserByEmail(std::string & email, SecurityObjects::UserInfo & User);
-        bool GetUserById(std::string &Id, SecurityObjects::UserInfo &User);
+        bool GetUserByEmail(const std::string & email, SecurityObjects::UserInfo & User);
+        bool GetUserById(const std::string &Id, SecurityObjects::UserInfo &User);
         bool GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users);
         bool UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
         bool DeleteUser(const std::string & Admin, USER_ID_TYPE & Id);
-        bool SetLastLogin(std::string &Id);
+        bool SetLastLogin(const std::string &Id);
 
     private:
     };

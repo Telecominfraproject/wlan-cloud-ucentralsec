@@ -171,7 +171,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::GetUserByEmail(std::string & email, SecurityObjects::UserInfo & User) {
+    bool BaseUserDB::GetUserByEmail(const std::string & email, SecurityObjects::UserInfo & User) {
         try {
             return GetRecord("email", email, User);
         } catch (const Poco::Exception &E) {
@@ -180,7 +180,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::GetUserById(std::string &Id, SecurityObjects::UserInfo &User) {
+    bool BaseUserDB::GetUserById(const std::string &Id, SecurityObjects::UserInfo &User) {
         try {
             return GetRecord("id", Id, User);
         } catch (const Poco::Exception &E) {
@@ -211,11 +211,12 @@ namespace OpenWifi {
         try {
             Poco::Data::Session Sess = Pool_.get();
             Poco::Data::Statement Delete(Sess);
+            auto tId{Id};
 
             std::string     St1{"delete from " + DBName_ + " where id=?"};
 
             Delete << ConvertParams(St1),
-                    Poco::Data::Keywords::use(Id);
+                    Poco::Data::Keywords::use(tId);
             Delete.execute();
             return true;
         } catch (const Poco::Exception &E) {
@@ -224,16 +225,18 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::SetLastLogin(std::string &Id) {
+    bool BaseUserDB::SetLastLogin(const std::string &Id) {
         try {
             Poco::Data::Session Sess = Pool_.get();
             Poco::Data::Statement Update(Sess);
+
+            auto tId{Id};
 
             std::string     St1{"update " + DBName_ + " set lastLogin=? where id=?"};
             uint64_t Now=std::time(nullptr);
             Update << ConvertParams(St1),
                     Poco::Data::Keywords::use(Now),
-                    Poco::Data::Keywords::use(Id);
+                    Poco::Data::Keywords::use(tId);
             Update.execute();
             return true;
         } catch (const Poco::Exception &E) {
