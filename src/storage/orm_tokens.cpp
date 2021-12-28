@@ -18,14 +18,14 @@
 namespace OpenWifi {
     static ORM::FieldVec BaseTokenDB_Fields{
             // object info
-            ORM::Field{"Token", ORM::FT_TEXT, 0, true},
-            ORM::Field{"RefreshToken", ORM::FieldType::FT_TEXT},
-            ORM::Field{"TokenType", ORM::FieldType::FT_TEXT},
-            ORM::Field{"UserName", ORM::FieldType::FT_TEXT},
-            ORM::Field{"Created", ORM::FieldType::FT_BIGINT},
-            ORM::Field{"Expires", ORM::FieldType::FT_BIGINT},
-            ORM::Field{"IdleTimeOut", ORM::FieldType::FT_BIGINT},
-            ORM::Field{"RevocationDate", ORM::FieldType::FT_BIGINT}
+            ORM::Field{"token", ORM::FT_TEXT, 0, true},
+            ORM::Field{"refreshToken", ORM::FieldType::FT_TEXT},
+            ORM::Field{"tokenType", ORM::FieldType::FT_TEXT},
+            ORM::Field{"userName", ORM::FieldType::FT_TEXT},
+            ORM::Field{"created", ORM::FieldType::FT_BIGINT},
+            ORM::Field{"expires", ORM::FieldType::FT_BIGINT},
+            ORM::Field{"idleTimeOut", ORM::FieldType::FT_BIGINT},
+            ORM::Field{"revocationDate", ORM::FieldType::FT_BIGINT}
     };
 
     static ORM::IndexVec MakeIndices(const std::string &shortname) {
@@ -96,7 +96,7 @@ namespace OpenWifi {
     }
 
     bool BaseTokenDB::RevokeAllTokens(std::string & UserId) {
-        std::string WhereClause{" UserName='" + UserId + "'"};
+        std::string WhereClause{" userName='" + UserId + "' "};
         DeleteRecords( WhereClause );
         return true;
     }
