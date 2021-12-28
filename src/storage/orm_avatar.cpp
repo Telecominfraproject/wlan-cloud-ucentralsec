@@ -62,6 +62,8 @@ namespace OpenWifi {
                 Type = A.type;
                 Name = A.name;
 
+                std::cout << "Size:" << A.avatar.size() << std::endl;
+
                 Poco::Data::LOBInputStream IL(A.avatar);
                 std::ofstream f(FileName.path(), std::ios::binary);
                 Poco::StreamCopier::copyStream(IL, f);
