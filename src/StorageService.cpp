@@ -21,12 +21,14 @@ namespace OpenWifi {
         UserTokenDB_ = std::make_unique<OpenWifi::BaseTokenDB>("Tokens", "tok", dbType_,*Pool_, Logger());
         SubTokenDB_ = std::make_unique<OpenWifi::BaseTokenDB>("SubTokens", "stk", dbType_,*Pool_, Logger());
         PreferencesDB_ = std::make_unique<OpenWifi::PreferencesDB>("Preferences", "pre", dbType_,*Pool_, Logger());
+        ActionLinksDB_ = std::make_unique<OpenWifi::ActionLinkDB>("Actions", "act", dbType_,*Pool_, Logger());
 
         UserDB_->Create();
         SubDB_->Create();
         UserTokenDB_->Create();
         SubTokenDB_->Create();
         PreferencesDB_->Create();
+        ActionLinksDB_->Create();
 
 		UserDB_->InitializeDefaultUser();
 
@@ -50,7 +52,7 @@ namespace OpenWifi {
         StorageService()->SubTokenDB().CleanExpiredTokens();
         StorageService()->UserTokenDB().CleanExpiredTokens();
         logger.information("Squiggy the DB: removing old actionLinks.");
-        StorageService()->CleanOldActionLinks();
+        StorageService()->ActionLinksDB().CleanOldActionLinks();
     }
 
 }

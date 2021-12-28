@@ -4,13 +4,12 @@
 
 #include "StorageService.h"
 #include "storage_avatar.h"
-#include "storage_actionLinks.h"
 
 namespace OpenWifi {
 
     int StorageService::Create_Tables() {
         Create_AvatarTable();
-        Create_ActionLinkTable();
+        // Create_ActionLinkTable();
         // Create_Preferences();
         // Create_UserTable();
         // Create_TokensTable();
@@ -69,7 +68,7 @@ namespace OpenWifi {
         }
         return 1;
     }
-*/
+
     int StorageService::Create_ActionLinkTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
@@ -83,7 +82,7 @@ namespace OpenWifi {
         }
         return 1;
     }
-
+*/
     int StorageService::Create_AvatarTable() {
             try {
                 Poco::Data::Session Sess = Pool_->get();

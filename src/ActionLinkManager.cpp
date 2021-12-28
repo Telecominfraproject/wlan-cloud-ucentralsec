@@ -32,7 +32,7 @@ namespace OpenWifi {
             std::vector<SecurityObjects::ActionLink>    Links;
             {
                 std::lock_guard G(Mutex_);
-                StorageService()->GetActions(Links);
+                StorageService()->ActionLinksDB().GetActions(Links);
             }
 
             if(Links.empty())
@@ -45,11 +45,11 @@ namespace OpenWifi {
                 SecurityObjects::UserInfo UInfo;
                 if((i.action==OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD ||
                     i.action==OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) && !StorageService()->UserDB().GetUserById(i.userId,UInfo)) {
-                    StorageService()->CancelAction(i.id);
+                    StorageService()->ActionLinksDB().CancelAction(i.id);
                     continue;
                 } else if(( i.action==OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD ||
                             i.action==OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL) && !StorageService()->SubDB().GetUserById(i.userId,UInfo)) {
-                    StorageService()->CancelAction(i.id);
+                    StorageService()->ActionLinksDB().CancelAction(i.id);
                     continue;
                 }
 
@@ -58,7 +58,7 @@ namespace OpenWifi {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
                                 Logger().information(Poco::format("Send password reset link to %s",UInfo.email));
                             }
-                            StorageService()->SentAction(i.id);
+                            StorageService()->ActionLinksDB().SentAction(i.id);
                         }
                         break;
 
@@ -66,7 +66,7 @@ namespace OpenWifi {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::EMAIL_VERIFICATION)) {
                                 Logger().information(Poco::format("Send email verification link to %s",UInfo.email));
                             }
-                            StorageService()->SentAction(i.id);
+                            StorageService()->ActionLinksDB().SentAction(i.id);
                         }
                         break;
 
@@ -74,7 +74,7 @@ namespace OpenWifi {
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
                                 Logger().information(Poco::format("Send subscriber password reset link to %s",UInfo.email));
                             }
-                            StorageService()->SentAction(i.id);
+                            StorageService()->ActionLinksDB().SentAction(i.id);
                         }
                         break;
 
@@ -82,12 +82,12 @@ namespace OpenWifi {
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::EMAIL_VERIFICATION)) {
                                 Logger().information(Poco::format("Send subscriber email verification link to %s",UInfo.email));
                             }
-                            StorageService()->SentAction(i.id);
+                            StorageService()->ActionLinksDB().SentAction(i.id);
                         }
                         break;
 
                     default: {
-                        StorageService()->SentAction(i.id);
+                        StorageService()->ActionLinksDB().SentAction(i.id);
                     }
                 }
             }

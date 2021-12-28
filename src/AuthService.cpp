@@ -624,7 +624,7 @@ namespace OpenWifi {
         A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
-        StorageService()->CreateAction(A);
+        StorageService()->ActionLinksDB().CreateAction(A);
         UInfo.waitingForEmailCheck = true;
         return true;
     }
@@ -637,7 +637,7 @@ namespace OpenWifi {
         A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
-        StorageService()->CreateAction(A);
+        StorageService()->ActionLinksDB().CreateAction(A);
         UInfo.waitingForEmailCheck = true;
         return true;
     }

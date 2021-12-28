@@ -18,6 +18,7 @@
 #include "storage/orm_users.h"
 #include "storage/orm_tokens.h"
 #include "storage/orm_preferences.h"
+#include "storage/orm_actionLinks.h"
 
 namespace OpenWifi {
 
@@ -43,6 +44,7 @@ namespace OpenWifi {
         OpenWifi::BaseTokenDB & UserTokenDB() { return *UserTokenDB_; }
         OpenWifi::BaseTokenDB & SubTokenDB() { return *SubTokenDB_; }
         OpenWifi::PreferencesDB & PreferencesDB() { return *PreferencesDB_; }
+        OpenWifi::ActionLinkDB & ActionLinksDB() { return *ActionLinksDB_; }
 
         /*
          *  All user management functions
@@ -51,23 +53,11 @@ namespace OpenWifi {
         bool GetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
         bool DeleteAvatar(const std::string & Admin, std::string &Id);
 
-        /*
-         *  All ActionLinks functions
-         */
-        bool CreateAction( SecurityObjects::ActionLink & A);
-        bool DeleteAction(std::string &ActionId);
-        bool CompleteAction(std::string &ActionId);
-        bool CancelAction(std::string &ActionId);
-        bool SentAction(std::string &ActionId);
-        bool GetActionLink(std::string &ActionId, SecurityObjects::ActionLink &A);
-        bool GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max=200);
-        void CleanOldActionLinks();
-
 	  private:
         int Create_Tables();
         int Create_AvatarTable();
-        int Create_ActionLinkTable();
 
+//        int Create_ActionLinkTable();
 //        int Create_Preferences();
 //        int Create_UserTable();
 //        int Create_TokensTable();
@@ -79,6 +69,7 @@ namespace OpenWifi {
         std::unique_ptr<OpenWifi::BaseTokenDB>          UserTokenDB_;
         std::unique_ptr<OpenWifi::BaseTokenDB>          SubTokenDB_;
         std::unique_ptr<OpenWifi::PreferencesDB>        PreferencesDB_;
+        std::unique_ptr<OpenWifi::ActionLinkDB>         ActionLinksDB_;
 
         Poco::Timer                     Timer_;
         Archiver                        Archiver_;

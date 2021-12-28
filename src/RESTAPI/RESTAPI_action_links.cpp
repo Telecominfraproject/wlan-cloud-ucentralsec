@@ -18,7 +18,7 @@ namespace OpenWifi {
         auto Id = GetParameter("id","");
 
         SecurityObjects::ActionLink Link;
-        if(!StorageService()->GetActionLink(Id,Link))
+        if(!StorageService()->ActionLinksDB().GetActionLink(Id,Link))
             return DoReturnA404();
 
         if(Action=="password_reset")
@@ -58,11 +58,11 @@ namespace OpenWifi {
             auto Now = std::time(nullptr);
 
             SecurityObjects::ActionLink Link;
-            if(!StorageService()->GetActionLink(Id,Link))
+            if(!StorageService()->ActionLinksDB().GetActionLink(Id,Link))
                 return DoReturnA404();
 
             if(Now > Link.expires) {
-                StorageService()->CancelAction(Id);
+                StorageService()->ActionLinksDB().CancelAction(Id);
                 return DoReturnA404();
             }
 
@@ -102,7 +102,7 @@ namespace OpenWifi {
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email},
                                               {"ACTION_LINK",MicroService::instance().GetUIURI()}};
-            StorageService()->CompleteAction(Id);
+            StorageService()->ActionLinksDB().CompleteAction(Id);
             SendHTMLFileBack(FormFile,FormVars);
         } else {
             DoReturnA404();
@@ -113,7 +113,7 @@ namespace OpenWifi {
         auto Now = std::time(nullptr);
 
         if(Now > Link.expires) {
-            StorageService()->CancelAction(Link.id);
+            StorageService()->ActionLinksDB().CancelAction(Link.id);
             return DoReturnA404();
         }
 
@@ -135,7 +135,7 @@ namespace OpenWifi {
                                       {"USERNAME", UInfo.email},
                                       {"ACTION_LINK",MicroService::instance().GetUIURI()}};
         Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_success.html"};
-        StorageService()->CompleteAction(Link.id);
+        StorageService()->ActionLinksDB().CompleteAction(Link.id);
         SendHTMLFileBack(FormFile, FormVars);
     }
 
