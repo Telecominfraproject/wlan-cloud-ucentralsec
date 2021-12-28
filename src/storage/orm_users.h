@@ -92,6 +92,7 @@ namespace OpenWifi {
         bool UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
         bool DeleteUser(const std::string & Admin, USER_ID_TYPE & Id);
         bool SetLastLogin(const std::string &Id);
+        bool SetAvatar(const std::string &Id, const std::string &Value);
 
     private:
     };

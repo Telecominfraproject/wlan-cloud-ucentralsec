@@ -48,6 +48,7 @@ namespace OpenWifi {
             Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
             StorageService()->AvatarDB().SetAvatar(UserInfo_.userinfo.email,
                                  Id, SS.str(), partHandler.ContentType(), partHandler.Name());
+            StorageService()->UserDB().SetAvatar(Id,"1");
         } else {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
@@ -61,6 +62,7 @@ namespace OpenWifi {
         if (Id.empty()) {
             return NotFound();
         }
+
         std::string Type, Name, AvatarContent;
         if (!StorageService()->AvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, AvatarContent, Type, Name)) {
             return NotFound();
@@ -70,12 +72,15 @@ namespace OpenWifi {
 
     void RESTAPI_avatar_handler::DoDelete() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+
         if (Id.empty()) {
             return NotFound();
         }
+
         if (!StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email, Id)) {
             return NotFound();
         }
+        StorageService()->UserDB().SetAvatar(Id,"");
         OK();
     }
 }

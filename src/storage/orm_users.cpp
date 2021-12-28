@@ -198,6 +198,27 @@ namespace OpenWifi {
         return false;
     }
 
+    bool BaseUserDB::SetAvatar(const std::string &Id, const std::string &Value) {
+        try {
+            SecurityObjects::UserInfo   User;
+            if(GetRecord("id",Id,User)) {
+                if(Value.empty()) {
+                    User.avatar = "0";
+                } else {
+                    auto V = std::atoi(User.avatar.c_str());
+                    if(V<1)
+                        V=1;
+                    V++;
+                    User.avatar = std::to_string(V);
+                }
+                return UpdateRecord("id",Id,User);
+            }
+        } catch (const Poco::Exception &E) {
+            Logger().log(E);
+        }
+        return false;
+    }
+
     bool BaseUserDB::UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo) {
         try {
             return UpdateRecord("id", Id, UInfo);
