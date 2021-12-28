@@ -47,7 +47,7 @@ namespace OpenWifi {
     }
 
     bool BaseTokenDB::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
-        SecurityObjects::Token  T{.token=Token, .refreshToken=RefreshToken, .userName=UserID, .tokenType="Bearer",
+        SecurityObjects::Token  T{.token=Token, .refreshToken=RefreshToken, .tokenType="Bearer", .userName=UserID,
                                   .created=(uint64_t) std::time(nullptr), .expires=Expires, .idleTimeout=TimeOut,.revocationDate=0};
         return CreateRecord(T);
     }
