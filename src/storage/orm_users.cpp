@@ -206,11 +206,7 @@ namespace OpenWifi {
                 if(Value.empty()) {
                     User.avatar = "0";
                 } else {
-                    auto V = std::atoi(User.avatar.c_str());
-                    if(V<1)
-                        V=1;
-                    V++;
-                    User.avatar = std::to_string(V);
+                    User.avatar = std::to_string(std::time(nullptr));
                 }
                 return UpdateRecord("id",tID,User);
             }
