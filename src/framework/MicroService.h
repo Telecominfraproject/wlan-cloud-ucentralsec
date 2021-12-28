@@ -1905,7 +1905,25 @@ namespace OpenWifi {
 	        Response->sendFile(TempAvatar.path(),MT.ContentType);
 	    }
 
-	    inline void SendHTMLFileBack(Poco::File & File,
+        inline void SendFileContent(const std::string &Content, const std::string &Type, const std::string & Name) {
+            auto MT = Utils::FindMediaType(Name);
+            if(MT.Encoding==Utils::BINARY) {
+                Response->set("Content-Transfer-Encoding","binary");
+                Response->set("Accept-Ranges", "bytes");
+            }
+            Response->set("Content-Disposition", "attachment; filename=" + Name );
+            Response->set("Accept-Ranges", "bytes");
+            Response->set("Cache-Control", "private");
+            Response->set("Pragma", "private");
+            Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
+            Response->setContentLength(Content.size());
+            Response->setContentType(Type );
+            AddCORS();
+            auto & OutputStream = Response->send();
+            OutputStream << Content ;
+        }
+
+        inline void SendHTMLFileBack(Poco::File & File,
                                      const Types::StringPairVec & FormVars) {
 	        Response->set("Pragma", "private");
 	        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");

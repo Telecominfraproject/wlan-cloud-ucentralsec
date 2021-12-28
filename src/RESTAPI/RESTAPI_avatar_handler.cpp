@@ -62,13 +62,13 @@ namespace OpenWifi {
         if (Id.empty()) {
             return NotFound();
         }
-        Poco::TemporaryFile TempAvatar;
-        std::string Type, Name;
-        if (!StorageService()->AvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
+
+        std::string Type, Name, AvatarContent;
+        if (!StorageService()->AvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, AvatarContent, Type, Name)) {
             return NotFound();
         }
         std::cout << "Sending avatar" << std::endl;
-        SendFile(TempAvatar, Type, Name);
+        SendFileContent(AvatarContent, Type, Name);
     }
 
     void RESTAPI_avatar_handler::DoDelete() {

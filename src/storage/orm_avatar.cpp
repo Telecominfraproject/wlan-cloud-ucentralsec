@@ -54,7 +54,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool AvatarDB::GetAvatar(const std::string &Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type,
+    bool AvatarDB::GetAvatar(const std::string &Admin, std::string &Id, std::string & AvatarContent, std::string &Type,
                    std::string &Name) {
         SecurityObjects::Avatar A;
         try {
@@ -65,9 +65,9 @@ namespace OpenWifi {
                 std::cout << "Size:" << A.avatar.size() << std::endl;
 
                 Poco::Data::LOBInputStream IL(A.avatar);
-                std::ofstream f(FileName.path(), std::ios::binary);
-                Poco::StreamCopier::copyStream(IL, f);
-
+                std::stringstream           os;
+                Poco::StreamCopier::copyStream(IL, os);
+                AvatarContent = os.str();
                 return true;
             }
         } catch (const Poco::Exception &E) {
