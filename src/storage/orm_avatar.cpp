@@ -50,8 +50,8 @@ namespace OpenWifi {
         return false;
     }
 
-    bool AvatarDB::GetAvatar(const std::string &Admin, std::string &Id, std::string & AvatarContent, std::string &Type,
-                   std::string &Name) {
+    bool AvatarDB::GetAvatar(const std::string &Admin, std::string &Id, std::string & AvatarContent,
+                             std::string &Type, std::string &Name) {
         SecurityObjects::Avatar A;
         try {
             if(GetRecord("id",Id,A)) {
@@ -81,7 +81,8 @@ namespace OpenWifi {
 }
 
 template<> void ORM::DB<OpenWifi::AvatarRecordTuple,
-        OpenWifi::SecurityObjects::Avatar>::Convert(OpenWifi::AvatarRecordTuple &T, OpenWifi::SecurityObjects::Avatar &U) {
+        OpenWifi::SecurityObjects::Avatar>::Convert(OpenWifi::AvatarRecordTuple &T,
+                                                    OpenWifi::SecurityObjects::Avatar &U) {
     U.id = T.get<0>();
     U.type = T.get<1>();
     U.created = T.get<2>();
@@ -90,7 +91,8 @@ template<> void ORM::DB<OpenWifi::AvatarRecordTuple,
 }
 
 template<> void ORM::DB<OpenWifi::AvatarRecordTuple,
-        OpenWifi::SecurityObjects::Avatar>::Convert(OpenWifi::SecurityObjects::Avatar &U, OpenWifi::AvatarRecordTuple &T) {
+        OpenWifi::SecurityObjects::Avatar>::Convert(OpenWifi::SecurityObjects::Avatar &U,
+                                                    OpenWifi::AvatarRecordTuple &T) {
     T.set<0>(U.id);
     T.set<1>(U.type);
     T.set<2>(U.created);
