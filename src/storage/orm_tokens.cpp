@@ -32,11 +32,11 @@ namespace OpenWifi {
         return ORM::IndexVec{
                 {std::string(shortname + "_user_id_index"),
                         ORM::IndexEntryVec{
-                                {std::string("UserName"),
+                                {std::string("userName"),
                                  ORM::Indextype::ASC}}},
                 {std::string(shortname + "_refresh_index"),
                         ORM::IndexEntryVec{
-                                {std::string("RefreshToken"),
+                                {std::string("refreshToken"),
                                  ORM::Indextype::ASC}}}
         };
     }
