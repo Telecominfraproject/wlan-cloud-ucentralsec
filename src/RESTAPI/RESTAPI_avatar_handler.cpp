@@ -34,14 +34,11 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        //  if there is an avatar, just remove it...
-        StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email,Id);
-
         std::stringstream SS;
         AvatarPartHandler partHandler(Id, Logger_, SS);
-
         Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
         Poco::JSON::Object Answer;
+
         if (!partHandler.Name().empty() && partHandler.Length()< MicroService::instance().ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
