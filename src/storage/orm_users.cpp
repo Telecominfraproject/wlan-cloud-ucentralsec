@@ -4,6 +4,8 @@
 
 #include "orm_users.h"
 #include "AuthService.h"
+#include "RESTObjects/RESTAPI_CertObjects.h"
+#include "StorageService.h"
 
 /*
             std::string,    // Id = 0;
@@ -90,7 +92,6 @@ namespace OpenWifi {
             DB(T, Name.c_str(), BaseUserDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str()) {
     }
 
-
     bool BaseUserDB::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
         try {
             Poco::toLowerInPlace(NewUser.email);
@@ -145,9 +146,9 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users) {
+    bool BaseUserDB::GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users, std::string WhereClause) {
         try {
-            return GetRecords(Offset, HowMany, Users);
+            return GetRecords(Offset, HowMany, Users, WhereClause);
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }
@@ -197,6 +198,11 @@ namespace OpenWifi {
             Logger().log(E);
         }
         return false;
+    }
+
+    bool BaseUserDB::DeleteUsers(const std::string & Admin, std::string & owner) {
+        std::string WhereClause{ " owner='" + owner +"' "};
+        return DeleteRecords(WhereClause);
     }
 
     bool BaseUserDB::SetLastLogin(const std::string &Id) {
