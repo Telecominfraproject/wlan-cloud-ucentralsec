@@ -23,8 +23,8 @@ namespace OpenWifi {
     public:
         int Start() override;
         void Stop() override;
-        static MFAServer *instance() {
-            static auto * instance_ = new MFAServer;
+        static auto instance() {
+            static auto instance_ = new MFAServer;
             return instance_;
         }
 
@@ -50,7 +50,7 @@ namespace OpenWifi {
         void CleanCache();
     };
 
-    inline MFAServer & MFAServer() { return *MFAServer::instance(); }
+    inline auto MFAServer() { return MFAServer::instance(); }
 }
 
 #endif //OWSEC_MFASERVER_H

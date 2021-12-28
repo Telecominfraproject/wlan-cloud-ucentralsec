@@ -217,7 +217,7 @@ namespace OpenWifi {
     }
 
     bool AuthService::RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo) {
-        return (UInfo.userinfo.userTypeProprietaryInfo.mfa.enabled && MFAServer().MethodEnabled(UInfo.userinfo.userTypeProprietaryInfo.mfa.method));
+        return (UInfo.userinfo.userTypeProprietaryInfo.mfa.enabled && MFAServer()->MethodEnabled(UInfo.userinfo.userTypeProprietaryInfo.mfa.method));
     }
 
     bool AuthService::ValidatePassword(const std::string &Password) {

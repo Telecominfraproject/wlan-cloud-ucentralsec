@@ -110,7 +110,7 @@ namespace OpenWifi {
             Logger_.information(Poco::format("RESEND-MFA-CODE(%s): Request for %s", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid")) {
                 auto uuid = Obj->get("uuid").toString();
-                if(MFAServer().ResendCode(uuid))
+                if(MFAServer()->ResendCode(uuid))
                     return OK();
             }
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials, BAD_MFA_TRANSACTION);
@@ -120,7 +120,7 @@ namespace OpenWifi {
             Logger_.information(Poco::format("COMPLETE-MFA-CHALLENGE(%s): Request for %s", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid")) {
                 SecurityObjects::UserInfoAndPolicy UInfo;
-                if(MFAServer().CompleteMFAChallenge(Obj,UInfo)) {
+                if(MFAServer()->CompleteMFAChallenge(Obj,UInfo)) {
                     Poco::JSON::Object ReturnObj;
                     UInfo.webtoken.to_json(ReturnObj);
                     return ReturnObject(ReturnObj);
@@ -135,7 +135,7 @@ namespace OpenWifi {
         if (Code==SUCCESS) {
             Poco::JSON::Object ReturnObj;
             if(AuthService()->RequiresMFA(UInfo)) {
-                if(MFAServer().StartMFAChallenge(UInfo, ReturnObj)) {
+                if(MFAServer()->StartMFAChallenge(UInfo, ReturnObj)) {
                     return ReturnObject(ReturnObj);
                 }
                 Logger_.warning("MFA Seems to be broken. Please fix. Disabling MFA checking for now.");
