@@ -201,7 +201,8 @@ namespace OpenWifi {
     bool BaseUserDB::SetAvatar(const std::string &Id, const std::string &Value) {
         try {
             SecurityObjects::UserInfo   User;
-            if(GetRecord("id",Id,User)) {
+            auto tID{Id};
+            if(GetRecord("id",tID,User)) {
                 if(Value.empty()) {
                     User.avatar = "0";
                 } else {
@@ -211,7 +212,7 @@ namespace OpenWifi {
                     V++;
                     User.avatar = std::to_string(V);
                 }
-                return UpdateRecord("id",Id,User);
+                return UpdateRecord("id",tID,User);
             }
         } catch (const Poco::Exception &E) {
             Logger().log(E);
