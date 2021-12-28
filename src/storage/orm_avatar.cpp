@@ -27,20 +27,16 @@ namespace OpenWifi {
             DB(T, Name.c_str(), AvatarDB_Fields,{}, P, L, ShortName.c_str()) {
     }
 
-    bool AvatarDB::SetAvatar(const std::string &Admin, std::string &Id, Poco::TemporaryFile &FileName,
+    bool AvatarDB::SetAvatar(const std::string &Admin, std::string &Id, const std::string & AvatarContent,
                              std::string &Type, std::string &Name) {
 
         try {
-            std::stringstream ss;
-            std::ifstream ifs(FileName.path().c_str(), std::ios_base::in | std::ios_base::binary);
-            Poco::StreamCopier::copyStream(ifs, ss);
-
             SecurityObjects::Avatar A;
             A.id = Id;
             A.type = Type;
             A.name = Name;
             A.created = std::time(nullptr);
-            A.avatar.assignRaw(ss.str().c_str(), ss.str().size());
+            A.avatar.assignRaw(AvatarContent.c_str(), AvatarContent.size());
 
             if (Exists("id", Id)) {
                 return UpdateRecord("id", Id, A);

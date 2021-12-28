@@ -30,7 +30,7 @@ namespace OpenWifi {
     public:
         AvatarDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
 
-        bool SetAvatar(const std::string & Admin, std::string &Id, Poco::TemporaryFile &FileName, std::string &Type, std::string & Name);
+        bool SetAvatar(const std::string & Admin, std::string &Id, const std::string & AvatarContent, std::string &Type, std::string & Name);
         bool GetAvatar(const std::string & Admin, std::string &Id, std::string & AvatarContent, std::string &Type, std::string & Name);
         bool DeleteAvatar(const std::string & Admin, std::string &Id);
 

@@ -9,23 +9,23 @@ namespace OpenWifi {
 
     class AvatarPartHandler : public Poco::Net::PartHandler {
     public:
-        AvatarPartHandler(std::string Id, Poco::Logger &Logger, Poco::TemporaryFile &TmpFile) :
+        AvatarPartHandler(std::string Id, Poco::Logger &Logger, std::stringstream & ofs) :
                 Id_(std::move(Id)),
                 Logger_(Logger),
-                TempFile_(TmpFile){
+                OutputStream_(ofs){
         }
         void handlePart(const Poco::Net::MessageHeader &Header, std::istream &Stream);
         [[nodiscard]] uint64_t Length() const { return Length_; }
         [[nodiscard]] std::string &Name() { return Name_; }
         [[nodiscard]] std::string &ContentType() { return FileType_; }
-        [[nodiscard]] std::string FileName() const { return TempFile_.path(); }
+
     private:
         uint64_t        Length_ = 0;
         std::string     FileType_;
         std::string     Name_;
         std::string     Id_;
         Poco::Logger    &Logger_;
-        Poco::TemporaryFile &TempFile_;
+        std::stringstream &OutputStream_;
     };
 
     class RESTAPI_avatar_handler : public RESTAPIHandler {

@@ -22,9 +22,8 @@ namespace OpenWifi {
             Name_ = Parameters.get(RESTAPI::Protocol::NAME, RESTAPI::Protocol::UNNAMED);
         }
         Poco::CountingInputStream InputStream(Stream);
-        std::ofstream OutputStream(TempFile_.path(), std::ofstream::out);
-        Poco::StreamCopier::copyStream(InputStream, OutputStream);
-        Length_ = InputStream.chars();
+        Poco::StreamCopier::copyStream(InputStream, OutputStream_);
+        Length_ = OutputStream_.str().size();
     };
 
     void RESTAPI_avatar_handler::DoPost() {
@@ -38,8 +37,8 @@ namespace OpenWifi {
         //  if there is an avatar, just remove it...
         StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email,Id);
 
-        Poco::TemporaryFile TmpFile;
-        AvatarPartHandler partHandler(Id, Logger_, TmpFile);
+        std::stringstream SS;
+        AvatarPartHandler partHandler(Id, Logger_, SS);
 
         Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
         Poco::JSON::Object Answer;
@@ -48,7 +47,7 @@ namespace OpenWifi {
             Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
             Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
             StorageService()->AvatarDB().SetAvatar(UserInfo_.userinfo.email,
-                                 Id, TmpFile, partHandler.ContentType(), partHandler.Name());
+                                 Id, SS.str(), partHandler.ContentType(), partHandler.Name());
         } else {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
@@ -62,13 +61,11 @@ namespace OpenWifi {
         if (Id.empty()) {
             return NotFound();
         }
-
         std::string Type, Name, AvatarContent;
         if (!StorageService()->AvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, AvatarContent, Type, Name)) {
             return NotFound();
         }
-        std::cout << "Sending avatar" << std::endl;
-        SendFileContent(AvatarContent, Type, Name);
+        return SendFileContent(AvatarContent, Type, Name);
     }
 
     void RESTAPI_avatar_handler::DoDelete() {
