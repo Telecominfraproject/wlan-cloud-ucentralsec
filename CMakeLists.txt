@@ -96,6 +96,7 @@ add_executable( owsec
         src/RESTAPI/RESTAPI_validate_sub_token_handler.cpp src/RESTAPI/RESTAPI_validate_sub_token_handler.h
         src/RESTAPI/RESTAPI_Routers.cpp
         src/Daemon.h src/Daemon.cpp
+        src/SpecialUserHelpers.h
         src/AuthService.h src/AuthService.cpp
         src/StorageService.cpp src/StorageService.h
         src/SMTPMailerService.cpp src/SMTPMailerService.h
@@ -109,7 +110,7 @@ add_executable( owsec
         src/framework/OpenWifiTypes.h
         src/RESTAPI/RESTAPI_submfa_handler.cpp src/RESTAPI/RESTAPI_submfa_handler.h
         src/storage/orm_users.cpp src/storage/orm_users.h
-        src/storage/orm_tokens.cpp src/storage/orm_tokens.h src/storage/orm_preferences.cpp src/storage/orm_preferences.h src/storage/orm_actionLinks.cpp src/storage/orm_actionLinks.h src/storage/orm_avatar.cpp src/storage/orm_avatar.h)
+        src/storage/orm_tokens.cpp src/storage/orm_tokens.h src/storage/orm_preferences.cpp src/storage/orm_preferences.h src/storage/orm_actionLinks.cpp src/storage/orm_actionLinks.h src/storage/orm_avatar.cpp src/storage/orm_avatar.h src/SpecialUserHelpers.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

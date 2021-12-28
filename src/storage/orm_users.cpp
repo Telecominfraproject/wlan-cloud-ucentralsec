@@ -90,50 +90,6 @@ namespace OpenWifi {
             DB(T, Name.c_str(), BaseUserDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str()) {
     }
 
-    std::string OldDefaultUseridStockUUID{"DEFAULT-USER-UUID-SHOULD-BE-DELETED!!!"};
-    std::string NewDefaultUseridStockUUID{"11111111-0000-0000-6666-999999999999"};
-
-    void BaseUserDB::ReplaceOldDefaultUUID() {
-        try {
-            Poco::Data::Session Sess = Pool_.get();
-            std::string St1{"update users set id=? where id=?"};
-
-            Poco::Data::Statement Update(Sess);
-            Update << ConvertParams(St1),
-                    Poco::Data::Keywords::use(NewDefaultUseridStockUUID),
-                    Poco::Data::Keywords::use(OldDefaultUseridStockUUID);
-            Update.execute();
-        } catch (...) {
-
-        }
-    }
-
-    //  if we do not find a default user, then we need to create one based on the
-    //  property file. We must set its flag to "must change password", this user has root privilege.
-    //  if the "DEFAULT-USER-UUID", we keep the UUID of that user. We want to hide the UUID of the default root user
-    bool BaseUserDB::InitializeDefaultUser() {
-        SecurityObjects::UserInfo   U;
-        bool DefaultUserCreated = false;
-
-        ReplaceOldDefaultUUID();
-        AppServiceRegistry().Get("defaultusercreated",DefaultUserCreated);
-        if(!GetUserById(NewDefaultUseridStockUUID,U) && !DefaultUserCreated) {
-            U.currentPassword = MicroService::instance().ConfigGetString("authentication.default.password","");
-            U.lastPasswords.push_back(U.currentPassword);
-            U.email = MicroService::instance().ConfigGetString("authentication.default.username","");
-            U.Id = NewDefaultUseridStockUUID;
-            U.userRole = SecurityObjects::ROOT;
-            U.creationDate = std::time(nullptr);
-            U.validated = true;
-            U.name = "Default User";
-            U.description = "Default user should be deleted.";
-            U.changePassword = true;
-            CreateUser("SYSTEM",U, true);
-            AppServiceRegistry().Set("defaultusercreated",true);
-            return true;
-        }
-        return false;
-    }
 
     bool BaseUserDB::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
         try {

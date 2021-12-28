@@ -83,8 +83,6 @@ namespace OpenWifi {
     public:
         BaseUserDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
 
-        void ReplaceOldDefaultUUID();
-        bool InitializeDefaultUser();
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false );
         bool GetUserByEmail(const std::string & email, SecurityObjects::UserInfo & User);
         bool GetUserById(const std::string &Id, SecurityObjects::UserInfo &User);

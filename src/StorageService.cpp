@@ -7,6 +7,7 @@
 //
 
 #include "StorageService.h"
+#include "SpecialUserHelpers.h"
 
 namespace OpenWifi {
 
@@ -31,7 +32,7 @@ namespace OpenWifi {
         ActionLinksDB_->Create();
         AvatarDB_->Create();
 
-		UserDB_->InitializeDefaultUser();
+		OpenWifi::SpecialUserHelpers::InitializeDefaultUser();
 
 		Archivercallback_ = std::make_unique<Poco::TimerCallback<Archiver>>(Archiver_,&Archiver::onTimer);
 		Timer_.setStartInterval( 5 * 60 * 1000);  // first run in 5 minutes

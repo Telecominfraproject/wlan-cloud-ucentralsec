@@ -61,9 +61,6 @@ namespace OpenWifi {
         Poco::Timer                     Timer_;
         Archiver                        Archiver_;
         std::unique_ptr<Poco::TimerCallback<Archiver>>   Archivercallback_;
-
-        /// This is to support a mistake that was deployed...
-        void ReplaceOldDefaultUUID();
    };
 
     inline auto StorageService() { return StorageService::instance(); };
