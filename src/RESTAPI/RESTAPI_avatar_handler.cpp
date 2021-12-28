@@ -36,7 +36,7 @@ namespace OpenWifi {
         }
 
         //  if there is an avatar, just remove it...
-        StorageService()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+        StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email,Id);
 
         Poco::TemporaryFile TmpFile;
         AvatarPartHandler partHandler(Id, Logger_, TmpFile);
@@ -47,7 +47,7 @@ namespace OpenWifi {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
             Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
-            StorageService()->SetAvatar(UserInfo_.userinfo.email,
+            StorageService()->AvatarDB().SetAvatar(UserInfo_.userinfo.email,
                                  Id, TmpFile, partHandler.ContentType(), partHandler.Name());
         } else {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
@@ -64,7 +64,7 @@ namespace OpenWifi {
         }
         Poco::TemporaryFile TempAvatar;
         std::string Type, Name;
-        if (!StorageService()->GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
+        if (!StorageService()->AvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
             return NotFound();
         }
         SendFile(TempAvatar, Type, Name);
@@ -75,7 +75,7 @@ namespace OpenWifi {
         if (Id.empty()) {
             return NotFound();
         }
-        if (!StorageService()->DeleteAvatar(UserInfo_.userinfo.email, Id)) {
+        if (!StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email, Id)) {
             return NotFound();
         }
         OK();

@@ -14,7 +14,6 @@ namespace OpenWifi {
 		std::lock_guard		Guard(Mutex_);
 
 		StorageClass::Start();
-		Create_Tables();
 
         UserDB_ = std::make_unique<OpenWifi::BaseUserDB>("Users", "usr", dbType_,*Pool_, Logger());
         SubDB_ = std::make_unique<OpenWifi::BaseUserDB>("Subscribers", "sub", dbType_,*Pool_, Logger());
@@ -22,6 +21,7 @@ namespace OpenWifi {
         SubTokenDB_ = std::make_unique<OpenWifi::BaseTokenDB>("SubTokens", "stk", dbType_,*Pool_, Logger());
         PreferencesDB_ = std::make_unique<OpenWifi::PreferencesDB>("Preferences", "pre", dbType_,*Pool_, Logger());
         ActionLinksDB_ = std::make_unique<OpenWifi::ActionLinkDB>("Actions", "act", dbType_,*Pool_, Logger());
+        AvatarDB_ = std::make_unique<OpenWifi::AvatarDB>("Avatars", "ava", dbType_,*Pool_, Logger());
 
         UserDB_->Create();
         SubDB_->Create();
@@ -29,6 +29,7 @@ namespace OpenWifi {
         SubTokenDB_->Create();
         PreferencesDB_->Create();
         ActionLinksDB_->Create();
+        AvatarDB_->Create();
 
 		UserDB_->InitializeDefaultUser();
 

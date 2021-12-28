@@ -63,7 +63,7 @@ namespace OpenWifi {
             // nothing to do
         }
 
-        StorageService()->DeleteAvatar(UserInfo_.userinfo.email,Id);
+        StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email,Id);
         StorageService()->PreferencesDB().DeletePreferences(UserInfo_.userinfo.email,Id);
 
         Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));

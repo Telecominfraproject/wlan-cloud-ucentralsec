@@ -11,6 +11,8 @@
 #include <string>
 #include "framework/OpenWifiTypes.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/Data/LOB.h"
+#include "Poco/Data/LOBStream.h"
 
 namespace OpenWifi {
     namespace SecurityObjects {
@@ -278,6 +280,14 @@ namespace OpenWifi {
 
             void to_json(Poco::JSON::Object &Obj) const;
             bool from_json(Poco::JSON::Object::Ptr &Obj);
+        };
+
+        struct Avatar {
+            std::string             id;
+            std::string             type;
+            uint64_t                created=0;
+            std::string             name;
+            Poco::Data::LOB<char>   avatar;
         };
 
     }
