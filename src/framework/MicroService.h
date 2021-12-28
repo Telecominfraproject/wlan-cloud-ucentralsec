@@ -1900,6 +1900,7 @@ namespace OpenWifi {
 	        Response->set("Cache-Control", "private");
 	        Response->set("Pragma", "private");
 	        Response->set("Expires", "Mon, 26 Jul 2027 05:00:00 GMT");
+            Response->setContentLength(TempAvatar.getSize());
 	        AddCORS();
 	        Response->sendFile(TempAvatar.path(),MT.ContentType);
 	    }
