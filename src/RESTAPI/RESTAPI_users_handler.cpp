@@ -15,7 +15,7 @@ namespace OpenWifi {
         if(QB_.Select.empty()) {
             Poco::JSON::Array ArrayObj;
             Poco::JSON::Object Answer;
-            if (StorageService()->SubDB().GetUsers(QB_.Offset, QB_.Limit, Users)) {
+            if (StorageService()->UserDB().GetUsers(QB_.Offset, QB_.Limit, Users)) {
                 for (auto &i : Users) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
@@ -36,7 +36,7 @@ namespace OpenWifi {
             for(auto &i:SelectedRecords()) {
                 SecurityObjects::UserInfo   UInfo;
                 auto tI{i};
-                if(StorageService()->SubDB().GetUserById(tI,UInfo)) {
+                if(StorageService()->UserDB().GetUserById(tI,UInfo)) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
                         ArrayObj.add(UInfo.Id);

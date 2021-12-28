@@ -22,6 +22,7 @@ namespace OpenWifi {
         return 0;
     }
 
+/*
     int StorageService::Create_UserTable() {
         Poco::Data::Session Sess = Pool_->get();
 
@@ -71,7 +72,7 @@ namespace OpenWifi {
         }
         return 1;
     }
-
+*/
     int StorageService::Create_ActionLinkTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
@@ -106,7 +107,7 @@ namespace OpenWifi {
             }
             return 1;
         }
-
+/*
     int StorageService::Create_TokensTable() {
         try {
             Poco::Data::Session Sess = Pool_->get();
@@ -132,6 +133,7 @@ namespace OpenWifi {
         }
         return 1;
     }
+*/
 
     int StorageService::Create_Preferences() {
         try {

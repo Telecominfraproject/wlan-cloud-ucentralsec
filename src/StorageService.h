@@ -67,13 +67,14 @@ namespace OpenWifi {
 
 	  private:
         int Create_Tables();
-        int Create_UserTable();
         int Create_AvatarTable();
-        int Create_TokensTable();
         int Create_ActionLinkTable();
         int Create_Preferences();
-        int Create_SubTokensTable();
-        int Create_SubscriberTable();
+
+//        int Create_UserTable();
+//        int Create_TokensTable();
+//        int Create_SubTokensTable();
+//        int Create_SubscriberTable();
 
         std::unique_ptr<OpenWifi::BaseUserDB>           UserDB_;
         std::unique_ptr<OpenWifi::BaseUserDB>           SubDB_;
