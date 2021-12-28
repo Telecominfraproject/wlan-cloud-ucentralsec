@@ -67,6 +67,7 @@ namespace OpenWifi {
         if (!StorageService()->AvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, TempAvatar, Type, Name)) {
             return NotFound();
         }
+        std::cout << "Sending avatar" << std::endl;
         SendFile(TempAvatar, Type, Name);
     }
 
