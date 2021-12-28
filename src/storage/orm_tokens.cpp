@@ -17,7 +17,6 @@
 
 namespace OpenWifi {
     static ORM::FieldVec BaseTokenDB_Fields{
-            // object info
             ORM::Field{"token", ORM::FT_TEXT, 0, true},
             ORM::Field{"refreshToken", ORM::FieldType::FT_TEXT},
             ORM::Field{"tokenType", ORM::FieldType::FT_TEXT},

@@ -3,18 +3,15 @@
 //
 
 #include "StorageService.h"
-#include "storage_users.h"
 #include "storage_avatar.h"
 #include "storage_actionLinks.h"
-#include "storage_tokens.h"
-#include "storage_preferences.h"
 
 namespace OpenWifi {
 
     int StorageService::Create_Tables() {
         Create_AvatarTable();
         Create_ActionLinkTable();
-        Create_Preferences();
+        // Create_Preferences();
         // Create_UserTable();
         // Create_TokensTable();
         // Create_SubTokensTable();
@@ -133,7 +130,6 @@ namespace OpenWifi {
         }
         return 1;
     }
-*/
 
     int StorageService::Create_Preferences() {
         try {
@@ -148,4 +144,7 @@ namespace OpenWifi {
         }
         return 1;
     }
+
+ */
+
 }

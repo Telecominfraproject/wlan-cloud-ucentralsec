@@ -91,12 +91,7 @@ add_executable( owsec
         src/RESTAPI/RESTAPI_email_handler.cpp src/RESTAPI/RESTAPI_email_handler.h
         src/RESTAPI/RESTAPI_sms_handler.cpp src/RESTAPI/RESTAPI_sms_handler.h
         src/storage/storage_avatar.cpp src/storage/storage_avatar.h
-#        src/storage/storage_users.h src/storage/storage_users.cpp
-#        src/storage/storage_subscribers.cpp src/storage/storage_subscribers.h
         src/storage/storage_actionLinks.cpp src/storage/storage_actionLinks.h
-#        src/storage/storage_tokens.h src/storage/storage_tokens.cpp
-#        src/storage/storage_subtokens.h src/storage/storage_subtokens.cpp
-        src/storage/storage_preferences.cpp src/storage/storage_preferences.h
         src/storage/storage_tables.cpp
         src/RESTAPI/RESTAPI_suboauth2_handler.h src/RESTAPI/RESTAPI_suboauth2_handler.cpp
         src/RESTAPI/RESTAPI_subuser_handler.h src/RESTAPI/RESTAPI_subuser_handler.cpp
@@ -117,7 +112,7 @@ add_executable( owsec
         src/framework/OpenWifiTypes.h
         src/RESTAPI/RESTAPI_submfa_handler.cpp src/RESTAPI/RESTAPI_submfa_handler.h
         src/storage/orm_users.cpp src/storage/orm_users.h
-        src/storage/orm_tokens.cpp src/storage/orm_tokens.h)
+        src/storage/orm_tokens.cpp src/storage/orm_tokens.h src/storage/orm_preferences.cpp src/storage/orm_preferences.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

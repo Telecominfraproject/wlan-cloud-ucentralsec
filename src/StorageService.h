@@ -17,6 +17,7 @@
 
 #include "storage/orm_users.h"
 #include "storage/orm_tokens.h"
+#include "storage/orm_preferences.h"
 
 namespace OpenWifi {
 
@@ -41,6 +42,7 @@ namespace OpenWifi {
         OpenWifi::BaseUserDB & SubDB() { return *SubDB_; }
         OpenWifi::BaseTokenDB & UserTokenDB() { return *UserTokenDB_; }
         OpenWifi::BaseTokenDB & SubTokenDB() { return *SubTokenDB_; }
+        OpenWifi::PreferencesDB & PreferencesDB() { return *PreferencesDB_; }
 
         /*
          *  All user management functions
@@ -61,16 +63,12 @@ namespace OpenWifi {
         bool GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max=200);
         void CleanOldActionLinks();
 
-        bool GetPreferences(std::string &Id, SecurityObjects::Preferences &P);
-        bool SetPreferences(SecurityObjects::Preferences &P);
-        bool DeletePreferences(const std::string &AdminId, std::string & Id);
-
 	  private:
         int Create_Tables();
         int Create_AvatarTable();
         int Create_ActionLinkTable();
-        int Create_Preferences();
 
+//        int Create_Preferences();
 //        int Create_UserTable();
 //        int Create_TokensTable();
 //        int Create_SubTokensTable();
@@ -80,7 +78,7 @@ namespace OpenWifi {
         std::unique_ptr<OpenWifi::BaseUserDB>           SubDB_;
         std::unique_ptr<OpenWifi::BaseTokenDB>          UserTokenDB_;
         std::unique_ptr<OpenWifi::BaseTokenDB>          SubTokenDB_;
-
+        std::unique_ptr<OpenWifi::PreferencesDB>        PreferencesDB_;
 
         Poco::Timer                     Timer_;
         Archiver                        Archiver_;
