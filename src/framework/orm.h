@@ -94,10 +94,10 @@ namespace ORM {
 
     inline std::string FieldTypeToChar(OpenWifi::DBType Type, FieldType T, int Size=0) {
         switch(T) {
-            case FT_INT:        return "INT";
-            case FT_BIGINT:     return "BIGINT";
-            case FT_TEXT:       return "TEXT";
-            case FT_BOOLEAN:    return "BOOLEAN";
+            case FT_INT:    return "INT";
+            case FT_BIGINT: return "BIGINT";
+            case FT_TEXT:   return "TEXT";
+            case FT_BOOLEAN:   return "BOOLEAN";
             case FT_VARCHAR:
                 if(Size)
                     return std::string("VARCHAR(") + std::to_string(Size) + std::string(")");
