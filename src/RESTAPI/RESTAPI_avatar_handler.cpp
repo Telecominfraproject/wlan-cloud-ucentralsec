@@ -27,12 +27,8 @@ namespace OpenWifi {
     };
 
     void RESTAPI_avatar_handler::DoPost() {
-        std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
+        std::string Id = UserInfo_.userinfo.Id;
         SecurityObjects::UserInfo UInfo;
-
-        if (Id.empty() || !StorageService()->UserDB().GetUserById(Id, UInfo)) {
-            return NotFound();
-        }
 
         std::stringstream SS;
         AvatarPartHandler partHandler(Id, Logger_, SS);
@@ -70,13 +66,14 @@ namespace OpenWifi {
     void RESTAPI_avatar_handler::DoDelete() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
 
-        if (Id.empty()) {
-            return NotFound();
+        if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && Id!=UserInfo_.userinfo.Id) {
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
         if (!StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email, Id)) {
             return NotFound();
         }
+
         StorageService()->UserDB().SetAvatar(Id,"");
         OK();
     }

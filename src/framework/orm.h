@@ -162,21 +162,20 @@ namespace ORM {
             const FieldVec & Fields,
             const IndexVec & Indexes,
             Poco::Data::SessionPool & Pool,
-                Poco::Logger &L,
-                const char *Prefix):
+            Poco::Logger &L,
+            const char *Prefix):
                 Type_(dbtype),
                 DBName_(TableName),
                 Pool_(Pool),
                 Logger_(L),
                 Prefix_(Prefix)
         {
+            assert(RecordTuple::length == Fields.size());
+
             bool first = true;
             int  Place=0;
 
-            assert( RecordTuple::length == Fields.size());
-
             for(const auto &i:Fields) {
-
                 FieldNames_[i.Name] = Place;
                 if(!first) {
                     CreateFields_ += ", ";
