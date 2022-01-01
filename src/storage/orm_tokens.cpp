@@ -119,11 +119,15 @@ namespace OpenWifi {
         std::cout << "Getting token: " << Value << std::endl;
         if(FieldName=="token") {
             auto Entry = CacheByToken_->get(Value);
-            if(Entry.isNull())
+            if(Entry.isNull()) {
+                std::cout << "Getting Token: " << Value << " not found in cache." << std::endl;
                 return false;
+            }
             R = *Entry;
+            std::cout << "Getting Token: " << Value << " found in cache." << std::endl;
             return true;
         }
+        std::cout << "Getting Token: " << FieldName << " not known." << std::endl;
         return false;
     }
 
