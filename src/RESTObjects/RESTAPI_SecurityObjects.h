@@ -17,6 +17,8 @@
 namespace OpenWifi {
     namespace SecurityObjects {
 
+        typedef std::string USER_ID_TYPE;
+
         struct AclTemplate {
             bool Read_ = true;
             bool ReadWrite_ = true;

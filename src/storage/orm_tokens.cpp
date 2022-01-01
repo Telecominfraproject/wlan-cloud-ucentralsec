@@ -3,6 +3,8 @@
 //
 
 #include "orm_tokens.h"
+#include "AuthService.h"
+#include "StorageService.h"
 
 /*
     "Token			    TEXT PRIMARY KEY, "
@@ -41,8 +43,9 @@ namespace OpenWifi {
     }
 
     BaseTokenDB::BaseTokenDB(const std::string &Name, const std::string &ShortName, OpenWifi::DBType T,
-                             Poco::Data::SessionPool &P, Poco::Logger &L) :
-            DB(T, Name.c_str(), BaseTokenDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str()) {
+                             Poco::Data::SessionPool &P, Poco::Logger &L, TokenCache *Cache, bool Users) :
+            DB(T, Name.c_str(), BaseTokenDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str(), Cache),
+            UsersOnly_(Users) {
     }
 
     bool BaseTokenDB::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
@@ -73,19 +76,13 @@ namespace OpenWifi {
         SecurityObjects::Token  T;
 
         if(GetRecord("token",Token,T)) {
-            return T.revocationDate!=0;
+            return false;
         }
-        return false;
+        return true;
     }
 
     bool BaseTokenDB::RevokeToken(std::string &Token) {
-        SecurityObjects::Token  T;
-
-        if(GetRecord("token", Token, T)) {
-            T.revocationDate = std::time(nullptr);
-            return UpdateRecord("token", Token, T);
-        }
-        return false;
+        return DeleteRecord("token", Token);
     }
 
     bool BaseTokenDB::CleanExpiredTokens() {
@@ -97,7 +94,57 @@ namespace OpenWifi {
     bool BaseTokenDB::RevokeAllTokens(std::string & UserId) {
         std::string WhereClause{" userName='" + UserId + "' "};
         DeleteRecords( WhereClause );
+        Cache_->Delete("userName", UserId);
         return true;
+    }
+
+    TokenCache::TokenCache(unsigned Size, unsigned TimeOut, bool Users) :
+            UsersOnly_(Users),
+            ORM::DBCache<SecurityObjects::Token>(Size,TimeOut) {
+        CacheByToken_ = std::make_unique<Poco::ExpireLRUCache<std::string,SecurityObjects::Token>>(Size,TimeOut);
+    }
+
+    void TokenCache::UpdateCache(const SecurityObjects::Token &R) {
+        std::lock_guard M(Mutex_);
+        std::cout << "Updating token: " << R.token << std::endl;
+        CacheByToken_->update(R.token,R);
+    }
+
+    void TokenCache::Create(const SecurityObjects::Token &R) {
+
+    }
+
+    bool TokenCache::GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::Token &R) {
+        std::lock_guard M(Mutex_);
+        std::cout << "Getting token: " << Value << std::endl;
+        if(FieldName=="token") {
+            auto Entry = CacheByToken_->get(Value);
+            if(Entry.isNull())
+                return false;
+            R = *Entry;
+            return true;
+        }
+        return false;
+    }
+
+    void TokenCache::Delete(const std::string &FieldName, const std::string &Value) {
+        std::lock_guard M(Mutex_);
+        std::cout << "Deleting token: " << Value << std::endl;
+        if(FieldName=="token") {
+            AuthService()->RemoveTokenSystemWide(Value);
+            CacheByToken_->remove(Value);
+        } else if(FieldName=="userName") {
+            std::vector<std::string>    TokenToRemove;
+
+            CacheByToken_->forEach([&TokenToRemove,Value](const std::string &Key, const SecurityObjects::Token &TokenRecord) {
+                if(TokenRecord.userName==Value)
+                    TokenToRemove.push_back(Key);
+            });
+            for(const auto &i:TokenToRemove) {
+                AuthService()->RemoveTokenSystemWide(i);
+                CacheByToken_->remove(i);
+            }
+        }
     }
 
 }

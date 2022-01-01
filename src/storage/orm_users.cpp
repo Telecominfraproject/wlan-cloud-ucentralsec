@@ -88,8 +88,9 @@ namespace OpenWifi {
         };
     }
 
-    BaseUserDB::BaseUserDB(const std::string &Name, const std::string & ShortName, OpenWifi::DBType T, Poco::Data::SessionPool &P, Poco::Logger &L) :
-            DB(T, Name.c_str(), BaseUserDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str()) {
+    BaseUserDB::BaseUserDB(const std::string &Name, const std::string & ShortName, OpenWifi::DBType T, Poco::Data::SessionPool &P, Poco::Logger &L, UserCache * Cache, bool Users) :
+            DB(T, Name.c_str(), BaseUserDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str(), Cache),
+            UsersOnly_(Users) {
     }
 
     bool BaseUserDB::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
@@ -173,7 +174,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo) {
+    bool BaseUserDB::UpdateUserInfo(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo) {
         try {
             return UpdateRecord("id", Id, UInfo);
         } catch (const Poco::Exception &E) {
@@ -182,22 +183,8 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::DeleteUser(const std::string & Admin, USER_ID_TYPE & Id)  {
-        try {
-            Poco::Data::Session Sess = Pool_.get();
-            Poco::Data::Statement Delete(Sess);
-            auto tId{Id};
-
-            std::string     St1{"delete from " + DBName_ + " where id=?"};
-
-            Delete << ConvertParams(St1),
-                    Poco::Data::Keywords::use(tId);
-            Delete.execute();
-            return true;
-        } catch (const Poco::Exception &E) {
-            Logger().log(E);
-        }
-        return false;
+    bool BaseUserDB::DeleteUser(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id)  {
+        return DeleteRecord("id", Id);
     }
 
     bool BaseUserDB::DeleteUsers(const std::string & Admin, std::string & owner) {
@@ -223,6 +210,64 @@ namespace OpenWifi {
             Logger().log(E);
         }
         return false;
+    }
+
+    UserCache::UserCache(unsigned Size, unsigned TimeOut, bool Users) :
+            UsersOnly_(Users),
+            ORM::DBCache<SecurityObjects::UserInfo>(Size,TimeOut) {
+        CacheById_ = std::make_unique<Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>>(Size,TimeOut);
+        CacheByEMail_ = std::make_unique<Poco::ExpireLRUCache<std::string,std::string>>(Size,TimeOut);
+    }
+
+    void UserCache::UpdateCache(const SecurityObjects::UserInfo &R) {
+        std::cout << "Update user cache:" << R.Id << std::endl;
+        CacheById_->update(R.Id,R);
+        CacheByEMail_->update(R.email,R.Id);
+        if(UsersOnly_)
+            StorageService()->UserTokenDB().DeleteRecordsFromCache("userName", R.Id);
+        else
+            StorageService()->SubTokenDB().DeleteRecordsFromCache("userName", R.Id);
+    }
+
+    inline void UserCache::Create(const SecurityObjects::UserInfo &R)  {
+    }
+
+    inline bool UserCache::GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::UserInfo &R) {
+        std::lock_guard     M(Mutex_);
+        if(FieldName=="id") {
+            auto Entry = CacheById_->get(Value);
+            if(Entry.isNull())
+                return false;
+            R = *Entry;
+            return true;
+        } else if(FieldName=="email") {
+            auto Entry = CacheByEMail_->get(Value);
+            if(Entry.isNull())
+                return false;
+            auto Record = CacheById_->get(*Entry);
+            if(Record.isNull())
+                return false;
+            R = *Record;
+            return true;
+        }
+        return false;
+    }
+
+    inline void UserCache::Delete(const std::string &FieldName, const std::string &Value) {
+    std::lock_guard     M(Mutex_);
+        std::cout << "Delete user cache:" << Value << std::endl;
+        if(FieldName=="id") {
+            auto  E = CacheById_->get(Value);
+            if(!E.isNull())
+                CacheByEMail_->remove(E->email);
+            CacheById_->remove(Value);
+        } else if(FieldName=="email") {
+            auto E = CacheByEMail_->get(Value);
+            if(!E.isNull()) {
+                CacheById_->remove(*E);
+                CacheByEMail_->remove(Value);
+            }
+        }
     }
 }
 

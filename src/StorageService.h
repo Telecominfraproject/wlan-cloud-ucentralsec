@@ -58,6 +58,11 @@ namespace OpenWifi {
         std::unique_ptr<OpenWifi::ActionLinkDB>         ActionLinksDB_;
         std::unique_ptr<OpenWifi::AvatarDB>             AvatarDB_;
 
+        std::unique_ptr<OpenWifi::UserCache>            UserCache_;
+        std::unique_ptr<OpenWifi::UserCache>            SubCache_;
+        std::unique_ptr<OpenWifi::TokenCache>           UserTokenCache_;
+        std::unique_ptr<OpenWifi::TokenCache>           SubTokenCache_;
+
         Poco::Timer                     Timer_;
         Archiver                        Archiver_;
         std::unique_ptr<Poco::TimerCallback<Archiver>>   Archivercallback_;

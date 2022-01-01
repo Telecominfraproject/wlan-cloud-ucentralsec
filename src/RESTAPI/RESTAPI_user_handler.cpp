@@ -59,14 +59,9 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        if(AuthService()->DeleteUserFromCache(Id)) {
-            // nothing to do
-        }
-
+        AuthService()->DeleteUserFromCache(Id);
         StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email,Id);
         StorageService()->PreferencesDB().DeletePreferences(UserInfo_.userinfo.email,Id);
-
-        Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
         StorageService()->UserTokenDB().RevokeAllTokens(UInfo.email);
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
         OK();
@@ -232,7 +227,6 @@ namespace OpenWifi {
         if(StorageService()->UserDB().UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
             SecurityObjects::UserInfo   NewUserInfo;
             StorageService()->UserDB().GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
-            AuthService()->UpdateUserCache(NewUserInfo);
             Poco::JSON::Object  ModifiedObject;
             FilterCredentials(NewUserInfo);
             NewUserInfo.to_json(ModifiedObject);

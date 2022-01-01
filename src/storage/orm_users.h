@@ -9,41 +9,6 @@
 
 namespace OpenWifi {
 
-    enum USER_TYPE {
-        UNKNOWN, ROOT, ADMIN, SUBSCRIBER, CSR, SYSTEM, SPECIAL
-    };
-
-    typedef std::string USER_ID_TYPE;
-
-    inline USER_TYPE to_userType(const std::string &U) {
-        if (U=="root")
-            return ROOT;
-        else if (U=="admin")
-            return ADMIN;
-        else if (U=="subscriber")
-            return SUBSCRIBER;
-        else if (U=="csr")
-            return CSR;
-        else if (U=="system")
-            return SYSTEM;
-        else if (U=="SPECIAL")
-            return SPECIAL;
-        return UNKNOWN;
-    }
-
-    inline std::string from_userType(USER_TYPE U) {
-        switch(U) {
-            case ROOT: return "root";
-            case ADMIN: return "admin";
-            case SUBSCRIBER: return "subscriber";
-            case CSR: return "csr";
-            case SYSTEM: return "system";
-            case SPECIAL: return "special";
-            case UNKNOWN:
-            default: return "unknown";
-        }
-    }
-
     typedef Poco::Tuple<
             std::string,    // Id = 0;
             std::string,    // name;
@@ -79,21 +44,36 @@ namespace OpenWifi {
 
     typedef std::vector <UserInfoRecordTuple> UserInfoRecordTupleList;
 
+    class UserCache : public ORM::DBCache<SecurityObjects::UserInfo> {
+    public:
+        UserCache(unsigned Size, unsigned TimeOut, bool Users);
+        void UpdateCache(const SecurityObjects::UserInfo &R) override;
+        void Create(const SecurityObjects::UserInfo &R) override;
+        bool GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::UserInfo &R) override;
+        void Delete(const std::string &FieldName, const std::string &Value) override;
+    private:
+        std::mutex  Mutex_;
+        bool        UsersOnly_;
+        std::unique_ptr<Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>>    CacheById_;
+        std::unique_ptr<Poco::ExpireLRUCache<std::string,std::string>>                  CacheByEMail_;
+
+    };
+
     class BaseUserDB : public ORM::DB<UserInfoRecordTuple, SecurityObjects::UserInfo> {
     public:
-        BaseUserDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        BaseUserDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L, UserCache * Cache, bool users);
 
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false );
         bool GetUserByEmail(const std::string & email, SecurityObjects::UserInfo & User);
         bool GetUserById(const std::string &Id, SecurityObjects::UserInfo &User);
         bool GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users, std::string WhereClause="");
-        bool UpdateUserInfo(const std::string & Admin, USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
-        bool DeleteUser(const std::string & Admin, USER_ID_TYPE & Id);
+        bool UpdateUserInfo(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
+        bool DeleteUser(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id);
         bool DeleteUsers(const std::string & Admin, std::string & owner);
         bool SetLastLogin(const std::string &Id);
         bool SetAvatar(const std::string &Id, const std::string &Value);
 
-    private:
+        bool UsersOnly_;
     };
 
 }

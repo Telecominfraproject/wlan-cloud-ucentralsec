@@ -155,6 +155,20 @@ namespace ORM {
         return S;
     }
 
+    template <typename RecordType> class DBCache {
+    public:
+        DBCache(unsigned Size, unsigned Timeout)
+        {
+
+        }
+        virtual void Create(const RecordType &R)=0;
+        virtual bool GetFromCache(const std::string &FieldName, const std::string &Value, RecordType &R)=0;
+        virtual void UpdateCache(const RecordType &R)=0;
+        virtual void Delete(const std::string &FieldName, const std::string &Value)=0;
+    private:
+
+    };
+
     template <typename RecordTuple, typename RecordType> class DB {
     public:
         DB( OpenWifi::DBType dbtype,
@@ -163,12 +177,14 @@ namespace ORM {
             const IndexVec & Indexes,
             Poco::Data::SessionPool & Pool,
             Poco::Logger &L,
-            const char *Prefix):
+            const char *Prefix,
+            DBCache<RecordType> * Cache=nullptr):
                 Type_(dbtype),
                 DBName_(TableName),
                 Pool_(Pool),
                 Logger_(L),
-                Prefix_(Prefix)
+                Prefix_(Prefix),
+                Cache_(Cache)
         {
             assert(RecordTuple::length == Fields.size());
 
@@ -373,7 +389,11 @@ namespace ORM {
                 Insert  << ConvertParams(St) ,
                     Poco::Data::Keywords::use(RT);
                 Insert.execute();
+
+                if(Cache_)
+                    Cache_->Create(R);
                 return true;
+
             } catch (const Poco::Exception &E) {
                 Logger_.log(E);
             }
@@ -382,8 +402,12 @@ namespace ORM {
 
         template<typename T> bool GetRecord( const char * FieldName, T Value,  RecordType & R) {
             try {
-
                 assert( FieldNames_.find(FieldName) != FieldNames_.end() );
+
+                if(Cache_) {
+                    if(Cache_->GetFromCache("id",Value,R))
+                        return true;
+                }
 
                 Poco::Data::Session     Session = Pool_.get();
                 Poco::Data::Statement   Select(Session);
@@ -396,6 +420,8 @@ namespace ORM {
                     Poco::Data::Keywords::use(Value);
                 if(Select.execute()==1) {
                     Convert(RT,R);
+                    if(Cache_)
+                        Cache_->UpdateCache(R);
                     return true;
                 }
                 return false;
@@ -480,6 +506,8 @@ namespace ORM {
                     Poco::Data::Keywords::use(RT),
                     Poco::Data::Keywords::use(Value);
                 Update.execute();
+                if(Cache_)
+                    Cache_->UpdateCache(R);
                 return true;
             } catch (const Poco::Exception &E) {
                 Logger_.log(E);
@@ -535,6 +563,8 @@ namespace ORM {
                 Delete  << ConvertParams(St) ,
                     Poco::Data::Keywords::use(Value);
                 Delete.execute();
+                if(Cache_)
+                    Cache_->Delete(FieldName, Value);
                 return true;
             } catch (const Poco::Exception &E) {
                 Logger_.log(E);
@@ -784,10 +814,17 @@ namespace ORM {
 
         Poco::Logger & Logger() { return Logger_; }
 
+        bool DeleteRecordsFromCache(const char *FieldName, const std::string &Value ) {
+            if(Cache_)
+                Cache_->Delete(FieldName, Value);
+            return true;
+        }
+
     protected:
         Poco::Data::SessionPool     &Pool_;
         Poco::Logger                &Logger_;
         std::string                 DBName_;
+        DBCache<RecordType>         *Cache_= nullptr;
     private:
         OpenWifi::DBType            Type_;
         std::string                 CreateFields_;
@@ -796,7 +833,6 @@ namespace ORM {
         std::string                 UpdateFields_;
         std::vector<std::string>    IndexCreation_;
         std::map<std::string,int>   FieldNames_;
-        // Poco::Data::SessionPool     &Pool_;
         std::string                 Prefix_;
     };
 }

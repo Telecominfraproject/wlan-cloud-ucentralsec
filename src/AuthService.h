@@ -44,8 +44,8 @@ namespace OpenWifi{
         static ACCESS_TYPE IntToAccessType(int C);
         static int AccessTypeToInt(ACCESS_TYPE T);
 
-        static AuthService *instance() {
-            static auto * instance_ = new AuthService;
+        static auto instance() {
+            static auto instance_ = new AuthService;
             return instance_;
         }
 
@@ -59,20 +59,14 @@ namespace OpenWifi{
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
         void Logout(const std::string &token, bool EraseFromCache=true);
 
-        inline void UpdateUserCache(const SecurityObjects::UserInfo &UI) {
-            UserCacheIDToUserInfo_.update(UI.Id,UI);
-        }
-
-        inline void UpdateSubUserCache(const SecurityObjects::UserInfo &UI) {
-            SubUserCacheIDToUserInfo_.update(UI.Id,UI);
-        }
-
         [[nodiscard]] bool IsSubAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired);
         [[nodiscard]] UNAUTHORIZED_REASON AuthorizeSub( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired );
         void CreateSubToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool SetSubPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
         [[nodiscard]] const std:: string & SubPasswordValidationExpression() const { return PasswordValidationStr_;};
         void SubLogout(const std::string &token, bool EraseFromCache=true);
+
+        void RemoveTokenSystemWide(const std::string &token);
 
         bool ValidatePassword(const std::string &pwd);
         bool ValidateSubPassword(const std::string &pwd);
@@ -97,10 +91,10 @@ namespace OpenWifi{
 
         [[nodiscard]] static bool SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
         [[nodiscard]] static bool SendEmailToSubUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
-        [[nodiscard]] bool DeleteUserFromCache(const std::string &UserName);
-        [[nodiscard]] bool DeleteSubUserFromCache(const std::string &UserName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
 
+        bool DeleteUserFromCache(const std::string &UserName);
+        bool DeleteSubUserFromCache(const std::string &UserName);
         void RevokeToken(std::string & Token);
         void RevokeSubToken(std::string & Token);
 
@@ -121,17 +115,6 @@ namespace OpenWifi{
     private:
 		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
-
-        struct SharedTokenID {
-            SecurityObjects::WebToken   WT;     //  Web token
-            std::string                 ID;     //  user.Id
-        };
-
-        Poco::ExpireLRUCache<std::string,SharedTokenID>                UserCacheTokenToSharedID_{256,1200000};
-        Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>    UserCacheIDToUserInfo_{256,1200000};
-
-        Poco::ExpireLRUCache<std::string,SharedTokenID>                SubUserCacheTokenToSharedID_{4096,1200000};
-        Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>    SubUserCacheIDToUserInfo_{4096,1200000};
 
 		std::string         AccessPolicy_;
 		std::string         PasswordPolicy_;
@@ -169,7 +152,7 @@ namespace OpenWifi{
         }
     };
 
-    inline AuthService * AuthService() { return AuthService::instance(); }
+    inline auto AuthService() { return AuthService::instance(); }
 
     [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired, bool Sub ) {
         if(Sub)

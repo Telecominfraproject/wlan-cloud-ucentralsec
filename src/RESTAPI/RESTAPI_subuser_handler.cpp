@@ -234,7 +234,6 @@ namespace OpenWifi {
         if(StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
             SecurityObjects::UserInfo   NewUserInfo;
             StorageService()->SubDB().GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
-            AuthService()->UpdateSubUserCache(NewUserInfo);
             Poco::JSON::Object  ModifiedObject;
             FilterCredentials(NewUserInfo);
             NewUserInfo.to_json(ModifiedObject);
