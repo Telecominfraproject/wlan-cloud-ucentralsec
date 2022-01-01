@@ -185,7 +185,7 @@ namespace OpenWifi {
 
         try {
             auto tToken{Token};
-            StorageService()->UserTokenDB().DeleteRecord("id",tToken);
+            StorageService()->UserTokenDB().DeleteRecord("token",tToken);
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }
@@ -196,7 +196,7 @@ namespace OpenWifi {
 
         try {
             auto tToken{Token};
-            StorageService()->SubTokenDB().DeleteRecord("id",tToken);
+            StorageService()->SubTokenDB().DeleteRecord("token",tToken);
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }
