@@ -16,10 +16,10 @@ namespace OpenWifi {
 
 		StorageClass::Start();
 
-        UserCache_ = std::make_unique<OpenWifi::UserCache>(64,900000,true);
-        SubCache_ = std::make_unique<OpenWifi::UserCache>(2048,900000,false);
-        UserTokenCache_ = std::make_unique<OpenWifi::TokenCache>(64,900000, true);
-        SubTokenCache_ = std::make_unique<OpenWifi::TokenCache>(2048,900000,false);
+        UserCache_ = std::make_unique<OpenWifi::UserCache>(64,1200000,true);
+        SubCache_ = std::make_unique<OpenWifi::UserCache>(2048,1200000,false);
+        UserTokenCache_ = std::make_unique<OpenWifi::TokenCache>(64,1200000, true);
+        SubTokenCache_ = std::make_unique<OpenWifi::TokenCache>(2048,1200000,false);
 
         UserDB_ = std::make_unique<OpenWifi::BaseUserDB>("Users", "usr", dbType_,*Pool_, Logger(), UserCache_.get(), true);
         SubDB_ = std::make_unique<OpenWifi::BaseUserDB>("Subscribers", "sub", dbType_,*Pool_, Logger(), SubCache_.get(), false);

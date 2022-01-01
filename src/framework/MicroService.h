@@ -2358,6 +2358,7 @@ namespace OpenWifi {
 	    }
 
 	    inline void Stop() override {
+            std::lock_guard	G(Mutex_);
 	        Cache_.clear();
 	    }
 
@@ -2387,6 +2388,7 @@ namespace OpenWifi {
 	                        return false;
 	                    }
 	                    Expired = false;
+                        std::lock_guard	G(Mutex_);
 	                    Cache_.update(SessionToken, UInfo);
 	                    return true;
 	                }
@@ -2399,6 +2401,7 @@ namespace OpenWifi {
 	    }
 
         inline bool IsAuthorized(const std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired, bool Sub = false) {
+            std::lock_guard	G(Mutex_);
 	        auto User = Cache_.get(SessionToken);
 	        if(!User.isNull()) {
 	            if(IsTokenExpired(User->webtoken)) {
@@ -2413,7 +2416,7 @@ namespace OpenWifi {
 	    }
 
 	private:
-	    Poco::ExpireLRUCache<std::string,OpenWifi::SecurityObjects::UserInfoAndPolicy>      Cache_{1024,1200000 };
+	    Poco::ExpireLRUCache<std::string,OpenWifi::SecurityObjects::UserInfoAndPolicy>      Cache_{512,1200000 };
 	};
 
 	inline auto AuthClient() { return AuthClient::instance(); }
@@ -2427,7 +2430,7 @@ namespace OpenWifi {
 	            {
 	            }
 
-	            void handleRequest(Poco::Net::HTTPServerRequest& Request, Poco::Net::HTTPServerResponse& Response)
+	            void handleRequest(Poco::Net::HTTPServerRequest& Request, Poco::Net::HTTPServerResponse& Response) override
 	            {
 	                Logger_.information(Poco::format("ALB-REQUEST(%s): New ALB request.",Request.clientAddress().toString()));
 	                Response.setChunkedTransferEncoding(true);
@@ -2669,8 +2672,6 @@ namespace OpenWifi {
 		uint64_t 		LastUpdate=0;
 	};
 
-
-
 	class SubSystemServer;
 	typedef std::map<uint64_t, MicroServiceMeta>	MicroServiceMetaMap;
 	typedef std::vector<MicroServiceMeta>			MicroServiceMetaVec;
@@ -2728,7 +2729,7 @@ namespace OpenWifi {
             return Poco::Logger::get(Name);
         }
 
-		inline void Exit(int Reason);
+		static inline void Exit(int Reason);
 		inline void BusMessageReceived(const std::string &Key, const std::string & Message);
 		inline MicroServiceMetaVec GetServices(const std::string & Type);
 		inline MicroServiceMetaVec GetServices();
