@@ -405,7 +405,7 @@ namespace ORM {
                 assert( FieldNames_.find(FieldName) != FieldNames_.end() );
 
                 if(Cache_) {
-                    if(Cache_->GetFromCache("id",Value,R))
+                    if(Cache_->GetFromCache(FieldName, Value, R))
                         return true;
                 }
 
