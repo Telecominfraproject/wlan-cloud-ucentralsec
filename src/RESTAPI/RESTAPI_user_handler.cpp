@@ -62,7 +62,7 @@ namespace OpenWifi {
         AuthService()->DeleteUserFromCache(Id);
         StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email,Id);
         StorageService()->PreferencesDB().DeletePreferences(UserInfo_.userinfo.email,Id);
-        StorageService()->UserTokenDB().RevokeAllTokens(UInfo.email);
+        StorageService()->UserTokenDB().RevokeAllTokens(Id);
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
         OK();
     }
