@@ -6,6 +6,7 @@
 #include "StorageService.h"
 #include "framework/RESTAPI_protocol.h"
 #include "framework/MicroService.h"
+#include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi {
     void RESTAPI_users_handler::DoGet() {
@@ -21,9 +22,7 @@ namespace OpenWifi {
                     if (IdOnly) {
                         ArrayObj.add(i.Id);
                     } else {
-                        i.currentPassword.clear();
-                        i.lastPasswords.clear();
-                        i.oauthType.clear();
+                        Sanitize(UserInfo_, i);
                         i.to_json(Obj);
                         ArrayObj.add(Obj);
                     }
@@ -41,9 +40,7 @@ namespace OpenWifi {
                     if (IdOnly) {
                         ArrayObj.add(UInfo.Id);
                     } else {
-                        UInfo.currentPassword.clear();
-                        UInfo.lastPasswords.clear();
-                        UInfo.oauthType.clear();
+                        Sanitize(UserInfo_, UInfo);
                         UInfo.to_json(Obj);
                         ArrayObj.add(Obj);
                     }

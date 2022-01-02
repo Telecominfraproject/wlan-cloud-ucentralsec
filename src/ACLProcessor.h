@@ -17,21 +17,61 @@ namespace OpenWifi {
             DELETE,
             CREATE
         };
+/*
+    1) You cannot delete yourself
+    2) If you are root, you can do anything.
+    3) You can do anything to yourself
+    4) Nobody can touch a root, unless they are a root, unless it is to get information on a ROOT
+    5) Creation rules:
+        ROOT -> create anything
+        PARTNER -> (multi-tenant owner) admin,subs,csr,installer,noc,accounting - matches to an entity in provisioning
+        ADMIN -> admin-subs-csr-installer-noc-accounting
+        ACCOUNTING -> subs-installer-csr
+
+ */
         static inline bool Can( const SecurityObjects::UserInfo & User, const SecurityObjects::UserInfo & Target, ACL_OPS Op) {
+            //  rule 1
             if(User.Id == Target.Id && Op==DELETE)
                 return false;
 
+            //  rule 2
             if(User.userRole==SecurityObjects::ROOT)
                 return true;
 
+            //  rule 3
             if(User.Id == Target.Id)
                 return true;
 
-            if(User.userRole!=SecurityObjects::ADMIN && User.userRole!=SecurityObjects::ROOT && Op!=READ)
-                return false;
-
+            //  rule 4
             if(Target.userRole==SecurityObjects::ROOT && Op!=READ)
                 return false;
+
+            if(Op==CREATE) {
+                if(User.userRole==SecurityObjects::ROOT)
+                    return true;
+                if(User.userRole==SecurityObjects::PARTNER && (Target.userRole==SecurityObjects::ADMIN ||
+                    Target.userRole==SecurityObjects::SUBSCRIBER ||
+                    Target.userRole==SecurityObjects::CSR ||
+                    Target.userRole==SecurityObjects::INSTALLER ||
+                    Target.userRole==SecurityObjects::NOC ||
+                    Target.userRole==SecurityObjects::ACCOUNTING))
+                    return true;
+                if(User.userRole==SecurityObjects::ADMIN &&
+                    (Target.userRole==SecurityObjects::ADMIN ||
+                    Target.userRole==SecurityObjects::SUBSCRIBER ||
+                    Target.userRole==SecurityObjects::CSR ||
+                    Target.userRole==SecurityObjects::INSTALLER ||
+                    Target.userRole==SecurityObjects::NOC ||
+                    Target.userRole==SecurityObjects::ACCOUNTING))
+                    return true;
+                if(User.userRole==SecurityObjects::ACCOUNTING &&
+                    (Target.userRole==SecurityObjects::SUBSCRIBER ||
+                    Target.userRole==SecurityObjects::INSTALLER ||
+                    Target.userRole==SecurityObjects::CSR))
+                    return true;
+                return false;
+            }
+
 
             return true;
         }

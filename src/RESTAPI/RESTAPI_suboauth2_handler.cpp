@@ -3,20 +3,14 @@
 //
 
 #include "RESTAPI_suboauth2_handler.h"
-#include "Daemon.h"
 #include "AuthService.h"
 #include "MFAServer.h"
 #include "framework/RESTAPI_protocol.h"
 #include "framework/MicroService.h"
 #include "StorageService.h"
+#include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi {
-
-    static void FilterCredentials(SecurityObjects::UserInfo & U) {
-        U.currentPassword.clear();
-        U.lastPasswords.clear();
-        U.oauthType.clear();
-    }
 
     void RESTAPI_suboauth2_handler::DoGet() {
         bool Expired = false;
@@ -30,7 +24,7 @@ namespace OpenWifi {
             Logger_.information(Poco::format("REQUEST-ME(%s): Request for %s", Request->clientAddress().toString(), UserInfo_.userinfo.email));
             Poco::JSON::Object Me;
             SecurityObjects::UserInfo   ReturnedUser = UserInfo_.userinfo;
-            FilterCredentials(ReturnedUser);
+            Sanitize(UserInfo_, ReturnedUser);
             ReturnedUser.to_json(Me);
             return ReturnObject(Me);
         }

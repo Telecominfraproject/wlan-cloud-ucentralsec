@@ -8,14 +8,9 @@
 #include "SMSSender.h"
 #include "ACLProcessor.h"
 #include "AuthService.h"
+#include "RESTAPI/RESTAPI_db_helpers.h"
 
 namespace OpenWifi {
-
-    static void FilterCredentials(SecurityObjects::UserInfo & U) {
-        U.currentPassword.clear();
-        U.lastPasswords.clear();
-        U.oauthType.clear();
-    }
 
     void RESTAPI_subuser_handler::DoGet() {
         std::string Id = GetBinding("id", "");
@@ -35,7 +30,7 @@ namespace OpenWifi {
         }
 
         Poco::JSON::Object  UserInfoObject;
-        FilterCredentials(UInfo);
+        Sanitize(UserInfo_, UInfo);
         UInfo.to_json(UserInfoObject);
         ReturnObject(UserInfoObject);
     }
@@ -82,11 +77,16 @@ namespace OpenWifi {
         SecurityObjects::UserInfo   NewUser;
         RESTAPI_utils::from_request(NewUser,*Request);
         if(NewUser.userRole == SecurityObjects::UNKNOWN || NewUser.userRole != SecurityObjects::SUBSCRIBER) {
-            return BadRequest(RESTAPI::Errors::InvalidUserRole);
+            return BadRequest(RESTAPI::Errors::EntityMustExist);
+        }
+
+        NewUser.owner = UserInfo_.userinfo.owner;
+        if(NewUser.owner.empty()) {
+            return BadRequest("Owner must be set for a subscriber.");
         }
 
         if(!ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
-            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
         Poco::toLowerInPlace(NewUser.email);
@@ -120,7 +120,7 @@ namespace OpenWifi {
         }
 
         Poco::JSON::Object  UserInfoObject;
-        FilterCredentials(NewUser);
+        Sanitize(UserInfo_, NewUser);
         NewUser.to_json(UserInfoObject);
         ReturnObject(UserInfoObject);
         Logger_.information(Poco::format("User '%s' has been added by '%s')",NewUser.email, UserInfo_.userinfo.email));
@@ -157,7 +157,7 @@ namespace OpenWifi {
         // The only valid things to change are: changePassword, name,
         AssignIfPresent(RawObject,"name", Existing.name);
         AssignIfPresent(RawObject,"description", Existing.description);
-        AssignIfPresent(RawObject,"owner", Existing.owner);
+        // AssignIfPresent(RawObject,"owner", Existing.owner);
         AssignIfPresent(RawObject,"location", Existing.location);
         AssignIfPresent(RawObject,"locale", Existing.locale);
         AssignIfPresent(RawObject,"changePassword", Existing.changePassword);
@@ -233,9 +233,9 @@ namespace OpenWifi {
 
         if(StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
             SecurityObjects::UserInfo   NewUserInfo;
-            StorageService()->SubDB().GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
+            StorageService()->SubDB().GetUserById(Id,NewUserInfo);
             Poco::JSON::Object  ModifiedObject;
-            FilterCredentials(NewUserInfo);
+            Sanitize(UserInfo_, NewUserInfo);
             NewUserInfo.to_json(ModifiedObject);
             return ReturnObject(ModifiedObject);
         }
