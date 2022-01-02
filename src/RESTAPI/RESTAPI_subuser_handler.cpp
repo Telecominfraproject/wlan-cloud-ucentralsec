@@ -58,12 +58,10 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        if(AuthService()->DeleteSubUserFromCache(Id)) {
-            // nothing to do
-        }
-
-        Logger_.information(Poco::format("Remove all tokens for '%s'", UserInfo_.userinfo.email));
+        AuthService()->DeleteSubUserFromCache(Id);
         StorageService()->SubTokenDB().RevokeAllTokens(TargetUser.email);
+        StorageService()->PreferencesDB().DeleteRecord("id",Id);
+
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
         OK();
     }
@@ -103,7 +101,7 @@ namespace OpenWifi {
         if(NewUser.name.empty())
             NewUser.name = NewUser.email;
 
-        if(!StorageService()->SubDB().CreateUser(NewUser.email,NewUser)) {
+        if(!StorageService()->SubDB().CreateUser(NewUser.email, NewUser)) {
             Logger_.information(Poco::format("Could not add user '%s'.",NewUser.email));
             return BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
@@ -221,13 +219,13 @@ namespace OpenWifi {
 
             if(!NewUser.userTypeProprietaryInfo.mfa.method.empty()) {
                 if(NewUser.userTypeProprietaryInfo.mfa.method!="email" && NewUser.userTypeProprietaryInfo.mfa.method!="sms" ) {
-                    return BadRequest("Unknown MFA method");
+                    return BadRequest(RESTAPI::Errors::BadMFAMethod);
                 }
                 Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
             }
 
             if(Existing.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mfa.method.empty()) {
-                return BadRequest("Illegal MFA method");
+                return BadRequest(RESTAPI::Errors::BadMFAMethod);
             }
         }
 

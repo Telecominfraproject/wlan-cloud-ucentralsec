@@ -86,7 +86,7 @@ namespace OpenWifi {
         }
 
         if(!ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
-            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
         Poco::toLowerInPlace(NewUser.email);
@@ -225,13 +225,14 @@ namespace OpenWifi {
 
             if(!NewUser.userTypeProprietaryInfo.mfa.method.empty()) {
                 if(NewUser.userTypeProprietaryInfo.mfa.method!="email" && NewUser.userTypeProprietaryInfo.mfa.method!="sms" ) {
-                    return BadRequest("Unknown MFA method");
+                    return BadRequest(RESTAPI::Errors::BadMFAMethod);
+
                 }
                 Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
             }
 
             if(Existing.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mfa.method.empty()) {
-                return BadRequest("Illegal MFA method");
+                return BadRequest(RESTAPI::Errors::BadMFAMethod);
             }
         }
 
