@@ -68,6 +68,7 @@ using namespace std::chrono_literals;
 #include "Poco/PatternFormatter.h"
 #include "Poco/FileChannel.h"
 #include "Poco/SimpleFileChannel.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
 
 #include "cppkafka/cppkafka.h"
 
@@ -2772,6 +2773,7 @@ namespace OpenWifi {
 		inline int main(const ArgVec &args) override;
 		static MicroService & instance() { return *instance_; }
         inline void InitializeLoggingSystem();
+        inline void SaveConfig() { PropConfigurationFile_->save(ConfigFileName_); }
 
 	  private:
 	    static MicroService         * instance_;
@@ -2797,7 +2799,7 @@ namespace OpenWifi {
 		BusEventManager				BusEventManager_;
 		std::mutex 					InfraMutex_;
 		std::default_random_engine  RandomEngine_;
-
+        Poco::Util::PropertyFileConfiguration   * PropConfigurationFile_ = nullptr;
 		std::string DAEMON_PROPERTIES_FILENAME;
 		std::string DAEMON_ROOT_ENV_VAR;
 		std::string DAEMON_CONFIG_ENV_VAR;
@@ -2904,9 +2906,8 @@ namespace OpenWifi {
 
 	inline void MicroService::LoadConfigurationFile() {
 	    std::string Location = Poco::Environment::get(DAEMON_CONFIG_ENV_VAR,".");
-	    Poco::Path ConfigFile;
-
-	    ConfigFile = ConfigFileName_.empty() ? Location + "/" + DAEMON_PROPERTIES_FILENAME : ConfigFileName_;
+        ConfigFileName_ = ConfigFileName_.empty() ? Location + "/" + DAEMON_PROPERTIES_FILENAME : ConfigFileName_;
+        Poco::Path ConfigFile(ConfigFileName_);
 
 	    if(!ConfigFile.isFile())
 	    {
@@ -2916,7 +2917,9 @@ namespace OpenWifi {
 	        std::exit(Poco::Util::Application::EXIT_CONFIG);
 	    }
 
-	    loadConfiguration(ConfigFile.toString());
+        // 	    loadConfiguration(ConfigFile.toString());
+        PropConfigurationFile_ = new Poco::Util::PropertyFileConfiguration(ConfigFile.toString());
+        configPtr()->add(PropConfigurationFile_);
 	}
 
 	inline void MicroService::Reload() {
