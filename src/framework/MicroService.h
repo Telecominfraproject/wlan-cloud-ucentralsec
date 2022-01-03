@@ -2919,7 +2919,7 @@ namespace OpenWifi {
 
         // 	    loadConfiguration(ConfigFile.toString());
         PropConfigurationFile_ = new Poco::Util::PropertyFileConfiguration(ConfigFile.toString());
-        configPtr()->add(PropConfigurationFile_);
+        configPtr()->addWriteable(PropConfigurationFile_, PRIO_DEFAULT);
 	}
 
 	inline void MicroService::Reload() {
