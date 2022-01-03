@@ -27,7 +27,7 @@ namespace OpenWifi {
             Enabled_ = ProviderImpl_->Initialize();
         }
 
-        MicroService::instance().config().setString("new.value", "hello");
+        MicroService::instance().UpdateConfig()->setString("new.value", "hello");
         MicroService::instance().SaveConfig();
 
         return 0;

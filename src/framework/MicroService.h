@@ -2774,7 +2774,7 @@ namespace OpenWifi {
 		static MicroService & instance() { return *instance_; }
         inline void InitializeLoggingSystem();
         inline void SaveConfig() { PropConfigurationFile_->save(ConfigFileName_); }
-
+        inline auto UpdateConfig() { return PropConfigurationFile_; }
 	  private:
 	    static MicroService         * instance_;
 		bool                        HelpRequested_ = false;
