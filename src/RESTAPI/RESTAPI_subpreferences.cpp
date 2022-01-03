@@ -2,20 +2,20 @@
 // Created by stephane bourque on 2021-11-16.
 //
 
-#include "RESTAPI_preferences.h"
+#include "RESTAPI_subpreferences.h"
 #include "StorageService.h"
 
 namespace OpenWifi {
 
-    void RESTAPI_preferences::DoGet() {
+    void RESTAPI_subpreferences::DoGet() {
         SecurityObjects::Preferences    P;
         Poco::JSON::Object  Answer;
-        StorageService()->PreferencesDB().GetPreferences(UserInfo_.userinfo.Id, P);
+        StorageService()->SubPreferencesDB().GetPreferences(UserInfo_.userinfo.Id, P);
         P.to_json(Answer);
         ReturnObject(Answer);
     }
 
-    void RESTAPI_preferences::DoPut() {
+    void RESTAPI_subpreferences::DoPut() {
 
         SecurityObjects::Preferences    P;
 
@@ -26,7 +26,7 @@ namespace OpenWifi {
 
         P.id = UserInfo_.userinfo.Id;
         P.modified = std::time(nullptr);
-        StorageService()->PreferencesDB().SetPreferences(P);
+        StorageService()->SubPreferencesDB().SetPreferences(P);
 
         Poco::JSON::Object  Answer;
         P.to_json(Answer);

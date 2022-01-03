@@ -27,16 +27,20 @@ namespace OpenWifi {
         SubTokenDB_ = std::make_unique<OpenWifi::BaseTokenDB>("SubTokens", "stk", dbType_,*Pool_, Logger(), SubTokenCache_.get(), false);
 
         PreferencesDB_ = std::make_unique<OpenWifi::PreferencesDB>("Preferences", "pre", dbType_,*Pool_, Logger());
+        SubPreferencesDB_ = std::make_unique<OpenWifi::PreferencesDB>("SubPreferences", "prs", dbType_,*Pool_, Logger());
         ActionLinksDB_ = std::make_unique<OpenWifi::ActionLinkDB>("Actions", "act", dbType_,*Pool_, Logger());
         AvatarDB_ = std::make_unique<OpenWifi::AvatarDB>("Avatars", "ava", dbType_,*Pool_, Logger());
+        SubAvatarDB_ = std::make_unique<OpenWifi::AvatarDB>("SubAvatars", "avs", dbType_,*Pool_, Logger());
 
         UserDB_->Create();
         SubDB_->Create();
         UserTokenDB_->Create();
         SubTokenDB_->Create();
-        PreferencesDB_->Create();
         ActionLinksDB_->Create();
+        PreferencesDB_->Create();
+        SubPreferencesDB_->Create();
         AvatarDB_->Create();
+        SubAvatarDB_->Create();
 
 		OpenWifi::SpecialUserHelpers::InitializeDefaultUser();
 

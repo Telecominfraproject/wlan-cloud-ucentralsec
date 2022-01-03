@@ -45,8 +45,10 @@ namespace OpenWifi {
         OpenWifi::BaseTokenDB & UserTokenDB() { return *UserTokenDB_; }
         OpenWifi::BaseTokenDB & SubTokenDB() { return *SubTokenDB_; }
         OpenWifi::PreferencesDB & PreferencesDB() { return *PreferencesDB_; }
+        OpenWifi::PreferencesDB & SubPreferencesDB() { return *SubPreferencesDB_; }
         OpenWifi::ActionLinkDB & ActionLinksDB() { return *ActionLinksDB_; }
         OpenWifi::AvatarDB & AvatarDB() { return *AvatarDB_; }
+        OpenWifi::AvatarDB & SubAvatarDB() { return *SubAvatarDB_; }
 
 	  private:
 
@@ -55,8 +57,10 @@ namespace OpenWifi {
         std::unique_ptr<OpenWifi::BaseTokenDB>          UserTokenDB_;
         std::unique_ptr<OpenWifi::BaseTokenDB>          SubTokenDB_;
         std::unique_ptr<OpenWifi::PreferencesDB>        PreferencesDB_;
+        std::unique_ptr<OpenWifi::PreferencesDB>        SubPreferencesDB_;
         std::unique_ptr<OpenWifi::ActionLinkDB>         ActionLinksDB_;
         std::unique_ptr<OpenWifi::AvatarDB>             AvatarDB_;
+        std::unique_ptr<OpenWifi::AvatarDB>             SubAvatarDB_;
 
         std::unique_ptr<OpenWifi::UserCache>            UserCache_;
         std::unique_ptr<OpenWifi::UserCache>            SubCache_;

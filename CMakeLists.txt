@@ -88,13 +88,17 @@ add_executable( owsec
         src/RESTAPI/RESTAPI_system_endpoints_handler.cpp src/RESTAPI/RESTAPI_system_endpoints_handler.h
         src/RESTAPI/RESTAPI_asset_server.cpp src/RESTAPI/RESTAPI_asset_server.h
         src/RESTAPI/RESTAPI_avatar_handler.cpp src/RESTAPI/RESTAPI_avatar_handler.h
+        src/RESTAPI/RESTAPI_subavatar_handler.cpp src/RESTAPI/RESTAPI_subavatar_handler.h
         src/RESTAPI/RESTAPI_email_handler.cpp src/RESTAPI/RESTAPI_email_handler.h
         src/RESTAPI/RESTAPI_sms_handler.cpp src/RESTAPI/RESTAPI_sms_handler.h
         src/RESTAPI/RESTAPI_suboauth2_handler.h src/RESTAPI/RESTAPI_suboauth2_handler.cpp
         src/RESTAPI/RESTAPI_subuser_handler.h src/RESTAPI/RESTAPI_subuser_handler.cpp
         src/RESTAPI/RESTAPI_subusers_handler.h src/RESTAPI/RESTAPI_subusers_handler.cpp
         src/RESTAPI/RESTAPI_validate_sub_token_handler.cpp src/RESTAPI/RESTAPI_validate_sub_token_handler.h
-        src/RESTAPI/RESTAPI_Routers.cpp
+        src/RESTAPI/RESTAPI_submfa_handler.cpp src/RESTAPI/RESTAPI_submfa_handler.h
+        src/RESTAPI/RESTAPI_preferences.cpp src/RESTAPI/RESTAPI_preferences.h
+        src/RESTAPI/RESTAPI_subpreferences.cpp src/RESTAPI/RESTAPI_subpreferences.h
+        src/RESTAPI/RESTAPI_routers.cpp
         src/Daemon.h src/Daemon.cpp
         src/SpecialUserHelpers.h
         src/AuthService.h src/AuthService.cpp
@@ -106,11 +110,15 @@ add_executable( owsec
         src/SMS_provider.cpp src/SMS_provider.h
         src/SMS_provider_twilio.cpp src/SMS_provider_twilio.h
         src/ActionLinkManager.cpp src/ActionLinkManager.h
-        src/ACLProcessor.h src/RESTAPI/RESTAPI_preferences.cpp src/RESTAPI/RESTAPI_preferences.h
+        src/ACLProcessor.h
         src/framework/OpenWifiTypes.h
-        src/RESTAPI/RESTAPI_submfa_handler.cpp src/RESTAPI/RESTAPI_submfa_handler.h
         src/storage/orm_users.cpp src/storage/orm_users.h
-        src/storage/orm_tokens.cpp src/storage/orm_tokens.h src/storage/orm_preferences.cpp src/storage/orm_preferences.h src/storage/orm_actionLinks.cpp src/storage/orm_actionLinks.h src/storage/orm_avatar.cpp src/storage/orm_avatar.h src/SpecialUserHelpers.h src/RESTAPI/RESTAPI_db_helpers.h)
+        src/storage/orm_tokens.cpp src/storage/orm_tokens.h
+        src/storage/orm_preferences.cpp src/storage/orm_preferences.h
+        src/storage/orm_actionLinks.cpp src/storage/orm_actionLinks.h
+        src/storage/orm_avatar.cpp src/storage/orm_avatar.h
+        src/SpecialUserHelpers.h
+        src/RESTAPI/RESTAPI_db_helpers.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
