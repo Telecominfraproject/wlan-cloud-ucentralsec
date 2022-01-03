@@ -106,7 +106,7 @@ namespace OpenWifi {
 
     void TokenCache::UpdateCache(const SecurityObjects::Token &R) {
         std::lock_guard M(Mutex_);
-        std::cout << "Updating token: " << R.token << std::endl;
+        // std::cout << "Updating token: " << R.token << std::endl;
         CacheByToken_->update(R.token,R);
     }
 
@@ -116,24 +116,24 @@ namespace OpenWifi {
 
     bool TokenCache::GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::Token &R) {
         std::lock_guard M(Mutex_);
-        std::cout << "Getting token: " << Value << std::endl;
+        // std::cout << "Getting token: " << Value << std::endl;
         if(FieldName=="token") {
             auto Entry = CacheByToken_->get(Value);
             if(Entry.isNull()) {
-                std::cout << "Getting Token: " << Value << " not found in cache." << std::endl;
+                // std::cout << "Getting Token: " << Value << " not found in cache." << std::endl;
                 return false;
             }
             R = *Entry;
-            std::cout << "Getting Token: " << Value << " found in cache." << std::endl;
+            // std::cout << "Getting Token: " << Value << " found in cache." << std::endl;
             return true;
         }
-        std::cout << "Getting Token: " << FieldName << " not known." << std::endl;
+        // std::cout << "Getting Token: " << FieldName << " not known." << std::endl;
         return false;
     }
 
     void TokenCache::Delete(const std::string &FieldName, const std::string &Value) {
         std::lock_guard M(Mutex_);
-        std::cout << "Deleting token: " << Value << std::endl;
+        // std::cout << "Deleting token: " << Value << std::endl;
         if(FieldName=="token") {
             AuthService()->RemoveTokenSystemWide(Value);
             CacheByToken_->remove(Value);

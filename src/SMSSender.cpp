@@ -27,11 +27,6 @@ namespace OpenWifi {
             Enabled_ = ProviderImpl_->Initialize();
         }
 
-        MicroService::instance().UpdateConfig()->setString("new.value", "hello");
-        MicroService::instance().SaveConfig();
-
-        std::cout << MicroService::instance().ConfigGetString("new.value","bouga") << std::endl;
-
         return 0;
     }
 

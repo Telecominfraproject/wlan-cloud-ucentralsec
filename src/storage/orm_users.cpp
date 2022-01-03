@@ -220,7 +220,7 @@ namespace OpenWifi {
     }
 
     void UserCache::UpdateCache(const SecurityObjects::UserInfo &R) {
-        std::cout << "Update user cache:" << R.Id << std::endl;
+        // std::cout << "Update user cache:" << R.Id << std::endl;
         CacheById_->update(R.Id,R);
         CacheByEMail_->update(R.email,R.Id);
         if(UsersOnly_)
@@ -255,7 +255,7 @@ namespace OpenWifi {
 
     inline void UserCache::Delete(const std::string &FieldName, const std::string &Value) {
     std::lock_guard     M(Mutex_);
-        std::cout << "Delete user cache:" << Value << std::endl;
+        // std::cout << "Delete user cache:" << Value << std::endl;
         if(FieldName=="id") {
             auto  E = CacheById_->get(Value);
             if(!E.isNull())
