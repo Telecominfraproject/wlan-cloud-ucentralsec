@@ -20,7 +20,7 @@ namespace OpenWifi {
                 U.currentPassword = MicroService::instance().ConfigGetString("authentication.default.password", "");
                 U.lastPasswords.push_back(U.currentPassword);
                 U.email = MicroService::instance().ConfigGetString("authentication.default.username", "");
-                U.Id = NewDefaultUseridStockUUID;
+                U.id = NewDefaultUseridStockUUID;
                 U.userRole = SecurityObjects::ROOT;
                 U.creationDate = std::time(nullptr);
                 U.validated = true;

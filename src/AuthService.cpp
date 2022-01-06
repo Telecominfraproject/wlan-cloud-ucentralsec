@@ -238,15 +238,15 @@ namespace OpenWifi {
         UInfo.webtoken.expires_in_ = TokenAging_ ;
         UInfo.webtoken.idle_timeout_ = 5 * 60;
         UInfo.webtoken.token_type_ = "Bearer";
-        UInfo.webtoken.access_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
-        UInfo.webtoken.id_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
-        UInfo.webtoken.refresh_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,CUSTOM);
+        UInfo.webtoken.access_token_ = GenerateTokenHMAC(UInfo.userinfo.id,USERNAME);
+        UInfo.webtoken.id_token_ = GenerateTokenHMAC(UInfo.userinfo.id,USERNAME);
+        UInfo.webtoken.refresh_token_ = GenerateTokenHMAC(UInfo.userinfo.id,CUSTOM);
         UInfo.webtoken.created_ = time(nullptr);
         UInfo.webtoken.username_ = UserName;
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
-        StorageService()->UserDB().SetLastLogin(UInfo.userinfo.Id);
-        StorageService()->UserTokenDB().AddToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
+        StorageService()->UserDB().SetLastLogin(UInfo.userinfo.id);
+        StorageService()->UserTokenDB().AddToken(UInfo.userinfo.id, UInfo.webtoken.access_token_,
                             UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                 UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
@@ -261,15 +261,15 @@ namespace OpenWifi {
         UInfo.webtoken.expires_in_ = TokenAging_ ;
         UInfo.webtoken.idle_timeout_ = 5 * 60;
         UInfo.webtoken.token_type_ = "Bearer";
-        UInfo.webtoken.access_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
-        UInfo.webtoken.id_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,USERNAME);
-        UInfo.webtoken.refresh_token_ = GenerateTokenHMAC(UInfo.userinfo.Id,CUSTOM);
+        UInfo.webtoken.access_token_ = GenerateTokenHMAC(UInfo.userinfo.id,USERNAME);
+        UInfo.webtoken.id_token_ = GenerateTokenHMAC(UInfo.userinfo.id,USERNAME);
+        UInfo.webtoken.refresh_token_ = GenerateTokenHMAC(UInfo.userinfo.id,CUSTOM);
         UInfo.webtoken.created_ = time(nullptr);
         UInfo.webtoken.username_ = UserName;
         UInfo.webtoken.errorCode = 0;
         UInfo.webtoken.userMustChangePassword = false;
-        StorageService()->SubDB().SetLastLogin(UInfo.userinfo.Id);
-        StorageService()->SubTokenDB().AddToken(UInfo.userinfo.Id, UInfo.webtoken.access_token_,
+        StorageService()->SubDB().SetLastLogin(UInfo.userinfo.id);
+        StorageService()->SubTokenDB().AddToken(UInfo.userinfo.id, UInfo.webtoken.access_token_,
                                    UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                    UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
     }
@@ -419,12 +419,12 @@ namespace OpenWifi {
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
-                StorageService()->UserDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
+                StorageService()->UserDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
             UInfo.userinfo.lastLogin=std::time(nullptr);
-            StorageService()->UserDB().SetLastLogin(UInfo.userinfo.Id);
+            StorageService()->UserDB().SetLastLogin(UInfo.userinfo.id);
             CreateToken(UserName, UInfo );
 
             return SUCCESS;
@@ -464,12 +464,12 @@ namespace OpenWifi {
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
-                StorageService()->SubDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.Id,UInfo.userinfo);
+                StorageService()->SubDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
             UInfo.userinfo.lastLogin=std::time(nullptr);
-            StorageService()->SubDB().SetLastLogin(UInfo.userinfo.Id);
+            StorageService()->SubDB().SetLastLogin(UInfo.userinfo.id);
             CreateSubToken(UserName, UInfo );
 
             return SUCCESS;

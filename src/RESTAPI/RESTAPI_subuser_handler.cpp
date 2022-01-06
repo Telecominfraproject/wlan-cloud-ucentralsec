@@ -109,7 +109,7 @@ namespace OpenWifi {
         if(GetParameter("email_verification","false")=="true") {
             if(AuthService::VerifySubEmail(NewUser))
                 Logger_.information(Poco::format("Verification e-mail requested for %s",NewUser.email));
-            StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email,NewUser.Id,NewUser);
+            StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email,NewUser.id,NewUser);
         }
 
         if(!StorageService()->SubDB().GetUserByEmail(NewUser.email, NewUser)) {
@@ -168,7 +168,7 @@ namespace OpenWifi {
                 if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && NewRole==SecurityObjects::ROOT) {
                     return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
                 }
-                if(Id==UserInfo_.userinfo.Id) {
+                if(Id==UserInfo_.userinfo.id) {
                     return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
                 }
                 Existing.userRole = NewRole;

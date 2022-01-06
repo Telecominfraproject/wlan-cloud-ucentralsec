@@ -10,7 +10,7 @@ namespace OpenWifi {
     void RESTAPI_subpreferences::DoGet() {
         SecurityObjects::Preferences    P;
         Poco::JSON::Object  Answer;
-        StorageService()->SubPreferencesDB().GetPreferences(UserInfo_.userinfo.Id, P);
+        StorageService()->SubPreferencesDB().GetPreferences(UserInfo_.userinfo.id, P);
         P.to_json(Answer);
         ReturnObject(Answer);
     }
@@ -24,7 +24,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }
 
-        P.id = UserInfo_.userinfo.Id;
+        P.id = UserInfo_.userinfo.id;
         P.modified = std::time(nullptr);
         StorageService()->SubPreferencesDB().SetPreferences(P);
 

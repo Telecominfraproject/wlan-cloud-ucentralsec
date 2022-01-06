@@ -21,7 +21,7 @@ namespace OpenWifi {
                 for (auto &i : Users) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
-                        ArrayObj.add(i.Id);
+                        ArrayObj.add(i.id);
                     } else {
                         Sanitize(UserInfo_, i);
                         i.to_json(Obj);
@@ -39,7 +39,7 @@ namespace OpenWifi {
                 if(StorageService()->SubDB().GetUserById(tI,UInfo)) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
-                        ArrayObj.add(UInfo.Id);
+                        ArrayObj.add(UInfo.id);
                     } else {
                         Sanitize(UserInfo_, UInfo);
                         UInfo.to_json(Obj);

@@ -13,23 +13,23 @@
             std::string,    // description;
             std::string,    // avatar;
             std::string,    // email;
-            bool,       // bool validated = false;
+            bool,           // bool validated = false;
             std::string,    // validationEmail;
             uint64_t,       // validationDate = 0;
             uint64_t,       // creationDate = 0;
             std::string,    // validationURI;
-            bool,       // bool changePassword = true;
+            bool,           // bool changePassword = true;
             uint64_t,       // lastLogin = 0;
             std::string,    // currentLoginURI;
             uint64_t,       // lastPasswordChange = 0;
             uint64_t,       // lastEmailCheck = 0;
-            bool,      // bool waitingForEmailCheck = false;
+            bool,           // bool waitingForEmailCheck = false;
             std::string,    // locale;
             std::string,    // notes;
             std::string,    // location;
             std::string,    // owner;
-            bool,       // bool suspended = false;
-            bool,       // bool blackListed = false;
+            bool,           // bool suspended = false;
+            bool,           // bool blackListed = false;
             std::string,    // userRole;
             std::string,    // userTypeProprietaryInfo;
             std::string,    // securityPolicy;
@@ -37,7 +37,7 @@
             std::string,    // currentPassword;
             std::string,    // lastPasswords;
             std::string,    // oauthType;
-            std::string    // oauthUserInfo;
+            std::string     // oauthUserInfo;
  */
 
 namespace OpenWifi {
@@ -93,6 +93,25 @@ namespace OpenWifi {
             UsersOnly_(Users) {
     }
 
+    bool BaseUserDB::Upgrade(int from, int &to, const std::string & TableName) {
+        auto Session = Pool_.get();
+        Poco::Data::Statement   S(Session);
+
+        S << "alter table " + TableName + " rename column owner to entity;", Poco::Data::Keywords::now;
+        S.reset(Session);
+        S << "alter table " + TableName + " rename column oauth to deviceList;", Poco::Data::Keywords::now;
+        S.reset(Session);
+        S << "alter table " + TableName + " rename column oauthuserinfo to loginRecords;", Poco::Data::Keywords::now;
+        S.reset(Session);
+        S << "alter table " + TableName + " add column modified BIGINT;", Poco::Data::Keywords::now;
+        S.reset(Session);
+
+        to = 1;
+
+        return true;
+    }
+
+
     bool BaseUserDB::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
         try {
             Poco::toLowerInPlace(NewUser.email);
@@ -103,7 +122,7 @@ namespace OpenWifi {
             Poco::Data::Session Sess = Pool_.get();
 
             if(!PasswordHashedAlready) {
-                NewUser.Id = MicroService::CreateUUID();
+                NewUser.id = MicroService::CreateUUID();
                 NewUser.creationDate = std::time(nullptr);
             }
 
@@ -221,12 +240,12 @@ namespace OpenWifi {
 
     void UserCache::UpdateCache(const SecurityObjects::UserInfo &R) {
         // std::cout << "Update user cache:" << R.Id << std::endl;
-        CacheById_->update(R.Id,R);
-        CacheByEMail_->update(R.email,R.Id);
+        CacheById_->update(R.id,R);
+        CacheByEMail_->update(R.email,R.id);
         if(UsersOnly_)
-            StorageService()->UserTokenDB().DeleteRecordsFromCache("userName", R.Id);
+            StorageService()->UserTokenDB().DeleteRecordsFromCache("userName", R.id);
         else
-            StorageService()->SubTokenDB().DeleteRecordsFromCache("userName", R.Id);
+            StorageService()->SubTokenDB().DeleteRecordsFromCache("userName", R.id);
     }
 
     inline void UserCache::Create(const SecurityObjects::UserInfo &R)  {
@@ -274,7 +293,7 @@ namespace OpenWifi {
 template<> void ORM::DB<OpenWifi::UserInfoRecordTuple,
         OpenWifi::SecurityObjects::UserInfo>::Convert(OpenWifi::UserInfoRecordTuple &T,
                                                       OpenWifi::SecurityObjects::UserInfo &U) {
-    U.Id = T.get<0>();
+    U.id = T.get<0>();
     U.name = T.get<1>();
     U.description = T.get<2>();
     U.avatar = T.get<3>();
@@ -309,7 +328,7 @@ template<> void ORM::DB<OpenWifi::UserInfoRecordTuple,
 template<> void ORM::DB< OpenWifi::UserInfoRecordTuple,
     OpenWifi::SecurityObjects::UserInfo>::Convert(OpenWifi::SecurityObjects::UserInfo &U,
                                                   OpenWifi::UserInfoRecordTuple &T) {
-    T.set<0>(U.Id);
+    T.set<0>(U.id);
     T.set<1>(U.name);
     T.set<2>(U.description);
     T.set<3>(U.avatar);

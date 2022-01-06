@@ -73,6 +73,9 @@ namespace OpenWifi {
         bool SetLastLogin(const std::string &Id);
         bool SetAvatar(const std::string &Id, const std::string &Value);
 
+        inline int Version() { return 1;}
+        bool Upgrade(int from, int &to, const std::string & Name);
+
         bool UsersOnly_;
     };
 

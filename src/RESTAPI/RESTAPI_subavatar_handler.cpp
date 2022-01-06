@@ -27,7 +27,7 @@ namespace OpenWifi {
     };
 
     void RESTAPI_subavatar_handler::DoPost() {
-        std::string Id = UserInfo_.userinfo.Id;
+        std::string Id = UserInfo_.userinfo.id;
         SecurityObjects::UserInfo UInfo;
 
         std::stringstream SS;
@@ -66,7 +66,7 @@ namespace OpenWifi {
     void RESTAPI_subavatar_handler::DoDelete() {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
 
-        if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && Id!=UserInfo_.userinfo.Id) {
+        if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && Id!=UserInfo_.userinfo.id) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
