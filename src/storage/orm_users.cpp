@@ -93,24 +93,30 @@ namespace OpenWifi {
             UsersOnly_(Users) {
     }
 
-    bool BaseUserDB::Upgrade(int from, int &to, const std::string & TableName) {
+    bool BaseUserDB::Upgrade(uint32_t from, uint32_t &to) {
+
+        if(from == CurrentVersion) {
+             to = CurrentVersion ;
+             return true;
+        }
+
         auto Session = Pool_.get();
         Poco::Data::Statement   S(Session);
 
-        S << "alter table " + TableName + " rename column owner to entity;", Poco::Data::Keywords::now;
-        S.reset(Session);
-        S << "alter table " + TableName + " rename column oauth to deviceList;", Poco::Data::Keywords::now;
-        S.reset(Session);
-        S << "alter table " + TableName + " rename column oauthuserinfo to loginRecords;", Poco::Data::Keywords::now;
-        S.reset(Session);
-        S << "alter table " + TableName + " add column modified BIGINT;", Poco::Data::Keywords::now;
-        S.reset(Session);
+        if(from==0) {
+            std::vector<std::string> Statements{
+                    "alter table " + TableName_ + " rename column owner to entity;",
+                    "alter table " + TableName_ + " rename column oauth to deviceList;",
+                    "alter table " + TableName_ + " rename column oauthuserinfo to loginRecords;",
+                    "alter table " + TableName_ + " add column modified BIGINT;"
+            };
+            RunScript(Statements);
+        }
 
-        to = 1;
+        to = CurrentVersion;
 
         return true;
     }
-
 
     bool BaseUserDB::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
         try {
@@ -166,7 +172,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users, std::string WhereClause) {
+    bool BaseUserDB::GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users, const std::string & WhereClause) {
         try {
             return GetRecords(Offset, HowMany, Users, WhereClause);
         } catch (const Poco::Exception &E) {
@@ -178,14 +184,13 @@ namespace OpenWifi {
     bool BaseUserDB::SetAvatar(const std::string &Id, const std::string &Value) {
         try {
             SecurityObjects::UserInfo   User;
-            auto tID{Id};
-            if(GetRecord("id",tID,User)) {
+            if(GetRecord("id",Value,User)) {
                 if(Value.empty()) {
                     User.avatar = "0";
                 } else {
                     User.avatar = std::to_string(std::time(nullptr));
                 }
-                return UpdateRecord("id",tID,User);
+                return UpdateRecord("id",Value,User);
             }
         } catch (const Poco::Exception &E) {
             Logger().log(E);
@@ -193,7 +198,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::UpdateUserInfo(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo) {
+    bool BaseUserDB::UpdateUserInfo(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, const SecurityObjects::UserInfo &UInfo) {
         try {
             return UpdateRecord("id", Id, UInfo);
         } catch (const Poco::Exception &E) {
@@ -202,11 +207,11 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::DeleteUser(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id)  {
+    bool BaseUserDB::DeleteUser(const std::string & Admin, const SecurityObjects::USER_ID_TYPE & Id)  {
         return DeleteRecord("id", Id);
     }
 
-    bool BaseUserDB::DeleteUsers(const std::string & Admin, std::string & owner) {
+    bool BaseUserDB::DeleteUsers(const std::string & Admin, const std::string & owner) {
         std::string WhereClause{ " owner='" + owner +"' "};
         return DeleteRecords(WhereClause);
     }
@@ -218,7 +223,7 @@ namespace OpenWifi {
 
             auto tId{Id};
 
-            std::string     St1{"update " + DBName_ + " set lastLogin=? where id=?"};
+            std::string     St1{"update " + TableName_ + " set lastLogin=? where id=?"};
             uint64_t Now=std::time(nullptr);
             Update << ConvertParams(St1),
                     Poco::Data::Keywords::use(Now),
@@ -291,7 +296,7 @@ namespace OpenWifi {
 }
 
 template<> void ORM::DB<OpenWifi::UserInfoRecordTuple,
-        OpenWifi::SecurityObjects::UserInfo>::Convert(OpenWifi::UserInfoRecordTuple &T,
+        OpenWifi::SecurityObjects::UserInfo>::Convert(const OpenWifi::UserInfoRecordTuple &T,
                                                       OpenWifi::SecurityObjects::UserInfo &U) {
     U.id = T.get<0>();
     U.name = T.get<1>();
@@ -326,7 +331,7 @@ template<> void ORM::DB<OpenWifi::UserInfoRecordTuple,
 }
 
 template<> void ORM::DB< OpenWifi::UserInfoRecordTuple,
-    OpenWifi::SecurityObjects::UserInfo>::Convert(OpenWifi::SecurityObjects::UserInfo &U,
+    OpenWifi::SecurityObjects::UserInfo>::Convert(const OpenWifi::SecurityObjects::UserInfo &U,
                                                   OpenWifi::UserInfoRecordTuple &T) {
     T.set<0>(U.id);
     T.set<1>(U.name);

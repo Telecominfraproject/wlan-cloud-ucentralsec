@@ -61,20 +61,21 @@ namespace OpenWifi {
 
     class BaseUserDB : public ORM::DB<UserInfoRecordTuple, SecurityObjects::UserInfo> {
     public:
+        const uint32_t CurrentVersion = 1;
         BaseUserDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L, UserCache * Cache, bool users);
 
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false );
         bool GetUserByEmail(const std::string & email, SecurityObjects::UserInfo & User);
         bool GetUserById(const std::string &Id, SecurityObjects::UserInfo &User);
-        bool GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users, std::string WhereClause="");
-        bool UpdateUserInfo(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, SecurityObjects::UserInfo &UInfo);
-        bool DeleteUser(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id);
-        bool DeleteUsers(const std::string & Admin, std::string & owner);
+        bool GetUsers( uint64_t Offset, uint64_t HowMany, SecurityObjects::UserInfoVec & Users, const std::string & WhereClause="");
+        bool UpdateUserInfo(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, const SecurityObjects::UserInfo &UInfo);
+        bool DeleteUser(const std::string & Admin, const SecurityObjects::USER_ID_TYPE & Id);
+        bool DeleteUsers(const std::string & Admin, const std::string & owner);
         bool SetLastLogin(const std::string &Id);
         bool SetAvatar(const std::string &Id, const std::string &Value);
 
-        inline int Version() { return 1;}
-        bool Upgrade(int from, int &to, const std::string & Name);
+        inline uint32_t Version() override { return CurrentVersion;}
+        bool Upgrade(uint32_t from, uint32_t &to) override;
 
         bool UsersOnly_;
     };

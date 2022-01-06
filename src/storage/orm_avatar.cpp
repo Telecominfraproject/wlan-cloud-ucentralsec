@@ -81,7 +81,7 @@ namespace OpenWifi {
 }
 
 template<> void ORM::DB<OpenWifi::AvatarRecordTuple,
-        OpenWifi::SecurityObjects::Avatar>::Convert(OpenWifi::AvatarRecordTuple &T,
+        OpenWifi::SecurityObjects::Avatar>::Convert(const OpenWifi::AvatarRecordTuple &T,
                                                     OpenWifi::SecurityObjects::Avatar &U) {
     U.id = T.get<0>();
     U.type = T.get<1>();
@@ -91,7 +91,7 @@ template<> void ORM::DB<OpenWifi::AvatarRecordTuple,
 }
 
 template<> void ORM::DB<OpenWifi::AvatarRecordTuple,
-        OpenWifi::SecurityObjects::Avatar>::Convert(OpenWifi::SecurityObjects::Avatar &U,
+        OpenWifi::SecurityObjects::Avatar>::Convert(const OpenWifi::SecurityObjects::Avatar &U,
                                                     OpenWifi::AvatarRecordTuple &T) {
     T.set<0>(U.id);
     T.set<1>(U.type);

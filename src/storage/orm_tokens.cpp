@@ -154,7 +154,7 @@ namespace OpenWifi {
 }
 
 template<> void ORM::DB<OpenWifi::TokenRecordTuple,
-        OpenWifi::SecurityObjects::Token>::Convert(OpenWifi::TokenRecordTuple &T,
+        OpenWifi::SecurityObjects::Token>::Convert(const OpenWifi::TokenRecordTuple &T,
                                                       OpenWifi::SecurityObjects::Token &U) {
     U.token = T.get<0>();
     U.refreshToken = T.get<1>();
@@ -167,7 +167,7 @@ template<> void ORM::DB<OpenWifi::TokenRecordTuple,
 }
 
 template<> void ORM::DB< OpenWifi::TokenRecordTuple,
-        OpenWifi::SecurityObjects::Token>::Convert(OpenWifi::SecurityObjects::Token &U,
+        OpenWifi::SecurityObjects::Token>::Convert(const OpenWifi::SecurityObjects::Token &U,
                                                          OpenWifi::TokenRecordTuple &T) {
     T.set<0>(U.token);
     T.set<1>(U.refreshToken);

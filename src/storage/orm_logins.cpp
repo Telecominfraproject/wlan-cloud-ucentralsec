@@ -54,7 +54,7 @@ namespace OpenWifi {
     }
 }
 
-template<> void ORM::DB<OpenWifi::LoginInfoRecordTuple, OpenWifi::SecurityObjects::LoginRecordInfo>::Convert(OpenWifi::LoginInfoRecordTuple &R, OpenWifi::SecurityObjects::LoginRecordInfo &P ) {
+template<> void ORM::DB<OpenWifi::LoginInfoRecordTuple, OpenWifi::SecurityObjects::LoginRecordInfo>::Convert(const OpenWifi::LoginInfoRecordTuple &R, OpenWifi::SecurityObjects::LoginRecordInfo &P ) {
     P.sessionId = R.get<0>();
     P.userId = R.get<1>();
     P.email = R.get<2>();
@@ -62,7 +62,7 @@ template<> void ORM::DB<OpenWifi::LoginInfoRecordTuple, OpenWifi::SecurityObject
     P.logout = R.get<4>();
 }
 
-template<> void ORM::DB<OpenWifi::LoginInfoRecordTuple, OpenWifi::SecurityObjects::LoginRecordInfo>::Convert(OpenWifi::SecurityObjects::LoginRecordInfo &P, OpenWifi::LoginInfoRecordTuple &R ) {
+template<> void ORM::DB<OpenWifi::LoginInfoRecordTuple, OpenWifi::SecurityObjects::LoginRecordInfo>::Convert(const OpenWifi::SecurityObjects::LoginRecordInfo &P, OpenWifi::LoginInfoRecordTuple &R ) {
     R.set<0>(P.sessionId);
     R.set<1>(P.userId);
     R.set<2>(P.email);

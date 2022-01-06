@@ -37,13 +37,13 @@ namespace OpenWifi {
 
 }
 
-template<> void ORM::DB<OpenWifi::PreferencesRecordTuple, OpenWifi::SecurityObjects::Preferences>::Convert(OpenWifi::PreferencesRecordTuple &R, OpenWifi::SecurityObjects::Preferences &P ) {
+template<> void ORM::DB<OpenWifi::PreferencesRecordTuple, OpenWifi::SecurityObjects::Preferences>::Convert(const OpenWifi::PreferencesRecordTuple &R, OpenWifi::SecurityObjects::Preferences &P ) {
     P.id = R.get<0>();
     P.modified = R.get<1>();
     P.data = OpenWifi::RESTAPI_utils::to_stringpair_array(R.get<2>());
 }
 
-template<> void ORM::DB<OpenWifi::PreferencesRecordTuple, OpenWifi::SecurityObjects::Preferences>::Convert(OpenWifi::SecurityObjects::Preferences &P, OpenWifi::PreferencesRecordTuple &R ) {
+template<> void ORM::DB<OpenWifi::PreferencesRecordTuple, OpenWifi::SecurityObjects::Preferences>::Convert(const OpenWifi::SecurityObjects::Preferences &P, OpenWifi::PreferencesRecordTuple &R ) {
     R.set<0>(P.id);
     R.set<1>(P.modified);
     R.set<2>(OpenWifi::RESTAPI_utils::to_string(P.data));

@@ -92,7 +92,7 @@ namespace OpenWifi {
 }
 
 template<> void ORM::DB<OpenWifi::ActionLinkRecordTuple,
-        OpenWifi::SecurityObjects::ActionLink>::Convert(OpenWifi::ActionLinkRecordTuple &T, OpenWifi::SecurityObjects::ActionLink &U) {
+        OpenWifi::SecurityObjects::ActionLink>::Convert(const OpenWifi::ActionLinkRecordTuple &T, OpenWifi::SecurityObjects::ActionLink &U) {
     U.id = T.get<0>();
     U.action = T.get<1>();
     U.userId = T.get<2>();
@@ -108,7 +108,7 @@ template<> void ORM::DB<OpenWifi::ActionLinkRecordTuple,
 }
 
 template<> void ORM::DB<OpenWifi::ActionLinkRecordTuple,
-        OpenWifi::SecurityObjects::ActionLink>::Convert(OpenWifi::SecurityObjects::ActionLink &U, OpenWifi::ActionLinkRecordTuple &T) {
+        OpenWifi::SecurityObjects::ActionLink>::Convert(const OpenWifi::SecurityObjects::ActionLink &U, OpenWifi::ActionLinkRecordTuple &T) {
     T.set<0>(U.id);
     T.set<1>(U.action);
     T.set<2>(U.userId);
