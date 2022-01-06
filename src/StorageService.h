@@ -20,6 +20,7 @@
 #include "storage/orm_preferences.h"
 #include "storage/orm_actionLinks.h"
 #include "storage/orm_avatar.h"
+#include "storage/orm_logins.h"
 
 namespace OpenWifi {
 
@@ -49,6 +50,8 @@ namespace OpenWifi {
         OpenWifi::ActionLinkDB & ActionLinksDB() { return *ActionLinksDB_; }
         OpenWifi::AvatarDB & AvatarDB() { return *AvatarDB_; }
         OpenWifi::AvatarDB & SubAvatarDB() { return *SubAvatarDB_; }
+        OpenWifi::LoginDB & LoginDB() { return *LoginDB_; }
+        OpenWifi::LoginDB & SubLoginDB() { return *SubLoginDB_; }
 
 	  private:
 
@@ -61,6 +64,8 @@ namespace OpenWifi {
         std::unique_ptr<OpenWifi::ActionLinkDB>         ActionLinksDB_;
         std::unique_ptr<OpenWifi::AvatarDB>             AvatarDB_;
         std::unique_ptr<OpenWifi::AvatarDB>             SubAvatarDB_;
+        std::unique_ptr<OpenWifi::LoginDB>              LoginDB_;
+        std::unique_ptr<OpenWifi::LoginDB>              SubLoginDB_;
 
         std::unique_ptr<OpenWifi::UserCache>            UserCache_;
         std::unique_ptr<OpenWifi::UserCache>            SubCache_;

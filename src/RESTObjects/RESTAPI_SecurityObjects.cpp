@@ -585,5 +585,12 @@ namespace OpenWifi::SecurityObjects {
         return false;
     }
 
+    void LoginRecordInfo::to_json(Poco::JSON::Object &Obj) const {
+        field_to_json(Obj,"sessionId",sessionId);
+        field_to_json(Obj,"userId",userId);
+        field_to_json(Obj,"email",email);
+        field_to_json(Obj,"login",login);
+        field_to_json(Obj,"logout",logout);
+    }
 }
 

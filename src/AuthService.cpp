@@ -186,6 +186,7 @@ namespace OpenWifi {
         try {
             auto tToken{Token};
             StorageService()->UserTokenDB().DeleteRecord("token",tToken);
+            StorageService()->LoginDB().AddLogout(Token);
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }
@@ -197,6 +198,7 @@ namespace OpenWifi {
         try {
             auto tToken{Token};
             StorageService()->SubTokenDB().DeleteRecord("token",tToken);
+            StorageService()->SubLoginDB().AddLogout(Token);
         } catch (const Poco::Exception &E) {
             Logger().log(E);
         }
@@ -249,6 +251,7 @@ namespace OpenWifi {
         StorageService()->UserTokenDB().AddToken(UInfo.userinfo.id, UInfo.webtoken.access_token_,
                             UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                 UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
+        StorageService()->LoginDB().AddLogin(UInfo.userinfo.id, UInfo.userinfo.email,UInfo.webtoken.access_token_ );
     }
 
     void AuthService::CreateSubToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo)
@@ -272,6 +275,7 @@ namespace OpenWifi {
         StorageService()->SubTokenDB().AddToken(UInfo.userinfo.id, UInfo.webtoken.access_token_,
                                    UInfo.webtoken.refresh_token_, UInfo.webtoken.token_type_,
                                    UInfo.webtoken.expires_in_, UInfo.webtoken.idle_timeout_);
+        StorageService()->SubLoginDB().AddLogin(UInfo.userinfo.id, UInfo.userinfo.email,UInfo.webtoken.access_token_ );
     }
 
     bool AuthService::SetPassword(const std::string &NewPassword, SecurityObjects::UserInfo & UInfo) {

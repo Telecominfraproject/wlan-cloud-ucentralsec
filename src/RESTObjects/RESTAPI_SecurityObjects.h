@@ -292,5 +292,14 @@ namespace OpenWifi {
             Poco::Data::LOB<char>   avatar;
         };
 
+        struct LoginRecordInfo {
+            std::string sessionId;
+            std::string userId;
+            std::string email;
+            uint64_t    login=0;
+            uint64_t    logout=0;
+
+            void to_json(Poco::JSON::Object &Obj) const;
+        };
     }
 }
