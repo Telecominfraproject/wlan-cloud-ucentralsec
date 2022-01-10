@@ -33,6 +33,12 @@ namespace OpenWifi {
             return BadRequest("Code and number could not be validated");
         }
 
+        if( UserInfo_.userinfo.userRole!=SecurityObjects::ROOT &&
+            UserInfo_.userinfo.userRole!=SecurityObjects::PARTNER &&
+            UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights,ACCESS_DENIED);
+        }
+
         if (Obj->has("to") &&
             Obj->has("text")) {
 
