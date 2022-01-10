@@ -19,8 +19,8 @@
 namespace OpenWifi {
 
 	void RESTAPI_oauth2_handler::DoGet() {
-	    bool Expired = false;
-        if (!IsAuthorized(Expired)) {
+	    bool Expired = false, Contacted = false;
+        if (!IsAuthorized(Expired, Contacted)) {
             if(Expired)
                 return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
             return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);
@@ -38,8 +38,8 @@ namespace OpenWifi {
 	}
 
     void RESTAPI_oauth2_handler::DoDelete() {
-	    bool Expired = false;
-	    if (!IsAuthorized(Expired)) {
+	    bool Expired = false, Contacted=false;
+	    if (!IsAuthorized(Expired, Contacted)) {
 	        if(Expired)
 	            return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
 	        return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);

@@ -65,6 +65,7 @@ components:
                   - 10    # RATE_LIMIT_EXCEEDED
                   - 11    # BAD_MFA_TRANSACTION
                   - 12    # MFA_FAILURE
+                  - 13    # SECURITY_SERVICE_UNREACHABLE
               ErrorDetails:
                 type: string
               ErrorDescription:
