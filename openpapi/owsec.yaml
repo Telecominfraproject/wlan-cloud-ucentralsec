@@ -348,6 +348,9 @@ components:
         securityPolicyChange:
           type: integer
           format: int64
+        modified:
+          type: integer
+          format: int64
         userTypeProprietaryInfo:
           $ref: '#/components/schemas/UserLoginLoginExtensions'
 

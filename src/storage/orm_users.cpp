@@ -72,7 +72,8 @@ namespace OpenWifi {
             ORM::Field{"currentPassword", ORM::FieldType::FT_TEXT},
             ORM::Field{"lastPasswords", ORM::FieldType::FT_TEXT},
             ORM::Field{"oauthType", ORM::FieldType::FT_TEXT},
-            ORM::Field{"oauthUserInfo", ORM::FieldType::FT_TEXT}
+            ORM::Field{"oauthUserInfo", ORM::FieldType::FT_TEXT},
+            ORM::Field{"modified", ORM::FieldType::FT_TEXT}
     };
 
     static ORM::IndexVec MakeIndices(const std::string & shortname) {
@@ -94,27 +95,11 @@ namespace OpenWifi {
     }
 
     bool BaseUserDB::Upgrade(uint32_t from, uint32_t &to) {
-
-        if(from == CurrentVersion) {
-             to = CurrentVersion ;
-             return true;
-        }
-
-        auto Session = Pool_.get();
-        Poco::Data::Statement   S(Session);
-
-        if(from==0) {
-            std::vector<std::string> Statements{
-                    "alter table " + TableName_ + " rename column owner to entity;",
-                    "alter table " + TableName_ + " rename column oauth to deviceList;",
-                    "alter table " + TableName_ + " rename column oauthuserinfo to loginRecords;",
-                    "alter table " + TableName_ + " add column modified BIGINT;"
-            };
-            RunScript(Statements);
-        }
-
+        std::vector<std::string> Statements{
+                "alter table " + TableName_ + " add column modified BIGINT;"
+        };
+        RunScript(Statements);
         to = CurrentVersion;
-
         return true;
     }
 
@@ -328,6 +313,7 @@ template<> void ORM::DB<OpenWifi::UserInfoRecordTuple,
     U.lastPasswords = OpenWifi::RESTAPI_utils::to_object_array(T.get<27>());
     U.oauthType = T.get<28>();
     U.oauthUserInfo = T.get<29>();
+    U.modified = T.get<30>();
 }
 
 template<> void ORM::DB< OpenWifi::UserInfoRecordTuple,
@@ -363,4 +349,5 @@ template<> void ORM::DB< OpenWifi::UserInfoRecordTuple,
     T.set<27>(OpenWifi::RESTAPI_utils::to_string(U.lastPasswords));
     T.set<28>(U.oauthType);
     T.set<29>(U.oauthUserInfo);
+    T.set<30>(U.modified);
 }

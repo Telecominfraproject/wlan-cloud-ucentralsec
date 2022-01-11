@@ -39,7 +39,8 @@ namespace OpenWifi {
             std::string,    // currentPassword;
             std::string,    // lastPasswords;
             std::string,    // oauthType;
-            std::string     // oauthUserInfo;
+            std::string,    // oauthUserInfo;
+            uint64_t        // modified
     > UserInfoRecordTuple;
 
     typedef std::vector <UserInfoRecordTuple> UserInfoRecordTupleList;
