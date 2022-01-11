@@ -77,7 +77,9 @@ namespace OpenWifi {
             }
 
             SecurityObjects::UserInfo   UInfo;
-            if(!StorageService()->UserDB().GetUserById(Link.userId,UInfo)) {
+
+            bool Found = Link.userAction ? StorageService()->UserDB().GetUserById(Link.userId,UInfo) : StorageService()->SubDB().GetUserById(Link.userId,UInfo);
+            if(!Found) {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
@@ -91,13 +93,20 @@ namespace OpenWifi {
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
-            if(!AuthService()->SetPassword(Password1,UInfo)) {
+            bool GoodPassword = Link.userAction ? AuthService()->SetPassword(Password1,UInfo) : AuthService()->SetSubPassword(Password1,UInfo);
+            if(!GoodPassword) {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
                 return SendHTMLFileBack(FormFile,FormVars);
             }
-            StorageService()->UserDB().UpdateUserInfo(UInfo.email,Link.userId,UInfo);
+
+            UInfo.modified = std::time(nullptr);
+            if(Link.userAction)
+                StorageService()->UserDB().UpdateUserInfo(UInfo.email,Link.userId,UInfo);
+            else
+                StorageService()->SubDB().UpdateUserInfo(UInfo.email,Link.userId,UInfo);
+
             Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_success.html"};
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email},
@@ -118,7 +127,8 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo UInfo;
-        if (!StorageService()->UserDB().GetUserById(Link.userId, UInfo)) {
+        bool Found = Link.userAction ? StorageService()->UserDB().GetUserById(Link.userId,UInfo) : StorageService()->SubDB().GetUserById(Link.userId,UInfo);
+        if (!Found) {
             Types::StringPairVec FormVars{{"UUID",       Link.id},
                                           {"ERROR_TEXT", "This does not appear to be a valid email verification link.."}};
             Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_error.html"};
@@ -130,7 +140,11 @@ namespace OpenWifi {
         UInfo.validated = true;
         UInfo.lastEmailCheck = std::time(nullptr);
         UInfo.validationDate = std::time(nullptr);
-        StorageService()->UserDB().UpdateUserInfo(UInfo.email, Link.userId, UInfo);
+        UInfo.modified  = std::time(nullptr);
+        if(Link.userAction)
+            StorageService()->UserDB().UpdateUserInfo(UInfo.email, Link.userId, UInfo);
+        else
+            StorageService()->SubDB().UpdateUserInfo(UInfo.email, Link.userId, UInfo);
         Types::StringPairVec FormVars{{"UUID",     Link.id},
                                       {"USERNAME", UInfo.email},
                                       {"ACTION_LINK",MicroService::instance().GetUIURI()}};

@@ -423,6 +423,7 @@ namespace OpenWifi {
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
+                UInfo.userinfo.modified = std::time(nullptr);
                 StorageService()->UserDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
@@ -468,6 +469,7 @@ namespace OpenWifi {
                 }
                 UInfo.userinfo.lastPasswordChange = std::time(nullptr);
                 UInfo.userinfo.changePassword = false;
+                UInfo.userinfo.modified = std::time(nullptr);
                 StorageService()->SubDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
@@ -560,6 +562,7 @@ namespace OpenWifi {
         A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
+        A.userAction = true;
         StorageService()->ActionLinksDB().CreateAction(A);
         UInfo.waitingForEmailCheck = true;
         return true;
@@ -573,6 +576,7 @@ namespace OpenWifi {
         A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
+        A.userAction = false;
         StorageService()->ActionLinksDB().CreateAction(A);
         UInfo.waitingForEmailCheck = true;
         return true;

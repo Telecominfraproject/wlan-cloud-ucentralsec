@@ -498,6 +498,7 @@ namespace OpenWifi::SecurityObjects {
 	    field_to_json(Obj,"expires",expires);
 	    field_to_json(Obj,"completed",completed);
 	    field_to_json(Obj,"canceled",canceled);
+        field_to_json(Obj,"userAction",userAction);
 	}
 
     bool ActionLink::from_json(Poco::JSON::Object::Ptr &Obj) {
@@ -514,6 +515,7 @@ namespace OpenWifi::SecurityObjects {
 	        field_from_json(Obj,"expires",expires);
 	        field_from_json(Obj,"completed",completed);
 	        field_from_json(Obj,"canceled",canceled);
+            field_from_json(Obj,"userAction",userAction);
 	        return true;
 	    } catch(...) {
 

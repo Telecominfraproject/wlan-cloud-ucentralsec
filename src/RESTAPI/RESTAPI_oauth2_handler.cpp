@@ -84,6 +84,7 @@ namespace OpenWifi {
                 NewLink.userId = UInfo1.id;
                 NewLink.created = std::time(nullptr);
                 NewLink.expires = NewLink.created + (24*60*60);
+                NewLink.userAction = true;
                 StorageService()->ActionLinksDB().CreateAction(NewLink);
 
                 Poco::JSON::Object ReturnObj;

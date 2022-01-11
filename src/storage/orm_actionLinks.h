@@ -21,7 +21,8 @@ namespace OpenWifi {
             uint64_t,       // created
             uint64_t,       // expires
             uint64_t,       // completed
-            uint64_t        // canceled
+            uint64_t,       // canceled
+            bool            // userAction
     > ActionLinkRecordTuple;
     typedef std::vector <ActionLinkRecordTuple> ActionLinkRecordTupleList;
 
@@ -37,6 +38,9 @@ namespace OpenWifi {
         bool GetActionLink(std::string &ActionId, SecurityObjects::ActionLink &A);
         bool GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max=200);
         void CleanOldActionLinks();
+
+        inline uint32_t Version() override { return 1;}
+        bool Upgrade(uint32_t from, uint32_t &to) override;
 
     private:
 

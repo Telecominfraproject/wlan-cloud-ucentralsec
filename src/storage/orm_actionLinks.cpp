@@ -16,7 +16,8 @@
 "created        bigint,"
 "expires        bigint,"
 "completed      bigint,"
-"canceled       bigint"
+"canceled       bigint,
+ userAction     boolean"
 */
 
 namespace OpenWifi {
@@ -32,7 +33,8 @@ namespace OpenWifi {
             ORM::Field{"created", ORM::FieldType::FT_BIGINT},
             ORM::Field{"expires", ORM::FieldType::FT_BIGINT},
             ORM::Field{"completed", ORM::FieldType::FT_BIGINT},
-            ORM::Field{"canceled", ORM::FieldType::FT_BIGINT}
+            ORM::Field{"canceled", ORM::FieldType::FT_BIGINT},
+            ORM::Field{"userAction", ORM::FieldType::FT_BOOLEAN}
     };
 
     ActionLinkDB::ActionLinkDB(const std::string &Name, const std::string &ShortName, OpenWifi::DBType T,
@@ -40,6 +42,16 @@ namespace OpenWifi {
             DB(T, Name.c_str(), ActionLinksDB_Fields,{}, P, L, ShortName.c_str()) {
     }
 
+    bool ActionLinkDB::Upgrade(uint32_t from, uint32_t &to) {
+        std::vector<std::string> Statements{
+                "alter table " + TableName_ + " add column userAction BOOLEAN default true;"
+        };
+        RunScript(Statements);
+        to = 1;
+        return true;
+
+        return true;
+    }
     bool ActionLinkDB::CreateAction( SecurityObjects::ActionLink & A) {
         return CreateRecord(A);
     }
@@ -105,6 +117,7 @@ template<> void ORM::DB<OpenWifi::ActionLinkRecordTuple,
     U.expires = T.get<9>();
     U.completed = T.get<10>();
     U.canceled = T.get<11>();
+    U.userAction = T.get<12>();
 }
 
 template<> void ORM::DB<OpenWifi::ActionLinkRecordTuple,
@@ -121,4 +134,5 @@ template<> void ORM::DB<OpenWifi::ActionLinkRecordTuple,
     T.set<9>(U.expires);
     T.set<10>(U.completed);
     T.set<11>(U.canceled);
+    T.set<12>(U.userAction);
 }

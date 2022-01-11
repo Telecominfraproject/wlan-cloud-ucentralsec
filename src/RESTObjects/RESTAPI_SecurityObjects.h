@@ -248,6 +248,7 @@ namespace OpenWifi {
             uint64_t            expires=0;
             uint64_t            completed=0;
             uint64_t            canceled=0;
+            bool                userAction=true;
 
             void to_json(Poco::JSON::Object &Obj) const;
             bool from_json(Poco::JSON::Object::Ptr &Obj);
