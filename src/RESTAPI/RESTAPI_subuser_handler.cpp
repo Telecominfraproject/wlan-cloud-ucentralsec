@@ -78,11 +78,6 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
-/*        NewUser.owner = UserInfo_.userinfo.owner;
-        if(NewUser.owner.empty()) {
-            return BadRequest("Owner must be set for a subscriber.");
-        }
-*/
         if(!ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
@@ -155,7 +150,7 @@ namespace OpenWifi {
         // The only valid things to change are: changePassword, name,
         AssignIfPresent(RawObject,"name", Existing.name);
         AssignIfPresent(RawObject,"description", Existing.description);
-        // AssignIfPresent(RawObject,"owner", Existing.owner);
+        AssignIfPresent(RawObject,"owner", Existing.owner);
         AssignIfPresent(RawObject,"location", Existing.location);
         AssignIfPresent(RawObject,"locale", Existing.locale);
         AssignIfPresent(RawObject,"changePassword", Existing.changePassword);
