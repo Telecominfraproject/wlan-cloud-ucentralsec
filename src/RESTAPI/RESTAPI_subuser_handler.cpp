@@ -78,11 +78,11 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
-        NewUser.owner = UserInfo_.userinfo.owner;
+/*        NewUser.owner = UserInfo_.userinfo.owner;
         if(NewUser.owner.empty()) {
             return BadRequest("Owner must be set for a subscriber.");
         }
-
+*/
         if(!ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
