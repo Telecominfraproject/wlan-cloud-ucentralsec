@@ -30,6 +30,15 @@
 #include <vector>
 
 
+/*
+    Usage...
+
+    qrcodegen::QrCode qr0 = qrcodegen::QrCode::encodeText("https://www.arilia.com", qrcodegen::QrCode::Ecc::MEDIUM);
+    std::string svg = qrcodegen::toSvgString(qr0, 4);  // See QrCodeGeneratorDemo
+
+ */
+
+
 namespace qrcodegen {
 
 /*
