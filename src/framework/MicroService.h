@@ -3037,7 +3037,7 @@ namespace OpenWifi {
                     std::ofstream of(ActivityFile,std::ios_base::app | std::ios_base::out );
                     auto t = std::chrono::system_clock::now();
                     std::time_t now = std::chrono::system_clock::to_time_t(t);
-                    of << std::ctime(&now) << ": " << Activity << std::endl;
+                    of << Activity << " at " << std::ctime(&now) ;
                 } catch (...) {
 
                 }
@@ -3386,7 +3386,7 @@ namespace OpenWifi {
 	}
 
 	inline void MicroService::StartSubSystemServers() {
-        AddActivity("starting");
+        AddActivity("Starting");
 	    for(auto i:SubSystems_) {
 	        i->Start();
 	    }
@@ -3394,7 +3394,7 @@ namespace OpenWifi {
 	}
 
 	inline void MicroService::StopSubSystemServers() {
-        AddActivity("stopping");
+        AddActivity("Stopping");
 	    BusEventManager_.Stop();
 	    for(auto i=SubSystems_.rbegin(); i!=SubSystems_.rend(); ++i) {
 			(*i)->Stop();
