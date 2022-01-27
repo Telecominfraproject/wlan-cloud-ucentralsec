@@ -76,6 +76,7 @@ add_executable( owsec
         src/framework/RESTAPI_protocol.h
         src/framework/StorageClass.h
         src/framework/uCentral_Protocol.h
+        src/framework/qrcodegen.hpp src/framework/qrcodegen.cpp
         src/RESTObjects/RESTAPI_SecurityObjects.h src/RESTObjects/RESTAPI_SecurityObjects.cpp
         src/RESTObjects/RESTAPI_ProvObjects.cpp src/RESTObjects/RESTAPI_ProvObjects.h
         src/RESTObjects/RESTAPI_GWobjects.h src/RESTObjects/RESTAPI_GWobjects.cpp
