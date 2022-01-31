@@ -202,8 +202,7 @@ namespace OpenWifi {
 
         if(RawObject->has("userTypeProprietaryInfo")) {
             if(NewUser.userTypeProprietaryInfo.mfa.enabled) {
-                if (!NewUser.userTypeProprietaryInfo.mfa.method.empty() &&
-                    !MFAMETHODS::Validate(NewUser.userTypeProprietaryInfo.mfa.method)) {
+                if (!MFAMETHODS::Validate(NewUser.userTypeProprietaryInfo.mfa.method)) {
                     return BadRequest(RESTAPI::Errors::BadMFAMethod);
                 }
 

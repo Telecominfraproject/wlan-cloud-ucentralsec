@@ -329,6 +329,14 @@ getpreferences() {
     jq < ${result_file}
 }
 
+getauthqrcode() {
+    curl ${FLAGS} -X GET "https://${OWSEC}/api/v1/totp" \
+    -H "Content-Type: application/json" \
+    -H "Accept: image/svg+xml" \
+    -H "Authorization: Bearer ${token}" \
+    -o qrcode.svg
+}
+
 testlogout() {
     echo "Logged in..."
     oldtoken=${token}
@@ -448,6 +456,7 @@ case "$1" in
     "systeminfo") login; systeminfo ; logout;;
     "setpreferences") login; setpreferences "$2" "$3" ; logout;;
     "getpreferences") login; getpreferences ; logout;;
+    "getauthqrcode") login; getauthqrcode; logout;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
