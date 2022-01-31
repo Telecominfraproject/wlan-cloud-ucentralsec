@@ -243,7 +243,7 @@ components:
           enum:
             - sms
             - email
-            - voice
+            - authenticator
 
     UserLoginLoginExtensions:
       type: object
@@ -252,6 +252,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MobilePhoneNumber'
+        authenticatorSecret:
+          type: string
         mfa:
           $ref: '#/components/schemas/MfaAuthInfo'
 
@@ -1420,6 +1422,67 @@ paths:
         400:
           $ref: '#/components/responses/BadRequest'
 
+  /totp:
+    get:
+      tags:
+        - Security
+      summary: Retrieve the Authenticator QR Code
+      operationId: getTotpQrCode
+      parameters:
+        - in: query
+          name: setup
+          schema:
+            type: boolean
+            default: true
+          required: true
+      responses:
+        200:
+          description: QRCode
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags:
+        - Security
+      summary: Send the first security code to validate your setup
+      operationId: sendToptTestCode
+      parameters:
+        - in: query
+          name: value
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - in: query
+          name: index
+          schema:
+            type: integer
+            format: int64
+          required: required
+          example: 1,2,3
+      responses:
+        200:
+          description: Succesful posting of response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nextIndex:
+                    type: integer
+                  moreCodes:
+                    type: boolean
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Unauthorized'
 
   #########################################################################################
   ##
