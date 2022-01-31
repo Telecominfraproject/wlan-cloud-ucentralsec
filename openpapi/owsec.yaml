@@ -1430,11 +1430,11 @@ paths:
       operationId: getTotpQrCode
       parameters:
         - in: query
-          name: setup
+          name: reset
           schema:
             type: boolean
-            default: true
-          required: true
+            default: false
+          required: false
       responses:
         200:
           description: QRCode
