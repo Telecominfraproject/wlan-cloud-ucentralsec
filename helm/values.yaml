@@ -22,7 +22,7 @@ images:
 
 services:
   owsec:
-    type: LoadBalancer
+    type: ClusterIP
     ports:
       restapi:
         servicePort: 16001
