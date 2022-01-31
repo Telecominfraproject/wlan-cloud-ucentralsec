@@ -21,7 +21,8 @@ namespace OpenWifi {
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
         if(GetMe) {
-            Logger_.information(Poco::format("REQUEST-ME(%s): Request for %s", Request->clientAddress().toString(), UserInfo_.userinfo.email));
+            Logger_.information(Poco::format("REQUEST-ME(%s): Request for %s", Request->clientAddress().toString(),
+                                             UserInfo_.userinfo.email));
             Poco::JSON::Object Me;
             SecurityObjects::UserInfo   ReturnedUser = UserInfo_.userinfo;
             Sanitize(UserInfo_, ReturnedUser);
