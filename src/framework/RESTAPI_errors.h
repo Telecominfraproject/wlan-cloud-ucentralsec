@@ -60,5 +60,6 @@ namespace OpenWifi::RESTAPI::Errors {
     static const std::string InsufficientAccessRights{"Insufficient access rights to complete the operation."};
     static const std::string ExpiredToken{"Token has expired, user must login."};
     static const std::string SubscriberMustExist{"Subscriber must exist."};
+    static const std::string AuthenticatorVerificationIncomplete{"Authenticator validation is not complete."};
 }
 

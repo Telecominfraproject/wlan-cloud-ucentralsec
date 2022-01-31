@@ -10,12 +10,24 @@
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {
+
+    namespace MFAMETHODS {
+        inline const static std::string SMS{"sms"};
+        inline const static std::string EMAIL{"email"};
+        inline const static std::string AUTHENTICATOR{"authenticator"};
+        inline const static std::vector<std::string> Methods{ SMS, EMAIL, AUTHENTICATOR };
+        inline bool Validate(const std::string &M) {
+            return std::find(cbegin(Methods), cend(Methods),M)!=Methods.end();
+        }
+    }
+
     struct MFACacheEntry {
         SecurityObjects::UserInfoAndPolicy  UInfo;
         std::string                         Answer;
         uint64_t                            Created;
         std::string                         Method;
     };
+
 
     typedef std::map<std::string,MFACacheEntry>     MFAChallengeCache;
 

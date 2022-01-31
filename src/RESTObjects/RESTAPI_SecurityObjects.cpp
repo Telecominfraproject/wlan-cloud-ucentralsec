@@ -172,12 +172,14 @@ namespace OpenWifi::SecurityObjects {
 	void UserLoginLoginExtensions::to_json(Poco::JSON::Object &Obj) const {
 	    field_to_json(Obj, "mobiles", mobiles);
 	    field_to_json(Obj, "mfa", mfa);
+        field_to_json(Obj, "authenticatorSecret", authenticatorSecret);
 	}
 
 	bool UserLoginLoginExtensions::from_json(Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj,"mobiles",mobiles);
 	        field_from_json(Obj,"mfa",mfa);
+            field_from_json(Obj, "authenticatorSecret", authenticatorSecret);
 	        return true;
 	    } catch (...) {
 

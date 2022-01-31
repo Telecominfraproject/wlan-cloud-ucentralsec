@@ -7,6 +7,7 @@
 #include "SMTPMailerService.h"
 #include "framework/MicroService.h"
 #include "AuthService.h"
+#include "TotpCache.h"
 
 namespace OpenWifi {
 
@@ -39,18 +40,18 @@ namespace OpenWifi {
     }
 
     bool MFAServer::SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge) {
-        if(Method=="sms" && SMSSender()->Enabled() && !UInfo.userinfo.userTypeProprietaryInfo.mobiles.empty()) {
+        if(Method==MFAMETHODS::SMS && SMSSender()->Enabled() && !UInfo.userinfo.userTypeProprietaryInfo.mobiles.empty()) {
             std::string Message = "This is your login code: " + Challenge + " Please enter this in your login screen.";
             return SMSSender()->Send(UInfo.userinfo.userTypeProprietaryInfo.mobiles[0].number, Message);
-        }
-
-        if(Method=="email" && SMTPMailerService()->Enabled() && !UInfo.userinfo.email.empty()) {
+        } else if(Method==MFAMETHODS::EMAIL && SMTPMailerService()->Enabled() && !UInfo.userinfo.email.empty()) {
             MessageAttributes Attrs;
             Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
             Attrs[LOGO] = AuthService::GetLogoAssetURI();
             Attrs[SUBJECT] = "Login validation code";
             Attrs[CHALLENGE_CODE] = Challenge;
             return SMTPMailerService()->SendMessage(UInfo.userinfo.email, "verification_code.txt", Attrs);
+        } else if(Method==MFAMETHODS::AUTHENTICATOR && !UInfo.userinfo.userTypeProprietaryInfo.authenticatorSecret.empty()) {
+            return true;
         }
 
         return false;
@@ -77,7 +78,10 @@ namespace OpenWifi {
         }
 
         auto answer = ChallengeResponse->get("answer").toString();
-        if(Hint->second.Answer!=answer) {
+        if(Hint->second.Method==MFAMETHODS::AUTHENTICATOR &&
+            !TotpCache()->ValidateCode(Hint->second.UInfo.userinfo.userTypeProprietaryInfo.authenticatorSecret,answer)) {
+            return false;
+        } else if(Hint->second.Answer!=answer) {
             return false;
         }
 
@@ -87,11 +91,14 @@ namespace OpenWifi {
     }
 
     bool MFAServer::MethodEnabled(const std::string &Method) {
-        if(Method=="sms")
+        if(Method==MFAMETHODS::SMS)
             return SMSSender()->Enabled();
 
-        if(Method=="email")
+        if(Method==MFAMETHODS::EMAIL)
             return SMTPMailerService()->Enabled();
+
+        if(Method==MFAMETHODS::AUTHENTICATOR)
+            return true;
 
         return false;
     }

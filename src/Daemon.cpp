@@ -31,6 +31,7 @@
 #include "AuthService.h"
 #include "SMSSender.h"
 #include "ActionLinkManager.h"
+#include "TotpCache.h"
 
 namespace OpenWifi {
     class Daemon *Daemon::instance_ = nullptr;
@@ -48,6 +49,7 @@ namespace OpenWifi {
                                            ActionLinkManager(),
                                            SMTPMailerService(),
                                            RESTAPI_RateLimiter(),
+                                           TotpCache(),
                                            AuthService()
                                    });
         }

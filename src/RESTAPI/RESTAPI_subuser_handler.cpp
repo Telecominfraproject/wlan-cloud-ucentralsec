@@ -9,6 +9,8 @@
 #include "ACLProcessor.h"
 #include "AuthService.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
+#include "MFAServer.h"
+#include "TotpCache.h"
 
 namespace OpenWifi {
 
@@ -95,6 +97,12 @@ namespace OpenWifi {
 
         if(NewUser.name.empty())
             NewUser.name = NewUser.email;
+
+        //  You cannot enable MFA during user creation
+        NewUser.userTypeProprietaryInfo.mfa.enabled = false;
+        NewUser.userTypeProprietaryInfo.mfa.method = "";
+        NewUser.userTypeProprietaryInfo.mobiles.clear();
+        NewUser.userTypeProprietaryInfo.authenticatorSecret.clear();
 
         if(!StorageService()->SubDB().CreateUser(NewUser.email, NewUser)) {
             Logger_.information(Poco::format("Could not add user '%s'.",NewUser.email));
@@ -193,34 +201,46 @@ namespace OpenWifi {
         }
 
         if(RawObject->has("userTypeProprietaryInfo")) {
-            bool ChangingMFA = NewUser.userTypeProprietaryInfo.mfa.enabled && !Existing.userTypeProprietaryInfo.mfa.enabled;
-
-            Existing.userTypeProprietaryInfo.mfa.enabled = NewUser.userTypeProprietaryInfo.mfa.enabled;
-
-            auto PropInfo = RawObject->get("userTypeProprietaryInfo");
-            auto PInfo = PropInfo.extract<Poco::JSON::Object::Ptr>();
-
-            if(PInfo->isArray("mobiles")) {
-                Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
-            }
-
-            if(ChangingMFA && !NewUser.userTypeProprietaryInfo.mobiles.empty() && !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number,UserInfo_.userinfo.email)){
-                return BadRequest(RESTAPI::Errors::NeedMobileNumber);
-            }
-
-            if(NewUser.userTypeProprietaryInfo.mfa.method=="sms" && Existing.userTypeProprietaryInfo.mobiles.empty()) {
-                return BadRequest(RESTAPI::Errors::NeedMobileNumber);
-            }
-
-            if(!NewUser.userTypeProprietaryInfo.mfa.method.empty()) {
-                if(NewUser.userTypeProprietaryInfo.mfa.method!="email" && NewUser.userTypeProprietaryInfo.mfa.method!="sms" ) {
+            if(NewUser.userTypeProprietaryInfo.mfa.enabled) {
+                if (!NewUser.userTypeProprietaryInfo.mfa.method.empty() &&
+                    !MFAMETHODS::Validate(NewUser.userTypeProprietaryInfo.mfa.method)) {
                     return BadRequest(RESTAPI::Errors::BadMFAMethod);
                 }
-                Existing.userTypeProprietaryInfo.mfa.method=NewUser.userTypeProprietaryInfo.mfa.method;
-            }
 
-            if(Existing.userTypeProprietaryInfo.mfa.enabled && Existing.userTypeProprietaryInfo.mfa.method.empty()) {
-                return BadRequest(RESTAPI::Errors::BadMFAMethod);
+                bool ChangingMFA =
+                        NewUser.userTypeProprietaryInfo.mfa.enabled && !Existing.userTypeProprietaryInfo.mfa.enabled;
+                Existing.userTypeProprietaryInfo.mfa.enabled = NewUser.userTypeProprietaryInfo.mfa.enabled;
+
+                auto PropInfo = RawObject->get("userTypeProprietaryInfo");
+                if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::SMS) {
+                    auto PInfo = PropInfo.extract<Poco::JSON::Object::Ptr>();
+                    if (PInfo->isArray("mobiles")) {
+                        Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
+                    }
+                    if (NewUser.userTypeProprietaryInfo.mobiles.empty() ||
+                        !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number,
+                                                    UserInfo_.userinfo.email)) {
+                        return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+                    }
+                } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::AUTHENTICATOR) {
+                    std::string Secret;
+                    Existing.userTypeProprietaryInfo.mobiles.clear();
+                    if(Existing.userTypeProprietaryInfo.authenticatorSecret.empty() && TotpCache()->CompleteValidation(UserInfo_.userinfo,true,Secret)) {
+                        Existing.userTypeProprietaryInfo.authenticatorSecret = Secret;
+                    } else if (!Existing.userTypeProprietaryInfo.authenticatorSecret.empty()) {
+                        // we allow someone to use their old secret
+                    } else {
+                        return BadRequest(RESTAPI::Errors::AuthenticatorVerificationIncomplete);
+                    }
+                } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::EMAIL) {
+                    // nothing to do for email.
+                    Existing.userTypeProprietaryInfo.mobiles.clear();
+                }
+                Existing.userTypeProprietaryInfo.mfa.method = NewUser.userTypeProprietaryInfo.mfa.method;
+                Existing.userTypeProprietaryInfo.mfa.enabled = true;
+            } else {
+                Existing.userTypeProprietaryInfo.mobiles.clear();
+                Existing.userTypeProprietaryInfo.mfa.enabled = false;
             }
         }
 

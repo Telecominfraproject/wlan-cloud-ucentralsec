@@ -81,7 +81,8 @@ namespace OpenWifi {
 
         struct UserLoginLoginExtensions {
             std::vector<MobilePhoneNumber>  mobiles;
-            struct MfaAuthInfo mfa;
+            struct MfaAuthInfo              mfa;
+            std::string                     authenticatorSecret;
 
             void to_json(Poco::JSON::Object &Obj) const;
             bool from_json(Poco::JSON::Object::Ptr &Obj);

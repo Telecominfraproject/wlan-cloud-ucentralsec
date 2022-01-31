@@ -76,7 +76,10 @@ add_executable( owsec
         src/framework/RESTAPI_protocol.h
         src/framework/StorageClass.h
         src/framework/uCentral_Protocol.h
-        src/framework/qrcodegen.hpp src/framework/qrcodegen.cpp
+        src/seclibs/qrcode/qrcodegen.hpp src/seclibs/qrcode/qrcodegen.cpp
+        src/seclibs/cpptotp/bytes.cpp src/seclibs/cpptotp/bytes.h
+        src/seclibs/cpptotp/otp.cpp src/seclibs/cpptotp/otp.h
+        src/seclibs/cpptotp/sha1.cpp src/seclibs/cpptotp/sha1.h
         src/RESTObjects/RESTAPI_SecurityObjects.h src/RESTObjects/RESTAPI_SecurityObjects.cpp
         src/RESTObjects/RESTAPI_ProvObjects.cpp src/RESTObjects/RESTAPI_ProvObjects.h
         src/RESTObjects/RESTAPI_GWobjects.h src/RESTObjects/RESTAPI_GWobjects.cpp
@@ -119,7 +122,7 @@ add_executable( owsec
         src/storage/orm_actionLinks.cpp src/storage/orm_actionLinks.h
         src/storage/orm_avatar.cpp src/storage/orm_avatar.h
         src/SpecialUserHelpers.h
-        src/RESTAPI/RESTAPI_db_helpers.h src/storage/orm_logins.cpp src/storage/orm_logins.h)
+        src/RESTAPI/RESTAPI_db_helpers.h src/storage/orm_logins.cpp src/storage/orm_logins.h src/RESTAPI/RESTAPI_totp_handler.cpp src/RESTAPI/RESTAPI_totp_handler.h src/TotpCache.cpp src/TotpCache.h src/RESTAPI/RESTAPI_subtotp_handler.cpp src/RESTAPI/RESTAPI_subtotp_handler.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
