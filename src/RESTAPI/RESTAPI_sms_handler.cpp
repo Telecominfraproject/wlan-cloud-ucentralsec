@@ -18,7 +18,7 @@ namespace OpenWifi {
             if(SMSSender()->StartValidation(Number, UserInfo_.userinfo.email)) {
                 return OK();
             }
-            return BadRequest("SMS could not be sent to validate device, try later or change the phone number.");
+            return BadRequest(RESTAPI::Errors::SMSCouldNotBeSentRetry);
         }
 
         std::string Code;
@@ -30,7 +30,7 @@ namespace OpenWifi {
             if(SMSSender()->CompleteValidation(Number, Code, UserInfo_.userinfo.email)) {
                 return OK();
             }
-            return BadRequest("Code and number could not be validated");
+            return BadRequest(RESTAPI::Errors::SMSCouldNotValidate);
         }
 
         if( UserInfo_.userinfo.userRole!=SecurityObjects::ROOT &&
@@ -47,7 +47,7 @@ namespace OpenWifi {
             if(SMSSender()->Send(PhoneNumber, Text))
                 return OK();
 
-            return InternalError("SMS Message could not be sent.");
+            return InternalError(RESTAPI::Errors::SMSCouldNotBeSentRetry);
         }
         BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
     }
