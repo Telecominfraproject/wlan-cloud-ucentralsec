@@ -40,15 +40,11 @@ namespace OpenWifi {
             return Base32Secret;
         }
 
-        static std::string GenerateQRCode(const std::string &Secret, const std::string &email) {
+        std::string GenerateQRCode(const std::string &Secret, const std::string &email) {
 
             std::string uri{
-                "otpauth://totp/" +
-                MicroService::instance().ConfigGetString("topt.issuer","OpenWiFi") +
-                ":" +
-                email +
-                "?secret=" + Secret +
-                "&issuer=" + MicroService::instance().ConfigGetString("topt.issuer","OpenWiFi")
+                "otpauth://totp/" + Issuer_ + ":" +
+                email + "?secret=" + Secret + "&issuer=" + Issuer_
             };
 
             qrcodegen::QrCode qr0 = qrcodegen::QrCode::encodeText(uri.c_str(), qrcodegen::QrCode::Ecc::MEDIUM);
@@ -65,6 +61,7 @@ namespace OpenWifi {
         }
 
         int Start() override {
+            Issuer_ = MicroService::instance().ConfigGetString("totp.issuer","OpenWiFi");
             return 0;
         };
 
@@ -136,6 +133,7 @@ namespace OpenWifi {
 
     private:
         std::map<std::string,Entry>     Cache_;
+        std::string                     Issuer_;
 
         TotpCache() noexcept:
             SubSystemServer("TOTP-system", "TOTP-SVR", "totp") {
