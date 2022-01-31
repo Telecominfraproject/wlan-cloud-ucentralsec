@@ -218,8 +218,8 @@ This is the FQDN used externally serving the OpenAPI interface.
 `owsec` hs the ability to send SMS messages to users during login or to send notifications. In order to do so,
 an SMS provider must be configured. At present time, 2 providers are supported: Tilio and AWS SNS
 
-#### AWS SNS
-For SNS you must create an IAM ID that has sns:sendmessage rights. 
+#### AWS SMS
+For SNS you must create an IAM ID that has sns:sendmessage rights.  
 
 ```asm
 smssender.provider = aws
@@ -252,3 +252,13 @@ mailer.loginmethod = login
 mailer.port = 587
 mailer.templates = $OWSEC_ROOT/templates
 ```
+
+#### Google Authenticator
+In order to use the Google Time-based One-Time Password (TOTP), the user must down load the Goole Authenticator 
+on any other app that support the TOTP protocol. You should include the following in your configuration
+
+```asm
+totp.issuer = OrgName
+```
+
+It is very important that you not use spaces in your OrgName.
