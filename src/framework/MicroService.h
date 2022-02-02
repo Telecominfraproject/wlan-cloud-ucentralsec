@@ -1929,6 +1929,16 @@ namespace OpenWifi {
 	        Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	    }
 
+        inline void BadRequest(uint64_t ErrorCode, const std::string & ErrorText) {
+            PrepareResponse(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            Poco::JSON::Object	ErrorObject;
+            ErrorObject.set("ErrorCode", ErrorCode);
+            ErrorObject.set("ErrorDetails",Request->getMethod());
+            ErrorObject.set("ErrorDescription", ErrorText) ;
+            std::ostream &Answer = Response->send();
+            Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
+        }
+
 	    inline void InternalError(const std::string & Reason = "") {
 	        PrepareResponse(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 	        Poco::JSON::Object	ErrorObject;

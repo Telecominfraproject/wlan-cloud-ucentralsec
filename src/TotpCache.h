@@ -22,6 +22,7 @@ namespace OpenWifi {
             uint64_t    Verifications = 0 ;
             std::string Secret;
             std::string QRCode;
+            std::string LastCode;
         };
 
         static auto instance() {
@@ -80,6 +81,7 @@ namespace OpenWifi {
                     Hint->second.Verifications = 0;
                     Hint->second.Secret = GenerateSecret(20,Base32Secret);
                     Hint->second.QRCode = QRCode = GenerateQRCode(Base32Secret, User.email);
+                    Hint->second.LastCode.clear();
                 } else {
                     QRCode = Hint->second.QRCode;
                 }
@@ -101,33 +103,45 @@ namespace OpenWifi {
             return true;
         }
 
-        inline bool ContinueValidation(const SecurityObjects::UserInfo &User, bool Subscriber, const std::string & code, uint64_t &NextIndex, bool &MoreCodes) {
+        inline bool ContinueValidation(const SecurityObjects::UserInfo &User, bool Subscriber, const std::string & Code, uint64_t &NextIndex, bool &MoreCodes, uint64_t & ErrorCode, std::string & ErrorText ) {
             auto Hint = Cache_.find(User.id);
             uint64_t Now = std::time(nullptr);
-            _OWDEBUG_
+            ErrorCode = 0;
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60)) {
-                _OWDEBUG_
-                std::cout << "NI:" << NextIndex << " S:" << Hint->second.Secret << " C:" << code << std::endl;
+                std::cout << "NI:" << NextIndex << " S:" << Hint->second.Secret << " C:" << Code << std::endl;
                 std::string Expecting;
-                if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, code, Expecting)) {
-                    _OWDEBUG_
+                if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, Code, Expecting)) {
                     NextIndex++;
                     Hint->second.Verifications++;
                     MoreCodes = true;
+                    Hint->second.LastCode = Code;
                     return true;
-                }
-                _OWDEBUG_
-                if (NextIndex == 2 && Hint->second.Verifications == 1 && ValidateCode(Hint->second.Secret, code, Expecting)) {
-                    _OWDEBUG_
+                } else if (NextIndex == 2 && Hint->second.Verifications == 1 && Code != Hint->second.LastCode && ValidateCode(Hint->second.Secret, Code, Expecting) ) {
                     MoreCodes = false;
                     Hint->second.Done = Now;
                     return true;
+                } else {
+                    if(!ValidateCode(Hint->second.Secret, Code, Expecting)) {
+                        ErrorCode = 1;
+                        ErrorText = "Invalid code.";
+                        return false;
+                    } else if(NextIndex!=1 && NextIndex != 2) {
+                        ErrorCode = 2;
+                        ErrorText = "Invalid Index";
+                        return false;
+                    } else if(Code == Hint->second.LastCode) {
+                        ErrorCode = 3;
+                        ErrorText = "Code is repeated. Must be new code.";
+                        return false;
+                    }
+                    ErrorCode = 5;
+                    ErrorText = "Invalid protocol sequence.";
+                    return false;
                 }
-                std::cout << "Ex:" << Expecting << std::endl;
-                _OWDEBUG_
-                return false;
+            } else {
+                ErrorCode = 4;
+                ErrorText = "No validation session present.";
             }
-            _OWDEBUG_
             return false;
         }
 

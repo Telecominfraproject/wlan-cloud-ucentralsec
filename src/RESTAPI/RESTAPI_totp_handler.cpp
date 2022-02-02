@@ -25,15 +25,15 @@ namespace OpenWifi {
 
         std::cout << "Value=" << Value << std::endl;
 
-        if(TotpCache()->ContinueValidation(UserInfo_.userinfo,false,Value,nextIndex,moreCodes)) {
-            _OWDEBUG_
+        uint64_t ErrorCode = 0;
+        std::string ErrorText;
+        if(TotpCache()->ContinueValidation(UserInfo_.userinfo,false,Value,nextIndex,moreCodes, ErrorCode, ErrorText )) {
             Poco::JSON::Object Answer;
             Answer.set("nextIndex", nextIndex);
             Answer.set("moreCodes", moreCodes);
-            _OWDEBUG_
             return ReturnObject(Answer);
         }
-        return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+        return BadRequest(ErrorCode, ErrorText);
     }
 
 }
