@@ -230,6 +230,7 @@ namespace OpenWifi {
                                                     UserInfo_.userinfo.email)) {
                         return BadRequest(RESTAPI::Errors::NeedMobileNumber);
                     }
+                    Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::AUTHENTICATOR) {
                     std::string Secret;
                     Existing.userTypeProprietaryInfo.mobiles.clear();
@@ -243,10 +244,12 @@ namespace OpenWifi {
                 } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::EMAIL) {
                     // nothing to do for email.
                     Existing.userTypeProprietaryInfo.mobiles.clear();
+                    Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 }
                 Existing.userTypeProprietaryInfo.mfa.method = NewUser.userTypeProprietaryInfo.mfa.method;
                 Existing.userTypeProprietaryInfo.mfa.enabled = true;
             } else {
+                Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 Existing.userTypeProprietaryInfo.mobiles.clear();
                 Existing.userTypeProprietaryInfo.mfa.enabled = false;
             }
