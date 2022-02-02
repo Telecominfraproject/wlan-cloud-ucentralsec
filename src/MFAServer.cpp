@@ -79,9 +79,10 @@ namespace OpenWifi {
 
         auto answer = ChallengeResponse->get("answer").toString();
         std::string Expecting;
-        if(Hint->second.Method==MFAMETHODS::AUTHENTICATOR &&
-            !TotpCache()->ValidateCode(Hint->second.UInfo.userinfo.userTypeProprietaryInfo.authenticatorSecret,answer, Expecting)) {
-            return false;
+        if(Hint->second.Method==MFAMETHODS::AUTHENTICATOR) {
+            if(!TotpCache()->ValidateCode(Hint->second.UInfo.userinfo.userTypeProprietaryInfo.authenticatorSecret,answer, Expecting)) {
+                return false;
+            }
         } else if(Hint->second.Answer!=answer) {
             return false;
         }
