@@ -71,23 +71,34 @@ namespace OpenWifi {
 
         inline bool StartValidation(const SecurityObjects::UserInfo &User, bool Subscriber, std::string & QRCode, bool Reset) {
             auto Hint = Cache_.find(User.id);
+            _OWDEBUG_
             if(Hint!=Cache_.end() && Hint->second.Subscriber==Subscriber) {
+                _OWDEBUG_
                 if(Reset) {
+                    _OWDEBUG_
                     Hint->second.Subscriber = Subscriber;
                     Hint->second.Start = std::time(nullptr);
                     Hint->second.Done = 0;
                     Hint->second.Verifications = 0;
                     Hint->second.Secret = GenerateSecret(32);
                     Hint->second.QRCode = QRCode = GenerateQRCode(Hint->second.Secret, User.email);
+                    _OWDEBUG_
                 } else {
+                    _OWDEBUG_
                     QRCode = Hint->second.QRCode;
+                    _OWDEBUG_
                 }
+                _OWDEBUG_
                 return true;
             }
 
+            _OWDEBUG_
             auto Secret = GenerateSecret(32);
+            _OWDEBUG_
             QRCode = GenerateQRCode(Hint->second.Secret, User.email);
+            _OWDEBUG_
 
+            _OWDEBUG_
             Entry E{ .Subscriber = Subscriber,
                      .Start = (uint64_t )std::time(nullptr),
                      .Done = 0,
@@ -95,7 +106,9 @@ namespace OpenWifi {
                      .Secret = Secret,
                      .QRCode = QRCode
                      };
+            _OWDEBUG_
             Cache_[User.id] = E;
+            _OWDEBUG_
             return true;
         }
 
