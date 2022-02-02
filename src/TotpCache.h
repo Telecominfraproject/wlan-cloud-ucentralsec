@@ -95,7 +95,7 @@ namespace OpenWifi {
             _OWDEBUG_
             auto Secret = GenerateSecret(32);
             _OWDEBUG_
-            QRCode = GenerateQRCode(Hint->second.Secret, User.email);
+            QRCode = GenerateQRCode(Secret, User.email);
             _OWDEBUG_
 
             _OWDEBUG_
