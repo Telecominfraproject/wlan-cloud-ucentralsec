@@ -77,7 +77,7 @@ namespace OpenWifi {
                     Hint->second.Start = std::time(nullptr);
                     Hint->second.Done = 0;
                     Hint->second.Verifications = 0;
-                    Hint->second.Secret = GenerateSecret(32);
+                    Hint->second.Secret = GenerateSecret(20);
                     Hint->second.QRCode = QRCode = GenerateQRCode(Hint->second.Secret, User.email);
                 } else {
                     QRCode = Hint->second.QRCode;
@@ -85,7 +85,7 @@ namespace OpenWifi {
                 return true;
             }
 
-            auto Secret = GenerateSecret(32);
+            auto Secret = GenerateSecret(20);
             QRCode = GenerateQRCode(Secret, User.email);
 
             Entry E{ .Subscriber = Subscriber,
