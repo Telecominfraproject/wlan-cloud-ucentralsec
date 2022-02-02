@@ -108,7 +108,6 @@ namespace OpenWifi {
             uint64_t Now = std::time(nullptr);
             ErrorCode = 0;
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60)) {
-                std::cout << "NI:" << NextIndex << " S:" << Hint->second.Secret << " C:" << Code << std::endl;
                 std::string Expecting;
                 if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, Code, Expecting)) {
                     NextIndex++;
