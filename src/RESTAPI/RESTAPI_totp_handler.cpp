@@ -23,8 +23,6 @@ namespace OpenWifi {
         auto nextIndex = GetParameter("index",0);
         bool moreCodes=false;
 
-        std::cout << "Value=" << Value << std::endl;
-
         uint64_t ErrorCode = 0;
         std::string ErrorText;
         if(TotpCache()->ContinueValidation(UserInfo_.userinfo,false,Value,nextIndex,moreCodes, ErrorCode, ErrorText )) {
