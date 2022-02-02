@@ -52,11 +52,12 @@ namespace OpenWifi {
             return svg;
         }
 
-        static bool ValidateCode( const std::string &Secret, const std::string &Code) {
+        static bool ValidateCode( const std::string &Secret, const std::string &Code, std::string & Expecting) {
             uint64_t Now = std::time(nullptr);
             uint32_t p = CppTotp::totp(CppTotp::Bytes::ByteString{ (const u_char *)Secret.c_str()}, Now, 0, 30, 6);
             char buffer[16];
             sprintf(buffer,"%06u",p);
+            Expecting = buffer;
             return Code == buffer;
         }
 
@@ -106,7 +107,8 @@ namespace OpenWifi {
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60)) {
                 _OWDEBUG_
                 std::cout << "NI:" << NextIndex << " S:" << Hint->second.Secret << " C:" << code << std::endl;
-                if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, code)) {
+                std::string Expecting;
+                if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, code, Expecting)) {
                     _OWDEBUG_
                     NextIndex++;
                     Hint->second.Verifications++;
@@ -114,12 +116,13 @@ namespace OpenWifi {
                     return true;
                 }
                 _OWDEBUG_
-                if (NextIndex == 2 && Hint->second.Verifications == 1 && ValidateCode(Hint->second.Secret, code)) {
+                if (NextIndex == 2 && Hint->second.Verifications == 1 && ValidateCode(Hint->second.Secret, code, Expecting)) {
                     _OWDEBUG_
                     MoreCodes = false;
                     Hint->second.Done = Now;
                     return true;
                 }
+                std::cout << "Ex:" << Expecting << std::endl;
                 _OWDEBUG_
                 return false;
             }
