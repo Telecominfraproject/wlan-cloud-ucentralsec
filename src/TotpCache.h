@@ -105,6 +105,7 @@ namespace OpenWifi {
             _OWDEBUG_
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60)) {
                 _OWDEBUG_
+                std::cout << "NI:" << NextIndex << " S:" << Hint->second.Secret << " C:" << code << std::endl;
                 if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, code)) {
                     _OWDEBUG_
                     NextIndex++;
