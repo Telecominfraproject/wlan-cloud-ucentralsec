@@ -102,21 +102,27 @@ namespace OpenWifi {
         inline bool ContinueValidation(const SecurityObjects::UserInfo &User, bool Subscriber, const std::string & code, uint64_t &NextIndex, bool &MoreCodes) {
             auto Hint = Cache_.find(User.id);
             uint64_t Now = std::time(nullptr);
+            _OWDEBUG_
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60)) {
+                _OWDEBUG_
                 if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, code)) {
+                    _OWDEBUG_
                     NextIndex++;
                     Hint->second.Verifications++;
                     MoreCodes = true;
                     return true;
                 }
+                _OWDEBUG_
                 if (NextIndex == 2 && Hint->second.Verifications == 1 && ValidateCode(Hint->second.Secret, code)) {
+                    _OWDEBUG_
                     MoreCodes = false;
                     Hint->second.Done = Now;
                     return true;
                 }
+                _OWDEBUG_
                 return false;
             }
-            Cache_.erase(Hint);
+            _OWDEBUG_
             return false;
         }
 

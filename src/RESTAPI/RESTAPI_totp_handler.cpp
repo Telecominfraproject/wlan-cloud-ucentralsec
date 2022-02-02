@@ -23,10 +23,14 @@ namespace OpenWifi {
         auto nextIndex = GetParameter("index",0);
         bool moreCodes=false;
 
+        std::cout << "Value=" << Value << std::endl;
+
         if(TotpCache()->ContinueValidation(UserInfo_.userinfo,false,Value,nextIndex,moreCodes)) {
+            _OWDEBUG_
             Poco::JSON::Object Answer;
             Answer.set("nextIndex", nextIndex);
             Answer.set("moreCodes", moreCodes);
+            _OWDEBUG_
             return ReturnObject(Answer);
         }
         return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
