@@ -29,15 +29,14 @@ namespace OpenWifi {
             return instance;
         }
 
-        static std::string GenerateSecret(uint Size) {
+        static std::string GenerateSecret(uint Size, std::string & Base32Secret) {
             std::string R;
 
             for(;Size;Size--) {
                 R += (char) MicroService::instance().Random(33,127);
             }
-
-            std::string Base32Secret = CppTotp::Bytes::toBase32( CppTotp::Bytes::ByteString{ (const u_char *)R.c_str()});
-            return Base32Secret;
+            Base32Secret = CppTotp::Bytes::toBase32( CppTotp::Bytes::ByteString{ (const u_char *)R.c_str()});
+            return R;
         }
 
         std::string GenerateQRCode(const std::string &Secret, const std::string &email) {
@@ -74,20 +73,22 @@ namespace OpenWifi {
             auto Hint = Cache_.find(User.id);
             if(Hint!=Cache_.end() && Hint->second.Subscriber==Subscriber) {
                 if(Reset) {
+                    std::string Base32Secret;
                     Hint->second.Subscriber = Subscriber;
                     Hint->second.Start = std::time(nullptr);
                     Hint->second.Done = 0;
                     Hint->second.Verifications = 0;
-                    Hint->second.Secret = GenerateSecret(20);
-                    Hint->second.QRCode = QRCode = GenerateQRCode(Hint->second.Secret, User.email);
+                    Hint->second.Secret = GenerateSecret(20,Base32Secret);
+                    Hint->second.QRCode = QRCode = GenerateQRCode(Base32Secret, User.email);
                 } else {
                     QRCode = Hint->second.QRCode;
                 }
                 return true;
             }
 
-            auto Secret = GenerateSecret(20);
-            QRCode = GenerateQRCode(Secret, User.email);
+            std::string Base32Secret;
+            auto Secret = GenerateSecret(20, Base32Secret);
+            QRCode = GenerateQRCode(Base32Secret, User.email);
 
             Entry E{ .Subscriber = Subscriber,
                      .Start = (uint64_t )std::time(nullptr),
