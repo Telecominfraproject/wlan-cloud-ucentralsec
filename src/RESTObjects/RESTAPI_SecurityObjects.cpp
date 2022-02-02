@@ -177,8 +177,8 @@ namespace OpenWifi::SecurityObjects {
 
 	bool UserLoginLoginExtensions::from_json(Poco::JSON::Object::Ptr &Obj) {
 	    try {
-	        field_from_json(Obj,"mobiles",mobiles);
-	        field_from_json(Obj,"mfa",mfa);
+	        field_from_json(Obj, "mobiles",mobiles);
+	        field_from_json(Obj, "mfa",mfa);
             field_from_json(Obj, "authenticatorSecret", authenticatorSecret);
 	        return true;
 	    } catch (...) {

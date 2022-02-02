@@ -151,6 +151,7 @@ namespace OpenWifi {
             uint64_t Now = std::time(nullptr);
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60) && Hint->second.Done!=0) {
                 Secret = Hint->second.Secret;
+                std::cout << "completed validation: " << Secret << std::endl;
                 Cache_.erase(Hint);
                 return true;
             }

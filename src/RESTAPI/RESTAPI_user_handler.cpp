@@ -234,6 +234,7 @@ namespace OpenWifi {
                     std::string Secret;
                     Existing.userTypeProprietaryInfo.mobiles.clear();
                     if(Existing.userTypeProprietaryInfo.authenticatorSecret.empty() && TotpCache()->CompleteValidation(UserInfo_.userinfo,false,Secret)) {
+                        std::cout << "Secret:" << Secret << std::endl;
                         Existing.userTypeProprietaryInfo.authenticatorSecret = Secret;
                     } else if (!Existing.userTypeProprietaryInfo.authenticatorSecret.empty()) {
                         // we allow someone to use their old secret
