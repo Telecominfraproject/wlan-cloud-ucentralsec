@@ -221,10 +221,11 @@ namespace OpenWifi {
                                                     UserInfo_.userinfo.email)) {
                         return BadRequest(RESTAPI::Errors::NeedMobileNumber);
                     }
+                    Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::AUTHENTICATOR) {
                     std::string Secret;
                     Existing.userTypeProprietaryInfo.mobiles.clear();
-                    if(Existing.userTypeProprietaryInfo.authenticatorSecret.empty() && TotpCache()->CompleteValidation(UserInfo_.userinfo,true,Secret)) {
+                    if(Existing.userTypeProprietaryInfo.authenticatorSecret.empty() && TotpCache()->CompleteValidation(UserInfo_.userinfo,false,Secret)) {
                         Existing.userTypeProprietaryInfo.authenticatorSecret = Secret;
                     } else if (!Existing.userTypeProprietaryInfo.authenticatorSecret.empty()) {
                         // we allow someone to use their old secret
@@ -234,10 +235,12 @@ namespace OpenWifi {
                 } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::EMAIL) {
                     // nothing to do for email.
                     Existing.userTypeProprietaryInfo.mobiles.clear();
+                    Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 }
                 Existing.userTypeProprietaryInfo.mfa.method = NewUser.userTypeProprietaryInfo.mfa.method;
                 Existing.userTypeProprietaryInfo.mfa.enabled = true;
             } else {
+                Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 Existing.userTypeProprietaryInfo.mobiles.clear();
                 Existing.userTypeProprietaryInfo.mfa.enabled = false;
             }
