@@ -103,7 +103,8 @@ namespace OpenWifi {
             return true;
         }
 
-        inline bool ContinueValidation(const SecurityObjects::UserInfo &User, bool Subscriber, const std::string & Code, uint64_t &NextIndex, bool &MoreCodes, uint64_t & ErrorCode, std::string & ErrorText ) {
+        inline bool ContinueValidation(const SecurityObjects::UserInfo &User, bool Subscriber, const std::string & Code,
+                                       uint64_t &NextIndex, bool &MoreCodes, uint64_t & ErrorCode, std::string & ErrorText ) {
             auto Hint = Cache_.find(User.id);
             uint64_t Now = std::time(nullptr);
             ErrorCode = 0;
@@ -115,7 +116,8 @@ namespace OpenWifi {
                     MoreCodes = true;
                     Hint->second.LastCode = Code;
                     return true;
-                } else if (NextIndex == 2 && Hint->second.Verifications == 1 && Code != Hint->second.LastCode && ValidateCode(Hint->second.Secret, Code, Expecting) ) {
+                } else if (NextIndex == 2 && Hint->second.Verifications == 1 && Code != Hint->second.LastCode &&
+                            ValidateCode(Hint->second.Secret, Code, Expecting) ) {
                     MoreCodes = false;
                     Hint->second.Done = Now;
                     return true;
