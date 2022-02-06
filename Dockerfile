@@ -93,7 +93,7 @@ RUN mkdir /openwifi
 RUN mkdir -p "$OWSEC_ROOT" "$OWSEC_CONFIG" && \
     chown "$OWSEC_USER": "$OWSEC_ROOT" "$OWSEC_CONFIG"
 
-RUN apk add --update --no-cache librdkafka su-exec gettext ca-certificates bash jq curl && \
+RUN apk add --update --no-cache librdkafka su-exec gettext ca-certificates bash jq curl \
     mariadb-connector-c libpq unixodbc postgresql-client
 
 COPY readiness_check /readiness_check
