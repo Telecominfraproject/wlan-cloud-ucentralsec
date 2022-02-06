@@ -5,7 +5,7 @@ RUN apk add --update --no-cache \
     unixodbc-dev postgresql-dev mariadb-dev \
     librdkafka-dev boost-dev openssl-dev \
     zlib-dev nlohmann-json \
-    curl
+    curl-dev
 
 FROM build-base AS poco-build
 
