@@ -44,7 +44,7 @@ RUN make install
 
 FROM build-base AS aws-sdk-cpp-build
 
-ADD https://api.github.com/repos/pboettch/aws-sdk-cpp/git/refs/heads/main version.json
+ADD https://api.github.com/repos/aws/aws-sdk-cpp/git/refs/heads/main version.json
 RUN git clone --recurse-submodules https://github.com/aws/aws-sdk-cpp /aws-sdk-cpp
 
 WORKDIR /aws-sdk-cpp
