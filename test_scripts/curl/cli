@@ -395,6 +395,61 @@ reloadsubsystem() {
             -d "$payload"
 }
 
+check_response() {
+
+    if [ -s "$1" ]; then
+        ERROR_CODE="$(jq -r '.ErrorCode' < $1)"
+
+        if [[ -n "$ERROR_CODE" && "$ERROR_CODE" != 'null' ]]; then
+            echo "Error: got HTTP error code $ERROR_CODE, exiting"
+            exit 1
+        fi
+
+    else
+        echo "Error: result file not found or empty"
+        exit 1
+    fi
+}
+
+test_service() {
+	echo
+	echo "----------------------"
+	echo "Get system information"
+	echo "----------------------"
+	systeminfo
+	check_response $result_file
+
+	echo
+	echo "----------------"
+	echo "Create test user"
+	echo "----------------"
+	createuser testuser@mail.telecominfraproject.com 'Test123!'
+	check_response $result_file
+	USER_ID="$(jq -r '.id' < $result_file)"
+
+	echo
+	echo "-------------"
+	echo "Get test user"
+	echo "-------------"
+	getuser $USER_ID 
+	check_response $result_file
+
+#	echo
+#	echo "----------------"
+#	echo "Delete test user"
+#	echo "----------------"
+#       deleteuser $USER_ID
+#	check_response $result_file
+#	USER_STATUS="$(jq -r '.ErrorCode' < $result_file)"
+
+#	if [ "$USER_STATUS" == 404 ]; then
+#	    echo "Test user was successfully deleted"
+#	 else
+#            echo "Error: failed to delete test user"
+#	    exit 1
+#	fi
+}
+
 help() {
     echo
     echo    "Usage: cli <cmd> [args]"
@@ -418,6 +473,7 @@ help() {
     echo    "getsubsystemnames                      Get the list of subsystems."
     echo    "systeminfo                             Get basic system information."
     echo    "reloadsubsystem <subsystem name>       Reload the configuration for a subsystem."
+    echo    "test_service                           Run a set of CLI commands for testing purposes"
     echo
 }
 
@@ -457,6 +513,7 @@ case "$1" in
     "setpreferences") login; setpreferences "$2" "$3" ; logout;;
     "getpreferences") login; getpreferences ; logout;;
     "getauthqrcode") login; getauthqrcode; logout;;
+    "test_service") login; test_service; logout;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
