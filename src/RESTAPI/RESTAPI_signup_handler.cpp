@@ -65,4 +65,9 @@ namespace OpenWifi {
 
         return OK();
     }
+
+    void RESTAPI_signup_handler::DoPut() {
+        // TODO
+    }
+
 }
