@@ -546,6 +546,17 @@ namespace OpenWifi {
                 }
                 break;
 
+                case SIGNUP_VERIFICATION: {
+                    MessageAttributes Attrs;
+                    Attrs[RECIPIENT_EMAIL] = UInfo.email;
+                    Attrs[LOGO] = GetLogoAssetURI();
+                    Attrs[SUBJECT] = "EMail Address Verification";
+                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, "signup_verification.txt", Attrs);
+                    UInfo.waitingForEmailCheck = true;
+                }
+                break;
+
                 default:
                     break;
             }

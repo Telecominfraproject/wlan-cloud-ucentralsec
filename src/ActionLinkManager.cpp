@@ -86,6 +86,14 @@ namespace OpenWifi {
                         }
                         break;
 
+                    case OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP: {
+                        if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::SIGNUP_VERIFICATION)) {
+                            Logger().information(Poco::format("Send new subscriber email verification link to %s",UInfo.email));
+                        }
+                        StorageService()->ActionLinksDB().SentAction(i.id);
+                    }
+                        break;
+
                     default: {
                         StorageService()->ActionLinksDB().SentAction(i.id);
                     }

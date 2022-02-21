@@ -24,6 +24,7 @@
 #include "RESTAPI/RESTAPI_submfa_handler.h"
 #include "RESTAPI/RESTAPI_totp_handler.h"
 #include "RESTAPI/RESTAPI_subtotp_handler.h"
+#include "RESTAPI/RESTAPI_signup_handler.h"
 
 namespace OpenWifi {
 
@@ -48,7 +49,8 @@ namespace OpenWifi {
             RESTAPI_subusers_handler,
             RESTAPI_submfa_handler,
             RESTAPI_totp_handler,
-            RESTAPI_subtotp_handler
+            RESTAPI_subtotp_handler,
+            RESTAPI_signup_handler
         >(Path, Bindings, L, S,TransactionId);
     }
 
@@ -67,7 +69,8 @@ namespace OpenWifi {
             RESTAPI_preferences,
             RESTAPI_subpreferences,
             RESTAPI_suboauth2_handler,
-            RESTAPI_submfa_handler
+            RESTAPI_submfa_handler,
+            RESTAPI_signup_handler
         >(Path, Bindings, L, S, TransactionId);
     }
 }

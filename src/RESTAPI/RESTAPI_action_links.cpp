@@ -25,6 +25,8 @@ namespace OpenWifi {
             return RequestResetPassword(Link);
         else if(Action=="email_verification")
             return DoEmailVerification(Link);
+        else if(Action=="signup_verification")
+            return DoNewSubVerification(Link);
         else
             return DoReturnA404();
     }
@@ -34,6 +36,8 @@ namespace OpenWifi {
 
         if(Action=="password_reset")
             return CompleteResetPassword();
+        else if(Action=="signup_completion")
+            return CompleteSubVerification();
         else
             return DoReturnA404();
     }
@@ -46,6 +50,14 @@ namespace OpenWifi {
         SendHTMLFileBack(FormFile,FormVars);
     }
 
+    void RESTAPI_action_links::DoNewSubVerification(SecurityObjects::ActionLink &Link) {
+        Logger_.information(Poco::format("REQUEST-SUB-SIGNUP(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
+        Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification.html"};
+        Types::StringPairVec    FormVars{ {"UUID", Link.id},
+                                          {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
+        SendHTMLFileBack(FormFile,FormVars);
+    }
+
     void RESTAPI_action_links::CompleteResetPassword() {
         //  form has been posted...
         RESTAPI_PartHandler PartHandler;
@@ -53,7 +65,7 @@ namespace OpenWifi {
         if (!Form.empty()) {
 
             auto Password1 = Form.get("password1","bla");
-            auto Password2 = Form.get("password1","blu");
+            auto Password2 = Form.get("password2","blu");
             auto Id = Form.get("id","");
             auto Now = std::time(nullptr);
 
@@ -111,6 +123,77 @@ namespace OpenWifi {
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email},
                                               {"ACTION_LINK",MicroService::instance().GetUIURI()}};
+            StorageService()->ActionLinksDB().CompleteAction(Id);
+            SendHTMLFileBack(FormFile,FormVars);
+        } else {
+            DoReturnA404();
+        }
+    }
+
+    void RESTAPI_action_links::CompleteSubVerification() {
+        RESTAPI_PartHandler PartHandler;
+        Poco::Net::HTMLForm Form(*Request, Request->stream(), PartHandler);
+
+        if (!Form.empty()) {
+            auto Password1 = Form.get("password1","bla");
+            auto Password2 = Form.get("password2","blu");
+            auto Id = Form.get("id","");
+            auto Now = std::time(nullptr);
+
+            SecurityObjects::ActionLink Link;
+            if(!StorageService()->ActionLinksDB().GetActionLink(Id,Link)) {
+                return DoReturnA404();
+            }
+
+            if(Now > Link.expires) {
+                StorageService()->ActionLinksDB().CancelAction(Id);
+                return DoReturnA404();
+            }
+
+            if(Password1!=Password2 || !AuthService()->ValidateSubPassword(Password1)) {
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
+                Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                  {"ERROR_TEXT", "For some reason, the passwords entered do not match or they do not comply with"
+                                                                 " accepted password creation restrictions. Please consult our on-line help"
+                                                                 " to look at the our password policy. If you would like to contact us, please mention"
+                                                                 " id(" + Id + ")"}};
+                return SendHTMLFileBack(FormFile,FormVars);
+            }
+
+            SecurityObjects::UserInfo   UInfo;
+            bool Found = StorageService()->SubDB().GetUserById(Link.userId,UInfo);
+            if(!Found) {
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_error.html"};
+                Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                  {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
+                return SendHTMLFileBack(FormFile,FormVars);
+            }
+
+            if(UInfo.blackListed || UInfo.suspended) {
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_error.html"};
+                Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                  {"ERROR_TEXT", "Please contact our system administrators. We have identified an error in your account that must be resolved first."}};
+                return SendHTMLFileBack(FormFile,FormVars);
+            }
+
+            bool GoodPassword = AuthService()->SetSubPassword(Password1,UInfo);
+            if(!GoodPassword) {
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_error.html"};
+                Types::StringPairVec    FormVars{ {"UUID", Id},
+                                                  {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
+                return SendHTMLFileBack(FormFile,FormVars);
+            }
+
+            UInfo.modified = std::time(nullptr);
+            UInfo.changePassword = false;
+            UInfo.lastEmailCheck = std::time(nullptr);
+            UInfo.waitingForEmailCheck = false;
+
+            StorageService()->SubDB().UpdateUserInfo(UInfo.email,Link.userId,UInfo);
+
+            Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_success.html"};
+            Types::StringPairVec    FormVars{ {"UUID", Id},
+                                              {"USERNAME", UInfo.email} };
             StorageService()->ActionLinksDB().CompleteAction(Id);
             SendHTMLFileBack(FormFile,FormVars);
         } else {

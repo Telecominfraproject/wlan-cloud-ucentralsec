@@ -73,7 +73,8 @@ namespace OpenWifi {
             ORM::Field{"lastPasswords", ORM::FieldType::FT_TEXT},
             ORM::Field{"oauthType", ORM::FieldType::FT_TEXT},
             ORM::Field{"oauthUserInfo", ORM::FieldType::FT_TEXT},
-            ORM::Field{"modified", ORM::FieldType::FT_TEXT}
+            ORM::Field{"modified", ORM::FieldType::FT_TEXT},
+            ORM::Field{"signingUp", ORM::FieldType::FT_TEXT}
     };
 
     static ORM::IndexVec MakeIndices(const std::string & shortname) {
@@ -96,7 +97,8 @@ namespace OpenWifi {
 
     bool BaseUserDB::Upgrade(uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
-                "alter table " + TableName_ + " add column modified BIGINT;"
+              "alter table " + TableName_ + " add column modified BIGINT;",
+              "alter table " + TableName_ + " add column signingUp TEXT default '';"
         };
         RunScript(Statements);
         to = CurrentVersion;
@@ -314,6 +316,7 @@ template<> void ORM::DB<OpenWifi::UserInfoRecordTuple,
     U.oauthType = T.get<28>();
     U.oauthUserInfo = T.get<29>();
     U.modified = T.get<30>();
+    U.signingUp = T.get<31>();
 }
 
 template<> void ORM::DB< OpenWifi::UserInfoRecordTuple,
@@ -350,4 +353,5 @@ template<> void ORM::DB< OpenWifi::UserInfoRecordTuple,
     T.set<28>(U.oauthType);
     T.set<29>(U.oauthUserInfo);
     T.set<30>(U.modified);
+    T.set<31>(U.signingUp);
 }

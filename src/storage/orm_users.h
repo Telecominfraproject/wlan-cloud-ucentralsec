@@ -40,7 +40,8 @@ namespace OpenWifi {
             std::string,    // lastPasswords;
             std::string,    // oauthType;
             std::string,    // oauthUserInfo;
-            uint64_t        // modified
+            uint64_t,       // modified
+            std::string     // signingUp;
     > UserInfoRecordTuple;
 
     typedef std::vector <UserInfoRecordTuple> UserInfoRecordTupleList;
@@ -62,7 +63,7 @@ namespace OpenWifi {
 
     class BaseUserDB : public ORM::DB<UserInfoRecordTuple, SecurityObjects::UserInfo> {
     public:
-        const uint32_t CurrentVersion = 1;
+        const uint32_t CurrentVersion = 2;
         BaseUserDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L, UserCache * Cache, bool users);
 
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false );

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial,
+            Helvetica, sans-serif;
+            background-color: #ebedef;
+        }
+
+        .body {
+            background-color: #ebedef;
+        }
+
+        input[type=text], input[type=password] {
+            width: 90%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 40%;
+            font-size: medium;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .imgcontainer {
+            width: 100%;
+            margin-top: 5%;
+            text-align: center;
+            display: block;
+        }
+
+        img.avatar {
+            width: 40%;
+            border-radius: 50%;
+        }
+
+        .grid-container  {
+            display: grid;
+            grid-template-columns: 15% 70% 15%;
+            grid-column-gap: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            padding: 30px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            display: block;
+            width: 50%;
+            border: 1em;
+            background-color: white;
+            width: 40%;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: auto;
+            margin-top: 50px;
+            position: relative;
+        }
+
+        .passwordtext {
+            float: left;
+            margin-left: 5%;
+        }
+
+        .password-input {
+            margin-top: 0px;
+        }
+
+        .rulestext {
+            width: 95%;
+            margin: auto;
+            display: inline-block;
+            text-align: left;
+            text-justify: none;
+            margin: 5px 0 5px 0;
+            grid-column-start: 2;
+            grid-column-end: 2;
+        }
+
+        ul {
+            display: inline-block;
+            text-align: left;
+            font-size: small;
+        }
+
+        span.password1 {
+            float: right;
+            padding-top: 16px;
+        }
+
+        /* Change styles for span and cancel button on extra small screens */
+        @media screen and (max-width: 300px) {
+            span.password1 {
+                display: block;
+                float: none;
+            }
+            .cancelbtn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="imgcontainer">
+    <img src="/wwwassets/the_logo.png" alt="OpenWifi">
+</div>
+
+<form action="/api/v1/actionLink?action=signup_completion" method="post" onsubmit="return validatePassword()">
+    <input type="hidden" id="custId" name="id" value="${UUID}">
+    <div class="grid-container">
+        <h2>Reset Password</h2>
+        <div class="passwordlabel">
+            <label class="passwordtext" for="password1" ><b>New Password</b></label>
+            <input className="password-input" id="password1" type="password" placeholder="New Password" name="password1" pattern="${PASSWORD_VALIDATION}" required>
+        </div>
+        <div class="passwordlabel">
+            <label class="passwordtext" for="password2"><b>Retype Password</b></label>
+            <input className="password-input" id="password2" type="password" placeholder="Retype Password" name="password2" pattern="${PASSWORD_VALIDATION}" required>
+        </div>
+        <div class="passwordlabel">
+            <button type="submit">Reset Password</button>
+        </div>
+
+        <div class="rulestext">
+            <ul>
+                <li>Must be at least 8 characters long</li>
+                <li>Must contain 1 uppercase letter</li>
+                <li>Must contain 1 lowercase letter</li>
+                <li>Must contain 1 digit</li>
+                <li>Must contain 1 special character</li>
+            </ul>
+        </div>
+    </div>
+</form>
+
+<script>
+    function validatePassword() {
+        if(document.getElementById("password1").value == document.getElementById("password2").value) {
+            return true;
+        } else {
+            alert("The 2 passwords did not match. The passwords must match to reset your new password.");
+            return false;
+        }
+    }
+</script>
+</body>
+</html>

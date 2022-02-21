@@ -23,8 +23,10 @@ namespace OpenWifi {
         static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/actionLink"}; };
         void RequestResetPassword(SecurityObjects::ActionLink &Link);
         void CompleteResetPassword();
+        void CompleteSubVerification();
         void DoEmailVerification(SecurityObjects::ActionLink &Link);
         void DoReturnA404();
+        void DoNewSubVerification(SecurityObjects::ActionLink &Link);
 
         void DoGet() final;
         void DoPost() final;

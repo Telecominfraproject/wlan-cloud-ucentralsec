@@ -16,17 +16,18 @@ namespace OpenWifi {
             FORGOT_PASSWORD,
             VERIFY_EMAIL,
             SUB_FORGOT_PASSWORD,
-            SUB_VERIFY_EMAIL
+            SUB_VERIFY_EMAIL,
+            SUB_SIGNUP
         };
 */
         static ActionLinkManager * instance() {
-            static auto * instance_ = new ActionLinkManager;
+            static auto instance_ = new ActionLinkManager;
             return instance_;
         }
 
         int Start() final;
         void Stop() final;
-        void run();
+        void run() final;
 
     private:
         Poco::Thread        Thr_;
