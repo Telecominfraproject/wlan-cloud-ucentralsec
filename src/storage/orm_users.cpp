@@ -38,6 +38,8 @@
             std::string,    // lastPasswords;
             std::string,    // oauthType;
             std::string     // oauthUserInfo;
+            uint64_t,       // modified
+            std::string     // signingUp
  */
 
 namespace OpenWifi {
