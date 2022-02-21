@@ -4,7 +4,7 @@
 
 #include "RESTAPI_user_handler.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_errors.h"
+#include "framework/ow_constants.h"
 #include "SMSSender.h"
 #include "ACLProcessor.h"
 #include "AuthService.h"

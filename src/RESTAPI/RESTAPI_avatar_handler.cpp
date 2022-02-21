@@ -8,7 +8,6 @@
 #include "RESTAPI_avatar_handler.h"
 #include "StorageService.h"
 #include "Poco/Net/HTMLForm.h"
-#include "framework/RESTAPI_protocol.h"
 #include "framework/MicroService.h"
 
 namespace OpenWifi {

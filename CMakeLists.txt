@@ -72,10 +72,8 @@ add_executable( owsec
         src/framework/KafkaTopics.h
         src/framework/MicroService.h
         src/framework/orm.h
-        src/framework/RESTAPI_errors.h
-        src/framework/RESTAPI_protocol.h
         src/framework/StorageClass.h
-        src/framework/uCentral_Protocol.h
+        src/framework/ow_constants.h
         src/seclibs/qrcode/qrcodegen.hpp src/seclibs/qrcode/qrcodegen.cpp
         src/seclibs/cpptotp/bytes.cpp src/seclibs/cpptotp/bytes.h
         src/seclibs/cpptotp/otp.cpp src/seclibs/cpptotp/otp.h

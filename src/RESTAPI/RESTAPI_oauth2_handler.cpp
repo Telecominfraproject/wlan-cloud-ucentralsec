@@ -11,7 +11,7 @@
 #include "AuthService.h"
 #include "RESTAPI_oauth2_handler.h"
 #include "MFAServer.h"
-#include "framework/RESTAPI_protocol.h"
+#include "framework/ow_constants.h"
 #include "framework/MicroService.h"
 #include "StorageService.h"
 #include "RESTAPI_db_helpers.h"

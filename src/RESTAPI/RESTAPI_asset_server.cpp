@@ -4,7 +4,7 @@
 
 #include "RESTAPI_asset_server.h"
 #include "Poco/File.h"
-#include "framework/RESTAPI_protocol.h"
+#include "framework/ow_constants.h"
 #include "Daemon.h"
 
 namespace OpenWifi {

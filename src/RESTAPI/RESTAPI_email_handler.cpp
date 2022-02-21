@@ -9,7 +9,7 @@
 #include "Poco/JSON/Parser.h"
 
 #include "SMTPMailerService.h"
-#include "framework/RESTAPI_errors.h"
+#include "framework/ow_constants.h"
 #include "framework/MicroService.h"
 
 namespace OpenWifi {

@@ -4,7 +4,6 @@
 
 #include "RESTAPI_users_handler.h"
 #include "StorageService.h"
-#include "framework/RESTAPI_protocol.h"
 #include "framework/MicroService.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
 

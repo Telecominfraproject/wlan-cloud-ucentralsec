@@ -4,7 +4,7 @@
 
 #include "RESTAPI_sms_handler.h"
 #include "SMSSender.h"
-#include "framework/RESTAPI_errors.h"
+#include "framework/ow_constants.h"
 #include "framework/MicroService.h"
 
 namespace OpenWifi {
