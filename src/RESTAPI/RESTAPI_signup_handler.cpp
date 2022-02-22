@@ -11,18 +11,14 @@ namespace OpenWifi {
     void RESTAPI_signup_handler::DoPost() {
 
         auto UserName = GetParameter("email","");
-        auto SerialNumber = GetParameter("serialNumber","");
+        auto signupUUID = GetParameter("signupUUID","");
 
-        if(UserName.empty() || SerialNumber.empty()) {
+        if(UserName.empty() || signupUUID.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
         if(!Utils::ValidEMailAddress(UserName)) {
             return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
-        }
-
-        if(!Utils::ValidSerialNumber(SerialNumber)) {
-            return BadRequest(RESTAPI::Errors::InvalidSerialNumber);
         }
 
         // Do we already exist? Can only signup once...
@@ -41,7 +37,7 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo   NewSub;
-        NewSub.signingUp = SerialNumber;
+        NewSub.signingUp = signupUUID;
         NewSub.waitingForEmailCheck = true;
         NewSub.modified = std::time(nullptr);
         NewSub.creationDate = std::time(nullptr);

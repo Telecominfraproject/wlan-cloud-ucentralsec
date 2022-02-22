@@ -1498,9 +1498,10 @@ paths:
             format: email
           required: true
         - in: query
-          name: serialNumber
+          name: signupUUID
           schema:
             type: string
+            format: uuid
           required: true
       responses:
         200:
@@ -1543,6 +1544,7 @@ paths:
               - inprogress
               - failed
               - poll
+              - emailVerified
           required: true
       requestBody:
         content:

@@ -188,6 +188,7 @@ namespace OpenWifi {
             UInfo.changePassword = false;
             UInfo.lastEmailCheck = std::time(nullptr);
             UInfo.waitingForEmailCheck = false;
+            UInfo.validated = OpenWifi::Now();
 
             StorageService()->SubDB().UpdateUserInfo(UInfo.email,Link.userId,UInfo);
 
@@ -195,6 +196,20 @@ namespace OpenWifi {
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email} };
             StorageService()->ActionLinksDB().CompleteAction(Id);
+
+            //  Send the update to the provisioning service
+            Poco::JSON::Object  Body;
+
+            OpenAPIRequestPut   ProvRequest(uSERVICE_PROVISIONING,"/api/v1/signup",
+                                            {
+                                                {"signupUUID", UInfo.signingUp} ,
+                                                {"operation", "emailVerified"}
+                                            },
+                                            Body,30000);
+
+            Poco::JSON::Object::Ptr Response;
+            ProvRequest.Do(Response);
+
             SendHTMLFileBack(FormFile,FormVars);
         } else {
             DoReturnA404();
