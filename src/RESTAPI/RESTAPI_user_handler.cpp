@@ -95,6 +95,11 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
         }
 
+        SecurityObjects::UserInfo   Existing;
+        if(StorageService()->SubDB().GetUserByEmail(NewUser.email,Existing)) {
+            return BadRequest(RESTAPI::Errors::UserAlreadyExists);
+        }
+
         if(!NewUser.currentPassword.empty()) {
             if(!AuthService()->ValidatePassword(NewUser.currentPassword)) {
                 return BadRequest(RESTAPI::Errors::InvalidPassword);

@@ -80,7 +80,13 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::EntityMustExist);
         }
 
-        if(!ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
+        Poco::toLowerInPlace(NewUser.email);
+        SecurityObjects::UserInfo   Existing;
+        if(StorageService()->SubDB().GetUserByEmail(NewUser.email,Existing)) {
+            return BadRequest(RESTAPI::Errors::UserAlreadyExists);
+        }
+
+        if(!Internal_ && !ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
@@ -138,7 +144,7 @@ namespace OpenWifi {
             return NotFound();
         }
 
-        if(!ACLProcessor::Can(UserInfo_.userinfo,Existing,ACLProcessor::MODIFY)) {
+        if(!Internal_ && !ACLProcessor::Can(UserInfo_.userinfo,Existing,ACLProcessor::MODIFY)) {
             return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
