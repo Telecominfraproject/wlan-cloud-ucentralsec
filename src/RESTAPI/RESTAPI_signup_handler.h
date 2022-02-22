@@ -19,7 +19,7 @@ namespace OpenWifi {
                                  TransactionId,
                                  Internal, false, true ){}
 
-        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/action"}; };
+        static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/signup"}; };
 
 /*        inline bool RoleIsAuthorized(std::string & Reason) {
             if(UserInfo_.userinfo.userRole != SecurityObjects::USER_ROLE::SUBSCRIBER) {
