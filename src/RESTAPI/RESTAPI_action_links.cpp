@@ -207,6 +207,7 @@ namespace OpenWifi {
                                             },
                                             Body,30000);
 
+            std::cout << "Completing password verification to provisioning for user: " << UInfo.email << std::endl;
             Poco::JSON::Object::Ptr Response;
             ProvRequest.Do(Response);
 
