@@ -26,8 +26,8 @@ namespace OpenWifi {
                         ArrayObj.add(Obj);
                     }
                 }
-                Answer.set(RESTAPI::Protocol::USERS, ArrayObj);
             }
+            Answer.set(RESTAPI::Protocol::USERS, ArrayObj);
             return ReturnObject(Answer);
         } else {
             Poco::JSON::Array ArrayObj;
