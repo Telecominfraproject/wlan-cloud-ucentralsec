@@ -57,7 +57,7 @@ namespace OpenWifi {
     }
 
     bool ActionLinkDB::GetActions(std::vector<SecurityObjects::ActionLink> &Links, uint64_t Max) {
-        return GetRecords(0,Max,Links);
+        return GetRecords(0,Max,Links," sent=0 ");
     }
 
     bool ActionLinkDB::GetActionLink(std::string &ActionId, SecurityObjects::ActionLink &A) {
