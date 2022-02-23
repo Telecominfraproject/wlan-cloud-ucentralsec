@@ -51,7 +51,8 @@ namespace OpenWifi {
                     StorageService()->ActionLinksDB().CancelAction(i.id);
                     continue;
                 } else if(( i.action==OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD ||
-                            i.action==OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL) && !StorageService()->SubDB().GetUserById(i.userId,UInfo)) {
+                            i.action==OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL ||
+                            i.action==OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP ) && !StorageService()->SubDB().GetUserById(i.userId,UInfo)) {
                     StorageService()->ActionLinksDB().CancelAction(i.id);
                     continue;
                 }
