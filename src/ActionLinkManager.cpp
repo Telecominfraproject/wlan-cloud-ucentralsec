@@ -39,13 +39,10 @@ namespace OpenWifi {
                 continue;
 
             for(auto &i:Links) {
-                std::cout << "Sending email " << __LINE__ << std::endl;
                 if(!Running_)
                     break;
 
-                std::cout << "Sending email " << __LINE__ << std::endl;
                 SecurityObjects::UserInfo UInfo;
-                std::cout << "Sending email " << __LINE__ << std::endl;
                 if((i.action==OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD ||
                     i.action==OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) && !StorageService()->UserDB().GetUserById(i.userId,UInfo)) {
                     StorageService()->ActionLinksDB().CancelAction(i.id);
@@ -57,7 +54,6 @@ namespace OpenWifi {
                     continue;
                 }
 
-                std::cout << "Sending email " << __LINE__ << std::endl;
                 switch(i.action) {
                     case OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
@@ -92,18 +88,14 @@ namespace OpenWifi {
                         break;
 
                     case OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP: {
-                        std::cout << "Sending email " << __LINE__ << std::endl;
                         if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::SIGNUP_VERIFICATION)) {
-                            std::cout << "Sending email " << __LINE__ << std::endl;
                             Logger().information(Poco::format("Send new subscriber email verification link to %s",UInfo.email));
                         }
-                        std::cout << "Sending email " << __LINE__ << std::endl;
                         StorageService()->ActionLinksDB().SentAction(i.id);
                         }
                         break;
 
                     default: {
-                        std::cout << "Sending email " << __LINE__ << std::endl;
                         StorageService()->ActionLinksDB().SentAction(i.id);
                     }
                 }

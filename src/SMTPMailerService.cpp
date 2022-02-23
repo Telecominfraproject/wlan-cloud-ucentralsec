@@ -65,6 +65,7 @@ namespace OpenWifi {
 
     void SMTPMailerService::run() {
         Running_ = true;
+
         while(Running_) {
 
             Poco::Thread::trySleep(10000);
@@ -80,16 +81,16 @@ namespace OpenWifi {
                 if(!Running_)
                     break;
                 auto Recipient = i->Attrs.find(RECIPIENT_EMAIL)->second;
-                uint64_t Now = std::time(nullptr);
-                if((i->LastTry==0 || (Now-i->LastTry)>MailRetry_)) {
+                uint64_t now = OpenWifi::Now();
+                if((i->LastTry==0 || (now-i->LastTry)>MailRetry_)) {
                     if (SendIt(*i)) {
                         Logger().information(Poco::format("Attempting to deliver for mail '%s'.", Recipient));
                         i = Messages_.erase(i);
                     } else {
-                        i->LastTry = Now;
+                        i->LastTry = now;
                         ++i;
                     }
-                } else if ((Now-i->Posted)>MailAbandon_) {
+                } else if ((now-i->Posted)>MailAbandon_) {
                     Logger().information(Poco::format("Mail for '%s' has timed out and will not be sent.", Recipient));
                     i = Messages_.erase(i);
                 } else {
@@ -141,16 +142,12 @@ namespace OpenWifi {
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
                 try {
-                    std::cout << "mail server ... " << __LINE__ << std::endl;
                     Poco::File          LogoFile(AuthService::GetLogoAssetFileName());
                     std::ifstream       IF(LogoFile.path());
                     std::ostringstream  OS;
                     Poco::StreamCopier::copyStream(IF, OS);
-                    std::cout << "mail server ... " << __LINE__ << std::endl;
                     Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
-                    std::cout << "mail server ... " << __LINE__ << std::endl;
                 } catch (...) {
-                    std::cout << "mail server ... " << __LINE__ << std::endl;
                     Logger().warning(Poco::format("Cannot add '%s' logo in email",AuthService::GetLogoAssetFileName()));
                 }
             }
@@ -165,26 +162,19 @@ namespace OpenWifi {
             Poco::Net::SSLManager::instance().initializeClient(nullptr,
                                                                ptrHandler_,
                                                                ptrContext);
-            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.login();
-            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.startTLS(ptrContext);
-            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.login(MailHost_,
                           Poco::Net::SecureSMTPClientSession::AUTH_LOGIN,
                           SenderLoginUserName_,
                           SenderLoginPassword_
             );
-            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.sendMessage(Message);
-            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.close();
-            std::cout << "mail server ... " << __LINE__ << std::endl;
             return true;
         }
         catch (const Poco::Exception& E)
         {
-            std::cout << "mail server ... " << __LINE__ << std::endl;
             Logger().log(E);
         }
         catch (const std::exception &E) {

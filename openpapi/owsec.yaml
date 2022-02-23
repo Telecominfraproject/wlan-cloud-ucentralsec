@@ -355,6 +355,9 @@ components:
           format: int64
         userTypeProprietaryInfo:
           $ref: '#/components/schemas/UserLoginLoginExtensions'
+        signupUUID:
+          type: string
+          format: uuid
 
     UserList:
       type: object
@@ -1465,8 +1468,8 @@ paths:
           schema:
             type: integer
             format: int64
-          required: required
-          example: 1,2,3
+            example: 1,2,3
+          required: true
       responses:
         200:
           description: Succesful posting of response.
@@ -1505,16 +1508,7 @@ paths:
           required: true
       responses:
         200:
-          description: Success signup post
-          content:
-            application/json:
-              schema:
-                type:
-                  object
-                properties:
-                  signupUUID:
-                    type: string
-                    format: uuid
+          $ref: '#/components/schemas/UserInfo'
         400:
           $ref: '#/components/responses/BadRequest'
         403:

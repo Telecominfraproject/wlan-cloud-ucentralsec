@@ -123,17 +123,17 @@
 <form action="/api/v1/actionLink?action=signup_completion" method="post" onsubmit="return validatePassword()">
     <input type="hidden" id="custId" name="id" value="${UUID}">
     <div class="grid-container">
-        <h2>Reset Password</h2>
+        <h2>Signup Completion</h2>
         <div class="passwordlabel">
             <label class="passwordtext" for="password1" ><b>New Password</b></label>
-            <input className="password-input" id="password1" type="password" placeholder="New Password" name="password1" pattern="${PASSWORD_VALIDATION}" required>
+            <input className="password-input" id="password1" type="password" placeholder="Password" name="password1" pattern="${PASSWORD_VALIDATION}" required>
         </div>
         <div class="passwordlabel">
             <label class="passwordtext" for="password2"><b>Retype Password</b></label>
             <input className="password-input" id="password2" type="password" placeholder="Retype Password" name="password2" pattern="${PASSWORD_VALIDATION}" required>
         </div>
         <div class="passwordlabel">
-            <button type="submit">Reset Password</button>
+            <button type="submit">Complete Signup</button>
         </div>
 
         <div class="rulestext">
@@ -153,7 +153,7 @@
         if(document.getElementById("password1").value == document.getElementById("password2").value) {
             return true;
         } else {
-            alert("The 2 passwords did not match. The passwords must match to reset your new password.");
+            alert("The 2 passwords did not match. The passwords must match to complete your signup.");
             return false;
         }
     }
