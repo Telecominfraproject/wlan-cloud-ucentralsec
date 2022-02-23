@@ -141,12 +141,16 @@ namespace OpenWifi {
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
                 try {
+                    std::cout << "mail server ... " << __LINE__ << std::endl;
                     Poco::File          LogoFile(AuthService::GetLogoAssetFileName());
                     std::ifstream       IF(LogoFile.path());
                     std::ostringstream  OS;
                     Poco::StreamCopier::copyStream(IF, OS);
+                    std::cout << "mail server ... " << __LINE__ << std::endl;
                     Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
+                    std::cout << "mail server ... " << __LINE__ << std::endl;
                 } catch (...) {
+                    std::cout << "mail server ... " << __LINE__ << std::endl;
                     Logger().warning(Poco::format("Cannot add '%s' logo in email",AuthService::GetLogoAssetFileName()));
                 }
             }
@@ -161,19 +165,26 @@ namespace OpenWifi {
             Poco::Net::SSLManager::instance().initializeClient(nullptr,
                                                                ptrHandler_,
                                                                ptrContext);
+            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.login();
+            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.startTLS(ptrContext);
+            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.login(MailHost_,
                           Poco::Net::SecureSMTPClientSession::AUTH_LOGIN,
                           SenderLoginUserName_,
                           SenderLoginPassword_
             );
+            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.sendMessage(Message);
+            std::cout << "mail server ... " << __LINE__ << std::endl;
             session.close();
+            std::cout << "mail server ... " << __LINE__ << std::endl;
             return true;
         }
         catch (const Poco::Exception& E)
         {
+            std::cout << "mail server ... " << __LINE__ << std::endl;
             Logger().log(E);
         }
         catch (const std::exception &E) {
