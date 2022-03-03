@@ -504,7 +504,7 @@ namespace OpenWifi {
                         MessageAttributes Attrs;
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
                         Attrs[LOGO] = GetLogoAssetURI();
-                        Attrs[SUBJECT] = "EMail Address Verification";
+                        Attrs[SUBJECT] = "e-mail Address Verification";
                         Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
                         SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
                         UInfo.waitingForEmailCheck = true;
@@ -539,7 +539,7 @@ namespace OpenWifi {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
-                    Attrs[SUBJECT] = "EMail Address Verification";
+                    Attrs[SUBJECT] = "e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
                     SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
                     UInfo.waitingForEmailCheck = true;
@@ -550,7 +550,7 @@ namespace OpenWifi {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
-                    Attrs[SUBJECT] = "EMail Address Verification";
+                    Attrs[SUBJECT] = "Signup e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
                     SMTPMailerService()->SendMessage(UInfo.email, "signup_verification.txt", Attrs);
                     UInfo.waitingForEmailCheck = true;
