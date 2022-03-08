@@ -18,6 +18,7 @@ namespace OpenWifi {
             CREATE
         };
 /*
+ *  0) You can only delete yourself if you are a subscriber
     1) You cannot delete yourself
     2) If you are root, you can do anything.
     3) You can do anything to yourself
@@ -30,6 +31,11 @@ namespace OpenWifi {
 
  */
         static inline bool Can( const SecurityObjects::UserInfo & User, const SecurityObjects::UserInfo & Target, ACL_OPS Op) {
+
+            // rule 0
+            if(User.id == Target.id && User.userRole == SecurityObjects::SUBSCRIBER)
+                return true;
+
             //  rule 1
             if(User.id == Target.id && Op==DELETE)
                 return false;
