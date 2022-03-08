@@ -57,20 +57,26 @@ namespace OpenWifi {
     Poco::Net::HTTPRequestHandler * RESTAPI_IntRouter(const char *Path, RESTAPIHandler::BindingMap &Bindings,
                                                             Poco::Logger & L, RESTAPI_GenericServer & S, uint64_t TransactionId) {
         return RESTAPI_Router_I<
-            RESTAPI_users_handler,
-            RESTAPI_user_handler,
-            RESTAPI_subuser_handler,
-            RESTAPI_subusers_handler,
-            RESTAPI_system_command,
-            RESTAPI_action_links,
-            RESTAPI_validate_token_handler,
-            RESTAPI_validate_sub_token_handler,
-            RESTAPI_sms_handler,
-            RESTAPI_preferences,
-            RESTAPI_subpreferences,
-            RESTAPI_suboauth2_handler,
-            RESTAPI_submfa_handler,
-            RESTAPI_signup_handler
+                RESTAPI_oauth2_handler,
+                RESTAPI_users_handler,
+                RESTAPI_user_handler,
+                RESTAPI_system_command,
+                RESTAPI_asset_server,
+                RESTAPI_system_endpoints_handler,
+                RESTAPI_action_links,
+                RESTAPI_avatar_handler,
+                RESTAPI_subavatar_handler,
+                RESTAPI_email_handler,
+                RESTAPI_sms_handler,
+                RESTAPI_preferences,
+                RESTAPI_subpreferences,
+                RESTAPI_suboauth2_handler,
+                RESTAPI_subuser_handler,
+                RESTAPI_subusers_handler,
+                RESTAPI_submfa_handler,
+                RESTAPI_totp_handler,
+                RESTAPI_subtotp_handler,
+                RESTAPI_signup_handler
         >(Path, Bindings, L, S, TransactionId);
     }
 }

@@ -38,11 +38,14 @@ namespace OpenWifi {
     }
 
     void RESTAPI_subuser_handler::DoDelete() {
+        std::cout << __LINE__ << std::endl;
         std::string Id = GetBinding("id", "");
+        std::cout << __LINE__ << std::endl;
         if(Id.empty()) {
             return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
+        std::cout << __LINE__ << std::endl;
         SecurityObjects::UserInfo TargetUser;
         if(!StorageService()->SubDB().GetUserById(Id,TargetUser)) {
             return NotFound();
