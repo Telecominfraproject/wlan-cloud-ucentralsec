@@ -48,23 +48,28 @@ namespace OpenWifi {
             return NotFound();
         }
 
+        std::cout << __LINE__ << std::endl;
         if(TargetUser.userRole != SecurityObjects::SUBSCRIBER) {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
+        std::cout << __LINE__ << std::endl;
         if(!ACLProcessor::Can(UserInfo_.userinfo, TargetUser,ACLProcessor::DELETE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
+        std::cout << __LINE__ << std::endl;
         if(!StorageService()->SubDB().DeleteUser(UserInfo_.userinfo.email,Id)) {
             return NotFound();
         }
 
+        std::cout << __LINE__ << std::endl;
         AuthService()->DeleteSubUserFromCache(Id);
         StorageService()->SubTokenDB().RevokeAllTokens(TargetUser.email);
         StorageService()->SubPreferencesDB().DeleteRecord("id", Id);
         StorageService()->SubAvatarDB().DeleteRecord("id", Id);
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
+        std::cout << __LINE__ << std::endl;
         OK();
     }
 

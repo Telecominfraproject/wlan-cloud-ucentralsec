@@ -33,7 +33,7 @@ namespace OpenWifi {
         static inline bool Can( const SecurityObjects::UserInfo & User, const SecurityObjects::UserInfo & Target, ACL_OPS Op) {
 
             // rule 0
-            if(User.id == Target.id && User.userRole == SecurityObjects::SUBSCRIBER)
+            if(User.id == Target.id && User.userRole == SecurityObjects::SUBSCRIBER && Op == DELETE)
                 return true;
 
             //  rule 1
