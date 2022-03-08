@@ -83,7 +83,7 @@ using namespace std::chrono_literals;
 #include "ow_version.h"
 
 #define _OWDEBUG_ std::cout<< __FILE__ <<":" << __LINE__ << std::endl;
-
+// #define _OWDEBUG_ Logger().debug(Poco::format("%s: %lu",__FILE__,__LINE__));
 namespace OpenWifi {
 
     inline uint64_t Now() { return std::time(nullptr); };
@@ -1858,7 +1858,17 @@ namespace OpenWifi {
 	            return Return;
 	    }
 
-	    static inline bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value) {
+        static inline bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, Types::UUIDvec_t & Value) {
+            if(O->has(Field) && O->isArray(Field)) {
+                auto Arr = O->getArray(Field);
+                for(const auto &i:*Arr)
+                    Value.emplace_back(i.toString());
+                return true;
+            }
+            return false;
+        }
+
+        static inline bool AssignIfPresent(const Poco::JSON::Object::Ptr &O, const std::string &Field, std::string &Value) {
 	        if(O->has(Field)) {
 	            Value = O->get(Field).toString();
 	            return true;
@@ -4292,12 +4302,6 @@ namespace OpenWifi {
                 Poco::Net::HTTPRequest Request(Poco::Net::HTTPRequest::HTTP_DELETE,
                                                Path,
                                                Poco::Net::HTTPMessage::HTTP_1_1);
-                std::ostringstream obody;
-                Poco::JSON::Stringifier::stringify(Body_,obody);
-
-                Request.setContentType("application/json");
-                Request.setContentLength(obody.str().size());
-
                 if(BearerToken.empty()) {
                     Request.add("X-API-KEY", Svc.AccessKey);
                     Request.add("X-INTERNAL-NAME", MicroService::instance().PublicEndPoint());
@@ -4305,9 +4309,6 @@ namespace OpenWifi {
                     // Authorization: Bearer ${token}
                     Request.add("Authorization", "Bearer " + BearerToken);
                 }
-
-                std::ostream & os = Session.sendRequest(Request);
-                os << obody.str();
 
                 Poco::Net::HTTPResponse Response;
                 Session.receiveResponse(Response);

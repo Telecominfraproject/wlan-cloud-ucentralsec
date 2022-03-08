@@ -38,6 +38,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_subuser_handler::DoDelete() {
+        std::cout << "Sub delete: " << Internal_ << std::endl;
         std::cout << __LINE__ << std::endl;
         std::string Id = GetBinding("id", "");
         std::cout << __LINE__ << std::endl;
