@@ -131,11 +131,11 @@ namespace OpenWifi {
                 Message.addContent(new Poco::Net::StringPartSource(Content));
             } else {
                 std::string Content = Utils::LoadFile(Msg.File);
-                std::cout << "Mailing " << Content << std::endl;
+                // std::cout << "Mailing " << Content << std::endl;
                 Types::StringPairVec    Variables;
                 FillVariables(Msg.Attrs, Variables);
                 Utils::ReplaceVariables(Content, Variables);
-                std::cout << "Mailing " << Content << std::endl;
+                // std::cout << "Mailing " << Content << std::endl;
                 Message.addContent(new Poco::Net::StringPartSource(Content));
             }
 

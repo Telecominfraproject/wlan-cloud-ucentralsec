@@ -38,42 +38,33 @@ namespace OpenWifi {
     }
 
     void RESTAPI_subuser_handler::DoDelete() {
-        std::cout << "Sub delete: " << Internal_ << std::endl;
-        std::cout << __LINE__ << std::endl;
         std::string Id = GetBinding("id", "");
-        std::cout << __LINE__ << std::endl;
         if(Id.empty()) {
             return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
-        std::cout << __LINE__ << std::endl;
         SecurityObjects::UserInfo TargetUser;
         if(!StorageService()->SubDB().GetUserById(Id,TargetUser)) {
             return NotFound();
         }
 
-        std::cout << __LINE__ << std::endl;
         if(TargetUser.userRole != SecurityObjects::SUBSCRIBER) {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
-        std::cout << __LINE__ << std::endl;
         if(!Internal_ && !ACLProcessor::Can(UserInfo_.userinfo, TargetUser,ACLProcessor::DELETE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
-        std::cout << __LINE__ << std::endl;
         if(!StorageService()->SubDB().DeleteUser(UserInfo_.userinfo.email,Id)) {
             return NotFound();
         }
 
-        std::cout << __LINE__ << std::endl;
         AuthService()->DeleteSubUserFromCache(Id);
         StorageService()->SubTokenDB().RevokeAllTokens(TargetUser.email);
         StorageService()->SubPreferencesDB().DeleteRecord("id", Id);
         StorageService()->SubAvatarDB().DeleteRecord("id", Id);
         Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
-        std::cout << __LINE__ << std::endl;
         OK();
     }
 
