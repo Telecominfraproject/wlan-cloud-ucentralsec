@@ -58,7 +58,7 @@ namespace OpenWifi {
         }
 
         std::cout << __LINE__ << std::endl;
-        if(!ACLProcessor::Can(UserInfo_.userinfo, TargetUser,ACLProcessor::DELETE)) {
+        if(!Internal_ && !ACLProcessor::Can(UserInfo_.userinfo, TargetUser,ACLProcessor::DELETE)) {
             return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
