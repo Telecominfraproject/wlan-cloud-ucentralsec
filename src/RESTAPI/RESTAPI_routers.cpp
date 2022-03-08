@@ -32,8 +32,8 @@ namespace OpenWifi {
                                                             Poco::Logger & L, RESTAPI_GenericServer & S, uint64_t TransactionId) {
         return RESTAPI_Router<
             RESTAPI_oauth2_handler,
-            RESTAPI_users_handler,
             RESTAPI_user_handler,
+            RESTAPI_users_handler,
             RESTAPI_system_command,
             RESTAPI_asset_server,
             RESTAPI_system_endpoints_handler,
@@ -58,8 +58,8 @@ namespace OpenWifi {
                                                             Poco::Logger & L, RESTAPI_GenericServer & S, uint64_t TransactionId) {
         return RESTAPI_Router_I<
                 RESTAPI_oauth2_handler,
-                RESTAPI_users_handler,
                 RESTAPI_user_handler,
+                RESTAPI_users_handler,
                 RESTAPI_system_command,
                 RESTAPI_asset_server,
                 RESTAPI_system_endpoints_handler,
