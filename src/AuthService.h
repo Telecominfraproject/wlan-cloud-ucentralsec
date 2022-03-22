@@ -114,7 +114,6 @@ namespace OpenWifi{
         inline const std::string & GetSubAccessPolicy() const { return SubAccessPolicy_; }
 
     private:
-		Poco::JWT::Signer	Signer_;
 		Poco::SHA2Engine	SHA2_;
 
 		std::string         AccessPolicy_;

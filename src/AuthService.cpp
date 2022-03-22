@@ -43,8 +43,6 @@ namespace OpenWifi {
 	}
 
     int AuthService::Start() {
-		Signer_.setRSAKey(MicroService::instance().Key());
-		Signer_.addAllAlgorithms();
 		Logger().notice("Starting...");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
@@ -225,7 +223,7 @@ namespace OpenWifi {
 		T.payload().set("identity", Identity);
 		T.setIssuedAt(Poco::Timestamp());
 		T.setExpiration(Poco::Timestamp() + (long long)TokenAging_);
-		std::string JWT = Signer_.sign(T,Poco::JWT::Signer::ALGO_RS256);
+		std::string JWT = MicroService::instance().Sign(T,Poco::JWT::Signer::ALGO_RS256);
 
 		return JWT;
     }
