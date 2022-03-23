@@ -54,6 +54,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED system)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(fmt  REQUIRED)
 find_package(AWSSDK     REQUIRED COMPONENTS sns)
 find_package(nlohmann_json  REQUIRED)
 find_package(CppKafka REQUIRED)
@@ -126,6 +127,7 @@ if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
             ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES}  ${ZLIB_LIBRARIES}
             CppKafka::cppkafka ${AWSSDK_LINK_LIBRARIES}
+            fmt::fmt
             )
     if(UNIX AND NOT APPLE)
         target_link_libraries(owsec PUBLIC PocoJSON)

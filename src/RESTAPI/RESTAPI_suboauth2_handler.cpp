@@ -20,7 +20,7 @@ namespace OpenWifi {
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
         if(GetMe) {
-            Logger_.information(Poco::format("REQUEST-ME(%s): Request for %s", Request->clientAddress().toString(),
+            Logger_.information(fmt::format("REQUEST-ME({}): Request for {}", Request->clientAddress().toString(),
                                              UserInfo_.userinfo.email));
             Poco::JSON::Object Me;
             SecurityObjects::UserInfo   ReturnedUser = UserInfo_.userinfo;
@@ -45,7 +45,7 @@ namespace OpenWifi {
             return ReturnStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, true);
         }
 
-        Logger_.information(Poco::format("BAD-LOGOUT(%s): Request for %s", Request->clientAddress().toString(), UserInfo_.userinfo.email));
+        Logger_.information(fmt::format("BAD-LOGOUT({}): Request for {}", Request->clientAddress().toString(), UserInfo_.userinfo.email));
         NotFound();
     }
 
@@ -58,7 +58,7 @@ namespace OpenWifi {
         Poco::toLowerInPlace(userId);
 
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
-            Logger_.information(Poco::format("POLICY-REQUEST(%s): Request.", Request->clientAddress().toString()));
+            Logger_.information(fmt::format("POLICY-REQUEST({}): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->SubPasswordValidationExpression());
             Answer.set(RESTAPI::Protocol::ACCESSPOLICY, AuthService()->GetSubAccessPolicy());
@@ -70,7 +70,7 @@ namespace OpenWifi {
             SecurityObjects::UserInfo UInfo1;
             auto UserExists = StorageService()->SubDB().GetUserByEmail(userId,UInfo1);
             if(UserExists) {
-                Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
+                Logger_.information(fmt::format("FORGOTTEN-PASSWORD({}): Request for {}", Request->clientAddress().toString(), userId));
                 SecurityObjects::ActionLink NewLink;
 
                 NewLink.action = OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD;
@@ -96,7 +96,7 @@ namespace OpenWifi {
         }
 
         if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE,false)) {
-            Logger_.information(Poco::format("RESEND-MFA-CODE(%s): Request for %s", Request->clientAddress().toString(), userId));
+            Logger_.information(fmt::format("RESEND-MFA-CODE({}): Request for {}", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid")) {
                 auto uuid = Obj->get("uuid").toString();
                 if(MFAServer()->ResendCode(uuid))
@@ -106,7 +106,7 @@ namespace OpenWifi {
         }
 
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
-            Logger_.information(Poco::format("COMPLETE-MFA-CHALLENGE(%s): Request for %s", Request->clientAddress().toString(), userId));
+            Logger_.information(fmt::format("COMPLETE-MFA-CHALLENGE({}): Request for {}", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid") && Obj->has("answer")) {
                 SecurityObjects::UserInfoAndPolicy UInfo;
                 if(MFAServer()->CompleteMFAChallenge(Obj,UInfo)) {

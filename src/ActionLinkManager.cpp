@@ -57,7 +57,7 @@ namespace OpenWifi {
                 switch(i.action) {
                     case OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
-                                Logger().information(Poco::format("Send password reset link to %s",UInfo.email));
+                                Logger().information(fmt::format("Send password reset link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -65,7 +65,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, AuthService::EMAIL_VERIFICATION)) {
-                                Logger().information(Poco::format("Send email verification link to %s",UInfo.email));
+                                Logger().information(fmt::format("Send email verification link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -73,7 +73,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::FORGOT_PASSWORD)) {
-                                Logger().information(Poco::format("Send subscriber password reset link to %s",UInfo.email));
+                                Logger().information(fmt::format("Send subscriber password reset link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -81,7 +81,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL: {
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::EMAIL_VERIFICATION)) {
-                                Logger().information(Poco::format("Send subscriber email verification link to %s",UInfo.email));
+                                Logger().information(fmt::format("Send subscriber email verification link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -89,7 +89,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP: {
                         if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::SIGNUP_VERIFICATION)) {
-                            Logger().information(Poco::format("Send new subscriber email verification link to %s",UInfo.email));
+                            Logger().information(fmt::format("Send new subscriber email verification link to {}",UInfo.email));
                         }
                         StorageService()->ActionLinksDB().SentAction(i.id);
                         }

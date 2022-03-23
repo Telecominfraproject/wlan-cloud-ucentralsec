@@ -64,7 +64,7 @@ namespace OpenWifi {
         StorageService()->SubTokenDB().RevokeAllTokens(TargetUser.email);
         StorageService()->SubPreferencesDB().DeleteRecord("id", Id);
         StorageService()->SubAvatarDB().DeleteRecord("id", Id);
-        Logger_.information(Poco::format("User '%s' deleted by '%s'.",Id,UserInfo_.userinfo.email));
+        Logger_.information(fmt::format("User '{}' deleted by '{}'.",Id,UserInfo_.userinfo.email));
         OK();
     }
 
@@ -111,18 +111,18 @@ namespace OpenWifi {
         NewUser.userTypeProprietaryInfo.authenticatorSecret.clear();
 
         if(!StorageService()->SubDB().CreateUser(NewUser.email, NewUser)) {
-            Logger_.information(Poco::format("Could not add user '%s'.",NewUser.email));
+            Logger_.information(fmt::format("Could not add user '{}'.",NewUser.email));
             return BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
 
         if(GetParameter("email_verification","false")=="true") {
             if(AuthService::VerifySubEmail(NewUser))
-                Logger_.information(Poco::format("Verification e-mail requested for %s",NewUser.email));
+                Logger_.information(fmt::format("Verification e-mail requested for {}",NewUser.email));
             StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email,NewUser.id,NewUser);
         }
 
         if(!StorageService()->SubDB().GetUserByEmail(NewUser.email, NewUser)) {
-            Logger_.information(Poco::format("User '%s' but not retrieved.",NewUser.email));
+            Logger_.information(fmt::format("User '{}' but not retrieved.",NewUser.email));
             return NotFound();
         }
 
@@ -130,7 +130,7 @@ namespace OpenWifi {
         Sanitize(UserInfo_, NewUser);
         NewUser.to_json(UserInfoObject);
         ReturnObject(UserInfoObject);
-        Logger_.information(Poco::format("User '%s' has been added by '%s')",NewUser.email, UserInfo_.userinfo.email));
+        Logger_.information(fmt::format("User '{}' has been added by '{}')",NewUser.email, UserInfo_.userinfo.email));
     }
 
     void RESTAPI_subuser_handler::DoPut() {
@@ -203,7 +203,7 @@ namespace OpenWifi {
 
         if(GetParameter("email_verification","false")=="true") {
             if(AuthService::VerifySubEmail(Existing))
-                Logger_.information(Poco::format("Verification e-mail requested for %s",Existing.email));
+                Logger_.information(fmt::format("Verification e-mail requested for {}",Existing.email));
         }
 
         if(RawObject->has("userTypeProprietaryInfo")) {

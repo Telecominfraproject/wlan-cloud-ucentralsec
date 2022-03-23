@@ -51,16 +51,16 @@ namespace OpenWifi {
 
             auto psms_out = sns.Publish(psms_req);
             if (psms_out.IsSuccess()) {
-                Logger().debug(Poco::format("SMS sent to %s",PhoneNumber));
+                Logger().debug(fmt::format("SMS sent to {}",PhoneNumber));
                 return true;
             }
             std::string ErrMsg{psms_out.GetError().GetMessage()};
-            Logger().debug(Poco::format("SMS NOT sent to %s: %s",PhoneNumber, ErrMsg));
+            Logger().debug(fmt::format("SMS NOT sent to {}: {}",PhoneNumber, ErrMsg));
             return false;
         } catch (...) {
 
         }
-        Logger().debug(Poco::format("SMS NOT sent to %s: failure in SMS service",PhoneNumber));
+        Logger().debug(fmt::format("SMS NOT sent to {}: failure in SMS service",PhoneNumber));
         return false;
     }
 

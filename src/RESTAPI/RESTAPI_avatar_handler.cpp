@@ -37,7 +37,7 @@ namespace OpenWifi {
         if (!partHandler.Name().empty() && partHandler.Length()< MicroService::instance().ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
-            Logger_.information(Poco::format("Uploaded avatar: %s Type: %s", partHandler.Name(), partHandler.ContentType()));
+            Logger_.information(fmt::format("Uploaded avatar: {} Type: {}", partHandler.Name(), partHandler.ContentType()));
             StorageService()->AvatarDB().SetAvatar(UserInfo_.userinfo.email,
                                  Id, SS.str(), partHandler.ContentType(), partHandler.Name());
             StorageService()->UserDB().SetAvatar(Id,"1");

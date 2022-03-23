@@ -84,14 +84,14 @@ namespace OpenWifi {
                 uint64_t now = OpenWifi::Now();
                 if((i->LastTry==0 || (now-i->LastTry)>MailRetry_)) {
                     if (SendIt(*i)) {
-                        Logger().information(Poco::format("Attempting to deliver for mail '%s'.", Recipient));
+                        Logger().information(fmt::format("Attempting to deliver for mail '{}'.", Recipient));
                         i = Messages_.erase(i);
                     } else {
                         i->LastTry = now;
                         ++i;
                     }
                 } else if ((now-i->Posted)>MailAbandon_) {
-                    Logger().information(Poco::format("Mail for '%s' has timed out and will not be sent.", Recipient));
+                    Logger().information(fmt::format("Mail for '{}' has timed out and will not be sent.", Recipient));
                     i = Messages_.erase(i);
                 } else {
                     ++i;
@@ -122,7 +122,7 @@ namespace OpenWifi {
                 TheSender = Sender_ ;
             }
             Message.setSender( TheSender );
-            Logger().information(Poco::format("Sending message to:%s from %s",Recipient,TheSender));
+            Logger().information(fmt::format("Sending message to:{} from {}",Recipient,TheSender));
             Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
 
@@ -148,7 +148,7 @@ namespace OpenWifi {
                     Poco::StreamCopier::copyStream(IF, OS);
                     Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
                 } catch (...) {
-                    Logger().warning(Poco::format("Cannot add '%s' logo in email",AuthService::GetLogoAssetFileName()));
+                    Logger().warning(fmt::format("Cannot add '{}' logo in email",AuthService::GetLogoAssetFileName()));
                 }
             }
 
@@ -178,7 +178,7 @@ namespace OpenWifi {
             Logger().log(E);
         }
         catch (const std::exception &E) {
-            Logger().warning(Poco::format("Cannot send message to:%s, error: %s",Recipient, E.what()));
+            Logger().warning(fmt::format("Cannot send message to:{}, error: {}",Recipient, E.what()));
         }
         return false;
     }

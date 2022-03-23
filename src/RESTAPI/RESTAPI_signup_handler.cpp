@@ -10,19 +10,16 @@
 namespace OpenWifi {
 
     void RESTAPI_signup_handler::DoPost() {
-        __DBG__
         auto UserName = GetParameter("email","");
         auto signupUUID = GetParameter("signupUUID","");
         if(UserName.empty() || signupUUID.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
-        __DBG__
         if(!Utils::ValidEMailAddress(UserName)) {
             return BadRequest(RESTAPI::Errors::InvalidEmailAddress);
         }
 
-        __DBG__
         // Do we already exist? Can only signup once...
         SecurityObjects::UserInfo   Existing;
         if(StorageService()->SubDB().GetUserByEmail(UserName,Existing)) {
@@ -36,7 +33,6 @@ namespace OpenWifi {
 
             return BadRequest(3, "Waiting for device:" + Existing.signingUp);
         }
-        __DBG__
 
         SecurityObjects::UserInfo   NewSub;
         NewSub.signingUp = signupUUID;
@@ -48,14 +44,11 @@ namespace OpenWifi {
         NewSub.email = UserName;
         NewSub.userRole = SecurityObjects::SUBSCRIBER;
         NewSub.changePassword = true;
-        __DBG__
 
         StorageService()->SubDB().CreateRecord(NewSub);
-        __DBG__
 
-        Logger_.information(Poco::format("SIGNUP-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), UserName));
+        Logger_.information(fmt::format("SIGNUP-PASSWORD({}): Request for {}", Request->clientAddress().toString(), UserName));
         SecurityObjects::ActionLink NewLink;
-        __DBG__
 
         NewLink.action = OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP;
         NewLink.id = MicroService::CreateUUID();
@@ -64,11 +57,9 @@ namespace OpenWifi {
         NewLink.expires = NewLink.created + (1*60*60);  // 1 hour
         NewLink.userAction = false;
         StorageService()->ActionLinksDB().CreateAction(NewLink);
-        __DBG__
 
         Poco::JSON::Object  Answer;
         NewSub.to_json(Answer);
-        __DBG__
         return ReturnObject(Answer);
     }
 

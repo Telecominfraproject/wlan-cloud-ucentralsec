@@ -64,12 +64,12 @@ namespace OpenWifi {
         std::istream& rs = session.receiveResponse(res);
 
         if(res.getStatus()==Poco::Net::HTTPResponse::HTTP_OK) {
-            Logger().information(Poco::format("Message sent to %s", PhoneNumber));
+            Logger().information(fmt::format("Message sent to {}", PhoneNumber));
             return true;
         } else {
             std::ostringstream os;
             Poco::StreamCopier::copyStream(rs,os);
-            Logger().information(Poco::format("Message was not to %s: Error:%s", PhoneNumber, os.str()));
+            Logger().information(fmt::format("Message was not to {}: Error:{}", PhoneNumber, os.str()));
             return false;
         }
     }

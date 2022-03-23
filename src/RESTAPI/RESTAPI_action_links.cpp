@@ -43,7 +43,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_action_links::RequestResetPassword(SecurityObjects::ActionLink &Link) {
-        Logger_.information(Poco::format("REQUEST-PASSWORD-RESET(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
+        Logger_.information(fmt::format("REQUEST-PASSWORD-RESET({}): For ID={}", Request->clientAddress().toString(), Link.userId));
         Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset.html"};
         Types::StringPairVec    FormVars{ {"UUID", Link.id},
                                           {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
@@ -51,7 +51,7 @@ namespace OpenWifi {
     }
 
     void RESTAPI_action_links::DoNewSubVerification(SecurityObjects::ActionLink &Link) {
-        Logger_.information(Poco::format("REQUEST-SUB-SIGNUP(%s): For ID=%s", Request->clientAddress().toString(), Link.userId));
+        Logger_.information(fmt::format("REQUEST-SUB-SIGNUP({}): For ID={}", Request->clientAddress().toString(), Link.userId));
         Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification.html"};
         Types::StringPairVec    FormVars{ {"UUID", Link.id},
                                           {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
@@ -207,7 +207,7 @@ namespace OpenWifi {
                                             },
                                             Body,30000);
 
-            Logger().information(Poco::format("(%s): Completed subscriber e-mail verification and password.",UInfo.email));
+            Logger().information(fmt::format("({}): Completed subscriber e-mail verification and password.",UInfo.email));
             Poco::JSON::Object::Ptr Response;
             ProvRequest.Do(Response);
 
@@ -234,7 +234,7 @@ namespace OpenWifi {
             return SendHTMLFileBack(FormFile, FormVars);
         }
 
-        Logger_.information(Poco::format("EMAIL-VERIFICATION(%s): For ID=%s", Request->clientAddress().toString(), UInfo.email));
+        Logger_.information(fmt::format("EMAIL-VERIFICATION(%s): For ID={}", Request->clientAddress().toString(), UInfo.email));
         UInfo.waitingForEmailCheck = false;
         UInfo.validated = true;
         UInfo.lastEmailCheck = std::time(nullptr);

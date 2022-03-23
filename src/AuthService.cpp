@@ -207,7 +207,7 @@ namespace OpenWifi {
     }
 
     [[nodiscard]] std::string AuthService::GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type) {
-        std::string Identity(UserName + ":" + Poco::format("%d",(int)std::time(nullptr)) + ":" + std::to_string(rand()));
+        std::string Identity(UserName + ":" + fmt::format("{}",std::time(nullptr)) + ":" + std::to_string(rand()));
         HMAC_.update(Identity);
         return Poco::DigestEngine::digestToHex(HMAC_.digest());
     }
