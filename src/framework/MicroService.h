@@ -4132,15 +4132,18 @@ namespace OpenWifi {
 	                for(uint64_t j=0;j<Hosts;++j) {
 	                    auto CertFileName = i->Host(j).CertFile();
 	                    if(!CertFileName.empty()) {
-	                        auto InsertResult = CertNames.insert(CertFileName);
-	                        if(InsertResult.second) {
-	                            Poco::JSON::Object  Inner;
-	                            Poco::Path  F(CertFileName);
-	                            Inner.set("filename", F.getFileName());
-	                            Poco::Crypto::X509Certificate   C(CertFileName);
-	                            auto ExpiresOn = C.expiresOn();
-	                            Inner.set("expiresOn",ExpiresOn.timestamp().epochTime());
-	                            Certificates.add(Inner);
+                            Poco::File  F1(CertFileName);
+                            if(F1.exists()) {
+                                auto InsertResult = CertNames.insert(CertFileName);
+                                if(InsertResult.second) {
+                                    Poco::JSON::Object Inner;
+                                    Poco::Path F(CertFileName);
+                                    Inner.set("filename", F.getFileName());
+                                    Poco::Crypto::X509Certificate C(CertFileName);
+                                    auto ExpiresOn = C.expiresOn();
+                                    Inner.set("expiresOn", ExpiresOn.timestamp().epochTime());
+                                    Certificates.add(Inner);
+                                }
 	                        }
 	                    }
 	                }
