@@ -70,6 +70,10 @@ namespace OpenWifi {
 		try {
 		    std::string CallToken;
             std::cout << __LINE__ << std::endl;
+            for(const auto &k:Request) {
+                std::cout << "  K:" << k.first << "    V:" << k.second << std::endl;
+            }
+
 		    Poco::Net::OAuth20Credentials Auth(Request);
 		    if (Auth.getScheme() == "Bearer") {
                 std::cout << __LINE__ << std::endl;
