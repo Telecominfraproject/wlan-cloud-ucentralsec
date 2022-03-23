@@ -61,9 +61,12 @@ namespace OpenWifi {
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
         auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
 
+        std::cout << __LINE__ << std::endl;
         Poco::toLowerInPlace(userId);
 
+        std::cout << __LINE__ << std::endl;
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
+            std::cout << __LINE__ << std::endl;
             Logger_.information(Poco::format("POLICY-REQUEST(%s): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
@@ -72,10 +75,13 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
+        std::cout << __LINE__ << std::endl;
         if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
+            std::cout << __LINE__ << std::endl;
             SecurityObjects::UserInfo UInfo1;
             auto UserExists = StorageService()->UserDB().GetUserByEmail(userId,UInfo1);
             if(UserExists) {
+                std::cout << __LINE__ << std::endl;
                 Logger_.information(Poco::format("FORGOTTEN-PASSWORD(%s): Request for %s", Request->clientAddress().toString(), userId));
                 SecurityObjects::ActionLink NewLink;
 
@@ -101,9 +107,12 @@ namespace OpenWifi {
             }
         }
 
+        std::cout << __LINE__ << std::endl;
         if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE,false)) {
+            std::cout << __LINE__ << std::endl;
             Logger_.information(Poco::format("RESEND-MFA-CODE(%s): Request for %s", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid")) {
+                std::cout << __LINE__ << std::endl;
                 auto uuid = Obj->get("uuid").toString();
                 if(MFAServer()->ResendCode(uuid))
                     return OK();
@@ -111,6 +120,7 @@ namespace OpenWifi {
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials, BAD_MFA_TRANSACTION);
         }
 
+        std::cout << __LINE__ << std::endl;
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
             Logger_.information(Poco::format("COMPLETE-MFA-CHALLENGE(%s): Request for %s", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid")) {
@@ -124,9 +134,12 @@ namespace OpenWifi {
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials, MFA_FAILURE);
         }
 
+        std::cout << __LINE__ << std::endl;
         SecurityObjects::UserInfoAndPolicy UInfo;
         bool Expired=false;
+        std::cout << __LINE__ << std::endl;
         auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo, Expired);
+        std::cout << __LINE__ << std::endl;
         if (Code==SUCCESS) {
             Poco::JSON::Object ReturnObj;
             if(AuthService()->RequiresMFA(UInfo)) {

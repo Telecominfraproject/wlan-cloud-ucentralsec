@@ -66,14 +66,19 @@ namespace OpenWifi {
     {
         std::lock_guard	Guard(Mutex_);
         Expired = false;
+        std::cout << __LINE__ << std::endl;
 		try {
 		    std::string CallToken;
+            std::cout << __LINE__ << std::endl;
 		    Poco::Net::OAuth20Credentials Auth(Request);
 		    if (Auth.getScheme() == "Bearer") {
+                std::cout << __LINE__ << std::endl;
 		        CallToken = Auth.getBearerToken();
 		    }
 
+            std::cout << __LINE__ << std::endl;
             if(CallToken.empty()) {
+                std::cout << __LINE__ << std::endl;
                 return false;
             }
 
@@ -92,6 +97,7 @@ namespace OpenWifi {
             }
             return false;
 		} catch(const Poco::Exception &E) {
+            std::cout << __LINE__ << std::endl;
 		    Logger().log(E);
 		}
 		return false;
