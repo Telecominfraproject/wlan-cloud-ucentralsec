@@ -54,9 +54,10 @@ namespace OpenWifi {
         std::string UserTypeToString(USER_ROLE U);
 
         struct NoteInfo {
-            uint64_t created = std::time(nullptr);
+            uint64_t    created = std::time(nullptr);
             std::string createdBy;
             std::string note;
+
             void to_json(Poco::JSON::Object &Obj) const;
             bool from_json(Poco::JSON::Object::Ptr &Obj);
         };

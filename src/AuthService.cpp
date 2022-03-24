@@ -68,10 +68,6 @@ namespace OpenWifi {
         Expired = false;
 		try {
 		    std::string CallToken;
-            for(const auto &k:Request) {
-                std::cout << "  K:" << k.first << "    V:" << k.second << std::endl;
-            }
-
 		    Poco::Net::OAuth20Credentials Auth(Request);
 		    if (Auth.getScheme() == "Bearer") {
 		        CallToken = Auth.getBearerToken();
