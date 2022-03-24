@@ -54,7 +54,7 @@ namespace OpenWifi {
         std::string UserTypeToString(USER_ROLE U);
 
         struct NoteInfo {
-            uint64_t    created = std::time(nullptr);
+            uint64_t    created=0; // = std::time(nullptr);
             std::string createdBy;
             std::string note;
 
