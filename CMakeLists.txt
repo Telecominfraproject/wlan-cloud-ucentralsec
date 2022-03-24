@@ -48,6 +48,9 @@ set(BUILD_SHARED_LIBS 1)
 
 add_definitions(-DTIP_SECURITY_SERVICE="1")
 
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
+
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
