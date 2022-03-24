@@ -59,7 +59,7 @@ namespace OpenWifi {
             std::string note;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
         typedef std::vector<NoteInfo>	NoteInfoVec;
 
@@ -69,7 +69,7 @@ namespace OpenWifi {
             bool primary = false;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct MfaAuthInfo {
@@ -77,7 +77,7 @@ namespace OpenWifi {
             std::string method;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct UserLoginLoginExtensions {
@@ -86,7 +86,7 @@ namespace OpenWifi {
             std::string                     authenticatorSecret;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct MFAChallengeRequest {
@@ -96,7 +96,7 @@ namespace OpenWifi {
             uint64_t    created = std::time(nullptr);
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct MFAChallengeResponse {
@@ -104,7 +104,7 @@ namespace OpenWifi {
             std::string answer;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct UserInfo {
@@ -209,7 +209,7 @@ namespace OpenWifi {
             std::string resource;
             ResourceAccessType access;
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
         typedef std::vector<ProfileAction>	ProfileActionVec;
 
@@ -221,14 +221,14 @@ namespace OpenWifi {
             std::string role;
             NoteInfoVec notes;
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
         typedef std::vector<SecurityProfile> SecurityProfileVec;
 
         struct SecurityProfileList {
             SecurityProfileVec profiles;
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         enum LinkActions {
@@ -255,7 +255,7 @@ namespace OpenWifi {
             bool                userAction=true;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct Preferences {
@@ -263,7 +263,7 @@ namespace OpenWifi {
             uint64_t                            modified;
             Types::StringPairVec                data;
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct SubMfaConfig {
@@ -273,7 +273,7 @@ namespace OpenWifi {
             std::string                         email;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct Token {
@@ -287,7 +287,7 @@ namespace OpenWifi {
             uint64_t            revocationDate=0;
 
             void to_json(Poco::JSON::Object &Obj) const;
-            bool from_json(Poco::JSON::Object::Ptr &Obj);
+            bool from_json(const Poco::JSON::Object::Ptr &Obj);
         };
 
         struct Avatar {

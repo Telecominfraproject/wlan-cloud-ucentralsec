@@ -142,7 +142,7 @@ namespace OpenWifi::SecurityObjects {
 	    field_to_json(Obj,"primary", primary);
 	}
 
-	bool MobilePhoneNumber::from_json(Poco::JSON::Object::Ptr &Obj) {
+	bool MobilePhoneNumber::from_json(const Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj,"number",number);
 	        field_from_json(Obj,"verified",verified);
@@ -159,7 +159,7 @@ namespace OpenWifi::SecurityObjects {
 	    field_to_json(Obj,"method", method);
 	}
 
-	bool MfaAuthInfo::from_json(Poco::JSON::Object::Ptr &Obj) {
+	bool MfaAuthInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj,"enabled",enabled);
 	        field_from_json(Obj,"method",method);
@@ -176,7 +176,7 @@ namespace OpenWifi::SecurityObjects {
         field_to_json(Obj, "authenticatorSecret", authenticatorSecret);
 	}
 
-	bool UserLoginLoginExtensions::from_json(Poco::JSON::Object::Ptr &Obj) {
+	bool UserLoginLoginExtensions::from_json(const Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj, "mobiles",mobiles);
 	        field_from_json(Obj, "mfa",mfa);
@@ -195,7 +195,7 @@ namespace OpenWifi::SecurityObjects {
         field_to_json(Obj, "method", method);
     }
 
-    bool MFAChallengeRequest::from_json(Poco::JSON::Object::Ptr &Obj) {
+    bool MFAChallengeRequest::from_json(const Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj,"uuid",uuid);
 	        field_from_json(Obj,"question",question);
@@ -213,7 +213,7 @@ namespace OpenWifi::SecurityObjects {
         field_to_json(Obj, "answer", answer);
     }
 
-    bool MFAChallengeResponse::from_json(Poco::JSON::Object::Ptr &Obj) {
+    bool MFAChallengeResponse::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             field_from_json(Obj,"uuid",uuid);
             field_from_json(Obj,"answer",answer);
@@ -398,7 +398,7 @@ namespace OpenWifi::SecurityObjects {
 		field_to_json(Obj,"note", note);
 	}
 
-	bool NoteInfo::from_json(Poco::JSON::Object::Ptr &Obj) {
+	bool NoteInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
 		try {
             std::ostringstream OO;
             Obj->stringify(OO);
@@ -447,7 +447,7 @@ namespace OpenWifi::SecurityObjects {
 		field_to_json<ResourceAccessType>(Obj,"access", access, ResourceAccessTypeToString);
 	}
 
-	bool ProfileAction::from_json(Poco::JSON::Object::Ptr &Obj) {
+	bool ProfileAction::from_json(const Poco::JSON::Object::Ptr &Obj) {
 		try {
 			field_from_json(Obj,"resource",resource);
 			field_from_json<ResourceAccessType>(Obj,"access",access,ResourceAccessTypeFromString );
@@ -467,7 +467,7 @@ namespace OpenWifi::SecurityObjects {
 		field_to_json(Obj,"notes", notes);
 	}
 
-	bool SecurityProfile::from_json(Poco::JSON::Object::Ptr &Obj) {
+	bool SecurityProfile::from_json(const Poco::JSON::Object::Ptr &Obj) {
 		try {
 			field_from_json(Obj,"id",id);
 			field_from_json(Obj,"name",name);
@@ -486,7 +486,7 @@ namespace OpenWifi::SecurityObjects {
 		field_to_json(Obj, "profiles", profiles);
 	}
 
-	bool SecurityProfileList::from_json(Poco::JSON::Object::Ptr &Obj) {
+	bool SecurityProfileList::from_json(const Poco::JSON::Object::Ptr &Obj) {
 		try {
 			field_from_json(Obj,"profiles",profiles);
 			return true;
@@ -512,7 +512,7 @@ namespace OpenWifi::SecurityObjects {
         field_to_json(Obj,"userAction",userAction);
 	}
 
-    bool ActionLink::from_json(Poco::JSON::Object::Ptr &Obj) {
+    bool ActionLink::from_json(const Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj,"id",id);
 	        field_from_json(Obj,"action",action);
@@ -540,7 +540,7 @@ namespace OpenWifi::SecurityObjects {
 	    field_to_json(Obj,"data",data);
 	}
 
-    bool Preferences::from_json(Poco::JSON::Object::Ptr &Obj) {
+    bool Preferences::from_json(const Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj,"id",id);
 	        field_from_json(Obj,"modified",modified);
@@ -559,7 +559,7 @@ namespace OpenWifi::SecurityObjects {
 	    field_to_json(Obj,"email",email);
 	}
 
-    bool SubMfaConfig::from_json(Poco::JSON::Object::Ptr &Obj) {
+    bool SubMfaConfig::from_json(const Poco::JSON::Object::Ptr &Obj) {
 	    try {
 	        field_from_json(Obj,"id",id);
 	        field_from_json(Obj,"type",type);
@@ -583,7 +583,7 @@ namespace OpenWifi::SecurityObjects {
         field_to_json(Obj,"revocationDate",revocationDate);
     }
 
-    bool Token::from_json(Poco::JSON::Object::Ptr &Obj) {
+    bool Token::from_json(const Poco::JSON::Object::Ptr &Obj) {
         try {
             field_from_json(Obj,"token",token);
             field_from_json(Obj,"refreshToken",refreshToken);
