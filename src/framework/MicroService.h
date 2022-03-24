@@ -341,33 +341,32 @@ namespace OpenWifi::RESTAPI_utils {
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, int16_t &Value) {
         if(Obj->has(Field))
-            Value = Obj->get(Field).extract<int16_t>();
+            Value = (int16_t)Obj->get(Field).extract<long long>();
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, int32_t &Value) {
         if(Obj->has(Field))
-            Value = Obj->get(Field).extract<int32_t>();
+            Value = (int32_t) Obj->get(Field).extract<long long>();
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, int64_t &Value) {
         if(Obj->has(Field))
-            Value = Obj->get(Field).extract<int64_t>();
+            Value = (int64_t)Obj->get(Field).extract<long long>();
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, uint16_t &Value) {
         if(Obj->has(Field))
-            Value = Obj->get(Field).extract<uint16_t>();
+            Value = (uint16_t)Obj->get(Field).extract<long long>();
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, uint32_t &Value) {
         if(Obj->has(Field))
-            Value = Obj->get(Field).extract<uint32_t>();
+            Value = (uint32_t)Obj->get(Field).extract<long long>();
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, uint64_t &Value) {
-        std::cout << Field << std::endl;
         if(Obj->has(Field))
-            Value = (uint64_t ) Obj->get(Field).extract<int64_t>();
+            Value = (uint64_t ) Obj->get(Field).extract<long long>();
     }
 
     inline void field_from_json(const Poco::JSON::Object::Ptr &Obj, const char *Field, Types::StringPairVec &Vec) {

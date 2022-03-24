@@ -400,16 +400,9 @@ namespace OpenWifi::SecurityObjects {
 
 	bool NoteInfo::from_json(const Poco::JSON::Object::Ptr &Obj) {
 		try {
-            std::ostringstream OO;
-            Obj->stringify(OO);
-            std::cout << OO.str() << std::endl;
-            std::cout << __LINE__ << std::endl;
             field_from_json(Obj,"created",created);
-            std::cout << __LINE__ << std::endl;
 			field_from_json(Obj,"createdBy",createdBy);
-            std::cout << __LINE__ << std::endl;
 			field_from_json(Obj,"note", note);
-            std::cout << __LINE__ << std::endl;
 			return true;
 		} catch(...) {
             std::cout << "Cannot parse: NoteInfo" << std::endl;
