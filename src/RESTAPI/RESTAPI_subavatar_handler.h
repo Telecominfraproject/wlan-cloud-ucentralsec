@@ -24,7 +24,7 @@ namespace OpenWifi {
         std::string     FileType_;
         std::string     Name_;
         std::string     Id_;
-        Poco::Logger    &Logger_;
+        [[maybe_unused]] Poco::Logger    &Logger_;
         std::stringstream &OutputStream_;
     };
 

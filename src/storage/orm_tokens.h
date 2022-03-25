@@ -36,6 +36,7 @@ namespace OpenWifi {
     public:
 
         TokenCache(unsigned Size, unsigned TimeOut, bool Users);
+        virtual ~TokenCache() {}
         void UpdateCache(const SecurityObjects::Token &R) override;
         void Create(const SecurityObjects::Token &R) override;
         bool GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::Token &R) override;
@@ -43,7 +44,7 @@ namespace OpenWifi {
 
     private:
         std::mutex  Mutex_;
-        bool        UsersOnly_;
+        [[maybe_unused]] bool        UsersOnly_;
         std::unique_ptr<Poco::ExpireLRUCache<std::string,SecurityObjects::Token>>    CacheByToken_;
     };
 
@@ -51,6 +52,7 @@ namespace OpenWifi {
     class BaseTokenDB : public ORM::DB<TokenRecordTuple, SecurityObjects::Token> {
     public:
         BaseTokenDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L, TokenCache * Cache, bool User);
+        virtual ~BaseTokenDB() {}
 
 
         bool AddToken(std::string &UserId, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut);
@@ -60,7 +62,7 @@ namespace OpenWifi {
         bool RevokeAllTokens( std::string & UserName );
         bool GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate);
     private:
-        bool UsersOnly_;
+        [[maybe_unused]] bool UsersOnly_;
     };
 
 }

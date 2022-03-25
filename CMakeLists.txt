@@ -48,6 +48,7 @@ set(BUILD_SHARED_LIBS 1)
 
 add_definitions(-DTIP_SECURITY_SERVICE="1")
 
+add_compile_options(-Wall -Wextra)
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 

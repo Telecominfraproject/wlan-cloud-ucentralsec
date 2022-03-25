@@ -8,7 +8,7 @@
 
 namespace OpenWifi {
 
-    inline void Sanitize(const SecurityObjects::UserInfoAndPolicy &User, SecurityObjects::UserInfo & U) {
+    inline void Sanitize([[maybe_unused]] const SecurityObjects::UserInfoAndPolicy &User, SecurityObjects::UserInfo & U) {
         U.currentPassword.clear();
         U.lastPasswords.clear();
         U.oauthType.clear();

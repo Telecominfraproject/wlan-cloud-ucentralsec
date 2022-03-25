@@ -27,7 +27,7 @@ namespace OpenWifi {
             DB(T, Name.c_str(), AvatarDB_Fields,{}, P, L, ShortName.c_str()) {
     }
 
-    bool AvatarDB::SetAvatar(const std::string &Admin, std::string &Id, const std::string & AvatarContent,
+    bool AvatarDB::SetAvatar([[maybe_unused]] const std::string &Admin, std::string &Id, const std::string & AvatarContent,
                              std::string &Type, std::string &Name) {
 
         try {
@@ -50,7 +50,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool AvatarDB::GetAvatar(const std::string &Admin, std::string &Id, std::string & AvatarContent,
+    bool AvatarDB::GetAvatar([[maybe_unused]] const std::string &Admin, std::string &Id, std::string & AvatarContent,
                              std::string &Type, std::string &Name) {
         SecurityObjects::Avatar A;
         try {
@@ -74,7 +74,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool AvatarDB::DeleteAvatar(const std::string &Admin, std::string &Id) {
+    bool AvatarDB::DeleteAvatar([[maybe_unused]] const std::string &Admin, std::string &Id) {
         return DeleteRecord("id",Id);
     }
 

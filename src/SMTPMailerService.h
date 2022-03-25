@@ -84,9 +84,9 @@ namespace OpenWifi {
         private:
             std::string             MailHost_;
             std::string             Sender_;
-            int                     MailHostPort_=25;
-            int                     MailRetry_=2*60;
-            int                     MailAbandon_=2*60*20;
+            uint32_t                MailHostPort_=25;
+            uint64_t                MailRetry_=2*60;
+            uint64_t                MailAbandon_=2*60*20;
             std::string             SenderLoginUserName_;
             std::string             SenderLoginPassword_;
             std::string             LoginMethod_ = "login";

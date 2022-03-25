@@ -52,9 +52,9 @@ namespace OpenWifi {
 
         Poco::JSON::Object  RObj;
 
-        form.add("To",PhoneNumber);
-        form.add("From",PhoneNumber_);
-        form.add("Body","This is from twillio");
+        form.add("To", PhoneNumber);
+        form.add("From", PhoneNumber_);
+        form.add("Body", Message);
 
         form.prepareSubmit(req);
         std::ostream& ostr = session.sendRequest(req);

@@ -21,6 +21,7 @@ namespace OpenWifi {
     class LoginDB : public ORM::DB<LoginInfoRecordTuple, SecurityObjects::LoginRecordInfo> {
     public:
         LoginDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        virtual ~LoginDB() {}
 
         void AddLogin(const std::string & id, const std::string & email, const std::string &token);
         void AddLogout(const std::string &token);

@@ -27,10 +27,10 @@ namespace OpenWifi {
             SenderLoginPassword_ = MicroService::instance().ConfigGetString("mailer.password");
             Sender_ = MicroService::instance().ConfigGetString("mailer.sender");
             LoginMethod_ = MicroService::instance().ConfigGetString("mailer.loginmethod");
-            MailHostPort_ = (int) MicroService::instance().ConfigGetInt("mailer.port");
+            MailHostPort_ = MicroService::instance().ConfigGetInt("mailer.port");
             TemplateDir_ = MicroService::instance().ConfigPath("mailer.templates", MicroService::instance().DataDir());
-            MailRetry_ = (int) MicroService::instance().ConfigGetInt("mailer.retry",2*60);
-            MailAbandon_ = (int) MicroService::instance().ConfigGetInt("mailer.abandon",2*60*60);
+            MailRetry_ = MicroService::instance().ConfigGetInt("mailer.retry",2*60);
+            MailAbandon_ = MicroService::instance().ConfigGetInt("mailer.abandon",2*60*60);
             Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
         }
     }
@@ -47,13 +47,13 @@ namespace OpenWifi {
         SenderThr_.join();
     }
 
-    void SMTPMailerService::reinitialize(Poco::Util::Application &self) {
+    void SMTPMailerService::reinitialize([[maybe_unused]] Poco::Util::Application &self) {
         MicroService::instance().LoadConfigurationFile();
         Logger().information("Reinitializing.");
         LoadMyConfig();
     }
 
-    bool SMTPMailerService::SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
+    bool SMTPMailerService::SendMessage([[maybe_unused]] const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
         std::lock_guard G(Mutex_);
         PendingMessages_.push_back(MessageEvent{.Posted=(uint64_t )std::time(nullptr),
                                             .LastTry=0,

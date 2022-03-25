@@ -48,7 +48,7 @@ namespace OpenWifi {
             UsersOnly_(Users) {
     }
 
-    bool BaseTokenDB::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
+    bool BaseTokenDB::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, [[maybe_unused]] std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
         SecurityObjects::Token  T{.token=Token, .refreshToken=RefreshToken, .tokenType="Bearer", .userName=UserID,
                                   .created=(uint64_t) std::time(nullptr), .expires=Expires, .idleTimeout=TimeOut,.revocationDate=0};
         return CreateRecord(T);
@@ -99,8 +99,9 @@ namespace OpenWifi {
     }
 
     TokenCache::TokenCache(unsigned Size, unsigned TimeOut, bool Users) :
-            UsersOnly_(Users),
-            ORM::DBCache<SecurityObjects::Token>(Size,TimeOut) {
+            ORM::DBCache<SecurityObjects::Token>(Size,TimeOut),
+            UsersOnly_(Users)
+             {
         CacheByToken_ = std::make_unique<Poco::ExpireLRUCache<std::string,SecurityObjects::Token>>(Size,TimeOut);
     }
 
@@ -110,7 +111,7 @@ namespace OpenWifi {
         CacheByToken_->update(R.token,R);
     }
 
-    void TokenCache::Create(const SecurityObjects::Token &R) {
+    void TokenCache::Create([[maybe_unused]] const SecurityObjects::Token &R) {
 
     }
 

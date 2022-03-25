@@ -49,6 +49,7 @@ namespace OpenWifi {
     class UserCache : public ORM::DBCache<SecurityObjects::UserInfo> {
     public:
         UserCache(unsigned Size, unsigned TimeOut, bool Users);
+        virtual ~UserCache() {}
         void UpdateCache(const SecurityObjects::UserInfo &R) override;
         void Create(const SecurityObjects::UserInfo &R) override;
         bool GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::UserInfo &R) override;
@@ -65,6 +66,7 @@ namespace OpenWifi {
     public:
         const uint32_t CurrentVersion = 2;
         BaseUserDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L, UserCache * Cache, bool users);
+        virtual ~BaseUserDB() {}
 
         bool CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready = false );
         bool GetUserByEmail(const std::string & email, SecurityObjects::UserInfo & User);

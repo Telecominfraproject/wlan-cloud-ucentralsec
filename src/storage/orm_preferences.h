@@ -23,6 +23,7 @@ namespace OpenWifi {
         bool GetPreferences(std::string &Id, SecurityObjects::Preferences &P);
         bool SetPreferences(SecurityObjects::Preferences &P);
         bool DeletePreferences(const std::string &AdminId, std::string & Id);
+        virtual ~PreferencesDB() {}
 
     private:
     };

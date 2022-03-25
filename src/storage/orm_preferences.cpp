@@ -31,7 +31,7 @@ namespace OpenWifi {
         return ReplaceRecord("id", P.id, P);
     }
 
-    bool PreferencesDB::DeletePreferences(const std::string &AdminId, std::string &Id) {
+    bool PreferencesDB::DeletePreferences([[maybe_unused]] const std::string &AdminId, std::string &Id) {
         return DeleteRecord("id",Id);
     }
 

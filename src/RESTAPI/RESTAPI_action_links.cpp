@@ -67,13 +67,13 @@ namespace OpenWifi {
             auto Password1 = Form.get("password1","bla");
             auto Password2 = Form.get("password2","blu");
             auto Id = Form.get("id","");
-            auto Now = std::time(nullptr);
+            auto now = OpenWifi::Now();
 
             SecurityObjects::ActionLink Link;
             if(!StorageService()->ActionLinksDB().GetActionLink(Id,Link))
                 return DoReturnA404();
 
-            if(Now > Link.expires) {
+            if(now > Link.expires) {
                 StorageService()->ActionLinksDB().CancelAction(Id);
                 return DoReturnA404();
             }
@@ -138,14 +138,14 @@ namespace OpenWifi {
             auto Password1 = Form.get("password1","bla");
             auto Password2 = Form.get("password2","blu");
             auto Id = Form.get("id","");
-            auto Now = std::time(nullptr);
+            auto now = OpenWifi::Now();
 
             SecurityObjects::ActionLink Link;
             if(!StorageService()->ActionLinksDB().GetActionLink(Id,Link)) {
                 return DoReturnA404();
             }
 
-            if(Now > Link.expires) {
+            if(now > Link.expires) {
                 StorageService()->ActionLinksDB().CancelAction(Id);
                 return DoReturnA404();
             }
@@ -218,9 +218,9 @@ namespace OpenWifi {
     }
 
     void RESTAPI_action_links::DoEmailVerification(SecurityObjects::ActionLink &Link) {
-        auto Now = std::time(nullptr);
+        auto now = OpenWifi::Now();
 
-        if(Now > Link.expires) {
+        if(now > Link.expires) {
             StorageService()->ActionLinksDB().CancelAction(Link.id);
             return DoReturnA404();
         }

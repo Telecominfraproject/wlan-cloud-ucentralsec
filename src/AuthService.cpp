@@ -83,7 +83,8 @@ namespace OpenWifi {
             if(StorageService()->UserTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
                 if(RevocationDate!=0)
                     return false;
-                Expired = (WT.created_ + WT.expires_in_) < time(nullptr);
+                auto now=OpenWifi::Now();
+                Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->UserDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
                     SessionToken = CallToken;
@@ -118,7 +119,8 @@ namespace OpenWifi {
             if(StorageService()->SubTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
                 if(RevocationDate!=0)
                     return false;
-                Expired = (WT.created_ + WT.expires_in_) < time(nullptr);
+                auto now=OpenWifi::Now();
+                Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->SubDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
                     SessionToken = CallToken;
@@ -178,7 +180,7 @@ namespace OpenWifi {
         }
     }
 
-    void AuthService::Logout(const std::string &Token, bool EraseFromCache) {
+    void AuthService::Logout(const std::string &Token,[[maybe_unused]]  bool EraseFromCache) {
 		std::lock_guard		Guard(Mutex_);
 
         try {
@@ -190,7 +192,7 @@ namespace OpenWifi {
         }
     }
 
-    void AuthService::SubLogout(const std::string &Token, bool EraseFromCache) {
+    void AuthService::SubLogout(const std::string &Token, [[maybe_unused]] bool EraseFromCache) {
         std::lock_guard		Guard(Mutex_);
 
         try {
@@ -202,7 +204,7 @@ namespace OpenWifi {
         }
     }
 
-    [[nodiscard]] std::string AuthService::GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type) {
+    [[nodiscard]] std::string AuthService::GenerateTokenHMAC(const std::string & UserName, [[maybe_unused]] ACCESS_TYPE Type) {
         std::string Identity(UserName + ":" + fmt::format("{}",std::time(nullptr)) + ":" + std::to_string(rand()));
         HMAC_.update(Identity);
         return Poco::DigestEngine::digestToHex(HMAC_.digest());
@@ -390,7 +392,7 @@ namespace OpenWifi {
         return false;
     }
 
-    UNAUTHORIZED_REASON AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired )
+    UNAUTHORIZED_REASON AuthService::Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo , [[maybe_unused]] bool & Expired )
     {
         std::lock_guard		Guard(Mutex_);
 
@@ -436,7 +438,7 @@ namespace OpenWifi {
         return INVALID_CREDENTIALS;
     }
 
-    UNAUTHORIZED_REASON AuthService::AuthorizeSub( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired )
+    UNAUTHORIZED_REASON AuthService::AuthorizeSub( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo , [[maybe_unused]] bool & Expired )
     {
         std::lock_guard		Guard(Mutex_);
 
@@ -602,7 +604,7 @@ namespace OpenWifi {
         if(StorageService()->UserTokenDB().GetToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
-            Expired = (WT.created_ + WT.expires_in_) < std::time(nullptr);
+            Expired = (WT.created_ + WT.expires_in_) < OpenWifi::Now();
             if(StorageService()->UserDB().GetUserById(UserId,UserInfo)) {
                 WebToken = WT;
                 return true;
@@ -622,7 +624,7 @@ namespace OpenWifi {
         if(StorageService()->SubTokenDB().GetToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
-            Expired = (WT.created_ + WT.expires_in_) < std::time(nullptr);
+            Expired = (WT.created_ + WT.expires_in_) < OpenWifi::Now();
             if(StorageService()->SubDB().GetUserById(UserId,UserInfo)) {
                 WebToken = WT;
                 return true;

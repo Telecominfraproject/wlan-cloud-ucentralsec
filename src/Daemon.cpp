@@ -56,12 +56,8 @@ namespace OpenWifi {
         return instance_;
     }
 
-    void Daemon::initialize() {
+    void Daemon::PostInitialization([[maybe_unused]] Poco::Util::Application &self) {
         AssetDir_ = MicroService::instance().ConfigPath("openwifi.restapi.wwwassets");
-    }
-
-    void MicroServicePostInitialization() {
-        Daemon()->initialize();
     }
 }
 

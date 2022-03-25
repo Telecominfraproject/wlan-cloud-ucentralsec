@@ -24,11 +24,11 @@
 
 namespace OpenWifi {
 
-    static const char * vDAEMON_PROPERTIES_FILENAME = "owsec.properties";
-    static const char * vDAEMON_ROOT_ENV_VAR = "OWSEC_ROOT";
-    static const char * vDAEMON_CONFIG_ENV_VAR = "OWSEC_CONFIG";
-    static const char * vDAEMON_APP_NAME = uSERVICE_SECURITY.c_str();
-    static const uint64_t vDAEMON_BUS_TIMER = 5000;
+    [[maybe_unused]] static const char * vDAEMON_PROPERTIES_FILENAME = "owsec.properties";
+    [[maybe_unused]] static const char * vDAEMON_ROOT_ENV_VAR = "OWSEC_ROOT";
+    [[maybe_unused]] static const char * vDAEMON_CONFIG_ENV_VAR = "OWSEC_CONFIG";
+    [[maybe_unused]] static const char * vDAEMON_APP_NAME = uSERVICE_SECURITY.c_str();
+    [[maybe_unused]] static const uint64_t vDAEMON_BUS_TIMER = 5000;
 
     class Daemon : public MicroService {
     public:
@@ -40,7 +40,7 @@ namespace OpenWifi {
                         const SubSystemVec & SubSystems) :
                 MicroService( PropFile, RootEnv, ConfigEnv, AppName, BusTimer, SubSystems) {};
 
-        void initialize();
+        void PostInitialization(Poco::Util::Application &self);
         static Daemon *instance();
         inline const std::string & AssetDir() { return AssetDir_; }
     private:
@@ -49,6 +49,9 @@ namespace OpenWifi {
     };
 
     inline Daemon * Daemon() { return Daemon::instance(); }
+    inline void DaemonPostInitialization(Poco::Util::Application &self) {
+        Daemon()->PostInitialization(self);
+    }
 }
 
 #endif //UCENTRALSEC_DAEMON_H

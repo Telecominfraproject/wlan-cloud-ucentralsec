@@ -29,6 +29,7 @@ namespace OpenWifi {
     class AvatarDB : public ORM::DB<AvatarRecordTuple, SecurityObjects::Avatar> {
     public:
         AvatarDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
+        virtual ~AvatarDB() {}
 
         bool SetAvatar(const std::string & Admin, std::string &Id, const std::string & AvatarContent, std::string &Type, std::string & Name);
         bool GetAvatar(const std::string & Admin, std::string &Id, std::string & AvatarContent, std::string &Type, std::string & Name);

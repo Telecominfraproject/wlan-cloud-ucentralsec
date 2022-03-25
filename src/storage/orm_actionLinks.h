@@ -29,7 +29,7 @@ namespace OpenWifi {
     class ActionLinkDB : public ORM::DB<ActionLinkRecordTuple, SecurityObjects::ActionLink> {
     public:
         ActionLinkDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-
+        virtual ~ActionLinkDB() {}
         bool CreateAction( SecurityObjects::ActionLink & A);
         bool DeleteAction(std::string &ActionId);
         bool CompleteAction(std::string &ActionId);

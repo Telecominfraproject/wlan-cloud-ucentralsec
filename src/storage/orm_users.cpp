@@ -97,7 +97,7 @@ namespace OpenWifi {
             UsersOnly_(Users) {
     }
 
-    bool BaseUserDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool BaseUserDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
               "alter table " + TableName_ + " add column modified BIGINT;",
               "alter table " + TableName_ + " add column signingUp TEXT default '';"
@@ -107,7 +107,7 @@ namespace OpenWifi {
         return true;
     }
 
-    bool BaseUserDB::CreateUser(const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
+    bool BaseUserDB::CreateUser([[maybe_unused]] const std::string & Admin, SecurityObjects::UserInfo & NewUser, bool PasswordHashedAlready ) {
         try {
             Poco::toLowerInPlace(NewUser.email);
             if(Exists("email", NewUser.email)) {
@@ -187,7 +187,7 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::UpdateUserInfo(const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, const SecurityObjects::UserInfo &UInfo) {
+    bool BaseUserDB::UpdateUserInfo([[maybe_unused]] const std::string & Admin, SecurityObjects::USER_ID_TYPE & Id, const SecurityObjects::UserInfo &UInfo) {
         try {
             return UpdateRecord("id", Id, UInfo);
         } catch (const Poco::Exception &E) {
@@ -196,11 +196,11 @@ namespace OpenWifi {
         return false;
     }
 
-    bool BaseUserDB::DeleteUser(const std::string & Admin, const SecurityObjects::USER_ID_TYPE & Id)  {
+    bool BaseUserDB::DeleteUser([[maybe_unused]] const std::string & Admin, const SecurityObjects::USER_ID_TYPE & Id)  {
         return DeleteRecord("id", Id);
     }
 
-    bool BaseUserDB::DeleteUsers(const std::string & Admin, const std::string & owner) {
+    bool BaseUserDB::DeleteUsers([[maybe_unused]] const std::string & Admin, const std::string & owner) {
         std::string WhereClause{ " owner='" + owner +"' "};
         return DeleteRecords(WhereClause);
     }
@@ -226,8 +226,9 @@ namespace OpenWifi {
     }
 
     UserCache::UserCache(unsigned Size, unsigned TimeOut, bool Users) :
-            UsersOnly_(Users),
-            ORM::DBCache<SecurityObjects::UserInfo>(Size,TimeOut) {
+            ORM::DBCache<SecurityObjects::UserInfo>(Size,TimeOut),
+            UsersOnly_(Users)
+                    {
         CacheById_ = std::make_unique<Poco::ExpireLRUCache<std::string,SecurityObjects::UserInfo>>(Size,TimeOut);
         CacheByEMail_ = std::make_unique<Poco::ExpireLRUCache<std::string,std::string>>(Size,TimeOut);
     }
@@ -242,7 +243,7 @@ namespace OpenWifi {
             StorageService()->SubTokenDB().DeleteRecordsFromCache("userName", R.id);
     }
 
-    inline void UserCache::Create(const SecurityObjects::UserInfo &R)  {
+    inline void UserCache::Create([[maybe_unused]] const SecurityObjects::UserInfo &R)  {
     }
 
     inline bool UserCache::GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::UserInfo &R) {

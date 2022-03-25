@@ -42,7 +42,7 @@ namespace OpenWifi {
             DB(T, Name.c_str(), ActionLinksDB_Fields,{}, P, L, ShortName.c_str()) {
     }
 
-    bool ActionLinkDB::Upgrade(uint32_t from, uint32_t &to) {
+    bool ActionLinkDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
         std::vector<std::string> Statements{
                 "alter table " + TableName_ + " add column userAction BOOLEAN default true;"
         };
