@@ -43,9 +43,8 @@ namespace OpenWifi {
     }
 
     BaseTokenDB::BaseTokenDB(const std::string &Name, const std::string &ShortName, OpenWifi::DBType T,
-                             Poco::Data::SessionPool &P, Poco::Logger &L, TokenCache *Cache, bool Users) :
-            DB(T, Name.c_str(), BaseTokenDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str(), Cache),
-            UsersOnly_(Users) {
+                             Poco::Data::SessionPool &P, Poco::Logger &L, TokenCache *Cache, [[maybe_unused]] bool Users) :
+            DB(T, Name.c_str(), BaseTokenDB_Fields, MakeIndices(ShortName), P, L, ShortName.c_str(), Cache) {
     }
 
     bool BaseTokenDB::AddToken(std::string &UserID, std::string &Token, std::string &RefreshToken, [[maybe_unused]] std::string & TokenType, uint64_t Expires, uint64_t TimeOut) {
@@ -98,9 +97,8 @@ namespace OpenWifi {
         return true;
     }
 
-    TokenCache::TokenCache(unsigned Size, unsigned TimeOut, bool Users) :
-            ORM::DBCache<SecurityObjects::Token>(Size,TimeOut),
-            UsersOnly_(Users)
+    TokenCache::TokenCache(unsigned Size, unsigned TimeOut, [[maybe_unused]] bool Users) :
+            ORM::DBCache<SecurityObjects::Token>(Size,TimeOut)
              {
         CacheByToken_ = std::make_unique<Poco::ExpireLRUCache<std::string,SecurityObjects::Token>>(Size,TimeOut);
     }

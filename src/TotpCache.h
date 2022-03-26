@@ -92,12 +92,26 @@ namespace OpenWifi {
             auto Secret = GenerateSecret(20, Base32Secret);
             QRCode = GenerateQRCode(Base32Secret, User.email);
 
+/*
+        struct Entry {
+            bool        Subscriber=false;
+            uint64_t    Start = 0;
+            uint64_t    Done = 0 ;
+            uint64_t    Verifications = 0 ;
+            std::string Secret;
+            std::string QRCode;
+            std::string LastCode;
+        };
+
+ */
+
             Entry E{ .Subscriber = Subscriber,
-                     .Start = (uint64_t )std::time(nullptr),
+                     .Start = OpenWifi::Now(),
                      .Done = 0,
                      .Verifications = 0,
                      .Secret = Secret,
-                     .QRCode = QRCode
+                     .QRCode = QRCode,
+                     .LastCode = 0
                      };
             Cache_[User.id] = E;
             return true;

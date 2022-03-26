@@ -44,7 +44,6 @@ namespace OpenWifi {
 
     private:
         std::mutex  Mutex_;
-        [[maybe_unused]] bool        UsersOnly_;
         std::unique_ptr<Poco::ExpireLRUCache<std::string,SecurityObjects::Token>>    CacheByToken_;
     };
 
@@ -62,7 +61,6 @@ namespace OpenWifi {
         bool RevokeAllTokens( std::string & UserName );
         bool GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate);
     private:
-        [[maybe_unused]] bool UsersOnly_;
     };
 
 }
