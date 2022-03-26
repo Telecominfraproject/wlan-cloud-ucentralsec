@@ -10,9 +10,6 @@
 //	Arilia Wireless Inc.
 //
 
-#include <cstdlib>
-#include <boost/algorithm/string.hpp>
-
 #include "Poco/Util/Application.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Environment.h"
@@ -20,11 +17,7 @@
 #include "Daemon.h"
 
 #include <aws/core/Aws.h>
-#include <aws/s3/model/CreateBucketRequest.h>
-#include <aws/s3/model/PutObjectRequest.h>
 #include <aws/s3/model/AccessControlPolicy.h>
-#include <aws/s3/model/PutBucketAclRequest.h>
-#include <aws/s3/model/GetBucketAclRequest.h>
 
 #include "StorageService.h"
 #include "SMTPMailerService.h"

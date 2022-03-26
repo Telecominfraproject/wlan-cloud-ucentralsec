@@ -52,10 +52,6 @@ add_compile_options(-Wall -Wextra)
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED system)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(fmt  REQUIRED)
@@ -129,8 +125,11 @@ add_executable( owsec
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC
-            ${Poco_LIBRARIES} ${Boost_LIBRARIES} ${MySQL_LIBRARIES}  ${ZLIB_LIBRARIES}
-            CppKafka::cppkafka ${AWSSDK_LINK_LIBRARIES}
+            ${Poco_LIBRARIES}
+            ${MySQL_LIBRARIES}
+            ${ZLIB_LIBRARIES}
+            CppKafka::cppkafka
+            ${AWSSDK_LINK_LIBRARIES}
             fmt::fmt
             )
     if(UNIX AND NOT APPLE)
