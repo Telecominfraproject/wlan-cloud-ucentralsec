@@ -41,6 +41,7 @@ namespace OpenWifi {
             StorageService()->SubAvatarDB().SetAvatar(UserInfo_.userinfo.email,
                                  Id, SS.str(), partHandler.ContentType(), partHandler.Name());
             StorageService()->SubDB().SetAvatar(Id,"1");
+            Logger().information(fmt::format("Adding avatar for {}",UserInfo_.userinfo.email));
         } else {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 13);
@@ -59,6 +60,7 @@ namespace OpenWifi {
         if (!StorageService()->SubAvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, AvatarContent, Type, Name)) {
             return NotFound();
         }
+        Logger().information(fmt::format("Retrieving avatar for {}",UserInfo_.userinfo.email));
         return SendFileContent(AvatarContent, Type, Name);
     }
 
@@ -72,6 +74,7 @@ namespace OpenWifi {
         if (!StorageService()->SubAvatarDB().DeleteAvatar(UserInfo_.userinfo.email, Id)) {
             return NotFound();
         }
+        Logger().information(fmt::format("Deleted avatar for {}",UserInfo_.userinfo.email));
         StorageService()->SubDB().SetAvatar(Id,"");
         OK();
     }
