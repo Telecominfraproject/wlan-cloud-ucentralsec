@@ -26,6 +26,8 @@ namespace OpenWifi {
         std::string     Id_;
         [[maybe_unused]] Poco::Logger    &Logger_;
         std::stringstream &OutputStream_;
+
+        inline Poco::Logger & Logger() { return Logger_; };
     };
 
     class RESTAPI_avatar_handler : public RESTAPIHandler {
