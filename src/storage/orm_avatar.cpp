@@ -4,6 +4,7 @@
 
 #include "orm_avatar.h"
 #include "Poco/Data/LOBStream.h"
+#include "StorageService.h"
 
 /*
     std::string             id;
@@ -54,6 +55,16 @@ namespace OpenWifi {
         return false;
     }
 
+    inline uint8_t fromhex(const char c) {
+        if(c>='0' && c<='9')
+            return c-'0';
+        if(c>='a' && c<='f')
+            return c-'a'+10;
+        if(c>='A' && c<='F')
+            return c-'A'+10;
+        return 0;
+    }
+
     bool AvatarDB::GetAvatar([[maybe_unused]] const std::string &Admin, std::string &Id, std::string & AvatarContent,
                              std::string &Type, std::string &Name) {
         SecurityObjects::Avatar A;
@@ -61,30 +72,22 @@ namespace OpenWifi {
             if(GetRecord("id",Id,A)) {
                 Type = A.type;
                 Name = A.name;
-
-                std::string TmpFile( MicroService::instance().DataDir() + "/" + Id);
-                Poco::Data::LOBInputStream IL(A.avatar);
-                std::ofstream f(TmpFile, std::ios::binary | std::ios::trunc);
-                Poco::StreamCopier::copyStream(IL, f);
-                f.close();
-
-                Logger().information(fmt::format("Avatar size: {}", A.avatar.size()));
-
-                std::ifstream           ifs(TmpFile,std::ios::binary);
-                std::ostringstream      os("",std::ios_base::binary);
-                Poco::StreamCopier::copyStream(ifs, os);
-                AvatarContent = os.str();
-
-/*
-                // std::cout << "Size:" << A.avatar.size() << std::endl;
-                Logger().information(fmt::format("Avatar size: {}", A.avatar.size()));
-
-                Poco::Data::LOBInputStream      IL(A.avatar);
-                std::ostringstream           os("",std::ios_base::binary);
-                Poco::StreamCopier::copyStream(IL, os);
-                AvatarContent = os.str();
-*/
-                Logger().information(fmt::format("Avatar size: {}", os.str().size()));
+                if(StorageService()->Type() == DBType::pgsql) {
+                    Poco::Data::LOBInputStream IL(A.avatar);
+                    std::ostringstream           os("",std::ios_base::binary);
+                    Poco::StreamCopier::copyStream(IL, os);
+                    std::string tmp = os.str().substr(2);
+                    AvatarContent.reserve(tmp.size()/2);
+                    for(size_t i=0,j=0;i<(tmp.size() / 2); i+=2) {
+                        AvatarContent[j++] = fromhex(tmp[i])*16 + fromhex(tmp[i+1]);
+                    }
+                } else {
+                    Poco::Data::LOBInputStream      IL(A.avatar);
+                    std::ostringstream           os("",std::ios_base::binary);
+                    Poco::StreamCopier::copyStream(IL, os);
+                    AvatarContent = os.str();
+                    Logger().information(fmt::format("Avatar size: {}", os.str().size()));
+                }
                 return true;
             }
         } catch (const Poco::Exception &E) {
