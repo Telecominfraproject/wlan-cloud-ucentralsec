@@ -76,12 +76,9 @@ namespace OpenWifi {
                     Poco::Data::LOBInputStream IL(A.avatar);
                     std::ostringstream           os;
                     Poco::StreamCopier::copyStream(IL, os);
-                    Logger().information(fmt::format("Avatar size:1 {}", A.avatar.size()));
                     std::string tmp = os.str().substr(2);
-                    Logger().information(fmt::format("Avatar size:2 {}", tmp.size()));
                     AvatarContent.reserve(tmp.size()/2);
-                    Logger().information(fmt::format("Avatar size:3 {}", AvatarContent.size()));
-                    for(size_t i=0,j=0;i<tmp.size(); i+=2) {
+                    for(size_t i=0;i<tmp.size(); i+=2) {
                         AvatarContent += (char) (fromhex(tmp[i])*16 + fromhex(tmp[i+1]));
                     }
                     Logger().information(fmt::format("Avatar size:4 {}", AvatarContent.size()));
