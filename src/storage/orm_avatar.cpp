@@ -72,19 +72,19 @@ namespace OpenWifi {
             if(GetRecord("id",Id,A)) {
                 Type = A.type;
                 Name = A.name;
-                if(StorageService()->Type() == DBType::pgsql) {
-//                    Poco::Data::BLOBInputStream IL(A.avatar);
+                AvatarContent = ORM::to_string(A.avatar);
+/*                if(StorageService()->Type() == DBType::pgsql) {
+                    Poco::Data::BLOBInputStream IL(A.avatar);
                     auto Content = A.avatar.content();
                     for(const auto &c:Content) {
                         AvatarContent += (char) c;
                     }
-/*                    while(IL.std::basic_ios<char>::good()) {
+
+                    while(IL.std::basic_ios<char>::good()) {
                         char buf[16000];
                         std::size_t Size = IL.readsome((unsigned char *)buf,16000);
                         AvatarContent += std::string{buf,Size};
                     }
-*/
-/*
                     Poco::StreamCopier::copyStream(IL, os);
                     IL.
                     std::string tmp = os.str().substr(2);
@@ -92,16 +92,15 @@ namespace OpenWifi {
                     for(size_t i=0;i<tmp.size(); i+=2) {
                         AvatarContent += (char) (fromhex(tmp[i])*16 + fromhex(tmp[i+1]));
                     }
-*/
                     Logger().information(fmt::format("Avatar size:4 {}", AvatarContent.size()));
                 } else {
-/*                    Poco::Data::BLOBInputStream      IL(A.avatar);
+                    Poco::Data::BLOBInputStream      IL(A.avatar);
                     std::ostringstream              os("",std::ios_base::binary);
                     Poco::StreamCopier::copyStream(IL, os);
                     AvatarContent = os.str();
                     Logger().information(fmt::format("Avatar size: {}", os.str().size()));
-*/
                 }
+*/
                 return true;
             }
         } catch (const Poco::Exception &E) {
