@@ -16,7 +16,7 @@ namespace OpenWifi {
 
     static ORM::FieldVec AvatarDB_Fields{
             ORM::Field{"id", 36, true},
-            ORM::Field{"type", ORM::FieldType::FT_BIGINT},
+            ORM::Field{"type", ORM::FieldType::FT_TEXT},
             ORM::Field{"created", ORM::FieldType::FT_BIGINT},
             ORM::Field{"name", ORM::FieldType::FT_TEXT},
             ORM::Field{"avatar", ORM::FieldType::FT_BLOB}
