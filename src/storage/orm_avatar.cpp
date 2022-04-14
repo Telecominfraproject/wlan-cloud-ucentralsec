@@ -59,6 +59,7 @@ namespace OpenWifi {
                 Name = A.name;
 
                 // std::cout << "Size:" << A.avatar.size() << std::endl;
+                Logger().information(fmt::format("Avatar size: {}", A.avatar.size()));
 
                 Poco::Data::LOBInputStream IL(A.avatar);
                 std::ostringstream           os("",std::ios_base::binary);
