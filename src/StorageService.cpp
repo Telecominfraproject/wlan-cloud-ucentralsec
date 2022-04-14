@@ -29,7 +29,7 @@ namespace OpenWifi {
         PreferencesDB_ = std::make_unique<OpenWifi::PreferencesDB>("Preferences", "pre", dbType_,*Pool_, Logger());
         SubPreferencesDB_ = std::make_unique<OpenWifi::PreferencesDB>("SubPreferences", "prs", dbType_,*Pool_, Logger());
         ActionLinksDB_ = std::make_unique<OpenWifi::ActionLinkDB>("Actions", "act", dbType_,*Pool_, Logger());
-        AvatarDB_ = std::make_unique<OpenWifi::AvatarDB>("Avatars", "ava", dbType_,*Pool_, Logger());
+        AvatarDB_ = std::make_unique<OpenWifi::AvatarDB>("Avatars2", "ava", dbType_,*Pool_, Logger());
         SubAvatarDB_ = std::make_unique<OpenWifi::AvatarDB>("SubAvatars", "avs", dbType_,*Pool_, Logger());
         LoginDB_ = std::make_unique<OpenWifi::LoginDB>("Logins", "lin", dbType_,*Pool_, Logger());
         SubLoginDB_ = std::make_unique<OpenWifi::LoginDB>("SubLogins", "lis", dbType_,*Pool_, Logger());
