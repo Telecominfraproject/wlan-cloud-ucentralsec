@@ -64,6 +64,8 @@ namespace OpenWifi {
                 std::stringstream           os;
                 Poco::StreamCopier::copyStream(IL, os);
                 AvatarContent = os.str();
+
+                Logger().information(fmt::format("Avatar size: {}", os.str().size()));
                 return true;
             }
         } catch (const Poco::Exception &E) {
