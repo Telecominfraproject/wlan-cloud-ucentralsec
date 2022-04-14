@@ -3,6 +3,7 @@
 //
 
 #include "orm_avatar.h"
+#include "Poco/Data/LOBStream.h"
 
 /*
     std::string             id;
@@ -58,14 +59,28 @@ namespace OpenWifi {
                 Type = A.type;
                 Name = A.name;
 
+                std::string TmpFile( MicroService::instance().DataDir() + "/" + Id);
+                Poco::Data::LOBInputStream IL(A.avatar);
+                std::ofstream f(TmpFile, std::ios::binary | std::ios::trunc);
+                Poco::StreamCopier::copyStream(IL, f);
+                f.close();
+
+                Logger().information(fmt::format("Avatar size: {}", A.avatar.size()));
+
+                std::ifstream           ifs(TmpFile,std::ios::binary);
+                std::ostringstream      os("",std::ios_base::binary);
+                Poco::StreamCopier::copyStream(ifs, os);
+                AvatarContent = os.str();
+
+/*
                 // std::cout << "Size:" << A.avatar.size() << std::endl;
                 Logger().information(fmt::format("Avatar size: {}", A.avatar.size()));
 
-                Poco::Data::LOBInputStream IL(A.avatar);
+                Poco::Data::LOBInputStream      IL(A.avatar);
                 std::ostringstream           os("",std::ios_base::binary);
                 Poco::StreamCopier::copyStream(IL, os);
                 AvatarContent = os.str();
-
+*/
                 Logger().information(fmt::format("Avatar size: {}", os.str().size()));
                 return true;
             }
