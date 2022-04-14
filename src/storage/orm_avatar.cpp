@@ -61,7 +61,7 @@ namespace OpenWifi {
                 // std::cout << "Size:" << A.avatar.size() << std::endl;
 
                 Poco::Data::LOBInputStream IL(A.avatar);
-                std::stringstream           os;
+                std::ostringstream           os("",std::ios_base::binary);
                 Poco::StreamCopier::copyStream(IL, os);
                 AvatarContent = os.str();
 
