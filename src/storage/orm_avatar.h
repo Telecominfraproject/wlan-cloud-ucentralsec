@@ -22,7 +22,8 @@ namespace OpenWifi {
             std::string,            // type
             uint64_t,               // created
             std::string,            // name
-            Poco::Data::LOB<char>   // avatar
+            // Poco::Data::LOB<char>   // avatar
+            Poco::Data::BLOB        // avatar
     > AvatarRecordTuple;
     typedef std::vector <AvatarRecordTuple> AvatarRecordTupleList;
 

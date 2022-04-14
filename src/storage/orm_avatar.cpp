@@ -38,9 +38,9 @@ namespace OpenWifi {
             A.type = Type;
             A.name = Name;
             A.created = std::time(nullptr);
-            Poco::Data::LOBOutputStream OL(A.avatar);
-            OL << AvatarContent;
-
+            // Poco::Data::LOBOutputStream OL(A.avatar);
+            // OL << AvatarContent;
+            A.avatar.appendRaw((const unsigned char *)AvatarContent.c_str(),AvatarContent.size());
 //            A.avatar.assignRaw(AvatarContent.c_str(), AvatarContent.size());
 
             if (Exists("id", Id)) {
@@ -73,21 +73,34 @@ namespace OpenWifi {
                 Type = A.type;
                 Name = A.name;
                 if(StorageService()->Type() == DBType::pgsql) {
-                    Poco::Data::LOBInputStream IL(A.avatar);
-                    std::ostringstream           os;
+//                    Poco::Data::BLOBInputStream IL(A.avatar);
+                    auto Content = A.avatar.content();
+                    for(const auto &c:Content) {
+                        AvatarContent += (char) c;
+                    }
+/*                    while(IL.std::basic_ios<char>::good()) {
+                        char buf[16000];
+                        std::size_t Size = IL.readsome((unsigned char *)buf,16000);
+                        AvatarContent += std::string{buf,Size};
+                    }
+*/
+/*
                     Poco::StreamCopier::copyStream(IL, os);
+                    IL.
                     std::string tmp = os.str().substr(2);
                     AvatarContent.reserve(tmp.size()/2);
                     for(size_t i=0;i<tmp.size(); i+=2) {
                         AvatarContent += (char) (fromhex(tmp[i])*16 + fromhex(tmp[i+1]));
                     }
+*/
                     Logger().information(fmt::format("Avatar size:4 {}", AvatarContent.size()));
                 } else {
-                    Poco::Data::LOBInputStream      IL(A.avatar);
-                    std::ostringstream           os("",std::ios_base::binary);
+/*                    Poco::Data::BLOBInputStream      IL(A.avatar);
+                    std::ostringstream              os("",std::ios_base::binary);
                     Poco::StreamCopier::copyStream(IL, os);
                     AvatarContent = os.str();
                     Logger().information(fmt::format("Avatar size: {}", os.str().size()));
+*/
                 }
                 return true;
             }
