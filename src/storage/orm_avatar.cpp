@@ -74,13 +74,14 @@ namespace OpenWifi {
                 Name = A.name;
                 if(StorageService()->Type() == DBType::pgsql) {
                     Poco::Data::LOBInputStream IL(A.avatar);
-                    std::ostringstream           os("",std::ios_base::binary);
+                    std::ostringstream           os;
                     Poco::StreamCopier::copyStream(IL, os);
                     std::string tmp = os.str().substr(2);
                     AvatarContent.reserve(tmp.size()/2);
-                    for(size_t i=0,j=0;i<(tmp.size() / 2); i+=2) {
+                    for(size_t i=0,j=0;i<tmp.size(); i+=2) {
                         AvatarContent[j++] = fromhex(tmp[i])*16 + fromhex(tmp[i+1]);
                     }
+                    Logger().information(fmt::format("Avatar size: {}", AvatarContent.size()));
                 } else {
                     Poco::Data::LOBInputStream      IL(A.avatar);
                     std::ostringstream           os("",std::ios_base::binary);
