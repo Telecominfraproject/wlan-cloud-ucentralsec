@@ -77,7 +77,7 @@ namespace OpenWifi {
         SecurityObjects::UserInfo   NewUser;
         RESTAPI_utils::from_request(NewUser,*Request);
         if(NewUser.userRole == SecurityObjects::UNKNOWN || NewUser.userRole != SecurityObjects::SUBSCRIBER) {
-            return BadRequest(RESTAPI::Errors::EntityMustExist);
+            return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
 
         Poco::toLowerInPlace(NewUser.email);
@@ -110,7 +110,7 @@ namespace OpenWifi {
         NewUser.userTypeProprietaryInfo.mobiles.clear();
         NewUser.userTypeProprietaryInfo.authenticatorSecret.clear();
 
-        if(!StorageService()->SubDB().CreateUser(NewUser.email, NewUser)) {
+        if(!StorageService()->SubDB().CreateUser(UserInfo_.userinfo.email, NewUser)) {
             Logger_.information(fmt::format("Could not add user '{}'.",NewUser.email));
             return BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
