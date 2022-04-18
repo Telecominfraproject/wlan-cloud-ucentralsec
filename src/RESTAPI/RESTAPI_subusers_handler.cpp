@@ -12,11 +12,25 @@ namespace OpenWifi {
     void RESTAPI_subusers_handler::DoGet() {
         std::vector<SecurityObjects::UserInfo> Users;
         bool IdOnly = (GetParameter("idOnly","false")=="true");
+        auto operatorId = GetParameter("operatorId");
 
-        if(QB_.Select.empty()) {
+        if(QB_.CountOnly) {
+            std::string whereClause;
+            if(!operatorId.empty()) {
+                whereClause = fmt::format(" owner='{}' ", operatorId);
+                auto count = StorageService()->SubDB().Count(whereClause);
+                return ReturnCountOnly(count);
+            }
+            auto count = StorageService()->UserDB().Count();
+            return ReturnCountOnly(count);
+        } else if(QB_.Select.empty()) {
             Poco::JSON::Array ArrayObj;
             Poco::JSON::Object Answer;
-            if (StorageService()->SubDB().GetUsers(QB_.Offset, QB_.Limit, Users)) {
+            std::string whereClause;
+            if(!operatorId.empty()) {
+                whereClause = fmt::format(" owner='{}' ", operatorId);
+            }
+            if (StorageService()->SubDB().GetUsers(QB_.Offset, QB_.Limit, Users, whereClause)) {
                 for (auto &i : Users) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
