@@ -92,7 +92,9 @@ COPY --from=fmtlib-build /usr/local/lib /usr/local/lib
 WORKDIR /owsec
 RUN mkdir cmake-build
 WORKDIR /owsec/cmake-build
-RUN cmake ..
+RUN cmake .. \
+          -Dcrypto_LIBRARY=/usr/lib/libcrypto.so \
+          -DBUILD_SHARED_LIBS=ON
 RUN cmake --build . --config Release -j8
 
 FROM alpine:3.15
