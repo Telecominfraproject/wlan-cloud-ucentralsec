@@ -153,6 +153,22 @@ namespace OpenWifi {
             return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
+        auto forgotPassword= GetBoolParameter("forgotPassword");
+        if(forgotPassword) {
+            Existing.changePassword = true;
+            Logger_.information(fmt::format("FORGOTTEN-PASSWORD({}): Request for {}", Request->clientAddress().toString(), Existing.email));
+            SecurityObjects::ActionLink NewLink;
+
+            NewLink.action = OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD;
+            NewLink.id = MicroService::CreateUUID();
+            NewLink.userId = Existing.id;
+            NewLink.created = OpenWifi::Now();
+            NewLink.expires = NewLink.created + (24*60*60);
+            NewLink.userAction = true;
+            StorageService()->ActionLinksDB().CreateAction(NewLink);
+            return OK();
+        }
+
         SecurityObjects::UserInfo   NewUser;
         auto RawObject = ParseStream();
         if(!NewUser.from_json(RawObject)) {
