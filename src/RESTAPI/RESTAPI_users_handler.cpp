@@ -9,7 +9,6 @@
 
 namespace OpenWifi {
     void RESTAPI_users_handler::DoGet() {
-        std::vector<SecurityObjects::UserInfo> Users;
         bool IdOnly = (GetParameter("idOnly","false")=="true");
         auto nameSearch = GetParameter("nameSearch");
         auto emailSearch = GetParameter("emailSearch");
@@ -24,41 +23,36 @@ namespace OpenWifi {
         }
 
         if(QB_.Select.empty()) {
-            Poco::JSON::Array ArrayObj;
-            Poco::JSON::Object Answer;
-            if (StorageService()->UserDB().GetUsers(QB_.Offset, QB_.Limit, Users, baseQuery )) {
-                for (auto &i : Users) {
-                    Poco::JSON::Object Obj;
-                    if (IdOnly) {
-                        ArrayObj.add(i.id);
-                    } else {
-                        Sanitize(UserInfo_, i);
-                        i.to_json(Obj);
-                        ArrayObj.add(Obj);
-                    }
+            SecurityObjects::UserInfoList   Users;
+            if(StorageService()->UserDB().GetUsers(QB_.Offset, QB_.Limit, Users.users, baseQuery)) {
+                for (auto &i : Users.users) {
+                    Sanitize(UserInfo_, i);
+                }
+                if(IdOnly) {
+                    Poco::JSON::Array   Arr;
+                    for(const auto &i:Users.users)
+                        Arr.add(i.id);
+                    Poco::JSON::Object  Answer;
+                    Answer.set("users", Arr);
+                    return ReturnObject(Answer);
                 }
             }
-            Answer.set(RESTAPI::Protocol::USERS, ArrayObj);
+            Poco::JSON::Object  Answer;
+            Users.to_json(Answer);
             return ReturnObject(Answer);
         } else {
-            Poco::JSON::Array ArrayObj;
+            SecurityObjects::UserInfoList   Users;
             for(auto &i:SelectedRecords()) {
                 SecurityObjects::UserInfo   UInfo;
-                auto tI{i};
                 if(StorageService()->UserDB().GetUserById(i,UInfo)) {
                     Poco::JSON::Object Obj;
-                    if (IdOnly) {
-                        ArrayObj.add(UInfo.id);
-                    } else {
-                        Sanitize(UserInfo_, UInfo);
-                        UInfo.to_json(Obj);
-                        ArrayObj.add(Obj);
-                    }
+                    Sanitize(UserInfo_, UInfo);
+                    Users.users.emplace_back(UInfo);
                 }
             }
-            Poco::JSON::Object RetObj;
-            RetObj.set(RESTAPI::Protocol::USERS, ArrayObj);
-            return ReturnObject(RetObj);
+            Poco::JSON::Object Answer;
+            Users.to_json(Answer);
+            return ReturnObject(Answer);
         }
     }
 }
