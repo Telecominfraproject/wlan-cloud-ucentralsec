@@ -37,11 +37,8 @@ namespace OpenWifi {
             A.id = Id;
             A.type = Type;
             A.name = Name;
-            A.created = std::time(nullptr);
-            // Poco::Data::LOBOutputStream OL(A.avatar);
-            // OL << AvatarContent;
+            A.created = OpenWifi::Now();
             A.avatar.appendRaw((const unsigned char *)AvatarContent.c_str(),AvatarContent.size());
-//            A.avatar.assignRaw(AvatarContent.c_str(), AvatarContent.size());
 
             if (Exists("id", Id)) {
                 return UpdateRecord("id", Id, A);
