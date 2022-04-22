@@ -13,11 +13,23 @@ namespace OpenWifi {
         std::vector<SecurityObjects::UserInfo> Users;
         bool IdOnly = (GetParameter("idOnly","false")=="true");
         auto operatorId = GetParameter("operatorId");
+        auto nameSearch = GetParameter("nameSearch");
+        auto emailSearch = GetParameter("emailSearch");
+
+        std::string baseQuery;
+        if(!nameSearch.empty() || !emailSearch.empty()) {
+            if(!nameSearch.empty())
+                baseQuery = fmt::format(" Lower(name) like('%{}%' ", Poco::toLower(nameSearch) );
+            if(!emailSearch.empty())
+                baseQuery += baseQuery.empty() ? fmt::format(" Lower(email) like('%{}%' ", Poco::toLower(emailSearch))
+                : fmt::format(" and Lower(email) like('%{}%' ", Poco::toLower(emailSearch));
+        }
 
         if(QB_.CountOnly) {
             std::string whereClause;
             if(!operatorId.empty()) {
-                whereClause = fmt::format(" owner='{}' ", operatorId);
+                whereClause = baseQuery.empty() ? fmt::format(" owner='{}' ", operatorId) :
+                              fmt::format(" owner='{}' and {} ", operatorId, baseQuery);
                 auto count = StorageService()->SubDB().Count(whereClause);
                 return ReturnCountOnly(count);
             }
@@ -28,7 +40,8 @@ namespace OpenWifi {
             Poco::JSON::Object Answer;
             std::string whereClause;
             if(!operatorId.empty()) {
-                whereClause = fmt::format(" owner='{}' ", operatorId);
+                whereClause = baseQuery.empty() ? fmt::format(" owner='{}' ", operatorId) :
+                              fmt::format(" owner='{}' and {} ", operatorId, baseQuery);
             }
             if (StorageService()->SubDB().GetUsers(QB_.Offset, QB_.Limit, Users, whereClause)) {
                 for (auto &i : Users) {

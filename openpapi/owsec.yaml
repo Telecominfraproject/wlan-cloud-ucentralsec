@@ -923,6 +923,16 @@ paths:
             type: string
             example: id1,id2,id3,id4,id5
           required: false
+        - in: query
+          description: Name matching
+          name: nameSearch
+          schema:
+            type: string
+        - in: query
+          description: Name matching
+          name: emailSearch
+          schema:
+            type: string
       responses:
         200:
           $ref: '#/components/schemas/UserList'
@@ -969,6 +979,16 @@ paths:
             type: string
             example: id1,id2,id3,id4,id5
           required: false
+        - in: query
+          description: Name matching
+          name: nameSearch
+          schema:
+            type: string
+        - in: query
+          description: Name matching
+          name: emailSearch
+          schema:
+            type: string
       responses:
         200:
           $ref: '#/components/schemas/UserList'

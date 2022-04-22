@@ -11,11 +11,22 @@ namespace OpenWifi {
     void RESTAPI_users_handler::DoGet() {
         std::vector<SecurityObjects::UserInfo> Users;
         bool IdOnly = (GetParameter("idOnly","false")=="true");
+        auto nameSearch = GetParameter("nameSearch");
+        auto emailSearch = GetParameter("emailSearch");
+
+        std::string baseQuery;
+        if(!nameSearch.empty() || !emailSearch.empty()) {
+            if(!nameSearch.empty())
+                baseQuery = fmt::format(" Lower(name) like('%{}%' ", Poco::toLower(nameSearch) );
+            if(!emailSearch.empty())
+                baseQuery += baseQuery.empty() ? fmt::format(" Lower(email) like('%{}%' ", Poco::toLower(emailSearch))
+                                               : fmt::format(" and Lower(email) like('%{}%' ", Poco::toLower(emailSearch));
+        }
 
         if(QB_.Select.empty()) {
             Poco::JSON::Array ArrayObj;
             Poco::JSON::Object Answer;
-            if (StorageService()->UserDB().GetUsers(QB_.Offset, QB_.Limit, Users)) {
+            if (StorageService()->UserDB().GetUsers(QB_.Offset, QB_.Limit, Users, baseQuery )) {
                 for (auto &i : Users) {
                     Poco::JSON::Object Obj;
                     if (IdOnly) {
