@@ -18,7 +18,7 @@ namespace OpenWifi {
                                                   TransactionId,
                                                   Internal, false, false , RateLimit{.Interval=1000,.MaxCalls=10},
                                                   false) {}
-                                                  static const std::list<const char *> PathName() { return std::list<const char *>{"/api/v1/suboauth2/{token}","/api/v1/suboauth2"}; };
+        static auto PathName() { return std::list<std::string>{"/api/v1/suboauth2/{token}","/api/v1/suboauth2"}; };
         void DoGet() final;
         void DoPost() final;
         void DoDelete() final;
