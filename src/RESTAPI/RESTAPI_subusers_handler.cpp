@@ -18,10 +18,10 @@ namespace OpenWifi {
         std::string baseQuery;
         if(!nameSearch.empty() || !emailSearch.empty()) {
             if(!nameSearch.empty())
-                baseQuery = fmt::format(" Lower(name) like('%{}%' ", Poco::toLower(nameSearch) );
+                baseQuery = fmt::format(" Lower(name) like('%{}%') ", Poco::toLower(nameSearch) );
             if(!emailSearch.empty())
-                baseQuery += baseQuery.empty() ? fmt::format(" Lower(email) like('%{}%' ", Poco::toLower(emailSearch))
-                : fmt::format(" and Lower(email) like('%{}%' ", Poco::toLower(emailSearch));
+                baseQuery += baseQuery.empty() ? fmt::format(" Lower(email) like('%{}%') ", Poco::toLower(emailSearch))
+                : fmt::format(" and Lower(email) like('%{}%') ", Poco::toLower(emailSearch));
         }
 
         if(QB_.CountOnly) {
