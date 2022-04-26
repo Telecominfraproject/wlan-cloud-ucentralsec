@@ -550,7 +550,7 @@ namespace OpenWifi {
                 StorageService()->SubDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
-            //  so we have a good password, password up date has taken place if need be, now generate the token.
+            //  so we have a good password, password update has taken place if need be, now generate the token.
             UInfo.userinfo.lastLogin=std::time(nullptr);
             StorageService()->SubDB().SetLastLogin(UInfo.userinfo.id);
             CreateSubToken(UserName, UInfo );
@@ -646,13 +646,14 @@ namespace OpenWifi {
         SecurityObjects::ActionLink A;
 
         A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
-        A.userId = UInfo.email;
+        A.userId = UInfo.id;
         A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
         A.userAction = true;
         StorageService()->ActionLinksDB().CreateAction(A);
         UInfo.waitingForEmailCheck = true;
+        UInfo.validated = false;
         return true;
     }
 
@@ -660,13 +661,14 @@ namespace OpenWifi {
         SecurityObjects::ActionLink A;
 
         A.action = OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL;
-        A.userId = UInfo.email;
+        A.userId = UInfo.id;
         A.id = MicroService::CreateUUID();
         A.created = std::time(nullptr);
         A.expires = A.created + 24*60*60;
         A.userAction = false;
         StorageService()->ActionLinksDB().CreateAction(A);
         UInfo.waitingForEmailCheck = true;
+        UInfo.validated = false;
         return true;
     }
 

@@ -114,6 +114,7 @@ namespace OpenWifi {
         NewUser.userTypeProprietaryInfo.mfa.method = "";
         NewUser.userTypeProprietaryInfo.mobiles.clear();
         NewUser.userTypeProprietaryInfo.authenticatorSecret.clear();
+        NewUser.validated = true;
 
         if(!StorageService()->UserDB().CreateUser(NewUser.email,NewUser)) {
             Logger_.information(fmt::format("Could not add user '{}'.",NewUser.email));
