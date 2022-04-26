@@ -104,7 +104,8 @@ namespace OpenWifi {
         RATE_LIMIT_EXCEEDED,
         BAD_MFA_TRANSACTION,
         MFA_FAILURE,
-        SECURITY_SERVICE_UNREACHABLE
+        SECURITY_SERVICE_UNREACHABLE,
+        CANNOT_REFRESH_TOKEN
     };
 
 	class AppServiceRegistry {
@@ -652,7 +653,8 @@ namespace OpenWifi::Utils {
     [[nodiscard]] inline bool ValidUUID(const std::string &UUID) {
         if(UUID.size()>36)
             return false;
-        return (std::all_of(UUID.begin(),UUID.end(),[](auto i){return i=='-' || std::isxdigit(i);}));
+        uint dashes=0;
+        return (std::all_of(UUID.begin(),UUID.end(),[&](auto i){ if(i=='-') dashes++; return i=='-' || std::isxdigit(i);})) && (dashes>0);
     }
 
     [[nodiscard]] inline std::vector<std::string> Split(const std::string &List, char Delimiter=',' ) {

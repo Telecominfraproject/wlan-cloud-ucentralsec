@@ -45,6 +45,7 @@ namespace OpenWifi {
     int AuthService::Start() {
 		Logger().notice("Starting...");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
+        RefreshTokenLifeSpan_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.refresh_token.lifespan", 90 * 24 * 60 * 600);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
 
         AccessPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.access", "/wwwassets/access_policy.html");
@@ -62,7 +63,83 @@ namespace OpenWifi {
 		Logger().notice("Stopping...");
     }
 
-	bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
+    bool AuthService::RefreshUserToken(Poco::Net::HTTPServerRequest & Request, const std::string & RefreshToken, SecurityObjects::UserInfoAndPolicy & UI) {
+        try {
+            std::string CallToken;
+            Poco::Net::OAuth20Credentials Auth(Request);
+            if (Auth.getScheme() == "Bearer") {
+                CallToken = Auth.getBearerToken();
+            }
+
+            if (CallToken.empty()) {
+                return false;
+            }
+
+            uint64_t                    RevocationDate=0;
+            std::string                 UserId;
+            if(StorageService()->UserTokenDB().GetToken(CallToken, UI.webtoken, UserId, RevocationDate) && UI.webtoken.refresh_token_==RefreshToken) {
+                auto now = OpenWifi::Now();
+
+                //  Create a new token
+                auto NewToken = GenerateTokenHMAC( UI.webtoken.access_token_, CUSTOM);
+                auto NewRefreshToken = RefreshToken;
+                if(now - UI.webtoken.lastRefresh_ < RefreshTokenLifeSpan_) {
+                    NewRefreshToken = GenerateTokenHMAC( UI.webtoken.refresh_token_, CUSTOM);
+                    UI.webtoken.lastRefresh_ = now;
+                }
+
+                StorageService()->UserTokenDB().RefreshToken(CallToken, NewToken, NewRefreshToken, UI.webtoken.lastRefresh_ );
+                UI.webtoken.access_token_ = NewToken;
+                UI.webtoken.refresh_token_ = NewRefreshToken;
+                return true;
+            }
+            return false;
+
+        } catch (...) {
+
+        }
+        return false;
+    }
+
+    bool AuthService::RefreshSubToken(Poco::Net::HTTPServerRequest & Request, const std::string & RefreshToken, SecurityObjects::UserInfoAndPolicy & UI) {
+        try {
+            std::string CallToken;
+            Poco::Net::OAuth20Credentials Auth(Request);
+            if (Auth.getScheme() == "Bearer") {
+                CallToken = Auth.getBearerToken();
+            }
+
+            if (CallToken.empty()) {
+                return false;
+            }
+
+            uint64_t                    RevocationDate=0;
+            std::string                 UserId;
+            if(StorageService()->SubTokenDB().GetToken(CallToken, UI.webtoken, UserId, RevocationDate) && UI.webtoken.refresh_token_==RefreshToken) {
+                auto now = OpenWifi::Now();
+
+                //  Create a new token
+                auto NewToken = GenerateTokenHMAC( UI.webtoken.access_token_, CUSTOM);
+                auto NewRefreshToken = RefreshToken;
+                if(now - UI.webtoken.lastRefresh_ < RefreshTokenLifeSpan_) {
+                    NewRefreshToken = GenerateTokenHMAC( UI.webtoken.refresh_token_, CUSTOM);
+                    UI.webtoken.lastRefresh_ = now;
+                }
+
+                StorageService()->SubTokenDB().RefreshToken(CallToken, NewToken, NewRefreshToken, UI.webtoken.lastRefresh_ );
+                UI.webtoken.access_token_ = NewToken;
+                UI.webtoken.refresh_token_ = NewRefreshToken;
+                return true;
+            }
+            return false;
+
+        } catch (...) {
+
+        }
+        return false;
+    }
+
+    bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
     {
         std::lock_guard	Guard(Mutex_);
         Expired = false;

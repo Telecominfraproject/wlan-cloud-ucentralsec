@@ -60,8 +60,21 @@ namespace OpenWifi {
         auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
         auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
+        auto refreshToken = GetS("refresh_token", Obj);
+        auto grant_type = GetParameter("grant_type");
 
         Poco::toLowerInPlace(userId);
+
+        if(!refreshToken.empty() && grant_type == "refresh_token") {
+            SecurityObjects::UserInfoAndPolicy UInfo;
+            if(AuthService()->RefreshUserToken(*Request, refreshToken, UInfo)) {
+                Poco::JSON::Object  Answer;
+                UInfo.webtoken.to_json(Answer);
+                return ReturnObject(Answer);
+            } else {
+                return UnAuthorized(RESTAPI::Errors::InvalidCredentials, CANNOT_REFRESH_TOKEN);
+            }
+        }
 
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
             Logger_.information(fmt::format("POLICY-REQUEST({}): Request.", Request->clientAddress().toString()));

@@ -66,6 +66,7 @@ components:
                   - 11    # BAD_MFA_TRANSACTION
                   - 12    # MFA_FAILURE
                   - 13    # SECURITY_SERVICE_UNREACHABLE
+                  - 14    # CANNOT REFRESH TOKEN
               ErrorDetails:
                 type: string
               ErrorDescription:

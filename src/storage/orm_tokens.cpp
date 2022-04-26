@@ -26,7 +26,8 @@ namespace OpenWifi {
             ORM::Field{"created", ORM::FieldType::FT_BIGINT},
             ORM::Field{"expires", ORM::FieldType::FT_BIGINT},
             ORM::Field{"idleTimeOut", ORM::FieldType::FT_BIGINT},
-            ORM::Field{"revocationDate", ORM::FieldType::FT_BIGINT}
+            ORM::Field{"revocationDate", ORM::FieldType::FT_BIGINT},
+            ORM::Field{"lastRefresh", ORM::FieldType::FT_BIGINT}
     };
 
     static ORM::IndexVec MakeIndices(const std::string &shortname) {
@@ -53,6 +54,17 @@ namespace OpenWifi {
         return CreateRecord(T);
     }
 
+    bool BaseTokenDB::Upgrade([[maybe_unused]] uint32_t from, uint32_t &to) {
+        std::vector<std::string> Statements{
+                "alter table " + TableName_ + " add column lastRefresh BIGINT default 0;"
+        };
+        RunScript(Statements);
+        to = 1;
+        return true;
+
+        return true;
+    }
+
     bool BaseTokenDB::GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate) {
         SecurityObjects::Token  T;
 
@@ -64,8 +76,25 @@ namespace OpenWifi {
             WT.created_ = T.created;
             WT.expires_in_ = T.expires;
             WT.idle_timeout_ = T.idleTimeout;
+            WT.lastRefresh_ = T.lastRefresh;
             RevocationDate = T.revocationDate;
             UserId = T.userName;
+            return true;
+        }
+        return false;
+    }
+
+    bool BaseTokenDB::RefreshToken(const std::string &OldToken, const std::string &NewToken, const std::string &NewRefreshToken, uint64_t LastRefresh ) {
+        SecurityObjects::Token  T;
+
+        if(GetRecord("token", OldToken, T)) {
+            T.token = NewToken;
+            T.refreshToken = NewRefreshToken;
+            T.lastRefresh = LastRefresh;
+            T.created = OpenWifi::Now();
+            UpdateRecord("token",OldToken,T);
+            Cache_->Delete("token",OldToken);
+            Cache_->UpdateCache(T);
             return true;
         }
         return false;
@@ -163,6 +192,7 @@ template<> void ORM::DB<OpenWifi::TokenRecordTuple,
     U.expires = T.get<5>();
     U.idleTimeout = T.get<6>();
     U.revocationDate = T.get<7>();
+    U.lastRefresh = T.get<8>();
 }
 
 template<> void ORM::DB< OpenWifi::TokenRecordTuple,
@@ -176,4 +206,5 @@ template<> void ORM::DB< OpenWifi::TokenRecordTuple,
     T.set<5>(U.expires);
     T.set<6>(U.idleTimeout);
     T.set<7>(U.revocationDate);
+    T.set<8>(U.lastRefresh);
 }

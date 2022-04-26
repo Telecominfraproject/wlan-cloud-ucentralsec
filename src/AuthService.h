@@ -113,6 +113,9 @@ namespace OpenWifi{
         inline const std::string & GetSubPasswordPolicy() const { return SubPasswordPolicy_; }
         inline const std::string & GetSubAccessPolicy() const { return SubAccessPolicy_; }
 
+        bool RefreshUserToken(Poco::Net::HTTPServerRequest & Request, const std::string & RefreshToken, SecurityObjects::UserInfoAndPolicy & UI);
+        bool RefreshSubToken(Poco::Net::HTTPServerRequest & Request, const std::string & RefreshToken, SecurityObjects::UserInfoAndPolicy & UI);
+
     private:
 		Poco::SHA2Engine	SHA2_;
 
@@ -125,8 +128,9 @@ namespace OpenWifi{
         std::regex          PasswordValidation_;
         std::regex          SubPasswordValidation_;
 
-        uint64_t            TokenAging_ = 30 * 24 * 60 * 60;
+        uint64_t            TokenAging_ = 15 * 24 * 60 * 60;
         uint64_t            HowManyOldPassword_=5;
+        uint64_t            RefreshTokenLifeSpan_ = 90 * 24 * 60 * 60 ;
 
         class SHA256Engine : public Poco::Crypto::DigestEngine
                 {

@@ -41,6 +41,7 @@ namespace OpenWifi {
             uint64_t idle_timeout_=0;
             AclTemplate acl_template_;
             uint64_t created_=0;
+            uint64_t lastRefresh_=0;
 
             void to_json(Poco::JSON::Object &Obj) const;
             bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -292,6 +293,7 @@ namespace OpenWifi {
             uint64_t            expires=0;
             uint64_t            idleTimeout=0;
             uint64_t            revocationDate=0;
+            uint64_t            lastRefresh=0;
 
             void to_json(Poco::JSON::Object &Obj) const;
             bool from_json(const Poco::JSON::Object::Ptr &Obj);

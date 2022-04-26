@@ -28,7 +28,8 @@ namespace OpenWifi {
             uint64_t,       // Created = 0;
             uint64_t,       // Expires = 0;
             uint64_t,       // IdleTimeOut = 0;
-            uint64_t        // RevocationDate = 0;
+            uint64_t,       // RevocationDate = 0;
+            uint64_t        //  lastRefresh
     > TokenRecordTuple;
     typedef std::vector <TokenRecordTuple> TokenRecordTupleList;
 
@@ -41,7 +42,6 @@ namespace OpenWifi {
         void Create(const SecurityObjects::Token &R) override;
         bool GetFromCache(const std::string &FieldName, const std::string &Value, SecurityObjects::Token &R) override;
         void Delete(const std::string &FieldName, const std::string &Value) override;
-
     private:
         std::mutex  Mutex_;
         std::unique_ptr<Poco::ExpireLRUCache<std::string,SecurityObjects::Token>>    CacheByToken_;
@@ -60,6 +60,10 @@ namespace OpenWifi {
         bool CleanExpiredTokens();
         bool RevokeAllTokens( std::string & UserName );
         bool GetToken(std::string &Token, SecurityObjects::WebToken &WT, std::string & UserId, uint64_t &RevocationDate);
+        bool RefreshToken(const std::string &OldToken, const std::string &NewToken, const std::string &NewRefreshToken, uint64_t LstRefresh );
+        inline uint32_t Version() override { return 1;}
+        bool Upgrade(uint32_t from, uint32_t &to) override;
+
     private:
     };
 
