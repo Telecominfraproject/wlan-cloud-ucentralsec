@@ -10,9 +10,11 @@
 namespace OpenWifi {
 
     void RESTAPI_signup_handler::DoPost() {
-        auto UserName = GetParameter("email","");
-        auto signupUUID = GetParameter("signupUUID","");
-        if(UserName.empty() || signupUUID.empty()) {
+        auto UserName = GetParameter("email");
+        auto signupUUID = GetParameter("signupUUID");
+        auto owner = GetParameter("owner");
+        if(UserName.empty() || signupUUID.empty() || owner.empty()) {
+            Logger().error("Signup requires: email, signupUUID, and owner.");
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
@@ -44,6 +46,7 @@ namespace OpenWifi {
         NewSub.email = UserName;
         NewSub.userRole = SecurityObjects::SUBSCRIBER;
         NewSub.changePassword = true;
+        NewSub.owner = owner;
 
         StorageService()->SubDB().CreateRecord(NewSub);
 
