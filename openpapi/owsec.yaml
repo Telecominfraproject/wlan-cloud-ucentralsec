@@ -121,6 +121,15 @@ components:
         userId: support@example.com
         password: support
 
+    WebTokenRefreshRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          default: support@example.com
+        refresh_token:
+          type: string
+
     WebTokenResult:
       description: Login and Refresh Tokens to be used in subsequent API calls.
       type: object
@@ -737,6 +746,12 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+            example: refresh_token
+          required: false
       requestBody:
         description: User id and password
         required: true
@@ -746,6 +761,7 @@ paths:
               oneOf:
                 - $ref: '#/components/schemas/WebTokenRequest'
                 - $ref: '#/components/schemas/MFAChallengeResponse'
+                - $ref: '#/components/schemas/WebTokenRefreshRequest'
       responses:
         200:
           description: successful operation
@@ -795,6 +811,12 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          name: grant_type
+          schema:
+            type: string
+            example: refresh_token
+          required: false
       requestBody:
         description: User id and password
         required: true
@@ -804,6 +826,7 @@ paths:
               oneOf:
                 - $ref: '#/components/schemas/WebTokenRequest'
                 - $ref: '#/components/schemas/MFAChallengeResponse'
+                - $ref: '#/components/schemas/WebTokenRefreshRequest'
       responses:
         200:
           description: successful operation
