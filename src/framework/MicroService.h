@@ -2040,13 +2040,11 @@ namespace OpenWifi {
 
 	    inline void ProcessOptions() {
 			// try to figure out if we are doing a CORS options or plain OPTIONS
-            std::cout << __LINE__ << " : process_options" << std::endl;
             AddCORS();
             Response->set("Vary", "Origin, Access-Control-Request-Headers, Access-Control-Request-Method");
 	        SetCommonHeaders();
 	        Response->set("Access-Control-Allow-Credentials", "true");
             Response->setContentLength(0);
-	        // Response->setStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
             Response->setStatus(Poco::Net::HTTPResponse::HTTP_OK);
 	        Response->send();
 	    }
