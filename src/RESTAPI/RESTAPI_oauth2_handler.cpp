@@ -63,6 +63,8 @@ namespace OpenWifi {
         auto refreshToken = GetS("refresh_token", Obj);
         auto grant_type = GetParameter("grant_type");
 
+        std::cout << __LINE__ << std::endl;
+
         Poco::toLowerInPlace(userId);
 
         if(!refreshToken.empty() && grant_type == "refresh_token") {
@@ -76,6 +78,7 @@ namespace OpenWifi {
             }
         }
 
+        std::cout << __LINE__ << std::endl;
         if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
             Logger_.information(fmt::format("POLICY-REQUEST({}): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
@@ -84,6 +87,7 @@ namespace OpenWifi {
             Answer.set(RESTAPI::Protocol::PASSWORDPOLICY, AuthService()->GetPasswordPolicy());
             return ReturnObject(Answer);
         }
+        std::cout << __LINE__ << std::endl;
 
         if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
             SecurityObjects::UserInfo UInfo1;
@@ -113,6 +117,7 @@ namespace OpenWifi {
                 return ReturnObject(ReturnObj);
             }
         }
+        std::cout << __LINE__ << std::endl;
 
         if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE,false)) {
             Logger_.information(fmt::format("RESEND-MFA-CODE({}): Request for {}", Request->clientAddress().toString(), userId));
@@ -123,6 +128,7 @@ namespace OpenWifi {
             }
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials, BAD_MFA_TRANSACTION);
         }
+        std::cout << __LINE__ << std::endl;
 
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
             Logger_.information(fmt::format("COMPLETE-MFA-CHALLENGE({}): Request for {}", Request->clientAddress().toString(), userId));
@@ -136,11 +142,13 @@ namespace OpenWifi {
             }
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials, MFA_FAILURE);
         }
+        std::cout << __LINE__ << std::endl;
 
         SecurityObjects::UserInfoAndPolicy UInfo;
         bool Expired=false;
         auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo, Expired);
         if (Code==SUCCESS) {
+            std::cout << __LINE__ << std::endl;
             Poco::JSON::Object ReturnObj;
             if(AuthService()->RequiresMFA(UInfo)) {
                 if(MFAServer()->StartMFAChallenge(UInfo, ReturnObj)) {
