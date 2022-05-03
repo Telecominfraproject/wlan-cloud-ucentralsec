@@ -2045,7 +2045,8 @@ namespace OpenWifi {
             Response->set("Vary", "Origin, Access-Control-Request-Headers, Access-Control-Request-Method");
 	        SetCommonHeaders();
 	        Response->set("Access-Control-Allow-Credentials", "true");
-	        Response->setStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+	        // Response->setStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+            Response->setStatus(Poco::Net::HTTPResponse::HTTP_OK);
 	        Response->send();
 	    }
 
