@@ -304,7 +304,6 @@ namespace OpenWifi {
             std::string             type;
             uint64_t                created=0;
             std::string             name;
-            // Poco::Data::LOB<char>   avatar;
             Poco::Data::BLOB        avatar;
         };
 
