@@ -427,6 +427,10 @@ test_service() {
 	check_response $result_file
 	USER_ID="$(jq -r '.id' < $result_file)"
 
+	if [[ $USER_ID == null ]]; then
+             USER_ID="$(jq -r '.Id' < $result_file)"
+	fi
+
 	echo
 	echo "-------------"
 	echo "Get test user"
