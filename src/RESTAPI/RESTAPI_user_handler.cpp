@@ -121,7 +121,7 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::RecordNotCreated);
         }
 
-        if(GetParameter("email_verification","false")=="true") {
+        if(GetBoolParameter("email_verification")) {
             if(AuthService::VerifyEmail(NewUser))
                 Logger_.information(fmt::format("Verification e-mail requested for {}",NewUser.email));
             StorageService()->UserDB().UpdateUserInfo(UserInfo_.userinfo.email,NewUser.id,NewUser);
@@ -151,11 +151,34 @@ namespace OpenWifi {
         }
 
         if(!ACLProcessor::Can(UserInfo_.userinfo,Existing,ACLProcessor::MODIFY)) {
-            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
         }
 
-        auto forgotPassword= GetBoolParameter("forgotPassword");
-        if(forgotPassword) {
+        if(GetBoolParameter("resetMFA")) {
+            if( (UserInfo_.userinfo.userRole == SecurityObjects::ROOT) ||
+                (UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && Existing.userRole!=SecurityObjects::ROOT) ||
+                (UserInfo_.userinfo.id == Id)) {
+                Existing.userTypeProprietaryInfo.mfa.enabled = false;
+                Existing.userTypeProprietaryInfo.mfa.method.clear();
+                Existing.userTypeProprietaryInfo.mobiles.clear();
+                Existing.modified = OpenWifi::Now();
+                Existing.notes.push_back( SecurityObjects::NoteInfo{
+                            .created=OpenWifi::Now(),
+                            .createdBy=UserInfo_.userinfo.email,
+                            .note="MFA Reset by " + UserInfo_.userinfo.email});
+                StorageService()->UserDB().UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing);
+                SecurityObjects::UserInfo   NewUserInfo;
+                StorageService()->UserDB().GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
+                Poco::JSON::Object  ModifiedObject;
+                Sanitize(UserInfo_, NewUserInfo);
+                NewUserInfo.to_json(ModifiedObject);
+                return ReturnObject(ModifiedObject);
+            } else {
+                return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+            }
+        }
+
+        if(GetBoolParameter("forgotPassword")) {
             Existing.changePassword = true;
             Logger_.information(fmt::format("FORGOTTEN-PASSWORD({}): Request for {}", Request->clientAddress().toString(), Existing.email));
             SecurityObjects::ActionLink NewLink;
@@ -226,7 +249,7 @@ namespace OpenWifi {
             }
         }
 
-        if(GetParameter("email_verification","false")=="true") {
+        if(GetBoolParameter("email_verification")) {
             if(AuthService::VerifyEmail(Existing))
                 Logger_.information(fmt::format("Verification e-mail requested for {}",Existing.email));
         }

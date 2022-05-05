@@ -1117,6 +1117,12 @@ paths:
             type: boolean
             default: false
           required: false
+        - in: query
+          name: resetMFA
+          schema:
+            type: boolean
+            default: false
+          required: false
       requestBody:
         description: User details (some fields are ignored during update)
         content:
@@ -1223,6 +1229,12 @@ paths:
           required: false
         - in: query
           name: forgotPassword
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
+          name: resetMFA
           schema:
             type: boolean
             default: false

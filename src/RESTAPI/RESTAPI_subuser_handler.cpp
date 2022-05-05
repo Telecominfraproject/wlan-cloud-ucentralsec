@@ -148,8 +148,31 @@ namespace OpenWifi {
             return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
         }
 
-        auto forgotPassword= GetBoolParameter("forgotPassword");
-        if(forgotPassword) {
+        if(GetBoolParameter("resetMFA")) {
+            if( (UserInfo_.userinfo.userRole == SecurityObjects::ROOT) ||
+                (UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && Existing.userRole!=SecurityObjects::ROOT) ||
+                (UserInfo_.userinfo.id == Id)) {
+                Existing.userTypeProprietaryInfo.mfa.enabled = false;
+                Existing.userTypeProprietaryInfo.mfa.method.clear();
+                Existing.userTypeProprietaryInfo.mobiles.clear();
+                Existing.modified = OpenWifi::Now();
+                Existing.notes.push_back( SecurityObjects::NoteInfo{
+                        .created=OpenWifi::Now(),
+                        .createdBy=UserInfo_.userinfo.email,
+                        .note="MFA Reset by " + UserInfo_.userinfo.email});
+                StorageService()->SubDB().UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing);
+                SecurityObjects::UserInfo   NewUserInfo;
+                StorageService()->SubDB().GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
+                Poco::JSON::Object  ModifiedObject;
+                Sanitize(UserInfo_, NewUserInfo);
+                NewUserInfo.to_json(ModifiedObject);
+                return ReturnObject(ModifiedObject);
+            } else {
+                return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+            }
+        }
+
+        if(GetBoolParameter("forgotPassword")) {
             Existing.changePassword = true;
             Logger_.information(fmt::format("FORGOTTEN-PASSWORD({}): Request for {}", Request->clientAddress().toString(), Existing.email));
 
