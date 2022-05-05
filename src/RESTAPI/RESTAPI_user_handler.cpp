@@ -6,6 +6,7 @@
 #include "StorageService.h"
 #include "framework/ow_constants.h"
 #include "SMSSender.h"
+#include "SMTPMailerService.h"
 #include "ACLProcessor.h"
 #include "AuthService.h"
 #include "RESTAPI/RESTAPI_db_helpers.h"
@@ -258,6 +259,18 @@ namespace OpenWifi {
             if(NewUser.userTypeProprietaryInfo.mfa.enabled) {
                 if (!MFAMETHODS::Validate(NewUser.userTypeProprietaryInfo.mfa.method)) {
                     return BadRequest(RESTAPI::Errors::BadMFAMethod);
+                }
+
+                if( NewUser.userTypeProprietaryInfo.mfa.enabled &&
+                    NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::SMS &&
+                    !SMSSender()->Enabled()) {
+                    return BadRequest(RESTAPI::Errors::SMSMFANotEnabled);
+                }
+
+                if( NewUser.userTypeProprietaryInfo.mfa.enabled &&
+                    NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::EMAIL &&
+                    !SMTPMailerService()->Enabled()) {
+                    return BadRequest(RESTAPI::Errors::EMailMFANotEnabled);
                 }
 
                 bool ChangingMFA =
