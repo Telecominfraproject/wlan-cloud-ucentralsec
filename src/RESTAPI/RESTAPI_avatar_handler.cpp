@@ -60,8 +60,7 @@ namespace OpenWifi {
         if (!StorageService()->AvatarDB().GetAvatar(UserInfo_.userinfo.email, Id, AvatarContent, Type, Name)) {
             return NotFound();
         }
-        Logger().information(fmt::format("REST Avatar size: {}",AvatarContent.size()));
-        Logger().information(fmt::format("Retrieving avatar for {}",UserInfo_.userinfo.email));
+        Logger().information(fmt::format("Retrieving avatar for {}, size:{}",UserInfo_.userinfo.email,AvatarContent.size()));
         return SendFileContent(AvatarContent, Type, Name);
     }
 
