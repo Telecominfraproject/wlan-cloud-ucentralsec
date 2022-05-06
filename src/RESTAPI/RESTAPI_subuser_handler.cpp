@@ -150,6 +150,9 @@ namespace OpenWifi {
         }
 
         if(GetBoolParameter("resetMFA")) {
+            if(Request->getContentLength()>0) {
+                std::ignore = ParseStream();
+            }
             if( (UserInfo_.userinfo.userRole == SecurityObjects::ROOT) ||
                 (UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && Existing.userRole!=SecurityObjects::ROOT) ||
                 (UserInfo_.userinfo.id == Id)) {
@@ -174,6 +177,9 @@ namespace OpenWifi {
         }
 
         if(GetBoolParameter("forgotPassword")) {
+            if(Request->getContentLength()>0) {
+                std::ignore = ParseStream();
+            }
             Existing.changePassword = true;
             Logger_.information(fmt::format("FORGOTTEN-PASSWORD({}): Request for {}", Request->clientAddress().toString(), Existing.email));
 
