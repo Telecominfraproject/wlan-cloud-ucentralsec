@@ -288,6 +288,7 @@ namespace OpenWifi {
                                                     UserInfo_.userinfo.email)) {
                         return BadRequest(RESTAPI::Errors::NeedMobileNumber);
                     }
+                    Existing.userTypeProprietaryInfo.mobiles[0].verified = true;
                     Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::AUTHENTICATOR) {
                     std::string Secret;
