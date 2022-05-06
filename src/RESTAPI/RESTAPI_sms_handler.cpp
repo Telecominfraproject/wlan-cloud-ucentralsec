@@ -10,7 +10,7 @@
 namespace OpenWifi {
 
     void OpenWifi::RESTAPI_sms_handler::DoPost() {
-        auto Obj = ParseStream();
+        const auto &Obj = ParsedBody_;
 
         std::string Arg;
         if(HasParameter("validateNumber",Arg) && Arg=="true" && Obj->has("to")) {

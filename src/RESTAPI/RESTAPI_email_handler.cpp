@@ -14,7 +14,7 @@
 
 namespace OpenWifi {
     void RESTAPI_email_handler::DoPost() {
-        auto Obj = ParseStream();
+        const auto & Obj = ParsedBody_;
         if (Obj->has("subject") &&
             Obj->has("from") &&
             Obj->has("text") &&

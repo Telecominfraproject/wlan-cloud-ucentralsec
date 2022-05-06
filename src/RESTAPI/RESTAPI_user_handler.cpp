@@ -70,13 +70,18 @@ namespace OpenWifi {
     }
 
     void RESTAPI_user_handler::DoPost() {
+
         std::string Id = GetBinding("id", "");
         if(Id!="0") {
             return BadRequest(RESTAPI::Errors::IdMustBe0);
         }
 
         SecurityObjects::UserInfo   NewUser;
-        RESTAPI_utils::from_request(NewUser,*Request);
+        const auto & RawObject = ParsedBody_;
+        if(!NewUser.from_json(RawObject)) {
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
         if(NewUser.userRole == SecurityObjects::UNKNOWN) {
             return BadRequest(RESTAPI::Errors::InvalidUserRole);
         }
@@ -149,7 +154,6 @@ namespace OpenWifi {
 
         SecurityObjects::UserInfo   Existing;
         if(!StorageService()->UserDB().GetUserById(Id,Existing)) {
-            DrainBody();
             return NotFound();
         }
 
@@ -158,7 +162,6 @@ namespace OpenWifi {
         }
 
         if(GetBoolParameter("resetMFA")) {
-            DrainBody();
             if( (UserInfo_.userinfo.userRole == SecurityObjects::ROOT) ||
                 (UserInfo_.userinfo.userRole == SecurityObjects::ADMIN && Existing.userRole!=SecurityObjects::ROOT) ||
                 (UserInfo_.userinfo.id == Id)) {
@@ -183,7 +186,6 @@ namespace OpenWifi {
         }
 
         if(GetBoolParameter("forgotPassword")) {
-            DrainBody();
             Existing.changePassword = true;
             Logger_.information(fmt::format("FORGOTTEN-PASSWORD({}): Request for {}", Request->clientAddress().toString(), Existing.email));
             SecurityObjects::ActionLink NewLink;
@@ -199,7 +201,7 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo   NewUser;
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         if(!NewUser.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }

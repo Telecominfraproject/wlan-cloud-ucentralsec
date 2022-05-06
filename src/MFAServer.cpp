@@ -65,7 +65,7 @@ namespace OpenWifi {
         return SendChallenge(Hint->second.UInfo, Hint->second.Method, Hint->second.Answer);
     }
 
-    bool MFAServer::CompleteMFAChallenge(Poco::JSON::Object::Ptr &ChallengeResponse, SecurityObjects::UserInfoAndPolicy &UInfo) {
+    bool MFAServer::CompleteMFAChallenge(const Poco::JSON::Object::Ptr &ChallengeResponse, SecurityObjects::UserInfoAndPolicy &UInfo) {
         std::lock_guard G(Mutex_);
 
         if(!ChallengeResponse->has("uuid") || !ChallengeResponse->has("answer"))

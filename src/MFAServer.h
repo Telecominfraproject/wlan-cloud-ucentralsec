@@ -41,7 +41,7 @@ namespace OpenWifi {
         }
 
         bool StartMFAChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, Poco::JSON::Object &Challenge);
-        bool CompleteMFAChallenge(Poco::JSON::Object::Ptr &ChallengeResponse, SecurityObjects::UserInfoAndPolicy &UInfo);
+        bool CompleteMFAChallenge(const Poco::JSON::Object::Ptr &ChallengeResponse, SecurityObjects::UserInfoAndPolicy &UInfo);
         static bool MethodEnabled(const std::string &Method);
         bool ResendCode(const std::string &uuid);
         static bool SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge);

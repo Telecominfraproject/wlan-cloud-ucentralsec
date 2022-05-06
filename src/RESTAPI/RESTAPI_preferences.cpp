@@ -19,7 +19,7 @@ namespace OpenWifi {
 
         SecurityObjects::Preferences    P;
 
-        auto RawObject = ParseStream();
+        const auto & RawObject = ParsedBody_;
         if(!P.from_json(RawObject)) {
             return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
         }

@@ -56,7 +56,7 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_oauth2_handler::DoPost() {
-        auto Obj = ParseStream();
+        const auto & Obj = ParsedBody_;
         auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
         auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
