@@ -266,8 +266,8 @@ namespace OpenWifi {
                 }
 
                 bool ChangingMFA =
-                        NewUser.userTypeProprietaryInfo.mfa.enabled && !Existing.userTypeProprietaryInfo.mfa.enabled;
-                Existing.userTypeProprietaryInfo.mfa.enabled = NewUser.userTypeProprietaryInfo.mfa.enabled;
+                        NewUser.userTypeProprietaryInfo.mfa.method != Existing.userTypeProprietaryInfo.mfa.method;
+                Existing.userTypeProprietaryInfo.mfa.method = NewUser.userTypeProprietaryInfo.mfa.method;
 
                 auto PropInfo = RawObject->get("userTypeProprietaryInfo");
                 if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::SMS) {
