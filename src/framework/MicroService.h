@@ -1813,7 +1813,9 @@ namespace OpenWifi {
 				Poco::Thread::current()->setName("WebServerThread_" + std::to_string(TransactionId_));
 
                 if(Request->getContentLength()>0) {
-                    ParsedBody_ = IncomingParser_.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
+                    if(Request->getContentType().find("application/json")!=std::string::npos) {
+                        ParsedBody_ = IncomingParser_.parse(Request->stream()).extract<Poco::JSON::Object::Ptr>();
+                    }
                 }
 
 	            if(RateLimited_ && RESTAPI_RateLimiter()->IsRateLimited(RequestIn,MyRates_.Interval, MyRates_.MaxCalls)) {
