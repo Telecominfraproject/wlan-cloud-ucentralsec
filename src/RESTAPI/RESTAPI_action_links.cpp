@@ -113,7 +113,7 @@ namespace OpenWifi {
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
-            UInfo.modified = std::time(nullptr);
+            UInfo.modified = OpenWifi::Now();
             if(Link.userAction)
                 StorageService()->UserDB().UpdateUserInfo(UInfo.email,Link.userId,UInfo);
             else
@@ -184,9 +184,9 @@ namespace OpenWifi {
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
-            UInfo.modified = std::time(nullptr);
+            UInfo.modified = OpenWifi::Now();
             UInfo.changePassword = false;
-            UInfo.lastEmailCheck = std::time(nullptr);
+            UInfo.lastEmailCheck = OpenWifi::Now();
             UInfo.waitingForEmailCheck = false;
             UInfo.validated = OpenWifi::Now();
 
@@ -237,9 +237,9 @@ namespace OpenWifi {
         Logger_.information(fmt::format("EMAIL-VERIFICATION(%s): For ID={}", Request->clientAddress().toString(), UInfo.email));
         UInfo.waitingForEmailCheck = false;
         UInfo.validated = true;
-        UInfo.lastEmailCheck = std::time(nullptr);
-        UInfo.validationDate = std::time(nullptr);
-        UInfo.modified  = std::time(nullptr);
+        UInfo.lastEmailCheck = OpenWifi::Now();
+        UInfo.validationDate = OpenWifi::Now();
+        UInfo.modified  = OpenWifi::Now();
         if(Link.userAction)
             StorageService()->UserDB().UpdateUserInfo(UInfo.email, Link.userId, UInfo);
         else

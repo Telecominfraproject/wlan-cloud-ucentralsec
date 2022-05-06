@@ -76,7 +76,7 @@ namespace OpenWifi {
             }
         }
 
-        if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
+        if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS)) {
             Logger_.information(fmt::format("POLICY-REQUEST({}): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->PasswordValidationExpression());
@@ -85,7 +85,7 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
-        if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
+        if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD)) {
             SecurityObjects::UserInfo UInfo1;
             auto UserExists = StorageService()->UserDB().GetUserByEmail(userId,UInfo1);
             if(UserExists) {
@@ -95,7 +95,7 @@ namespace OpenWifi {
                 NewLink.action = OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD;
                 NewLink.id = MicroService::CreateUUID();
                 NewLink.userId = UInfo1.id;
-                NewLink.created = std::time(nullptr);
+                NewLink.created = OpenWifi::Now();
                 NewLink.expires = NewLink.created + (24*60*60);
                 NewLink.userAction = true;
                 StorageService()->ActionLinksDB().CreateAction(NewLink);
@@ -114,7 +114,7 @@ namespace OpenWifi {
             }
         }
 
-        if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE,false)) {
+        if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE)) {
             Logger_.information(fmt::format("RESEND-MFA-CODE({}): Request for {}", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid")) {
                 auto uuid = Obj->get("uuid").toString();

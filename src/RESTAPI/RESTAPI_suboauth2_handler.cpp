@@ -70,7 +70,7 @@ namespace OpenWifi {
             }
         }
 
-        if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS, false)) {
+        if(GetBoolParameter(RESTAPI::Protocol::REQUIREMENTS)) {
             Logger_.information(fmt::format("POLICY-REQUEST({}): Request.", Request->clientAddress().toString()));
             Poco::JSON::Object  Answer;
             Answer.set(RESTAPI::Protocol::PASSWORDPATTERN, AuthService()->SubPasswordValidationExpression());
@@ -79,7 +79,7 @@ namespace OpenWifi {
             return ReturnObject(Answer);
         }
 
-        if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD,false)) {
+        if(GetBoolParameter(RESTAPI::Protocol::FORGOTPASSWORD)) {
             SecurityObjects::UserInfo UInfo1;
             auto UserExists = StorageService()->SubDB().GetUserByEmail(userId,UInfo1);
             if(UserExists) {
@@ -108,7 +108,7 @@ namespace OpenWifi {
             }
         }
 
-        if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE,false)) {
+        if(GetBoolParameter(RESTAPI::Protocol::RESENDMFACODE)) {
             Logger_.information(fmt::format("RESEND-MFA-CODE({}): Request for {}", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid")) {
                 auto uuid = Obj->get("uuid").toString();
@@ -118,7 +118,7 @@ namespace OpenWifi {
             return UnAuthorized(RESTAPI::Errors::InvalidCredentials, BAD_MFA_TRANSACTION);
         }
 
-        if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
+        if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE)) {
             Logger_.information(fmt::format("COMPLETE-MFA-CHALLENGE({}): Request for {}", Request->clientAddress().toString(), userId));
             if(Obj->has("uuid") && Obj->has("answer")) {
                 SecurityObjects::UserInfoAndPolicy UInfo;
