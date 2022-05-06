@@ -2011,7 +2011,13 @@ namespace OpenWifi {
             return false;
         }
 
-	    inline void SetCommonHeaders(bool CloseConnection=false) {
+        void DrainBody() {
+            if (Request->getContentLength() > 0) {
+                std::ignore = ParseStream();
+            }
+        }
+
+        inline void SetCommonHeaders(bool CloseConnection=false) {
 	        Response->setVersion(Poco::Net::HTTPMessage::HTTP_1_1);
 	        Response->setChunkedTransferEncoding(true);
 	        Response->setContentType("application/json");
