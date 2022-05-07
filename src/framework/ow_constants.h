@@ -136,6 +136,11 @@ namespace OpenWifi::RESTAPI::Errors {
     static const struct msg SMSMissingPhoneNumber{1094,"Missing phone number"};
     static const struct msg SMSTryLater{1095,"SMS could not be sent. Verify the number or try again later."};
     static const struct msg SMSMissingChallenge{1096,"Missing 'challengeCode'"};
+	static const struct msg MustHaveConfigElement{1097,"Must have 'configuration' element."};
+
+	static const struct msg ModelIDListCannotBeEmpty{1098,"Model ID list cannot be empty."};
+	static const struct msg DefConfigNameExists{1099,"Configuration name already exists."};
+
 
 }
 
