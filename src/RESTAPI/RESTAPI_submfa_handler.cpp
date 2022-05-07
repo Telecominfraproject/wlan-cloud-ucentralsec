@@ -11,7 +11,6 @@ namespace OpenWifi {
     void RESTAPI_submfa_handler::DoGet() {
         SecurityObjects::UserInfo   User;
 
-        // std::cout << "submfa get " << UserInfo_.userinfo.Id << "   user:" << UserInfo_.userinfo.email << std::endl;
         if (StorageService()->SubDB().GetUserById(UserInfo_.userinfo.id,User)) {
             Poco::JSON::Object              Answer;
             SecurityObjects::SubMfaConfig   MFC;
