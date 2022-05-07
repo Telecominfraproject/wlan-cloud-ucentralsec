@@ -118,10 +118,9 @@ namespace OpenWifi {
         }
 
         inline bool ContinueValidation(const SecurityObjects::UserInfo &User, bool Subscriber, const std::string & Code,
-                                       uint64_t &NextIndex, bool &MoreCodes, uint64_t & ErrorCode, std::string & ErrorText ) {
+                                       uint64_t &NextIndex, bool &MoreCodes, RESTAPI::Errors::msg & Error ) {
             auto Hint = Cache_.find(User.id);
-            uint64_t Now = std::time(nullptr);
-            ErrorCode = 0;
+            uint64_t Now = OpenWifi::Now();
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60)) {
                 std::string Expecting;
                 if (NextIndex == 1 && Hint->second.Verifications == 0 && ValidateCode(Hint->second.Secret, Code, Expecting)) {
@@ -137,25 +136,20 @@ namespace OpenWifi {
                     return true;
                 } else {
                     if(!ValidateCode(Hint->second.Secret, Code, Expecting)) {
-                        ErrorCode = 1;
-                        ErrorText = "Invalid code.";
+                        Error = RESTAPI::Errors::TOTInvalidCode;
                         return false;
                     } else if(NextIndex!=1 && NextIndex != 2) {
-                        ErrorCode = 2;
-                        ErrorText = "Invalid Index";
+                        Error = RESTAPI::Errors::TOTInvalidIndex;
                         return false;
                     } else if(Code == Hint->second.LastCode) {
-                        ErrorCode = 3;
-                        ErrorText = "Code is repeated. Must be new code.";
+                        Error = RESTAPI::Errors::TOTRepeatedCode;
                         return false;
                     }
-                    ErrorCode = 5;
-                    ErrorText = "Invalid protocol sequence.";
+                    Error = RESTAPI::Errors::TOTInvalidProtocol;
                     return false;
                 }
             } else {
-                ErrorCode = 4;
-                ErrorText = "No validation session present.";
+                Error = RESTAPI::Errors::TOTNoSession;
             }
             return false;
         }

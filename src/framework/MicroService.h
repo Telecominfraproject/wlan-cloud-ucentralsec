@@ -1819,7 +1819,7 @@ namespace OpenWifi {
                 }
 
 	            if(RateLimited_ && RESTAPI_RateLimiter()->IsRateLimited(RequestIn,MyRates_.Interval, MyRates_.MaxCalls)) {
-	                return UnAuthorized("Rate limit exceeded.",RATE_LIMIT_EXCEEDED);
+	                return UnAuthorized(RESTAPI::Errors::RATE_LIMIT_EXCEEDED);
 	            }
 
 	            if (!ContinueProcessing())
@@ -1828,16 +1828,16 @@ namespace OpenWifi {
 	            bool Expired=false, Contacted=false;
 	            if (AlwaysAuthorize_ && !IsAuthorized(Expired, Contacted, SubOnlyService_)) {
 	                if(Expired)
-	                    return UnAuthorized(RESTAPI::Errors::ExpiredToken, EXPIRED_TOKEN);
+	                    return UnAuthorized(RESTAPI::Errors::EXPIRED_TOKEN);
                     if(Contacted)
-	                    return UnAuthorized(RESTAPI::Errors::InvalidCredentials, INVALID_TOKEN);
+	                    return UnAuthorized(RESTAPI::Errors::INVALID_TOKEN);
                     else
-                        return UnAuthorized(RESTAPI::Errors::InvalidCredentials, SECURITY_SERVICE_UNREACHABLE);
+                        return UnAuthorized(RESTAPI::Errors::SECURITY_SERVICE_UNREACHABLE);
 	            }
 
 	            std::string Reason;
 	            if(!RoleIsAuthorized(RequestIn.getURI(), Request->getMethod(), Reason)) {
-                    return UnAuthorized(Reason, ACCESS_DENIED);
+                    return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
 	            }
 
 	            ParseParameters();
@@ -2068,17 +2068,17 @@ namespace OpenWifi {
 	        SetCommonHeaders(CloseConnection);
 	    }
 
-	    inline void BadRequest(const std::string & Reason) {
+	    inline void BadRequest(const OpenWifi::RESTAPI::Errors::msg &E) {
 	        PrepareResponse(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 	        Poco::JSON::Object	ErrorObject;
 	        ErrorObject.set("ErrorCode",400);
 	        ErrorObject.set("ErrorDetails",Request->getMethod());
-	        ErrorObject.set("ErrorDescription",Reason.empty() ? "Command is missing parameters or wrong values." : Reason) ;
+	        ErrorObject.set("ErrorDescription",fmt::format("{}: {}",E.err_num,E.err_txt)) ;
 	        std::ostream &Answer = Response->send();
 	        Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	    }
 
-        inline void BadRequest(uint64_t ErrorCode, const std::string & ErrorText) {
+/*        inline void BadRequest(uint64_t ErrorCode, const std::string & ErrorText) {
             PrepareResponse(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             Poco::JSON::Object	ErrorObject;
             ErrorObject.set("ErrorCode", ErrorCode);
@@ -2087,23 +2087,23 @@ namespace OpenWifi {
             std::ostream &Answer = Response->send();
             Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
         }
-
-	    inline void InternalError(const std::string & Reason = "") {
+*/
+	    inline void InternalError(const OpenWifi::RESTAPI::Errors::msg &E) {
 	        PrepareResponse(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 	        Poco::JSON::Object	ErrorObject;
 	        ErrorObject.set("ErrorCode",500);
 	        ErrorObject.set("ErrorDetails",Request->getMethod());
-	        ErrorObject.set("ErrorDescription",Reason.empty() ? "Please try later or review the data submitted." : Reason) ;
+            ErrorObject.set("ErrorDescription",fmt::format("{}: {}",E.err_num,E.err_txt)) ;
 	        std::ostream &Answer = Response->send();
 	        Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	    }
 
-	    inline void UnAuthorized(const std::string & Reason = "", int Code = INVALID_CREDENTIALS ) {
+	    inline void UnAuthorized(const OpenWifi::RESTAPI::Errors::msg &E) {
 	        PrepareResponse(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 	        Poco::JSON::Object	ErrorObject;
-	        ErrorObject.set("ErrorCode",Code);
+	        ErrorObject.set("ErrorCode",E.err_num);
 	        ErrorObject.set("ErrorDetails",Request->getMethod());
-	        ErrorObject.set("ErrorDescription",Reason.empty() ? "No access allowed." : Reason) ;
+            ErrorObject.set("ErrorDescription",fmt::format("{}: {}",E.err_num,E.err_txt)) ;
 	        std::ostream &Answer = Response->send();
 	        Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	    }
@@ -2113,7 +2113,8 @@ namespace OpenWifi {
 	        Poco::JSON::Object	ErrorObject;
 	        ErrorObject.set("ErrorCode",404);
 	        ErrorObject.set("ErrorDetails",Request->getMethod());
-	        ErrorObject.set("ErrorDescription","This resource does not exist.");
+            const auto & E = OpenWifi::RESTAPI::Errors::Error404;
+            ErrorObject.set("ErrorDescription",fmt::format("{}: {}",E.err_num,E.err_txt)) ;
 	        std::ostream &Answer = Response->send();
 	        Poco::JSON::Stringifier::stringify(ErrorObject, Answer);
 	        Logger_.debug(fmt::format("RES-NOTFOUND: User='{}@{}' Method='{}' Path='{}",

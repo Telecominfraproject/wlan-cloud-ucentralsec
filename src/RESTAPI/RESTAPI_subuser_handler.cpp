@@ -54,7 +54,7 @@ namespace OpenWifi {
         }
 
         if(!Internal_ && !ACLProcessor::Can(UserInfo_.userinfo, TargetUser,ACLProcessor::DELETE)) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
         }
 
         if(!StorageService()->SubDB().DeleteUser(UserInfo_.userinfo.email,Id)) {
@@ -92,7 +92,7 @@ namespace OpenWifi {
         }
 
         if(!Internal_ && !ACLProcessor::Can(UserInfo_.userinfo,NewUser,ACLProcessor::CREATE)) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
         }
 
         Poco::toLowerInPlace(NewUser.email);
@@ -150,7 +150,7 @@ namespace OpenWifi {
         }
 
         if(!Internal_ && !ACLProcessor::Can(UserInfo_.userinfo,Existing,ACLProcessor::MODIFY)) {
-            return UnAuthorized("Insufficient access rights.", ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
         }
 
         if(GetBoolParameter("resetMFA")) {
@@ -173,7 +173,7 @@ namespace OpenWifi {
                 NewUserInfo.to_json(ModifiedObject);
                 return ReturnObject(ModifiedObject);
             } else {
-                return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+                return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
             }
         }
 
@@ -220,10 +220,10 @@ namespace OpenWifi {
             auto NewRole = SecurityObjects::UserTypeFromString(RawObject->get("userRole").toString());
             if(NewRole!=Existing.userRole) {
                 if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && NewRole==SecurityObjects::ROOT) {
-                    return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+                    return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
                 }
                 if(Id==UserInfo_.userinfo.id) {
-                    return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+                    return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
                 }
                 Existing.userRole = NewRole;
             }
@@ -269,24 +269,20 @@ namespace OpenWifi {
                     return BadRequest(RESTAPI::Errors::EMailMFANotEnabled);
                 }
 
-                bool ChangingMFA =
-                        NewUser.userTypeProprietaryInfo.mfa.method != Existing.userTypeProprietaryInfo.mfa.method;
                 Existing.userTypeProprietaryInfo.mfa.method = NewUser.userTypeProprietaryInfo.mfa.method;
+                Existing.userTypeProprietaryInfo.mfa.enabled = true;
 
-                auto PropInfo = RawObject->get("userTypeProprietaryInfo");
-                if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::SMS) {
-                    auto PInfo = PropInfo.extract<Poco::JSON::Object::Ptr>();
-                    if (PInfo->isArray("mobiles")) {
-                        Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
-                    }
-                    if (NewUser.userTypeProprietaryInfo.mobiles.empty() ||
-                        !SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number,
-                                                    UserInfo_.userinfo.email)) {
+                if (NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::SMS) {
+                    if(NewUser.userTypeProprietaryInfo.mobiles.empty()) {
                         return BadRequest(RESTAPI::Errors::NeedMobileNumber);
                     }
+                    if (!SMSSender()->IsNumberValid(NewUser.userTypeProprietaryInfo.mobiles[0].number,UserInfo_.userinfo.email)) {
+                        return BadRequest(RESTAPI::Errors::NeedMobileNumber);
+                    }
+                    Existing.userTypeProprietaryInfo.mobiles = NewUser.userTypeProprietaryInfo.mobiles;
                     Existing.userTypeProprietaryInfo.mobiles[0].verified = true;
                     Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
-                } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::AUTHENTICATOR) {
+                } else if (NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::AUTHENTICATOR) {
                     std::string Secret;
                     Existing.userTypeProprietaryInfo.mobiles.clear();
                     if(Existing.userTypeProprietaryInfo.authenticatorSecret.empty() && TotpCache()->CompleteValidation(UserInfo_.userinfo,false,Secret)) {
@@ -296,13 +292,10 @@ namespace OpenWifi {
                     } else {
                         return BadRequest(RESTAPI::Errors::AuthenticatorVerificationIncomplete);
                     }
-                } else if (ChangingMFA && NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::EMAIL) {
-                    // nothing to do for email.
+                } else if (NewUser.userTypeProprietaryInfo.mfa.method == MFAMETHODS::EMAIL) {
                     Existing.userTypeProprietaryInfo.mobiles.clear();
                     Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 }
-                Existing.userTypeProprietaryInfo.mfa.method = NewUser.userTypeProprietaryInfo.mfa.method;
-                Existing.userTypeProprietaryInfo.mfa.enabled = true;
             } else {
                 Existing.userTypeProprietaryInfo.authenticatorSecret.clear();
                 Existing.userTypeProprietaryInfo.mobiles.clear();

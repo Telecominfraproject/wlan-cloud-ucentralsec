@@ -68,7 +68,7 @@ namespace OpenWifi {
         std::string Id = GetBinding(RESTAPI::Protocol::ID, "");
 
         if(UserInfo_.userinfo.userRole!=SecurityObjects::ROOT && Id!=UserInfo_.userinfo.id) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights, ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
         }
 
         if (!StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email, Id)) {

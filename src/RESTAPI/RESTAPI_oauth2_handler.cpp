@@ -22,8 +22,8 @@ namespace OpenWifi {
 	    bool Expired = false, Contacted = false;
         if (!IsAuthorized(Expired, Contacted)) {
             if(Expired)
-                return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
-            return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);
+                return UnAuthorized(RESTAPI::Errors::EXPIRED_TOKEN);
+            return UnAuthorized(RESTAPI::Errors::INVALID_TOKEN);
         }
         bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
         if(GetMe) {
@@ -41,8 +41,8 @@ namespace OpenWifi {
 	    bool Expired = false, Contacted=false;
 	    if (!IsAuthorized(Expired, Contacted)) {
 	        if(Expired)
-	            return UnAuthorized(RESTAPI::Errors::ExpiredToken,EXPIRED_TOKEN);
-	        return UnAuthorized(RESTAPI::Errors::MissingAuthenticationInformation, INVALID_TOKEN);
+	            return UnAuthorized(RESTAPI::Errors::EXPIRED_TOKEN);
+	        return UnAuthorized(RESTAPI::Errors::INVALID_TOKEN);
 	    }
 
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
@@ -72,7 +72,7 @@ namespace OpenWifi {
                 UInfo.webtoken.to_json(Answer);
                 return ReturnObject(Answer);
             } else {
-                return UnAuthorized(RESTAPI::Errors::InvalidCredentials, CANNOT_REFRESH_TOKEN);
+                return UnAuthorized(RESTAPI::Errors::CANNOT_REFRESH_TOKEN);
             }
         }
 
@@ -121,7 +121,7 @@ namespace OpenWifi {
                 if(MFAServer()->ResendCode(uuid))
                     return OK();
             }
-            return UnAuthorized(RESTAPI::Errors::InvalidCredentials, BAD_MFA_TRANSACTION);
+            return UnAuthorized(RESTAPI::Errors::BAD_MFA_TRANSACTION);
         }
 
         if(GetBoolParameter(RESTAPI::Protocol::COMPLETEMFACHALLENGE,false)) {
@@ -134,7 +134,7 @@ namespace OpenWifi {
                     return ReturnObject(ReturnObj);
                 }
             }
-            return UnAuthorized(RESTAPI::Errors::InvalidCredentials, MFA_FAILURE);
+            return UnAuthorized(RESTAPI::Errors::MFA_FAILURE);
         }
 
         SecurityObjects::UserInfoAndPolicy UInfo;
@@ -154,17 +154,17 @@ namespace OpenWifi {
 
             switch(Code) {
                 case INVALID_CREDENTIALS:
-                    return UnAuthorized(RESTAPI::Errors::InvalidCredentials, Code);
+                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
                 case PASSWORD_INVALID:
-                    return UnAuthorized(RESTAPI::Errors::InvalidPassword, Code);
+                    return UnAuthorized(RESTAPI::Errors::PASSWORD_INVALID);
                 case PASSWORD_ALREADY_USED:
-                    return UnAuthorized(RESTAPI::Errors::PasswordRejected, Code);
+                    return UnAuthorized(RESTAPI::Errors::PASSWORD_ALREADY_USED);
                 case USERNAME_PENDING_VERIFICATION:
-                    return UnAuthorized(RESTAPI::Errors::UserPendingVerification, Code);
+                    return UnAuthorized(RESTAPI::Errors::USERNAME_PENDING_VERIFICATION);
                 case PASSWORD_CHANGE_REQUIRED:
-                    return UnAuthorized(RESTAPI::Errors::PasswordMustBeChanged, Code);
+                    return UnAuthorized(RESTAPI::Errors::PASSWORD_CHANGE_REQUIRED);
                 default:
-                    return UnAuthorized(RESTAPI::Errors::InvalidCredentials); break;
+                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS); break;
             }
             return;
         }

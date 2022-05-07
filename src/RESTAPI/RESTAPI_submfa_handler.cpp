@@ -74,21 +74,21 @@ namespace OpenWifi {
             } else if (MFC.type == "sms") {
                 if (GetBoolParameter("startValidation", false)) {
                     if (MFC.sms.empty()) {
-                        return BadRequest("Missing phone number");
+                        return BadRequest(RESTAPI::Errors::SMSMissingPhoneNumber);
                     }
 
                     if (SMSSender()->StartValidation(MFC.sms, UserInfo_.userinfo.email)) {
                         return OK();
                     } else {
-                        return InternalError("SMS could not be sent. Verify the number or try again later.");
+                        return InternalError(RESTAPI::Errors::SMSTryLater);
                     }
                 } else if (GetBoolParameter("completeValidation", false)) {
                     auto ChallengeCode = GetParameter("challengeCode", "");
                     if (ChallengeCode.empty()) {
-                        return BadRequest("Missing 'challengeCode'");
+                        return BadRequest(RESTAPI::Errors::SMSMissingChallenge);
                     }
                     if (MFC.sms.empty()) {
-                        return BadRequest("Missing phone number");
+                        return BadRequest(RESTAPI::Errors::SMSMissingPhoneNumber);
                     }
                     if (SMSSender()->CompleteValidation(MFC.sms, ChallengeCode, UserInfo_.userinfo.email)) {
                         SecurityObjects::UserInfo User;
@@ -116,7 +116,7 @@ namespace OpenWifi {
                         return ReturnObject(Answer);
 
                     } else {
-                        return InternalError("SMS could not be sent. Verify the number or try again later.");
+                        return InternalError(RESTAPI::Errors::SMSTryLater);
                     }
                 }
             }

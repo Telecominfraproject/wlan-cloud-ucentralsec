@@ -26,14 +26,14 @@ namespace OpenWifi {
         SecurityObjects::UserInfo   Existing;
         if(StorageService()->SubDB().GetUserByEmail(UserName,Existing)) {
             if(Existing.signingUp.empty()) {
-                return BadRequest(1, "Subscriber already signed up.");
+                return BadRequest(RESTAPI::Errors::SignupAlreadySigned);
             }
 
             if(Existing.waitingForEmailCheck) {
-                return BadRequest(2, "Waiting for email check completion.");
+                return BadRequest(RESTAPI::Errors::SignupEmailCheck);
             }
 
-            return BadRequest(3, "Waiting for device:" + Existing.signingUp);
+            return BadRequest(RESTAPI::Errors::SignupWaitingForDevice);
         }
 
         SecurityObjects::UserInfo   NewSub;

@@ -36,7 +36,7 @@ namespace OpenWifi {
         if( UserInfo_.userinfo.userRole!=SecurityObjects::ROOT &&
             UserInfo_.userinfo.userRole!=SecurityObjects::PARTNER &&
             UserInfo_.userinfo.userRole!=SecurityObjects::ADMIN) {
-            return UnAuthorized(RESTAPI::Errors::InsufficientAccessRights,ACCESS_DENIED);
+            return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
         }
 
         if (Obj->has("to") &&

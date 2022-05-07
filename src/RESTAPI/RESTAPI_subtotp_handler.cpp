@@ -24,15 +24,14 @@ namespace OpenWifi {
         auto nextIndex = GetParameter("index",0);
         bool moreCodes=false;
 
-        uint64_t ErrorCode = 0;
-        std::string ErrorText;
-        if(TotpCache()->ContinueValidation(UserInfo_.userinfo,true,Value,nextIndex,moreCodes, ErrorCode, ErrorText )) {
+        RESTAPI::Errors::msg    Error;
+        if(TotpCache()->ContinueValidation(UserInfo_.userinfo,true,Value,nextIndex,moreCodes, Error )) {
             Poco::JSON::Object Answer;
             Answer.set("nextIndex", nextIndex);
             Answer.set("moreCodes", moreCodes);
             return ReturnObject(Answer);
         }
-        return BadRequest(ErrorCode, ErrorText);
+        return BadRequest(Error);
     }
 
 }
