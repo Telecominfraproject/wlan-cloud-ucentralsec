@@ -222,6 +222,7 @@ an SMS provider must be configured. At present time, 2 providers are supported: 
 For SNS you must create an IAM ID that has sns:sendmessage rights.  
 
 ```
+smssender.enabled = true
 smssender.provider = aws
 smssender.aws.secretkey = ***************************************
 smssender.aws.accesskey = ***************************************
@@ -232,6 +233,7 @@ smssender.aws.region = **************
 For Twilio, you must provide the following
 
 ```
+smssender.enabled = true
 smssender.provider = twilio
 smssender.twilio.sid = ***********************
 smssender.twilio.token = **********************
@@ -244,6 +246,7 @@ with GMail and AWS SES. For each, you must obtain the proper credentials and ins
 as the proper mail host.
 
 ```
+mailer.enabled = true
 mailer.hostname = smtp.gmail.com
 mailer.username = ************************
 mailer.password = ************************
