@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-11.
 //
 
-#ifndef OWSEC_MFASERVER_H
-#define OWSEC_MFASERVER_H
+#pragma once
 
 #include "framework/MicroService.h"
 #include "Poco/JSON/Object.h"
@@ -63,4 +62,3 @@ namespace OpenWifi {
     inline auto MFAServer() { return MFAServer::instance(); }
 }
 
-#endif //OWSEC_MFASERVER_H

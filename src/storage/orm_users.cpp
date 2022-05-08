@@ -118,7 +118,7 @@ namespace OpenWifi {
 
             if(!PasswordHashedAlready) {
                 NewUser.id = MicroService::CreateUUID();
-                NewUser.creationDate = std::time(nullptr);
+                NewUser.creationDate = OpenWifi::Now();
             }
 
             //  if there is a password, we assume that we do not want email verification,
@@ -130,7 +130,7 @@ namespace OpenWifi {
                     NewUser.currentPassword = AuthService()->ComputeNewPasswordHash(NewUser.email,NewUser.currentPassword);
                     NewUser.lastPasswords.clear();
                     NewUser.lastPasswords.push_back(NewUser.currentPassword);
-                    NewUser.lastPasswordChange = std::time(nullptr);
+                    NewUser.lastPasswordChange = OpenWifi::Now();
                     NewUser.validated = true;
                 }
             }
@@ -177,7 +177,7 @@ namespace OpenWifi {
                 if(Value.empty()) {
                     User.avatar = "0";
                 } else {
-                    User.avatar = std::to_string(std::time(nullptr));
+                    User.avatar = std::to_string(OpenWifi::Now());
                 }
                 return UpdateRecord("id",Id,User);
             }
@@ -213,7 +213,7 @@ namespace OpenWifi {
             auto tId{Id};
 
             std::string     St1{"update " + TableName_ + " set lastLogin=? where id=?"};
-            uint64_t Now=std::time(nullptr);
+            uint64_t Now=OpenWifi::Now();
             Update << ConvertParams(St1),
                     Poco::Data::Keywords::use(Now),
                     Poco::Data::Keywords::use(tId);

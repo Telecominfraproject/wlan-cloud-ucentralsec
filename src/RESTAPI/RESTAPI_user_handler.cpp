@@ -313,6 +313,7 @@ namespace OpenWifi {
             }
         }
 
+        Existing.modified = OpenWifi::Now();
         if(StorageService()->UserDB().UpdateUserInfo(UserInfo_.userinfo.email,Id,Existing)) {
             SecurityObjects::UserInfo   NewUserInfo;
             StorageService()->UserDB().GetUserByEmail(UserInfo_.userinfo.email,NewUserInfo);
