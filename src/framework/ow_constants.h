@@ -21,6 +21,7 @@ namespace OpenWifi::RESTAPI::Errors {
     struct msg { uint64_t err_num; std::string err_txt; };
     static const struct msg Error404{404,"Resource does not exist."};
 
+    static const struct msg SUCCESS{0,"No error."};
     static const struct msg PASSWORD_CHANGE_REQUIRED{1,"Password change required"};
     static const struct msg INVALID_CREDENTIALS{2,"Invalid credentials."};
     static const struct msg PASSWORD_ALREADY_USED{3,"Password already used."};
@@ -141,6 +142,24 @@ namespace OpenWifi::RESTAPI::Errors {
 	static const struct msg ModelIDListCannotBeEmpty{1098,"Model ID list cannot be empty."};
 	static const struct msg DefConfigNameExists{1099,"Configuration name already exists."};
 
+    static const struct msg SubNoDeviceActivated{1100,"No devices activated yet."};
+    static const struct msg SubConfigNotRefreshed{1101,"Configuration could not be refreshed."};
+
+    static const struct msg ProvServiceNotAvailable{1102,"Provisioning service not available yet."};
+    static const struct msg SSIDInvalidPassword{1103,"Invalid password length. Must be 8 characters or greater, and a maximum of 32 characters."};
+    static const struct msg InvalidStartingIPAddress{1104,"Invalid starting/ending IP address."};
+    static const struct msg SubnetFormatError{1105,"Subnet must be in format like 192.168.1.1/24"};
+    static const struct msg DeviceModeError{1106,"Device mode subnet must be of the form 192.168.1.1/24"};
+
+    static const struct msg BadDeviceMode{1107,"Mode must be bridge, nat, or manual"};
+    static const struct msg DefaultGatewayFormat{1108,"Default gateway must be in format like 192.168.1.1"};
+    static const struct msg PrimaryDNSFormat{1109,"Primary DNS must be an IP address i.e. 192.168.1.1"};
+
+    static const struct msg SecondaryDNSFormat{1110,"Secondary DNS must be an IP address i.e. 192.168.1.1"};
+    static const struct msg BadConnectionType{1111,"Internet Connection must be automatic, bridge, pppoe, or manual"};
+    static const struct msg InvalidDeviceID{1112,"Invalid deviceID"};
+    static const struct msg InvalidVisibilityAttribute{1113,"Invalid visibility attribute"};
+    static const struct msg UnknownConfigurationSection{1114,"Unknown section"};
 
 }
 
