@@ -136,7 +136,7 @@ docker run --rm -ti \
 This security service uses Kafka to coordinate security with other services that are part of the system. You must have a Kafka service running
 in order to use this. You can find several examples of Kafka services available with Docker. Here are the values you need to configure.
 
-```asm
+```
 openwifi.kafka.group.id = security
 openwifi.kafka.client.id = security1
 openwifi.kafka.enable = true
@@ -166,7 +166,7 @@ Here are the parameters for the public interface. The important files are:
 - `restapi-key.pem` : the key associated with this certificate
 - `openwifi.restapi.host.0.key.password` : if you key is password protected, you may supply that password here.
 
-```asm
+```
 openwifi.restapi.host.0.backlog = 100
 openwifi.restapi.host.0.security = relaxed
 openwifi.restapi.host.0.rootca = $OWSEC_ROOT/certs/restapi-ca.pem
@@ -181,7 +181,7 @@ openwifi.restapi.host.0.key.password = mypassword
 The private interface is used for service-to-service communication. You can use self-signed certificates here or letsencrypt. The file names are similar 
 to the filenames used in the previous section.
 
-```asm
+```
 openwifi.internal.restapi.host.0.backlog = 100
 openwifi.internal.restapi.host.0.security = relaxed
 openwifi.internal.restapi.host.0.rootca = $OWSEC_ROOT/certs/restapi-ca.pem
@@ -196,7 +196,7 @@ openwifi.internal.restapi.host.0.key.password = mypassword
 Here are other important values you must set.
 
 
-```asm
+```
 openwifi.system.data = $OWSEC_ROOT/data
 openwifi.system.uri.private = https://localhost:17001
 openwifi.system.uri.public = https://openwifi.dpaas.arilia.com:16001
@@ -221,7 +221,7 @@ an SMS provider must be configured. At present time, 2 providers are supported: 
 #### AWS SMS
 For SNS you must create an IAM ID that has sns:sendmessage rights.  
 
-```asm
+```
 smssender.provider = aws
 smssender.aws.secretkey = ***************************************
 smssender.aws.accesskey = ***************************************
@@ -231,7 +231,7 @@ smssender.aws.region = **************
 #### Twilio
 For Twilio, you must provide the following
 
-```asm
+```
 smssender.provider = twilio
 smssender.twilio.sid = ***********************
 smssender.twilio.token = **********************
@@ -243,7 +243,7 @@ smssender.twilio.phonenumber = +18888888888
 with GMail and AWS SES. For each, you must obtain the proper credentials and insert them in this configuration as well
 as the proper mail host.
 
-```asm
+```
 mailer.hostname = smtp.gmail.com
 mailer.username = ************************
 mailer.password = ************************
@@ -254,10 +254,10 @@ mailer.templates = $OWSEC_ROOT/templates
 ```
 
 #### Google Authenticator
-In order to use the Google Time-based One-Time Password (TOTP), the user must down load the Goole Authenticator 
+In order to use the Google Time-based One-Time Password (TOTP), the user must download the Google Authenticator 
 on any other app that support the TOTP protocol. You should include the following in your configuration
 
-```asm
+```
 totp.issuer = OrgName
 ```
 
