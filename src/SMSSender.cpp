@@ -34,7 +34,7 @@ namespace OpenWifi {
     }
 
     void SMSSender::CleanCache() {
-        uint64_t Now=std::time(nullptr);
+        uint64_t Now=OpenWifi::Now();
         for(auto i=begin(Cache_);i!=end(Cache_);) {
             if((Now-i->Created)>300)
                 i = Cache_.erase(i);
@@ -46,7 +46,7 @@ namespace OpenWifi {
     bool SMSSender::StartValidation(const std::string &Number, const std::string &UserName) {
         std::lock_guard     G(Mutex_);
         CleanCache();
-        uint64_t Now=std::time(nullptr);
+        uint64_t Now=OpenWifi::Now();
         auto Challenge = MFAServer::MakeChallenge();
         Cache_.emplace_back(SMSValidationCacheEntry{.Number=Number, .Code=Challenge, .UserName=UserName, .Created=Now});
         std::string Message = "Please enter the following code on your login screen: " + Challenge;

@@ -18,7 +18,7 @@ namespace OpenWifi {
         std::string Number;
         std::string Code;
         std::string UserName;
-        uint64_t    Created = std::time(nullptr);
+        uint64_t    Created = OpenWifi::Now();
         bool        Validated = false;
     };
 

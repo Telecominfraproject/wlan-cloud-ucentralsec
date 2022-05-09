@@ -40,8 +40,8 @@ namespace OpenWifi {
         NewSub.signingUp = signupUUID;
         NewSub.waitingForEmailCheck = true;
         NewSub.name = UserName;
-        NewSub.modified = std::time(nullptr);
-        NewSub.creationDate = std::time(nullptr);
+        NewSub.modified = OpenWifi::Now();
+        NewSub.creationDate = OpenWifi::Now();
         NewSub.id = MicroService::instance().CreateUUID();
         NewSub.email = UserName;
         NewSub.userRole = SecurityObjects::SUBSCRIBER;
@@ -56,7 +56,7 @@ namespace OpenWifi {
         NewLink.action = OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP;
         NewLink.id = MicroService::CreateUUID();
         NewLink.userId = NewSub.id;
-        NewLink.created = std::time(nullptr);
+        NewLink.created = OpenWifi::Now();
         NewLink.expires = NewLink.created + (1*60*60);  // 1 hour
         NewLink.userAction = false;
         StorageService()->ActionLinksDB().CreateAction(NewLink);

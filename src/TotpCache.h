@@ -53,7 +53,7 @@ namespace OpenWifi {
         }
 
         static bool ValidateCode( const std::string &Secret, const std::string &Code, std::string & Expecting) {
-            uint64_t Now = std::time(nullptr);
+            uint64_t Now = OpenWifi::Now();
             uint32_t p = CppTotp::totp(CppTotp::Bytes::ByteString{ (const u_char *)Secret.c_str()}, Now, 0, 30, 6);
             char buffer[16];
             sprintf(buffer,"%06u",p);
@@ -76,7 +76,7 @@ namespace OpenWifi {
                 if(Reset) {
                     std::string Base32Secret;
                     Hint->second.Subscriber = Subscriber;
-                    Hint->second.Start = std::time(nullptr);
+                    Hint->second.Start = OpenWifi::Now();
                     Hint->second.Done = 0;
                     Hint->second.Verifications = 0;
                     Hint->second.Secret = GenerateSecret(20,Base32Secret);
@@ -156,7 +156,7 @@ namespace OpenWifi {
 
         inline bool CompleteValidation(const SecurityObjects::UserInfo &User, bool Subscriber, std::string & Secret) {
             auto Hint = Cache_.find(User.id);
-            uint64_t Now = std::time(nullptr);
+            uint64_t Now = OpenWifi::Now();
             if(Hint!=Cache_.end() && Subscriber==Hint->second.Subscriber && (Now-Hint->second.Start)<(15*60) && Hint->second.Done!=0) {
                 Secret = Hint->second.Secret;
                 Cache_.erase(Hint);

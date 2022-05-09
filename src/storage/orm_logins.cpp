@@ -38,7 +38,7 @@ namespace OpenWifi {
         R.sessionId = MakeSessionId(token);
         R.userId = userId;
         R.email = email;
-        R.login = std::time(nullptr);
+        R.login = OpenWifi::Now();
         R.logout = 0;
         CreateRecord(R);
     }
@@ -48,7 +48,7 @@ namespace OpenWifi {
         SecurityObjects::LoginRecordInfo    R;
 
         if(GetRecord("session", Session, R)) {
-            R.logout = std::time(nullptr);
+            R.logout = OpenWifi::Now();
             UpdateRecord("session", Session, R);
         }
     }

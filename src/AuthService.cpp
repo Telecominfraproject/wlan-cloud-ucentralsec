@@ -282,7 +282,7 @@ namespace OpenWifi {
     }
 
     [[nodiscard]] std::string AuthService::GenerateTokenHMAC(const std::string & UserName, [[maybe_unused]] ACCESS_TYPE Type) {
-        std::string Identity(UserName + ":" + fmt::format("{}",std::time(nullptr)) + ":" + std::to_string(rand()));
+        std::string Identity(UserName + ":" + fmt::format("{}",OpenWifi::Now()) + ":" + std::to_string(rand()));
         HMAC_.update(Identity);
         return Poco::DigestEngine::digestToHex(HMAC_.digest());
     }
@@ -498,14 +498,14 @@ namespace OpenWifi {
                     UInfo.webtoken.errorCode = 1;
                     return PASSWORD_ALREADY_USED;
                 }
-                UInfo.userinfo.lastPasswordChange = std::time(nullptr);
+                UInfo.userinfo.lastPasswordChange = OpenWifi::Now();
                 UInfo.userinfo.changePassword = false;
-                UInfo.userinfo.modified = std::time(nullptr);
+                UInfo.userinfo.modified = OpenWifi::Now();
                 StorageService()->UserDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
-            UInfo.userinfo.lastLogin=std::time(nullptr);
+            UInfo.userinfo.lastLogin=OpenWifi::Now();
             StorageService()->UserDB().SetLastLogin(UInfo.userinfo.id);
             CreateToken(UserName, UInfo );
 
@@ -544,14 +544,14 @@ namespace OpenWifi {
                     UInfo.webtoken.errorCode = 1;
                     return PASSWORD_ALREADY_USED;
                 }
-                UInfo.userinfo.lastPasswordChange = std::time(nullptr);
+                UInfo.userinfo.lastPasswordChange = OpenWifi::Now();
                 UInfo.userinfo.changePassword = false;
-                UInfo.userinfo.modified = std::time(nullptr);
+                UInfo.userinfo.modified = OpenWifi::Now();
                 StorageService()->SubDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
             //  so we have a good password, password update has taken place if need be, now generate the token.
-            UInfo.userinfo.lastLogin=std::time(nullptr);
+            UInfo.userinfo.lastLogin=OpenWifi::Now();
             StorageService()->SubDB().SetLastLogin(UInfo.userinfo.id);
             CreateSubToken(UserName, UInfo );
 
@@ -648,7 +648,7 @@ namespace OpenWifi {
         A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
         A.userId = UInfo.id;
         A.id = MicroService::CreateUUID();
-        A.created = std::time(nullptr);
+        A.created = OpenWifi::Now();
         A.expires = A.created + 24*60*60;
         A.userAction = true;
         StorageService()->ActionLinksDB().CreateAction(A);
@@ -663,7 +663,7 @@ namespace OpenWifi {
         A.action = OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL;
         A.userId = UInfo.id;
         A.id = MicroService::CreateUUID();
-        A.created = std::time(nullptr);
+        A.created = OpenWifi::Now();
         A.expires = A.created + 24*60*60;
         A.userAction = false;
         StorageService()->ActionLinksDB().CreateAction(A);

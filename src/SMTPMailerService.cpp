@@ -55,7 +55,7 @@ namespace OpenWifi {
 
     bool SMTPMailerService::SendMessage([[maybe_unused]] const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
         std::lock_guard G(Mutex_);
-        PendingMessages_.push_back(MessageEvent{.Posted=(uint64_t )std::time(nullptr),
+        PendingMessages_.push_back(MessageEvent{.Posted= OpenWifi::Now(),
                                             .LastTry=0,
                                             .Sent=0,
                                             .File=Poco::File(TemplateDir_ + "/" +Name),

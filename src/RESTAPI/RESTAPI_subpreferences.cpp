@@ -25,7 +25,7 @@ namespace OpenWifi {
         }
 
         P.id = UserInfo_.userinfo.id;
-        P.modified = std::time(nullptr);
+        P.modified = OpenWifi::Now();
         StorageService()->SubPreferencesDB().SetPreferences(P);
 
         Poco::JSON::Object  Answer;

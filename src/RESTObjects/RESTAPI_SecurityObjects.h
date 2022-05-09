@@ -55,7 +55,7 @@ namespace OpenWifi {
         std::string UserTypeToString(USER_ROLE U);
 
         struct NoteInfo {
-            uint64_t    created=0; // = std::time(nullptr);
+            uint64_t    created=0; // = OpenWifi::Now();
             std::string createdBy;
             std::string note;
 
@@ -94,7 +94,7 @@ namespace OpenWifi {
             std::string uuid;
             std::string question;
             std::string method;
-            uint64_t    created = std::time(nullptr);
+            uint64_t    created = OpenWifi::Now();
 
             void to_json(Poco::JSON::Object &Obj) const;
             bool from_json(const Poco::JSON::Object::Ptr &Obj);
@@ -256,7 +256,7 @@ namespace OpenWifi {
             std::string         locale;
             std::string         message;
             uint64_t            sent=0;
-            uint64_t            created=std::time(nullptr);
+            uint64_t            created=OpenWifi::Now();
             uint64_t            expires=0;
             uint64_t            completed=0;
             uint64_t            canceled=0;

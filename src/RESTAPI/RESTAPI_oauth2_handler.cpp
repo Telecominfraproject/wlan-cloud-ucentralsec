@@ -25,8 +25,7 @@ namespace OpenWifi {
                 return UnAuthorized(RESTAPI::Errors::EXPIRED_TOKEN);
             return UnAuthorized(RESTAPI::Errors::INVALID_TOKEN);
         }
-        bool GetMe = GetBoolParameter(RESTAPI::Protocol::ME, false);
-        if(GetMe) {
+        if(GetBoolParameter(RESTAPI::Protocol::ME)) {
             Logger_.information(fmt::format("REQUEST-ME({}): Request for {}", Request->clientAddress().toString(), UserInfo_.userinfo.email));
             Poco::JSON::Object Me;
             SecurityObjects::UserInfo   ReturnedUser = UserInfo_.userinfo;
@@ -56,7 +55,12 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_oauth2_handler::DoPost() {
+
         const auto & Obj = ParsedBody_;
+        if(Obj == nullptr) {
+            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+        }
+
         auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
         auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
@@ -164,7 +168,7 @@ namespace OpenWifi {
                 case PASSWORD_CHANGE_REQUIRED:
                     return UnAuthorized(RESTAPI::Errors::PASSWORD_CHANGE_REQUIRED);
                 default:
-                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS); break;
+                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
             }
             return;
         }

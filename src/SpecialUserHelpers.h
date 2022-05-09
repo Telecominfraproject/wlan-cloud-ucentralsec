@@ -22,7 +22,7 @@ namespace OpenWifi {
                 U.email = MicroService::instance().ConfigGetString("authentication.default.username", "");
                 U.id = NewDefaultUseridStockUUID;
                 U.userRole = SecurityObjects::ROOT;
-                U.creationDate = std::time(nullptr);
+                U.creationDate = OpenWifi::Now();
                 U.validated = true;
                 U.name = "Default User";
                 U.description = "Default user should be deleted.";

@@ -67,7 +67,7 @@ namespace OpenWifi {
     bool ActionLinkDB::SentAction(std::string &ActionId) {
         SecurityObjects::ActionLink A;
         if(GetRecord("id",ActionId,A)) {
-            A.sent = std::time(nullptr);
+            A.sent = OpenWifi::Now();
             return UpdateRecord("id",ActionId,A);
         }
         return false;
@@ -80,7 +80,7 @@ namespace OpenWifi {
     bool ActionLinkDB::CompleteAction(std::string &ActionId) {
         SecurityObjects::ActionLink A;
         if(GetRecord("id",ActionId,A)) {
-            A.completed = std::time(nullptr);
+            A.completed = OpenWifi::Now();
             return UpdateRecord("id",ActionId,A);
         }
         return false;
@@ -89,14 +89,14 @@ namespace OpenWifi {
     bool ActionLinkDB::CancelAction(std::string &ActionId) {
         SecurityObjects::ActionLink A;
         if(GetRecord("id",ActionId,A)) {
-            A.canceled = std::time(nullptr);
+            A.canceled = OpenWifi::Now();
             return UpdateRecord("id",ActionId,A);
         }
         return false;
     }
 
     void ActionLinkDB::CleanOldActionLinks() {
-        uint64_t CutOff = std::time(nullptr) - (30 * 24 * 60 * 60);
+        uint64_t CutOff = OpenWifi::Now() - (30 * 24 * 60 * 60);
         std::string WhereClause{" Created <= " + std::to_string(CutOff) + " "};
         DeleteRecords(WhereClause);
     }

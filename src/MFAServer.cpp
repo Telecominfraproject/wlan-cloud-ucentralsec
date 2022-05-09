@@ -28,7 +28,7 @@ namespace OpenWifi {
 
         std::string Challenge = MakeChallenge();
         std::string uuid = MicroService::CreateUUID();
-        uint64_t Created = std::time(nullptr);
+        uint64_t Created = OpenWifi::Now();
 
         ChallengeStart.set("uuid",uuid);
         ChallengeStart.set("created", Created);
@@ -107,7 +107,7 @@ namespace OpenWifi {
 
     void MFAServer::CleanCache() {
         // it is assumed that you have locked Cache_ at this point.
-        uint64_t Now = std::time(nullptr);
+        uint64_t Now = OpenWifi::Now();
         for(auto i=begin(Cache_);i!=end(Cache_);) {
             if((Now-i->second.Created)>300) {
                 i = Cache_.erase(i);
