@@ -179,6 +179,7 @@ createuser() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
     curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0" \
     -H "accept: application/json" \
+    -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${token}" \
     -d "$payload"  > ${result_file}
     jq < ${result_file}
