@@ -438,20 +438,19 @@ test_service() {
 	getuser $USER_ID 
 	check_response $result_file
 
-#	echo
-#	echo "----------------"
-#	echo "Delete test user"
-#	echo "----------------"
-#       deleteuser $USER_ID
+	echo
+	echo "----------------"
+	echo "Delete test user"
+	echo "----------------"
+        deleteuser $USER_ID
 #	check_response $result_file
-#	USER_STATUS="$(jq -r '.ErrorCode' < $result_file)"
+	USER_STATUS="$(jq -r '.ErrorCode' < $result_file)"
 
-#	if [ "$USER_STATUS" == 404 ]; then
-#	    echo "Test user was successfully deleted"
-#	 else
-#            echo "Error: failed to delete test user"
-#	    exit 1
-#	fi
+	if [ "$USER_STATUS" == 404 ]; then
+	    echo "Error: failed to delete test user, HTTP error code 404"
+	 else
+            echo "Successfully deleted test user"
+	fi
 }
 
 help() {
