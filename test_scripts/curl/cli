@@ -130,15 +130,18 @@ logout() {
 }
 
 me() {
-    curl  ${FLAGS} -X GET -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    "https://${OWSEC}/api/v1/oauth2?me=true"
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/oauth2?me=true" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
 }
 
 listendpoints() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemEndpoints" \
-        -H "accept: application/json" \
-        -H "Authorization: Bearer ${token}"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 
     for index in {0..10}
@@ -178,99 +181,111 @@ getlogo() {
 createuser() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
     curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0" \
-    -H "accept: application/json" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 createsub() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : false, \"userRole\" : \"subscriber\" }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/subuser/0" \
-            -H "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"  > ${result_file}
-            jq < ${result_file}
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/subuser/0" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
+    jq < ${result_file}
 }
 
 createuser_v() {
     payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
     curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0?email_verification=true" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 deleteuser() {
     curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/user/$1" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 deletesub() {
     curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/subuser/$1" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 getuser() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/user/$1" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 getsub() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/subuser/$1" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 getuserbyemail() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/user/${1}?byEmail=true" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 getsubbyemail() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/subuser/${1}?byEmail=true" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 listusers() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/users" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 listsubs() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/subusers" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload"  > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload"  > ${result_file}
     jq < ${result_file}
 }
 
 policies() {
     payload="{}"
     curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/oauth2?requirements=true" \
+        -H "Accept: application/json" \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
         -d "$payload" > ${result_file}
     jq < ${result_file}
 }
@@ -290,52 +305,54 @@ getavatar() {
 
 deleteavatar() {
     curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/avatar/$1" \
-        -H "Authorization: Bearer ${token}" \
-        -H "Content-Type: application/json" > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
 sendemail() {
     payload="{ \"recipients\" : [ \"$1\" ] , \"subject\" : \"test1\" , \"from\" : \"$2\" , \"text\" : \"This is a test from SES.\" }"
-            curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/email" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload" > ${result_file}
-            jq < ${result_file}
+    curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/email" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload" > ${result_file}
+    jq < ${result_file}
 }
 
 sendsms() {
     payload="{ \"to\" : \"$1\" , \"text\" : \"$2\" }"
-            curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/sms" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload" > ${result_file}
-            jq < ${result_file}
+    curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/sms" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
 }
 
 setpreferences() {
     payload="{ \"data\" : [  { \"tag\" :  \"${1}\" , \"value\" : \"${2}\" } ] }"
     echo ${payload}
     curl ${FLAGS} -X PUT "https://${OWSEC}/api/v1/preferences" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" \
-    -d "$payload" > ${result_file}
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" \
+        -d "$payload" > ${result_file}
     jq < ${result_file}
 }
 
 getpreferences() {
     curl ${FLAGS} -X GET "https://${OWSEC}/api/v1/preferences" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${token}" > ${result_file}
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
 getauthqrcode() {
     curl ${FLAGS} -X GET "https://${OWSEC}/api/v1/totp" \
-    -H "Content-Type: application/json" \
-    -H "Accept: image/svg+xml" \
-    -H "Authorization: Bearer ${token}" \
-    -o qrcode.svg
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${token}" > ${result_file}
+        -o qrcode.svg
 }
 
 testlogout() {
@@ -351,49 +368,55 @@ testlogout() {
 
 setloglevel() {
     payload="{ \"command\" : \"setloglevel\" , \"subsystems\" : [ { \"tag\" : \"$1\" , \"value\" : \"$2\" } ] }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" \
+		-d "$payload"
 }
 
 getloglevels() {
     payload="{ \"command\" : \"getloglevels\" }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" \
+		-d "$payload"
 }
 
 getloglevelnames() {
     payload="{ \"command\" : \"getloglevelnames\" }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" \
+		-d "$payload"
 }
 
 getsubsystemnames() {
     payload="{ \"command\" : \"getsubsystemnames\" }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" \
+		-d "$payload"
 }
 
 systeminfo() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/system?command=info" \
-    -H "accept: application/json" \
-    -H "Authorization: Bearer ${token}" > ${result_file}
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
     jq < ${result_file}
 }
 
 reloadsubsystem() {
     payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"$1\" ] }"
-            curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
-            -H  "accept: application/json" \
-            -H "Authorization: Bearer ${token}" \
-            -d "$payload"
+    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" \
+		-d "$payload"
 }
 
 check_response() {
