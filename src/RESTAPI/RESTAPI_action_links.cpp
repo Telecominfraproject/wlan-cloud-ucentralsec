@@ -199,7 +199,6 @@ namespace OpenWifi {
 
             //  Send the update to the provisioning service
             Poco::JSON::Object  Body;
-
             OpenAPIRequestPut   ProvRequest(uSERVICE_PROVISIONING,"/api/v1/signup",
                                             {
                                                 {"signupUUID", UInfo.signingUp} ,
