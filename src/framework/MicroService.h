@@ -83,7 +83,7 @@ using namespace std::chrono_literals;
 #include "Poco/Environment.h"
 #include "Poco/NObserver.h"
 #include "Poco/Net/SocketNotification.h"
-
+#include "Poco/Base64Decoder.h"
 #include "cppkafka/cppkafka.h"
 
 #include "framework/OpenWifiTypes.h"
@@ -1119,6 +1119,39 @@ namespace OpenWifi::Utils {
         stream << std::setfill ('0') << std::setw(12)
         << std::hex << i;
         return stream.str();
+    }
+
+    inline bool ExtractBase64CompressedData(const std::string &CompressedData,
+                                            std::string &UnCompressedData, uint64_t compress_sz ) {
+        std::istringstream ifs(CompressedData);
+        Poco::Base64Decoder b64in(ifs);
+        std::ostringstream ofs;
+        Poco::StreamCopier::copyStream(b64in, ofs);
+
+        int factor = 20;
+        unsigned long MaxSize = compress_sz ? (unsigned long) (compress_sz + 5000) : (unsigned long) (ofs.str().size() * factor);
+        while(true) {
+            std::vector<uint8_t> UncompressedBuffer(MaxSize);
+            unsigned long FinalSize = MaxSize;
+            auto status = uncompress((uint8_t *)&UncompressedBuffer[0], &FinalSize,
+                                     (uint8_t *)ofs.str().c_str(), ofs.str().size());
+            if(status==Z_OK) {
+                UncompressedBuffer[FinalSize] = 0;
+                UnCompressedData = (char *)&UncompressedBuffer[0];
+                return true;
+            }
+            if(status==Z_BUF_ERROR) {
+                if(factor<300) {
+                    factor+=10;
+                    MaxSize = ofs.str().size() * factor;
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+        return false;
     }
 
 }
@@ -4356,7 +4389,7 @@ namespace OpenWifi {
                                                Path,
                                                Poco::Net::HTTPMessage::HTTP_1_1);
 
-                Poco::Logger::get("REST-CALLER").information(fmt::format("GET: {}", URI.toString()));
+                Poco::Logger::get("REST-CALLER-GET").information(fmt::format(" {}", URI.toString()));
 
                 if(BearerToken.empty()) {
                     Request.add("X-API-KEY", Svc.AccessKey);
@@ -4397,7 +4430,7 @@ namespace OpenWifi {
         }
         catch (const Poco::Exception &E)
         {
-            std::cerr << E.displayText() << std::endl;
+            Poco::Logger::get("REST-CALLER-GET").log(E);
         }
         return Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT;
     }
@@ -4415,7 +4448,7 @@ namespace OpenWifi {
                 for (const auto &qp : QueryData_)
                     URI.addQueryParameter(qp.first, qp.second);
 
-                Poco::Logger::get("REST-CALLER").information(fmt::format("PUT: {}", URI.toString()));
+                Poco::Logger::get("REST-CALLER-PUT").information(fmt::format("{}", URI.toString()));
 
                 std::string Path(URI.getPathAndQuery());
 
@@ -4475,7 +4508,7 @@ namespace OpenWifi {
         }
         catch (const Poco::Exception &E)
         {
-            std::cerr << E.displayText() << std::endl;
+            Poco::Logger::get("REST-CALLER-PUT").log(E);
         }
         return Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT;
     }
@@ -4494,7 +4527,7 @@ namespace OpenWifi {
                 for (const auto &qp : QueryData_)
                     URI.addQueryParameter(qp.first, qp.second);
 
-                Poco::Logger::get("REST-CALLER").information(fmt::format("POST: {}", URI.toString()));
+                Poco::Logger::get("REST-CALLER-POST").information(fmt::format(" {}", URI.toString()));
 
                 std::string Path(URI.getPathAndQuery());
 
@@ -4552,7 +4585,7 @@ namespace OpenWifi {
         }
         catch (const Poco::Exception &E)
         {
-            std::cerr << E.displayText() << std::endl;
+            Poco::Logger::get("REST-CALLER-POST").log(E);
         }
         return Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT;
     }
@@ -4570,7 +4603,7 @@ namespace OpenWifi {
                 for (const auto &qp : QueryData_)
                     URI.addQueryParameter(qp.first, qp.second);
 
-                Poco::Logger::get("REST-CALLER").information(fmt::format("DELETE: {}", URI.toString()));
+                Poco::Logger::get("REST-CALLER-DELETE").information(fmt::format(" {}", URI.toString()));
 
                 std::string Path(URI.getPathAndQuery());
 
@@ -4604,7 +4637,7 @@ namespace OpenWifi {
         }
         catch (const Poco::Exception &E)
         {
-            std::cerr << E.displayText() << std::endl;
+            Poco::Logger::get("REST-CALLER-DELETE").log(E);
         }
         return Poco::Net::HTTPServerResponse::HTTP_GATEWAY_TIMEOUT;
     }
