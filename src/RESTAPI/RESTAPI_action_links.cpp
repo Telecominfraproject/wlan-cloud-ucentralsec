@@ -211,7 +211,8 @@ namespace OpenWifi {
             Poco::JSON::Object::Ptr Response;
             auto Status = ProvRequest.Do(Response);
             std::stringstream ooo;
-            Response->stringify(ooo);
+            if(Response!= nullptr)
+                Response->stringify(ooo);
             Logger().information(fmt::format("({}): Status: {}, Completed subscriber e-mail verification. Provisioning notified. {}",
                                              UInfo.email, Status, ooo.str()));
             SendHTMLFileBack(FormFile,FormVars);
