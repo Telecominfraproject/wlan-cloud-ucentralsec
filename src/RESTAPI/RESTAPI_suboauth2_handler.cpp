@@ -32,21 +32,12 @@ namespace OpenWifi {
     }
 
     void RESTAPI_suboauth2_handler::DoDelete() {
-        bool Expired = false, Contacted = false;
-        if (!IsAuthorized(Expired, Contacted, true)) {
-            if(Expired)
-                return UnAuthorized(RESTAPI::Errors::EXPIRED_TOKEN);
-            return UnAuthorized(RESTAPI::Errors::INVALID_TOKEN);
+        auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "");
+        if(Token.empty() || (Token != SessionToken_)) {
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
-
-        auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "...");
-        if (Token == SessionToken_) {
-            AuthService()->SubLogout(Token);
-            return ReturnStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, true);
-        }
-
-        Logger_.information(fmt::format("BAD-LOGOUT({}): Request for {}", Request->clientAddress().toString(), UserInfo_.userinfo.email));
-        NotFound();
+        AuthService()->SubLogout(Token);
+        return ReturnStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, true);
     }
 
     void RESTAPI_suboauth2_handler::DoPost() {
