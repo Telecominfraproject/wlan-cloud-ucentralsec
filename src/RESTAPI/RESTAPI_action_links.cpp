@@ -206,15 +206,14 @@ namespace OpenWifi {
                                                 {"operation", "emailVerified"}
                                             },
                                             Body,30000);
-
             Logger().information(fmt::format("({}): Completed subscriber e-mail verification and password.",UInfo.email));
             Poco::JSON::Object::Ptr Response;
             auto Status = ProvRequest.Do(Response);
             std::stringstream ooo;
             if(Response!= nullptr)
                 Response->stringify(ooo);
-            Logger().information(fmt::format("({}): Status: {}, Completed subscriber e-mail verification. Provisioning notified. {}",
-                                             UInfo.email, Status, ooo.str()));
+            Logger().information(fmt::format("({}): Completed subscriber e-mail verification. Provisioning notified, Error={}.",
+                                             UInfo.email, Status));
             SendHTMLFileBack(FormFile,FormVars);
             Logger().information(fmt::format("({}): Completed subscriber e-mail verification. FORM notified.",UInfo.email));
         } else {
