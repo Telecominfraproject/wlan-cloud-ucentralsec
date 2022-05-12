@@ -29,11 +29,15 @@
             opacity: 0.8;
         }
 
-        .img-container {
+        .logo-grid {
+            display: grid;
+            grid-template-columns: 20% 60% 20%;
+        }
+
+        .logo-grid > div > img {
             width: 100%;
-            margin-top: 5%;
-            text-align: center;
-            display: block;
+            height: 100%;
+            object-fit: contain;
         }
 
         .info-card {
@@ -63,11 +67,6 @@
             margin: auto;
         }
 
-        img.avatar {
-            width: 40%;
-            border-radius: 50%;
-        }
-
         .container {
             padding: 16px;
         }
@@ -95,8 +94,10 @@
 </head>
 <body>
 
-<div class="img-container">
-    <img src="/wwwassets/the_logo.png" alt="OpenWifi">
+<div class="logo-grid">
+    <div></div>
+    <div><img src="/wwwassets/the_logo.png" alt="OpenWifi"></div>
+    <div></div>
 </div>
 
 <div class="info-card">
