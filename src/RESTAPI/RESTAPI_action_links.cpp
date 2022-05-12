@@ -209,8 +209,11 @@ namespace OpenWifi {
 
             Logger().information(fmt::format("({}): Completed subscriber e-mail verification and password.",UInfo.email));
             Poco::JSON::Object::Ptr Response;
-            ProvRequest.Do(Response);
-            Logger().information(fmt::format("({}): Completed subscriber e-mail verification. Provisioning notified.",UInfo.email));
+            auto Status = ProvRequest.Do(Response);
+            std::stringstream ooo;
+            Response->stringify(ooo);
+            Logger().information(fmt::format("({}): Status: {}, Completed subscriber e-mail verification. Provisioning notified. {}",
+                                             UInfo.email, Status, ooo.str()));
             SendHTMLFileBack(FormFile,FormVars);
             Logger().information(fmt::format("({}): Completed subscriber e-mail verification. FORM notified.",UInfo.email));
         } else {
