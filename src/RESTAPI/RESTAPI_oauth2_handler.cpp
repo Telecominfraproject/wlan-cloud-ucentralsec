@@ -55,7 +55,7 @@ namespace OpenWifi {
         auto userId = GetS(RESTAPI::Protocol::USERID, Obj);
         auto password = GetS(RESTAPI::Protocol::PASSWORD, Obj);
         auto newPassword = GetS(RESTAPI::Protocol::NEWPASSWORD, Obj);
-        auto refreshToken = GetS("refresh_token", Obj);
+        auto refreshToken = GetS("refreshToken", Obj);
         auto grant_type = GetParameter("grant_type");
 
         Poco::toLowerInPlace(userId);
