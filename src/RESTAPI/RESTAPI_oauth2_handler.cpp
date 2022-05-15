@@ -46,7 +46,7 @@ namespace OpenWifi {
                 SessionToken = Auth.getBearerToken();
             }
         } catch (const Poco::Exception &E) {
-            Logger_.log(E);
+            return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
         if (Token.empty() || (Token != SessionToken)) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
