@@ -33,7 +33,16 @@ namespace OpenWifi {
 
     void RESTAPI_suboauth2_handler::DoDelete() {
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "");
-        if(Token.empty() || (Token != SessionToken_)) {
+        std::string SessionToken;
+        try {
+            Poco::Net::OAuth20Credentials Auth(*Request);
+            if (Auth.getScheme() == "Bearer") {
+                SessionToken = Auth.getBearerToken();
+            }
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        if (Token.empty() || (Token != SessionToken)) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
         AuthService()->SubLogout(Token);

@@ -18,32 +18,43 @@
 
 namespace OpenWifi {
 
-	void RESTAPI_oauth2_handler::DoGet() {
-	    bool Expired = false, Contacted = false;
+    void RESTAPI_oauth2_handler::DoGet() {
+        bool Expired = false, Contacted = false;
         if (!IsAuthorized(Expired, Contacted)) {
-            if(Expired)
+            if (Expired)
                 return UnAuthorized(RESTAPI::Errors::EXPIRED_TOKEN);
             return UnAuthorized(RESTAPI::Errors::INVALID_TOKEN);
         }
-        if(GetBoolParameter(RESTAPI::Protocol::ME)) {
-            Logger_.information(fmt::format("REQUEST-ME({}): Request for {}", Request->clientAddress().toString(), UserInfo_.userinfo.email));
+        if (GetBoolParameter(RESTAPI::Protocol::ME)) {
+            Logger_.information(fmt::format("REQUEST-ME({}): Request for {}", Request->clientAddress().toString(),
+                                            UserInfo_.userinfo.email));
             Poco::JSON::Object Me;
-            SecurityObjects::UserInfo   ReturnedUser = UserInfo_.userinfo;
+            SecurityObjects::UserInfo ReturnedUser = UserInfo_.userinfo;
             Sanitize(UserInfo_, ReturnedUser);
             ReturnedUser.to_json(Me);
             return ReturnObject(Me);
         }
         BadRequest(RESTAPI::Errors::UnrecognizedRequest);
-	}
+    }
 
     void RESTAPI_oauth2_handler::DoDelete() {
         auto Token = GetBinding(RESTAPI::Protocol::TOKEN, "");
-        if(Token.empty() || (Token != SessionToken_)) {
+        std::string SessionToken;
+        try {
+            Poco::Net::OAuth20Credentials Auth(*Request);
+            if (Auth.getScheme() == "Bearer") {
+                SessionToken = Auth.getBearerToken();
+            }
+        } catch (const Poco::Exception &E) {
+            Logger_.log(E);
+        }
+        if (Token.empty() || (Token != SessionToken)) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
+
         AuthService()->Logout(Token);
         return ReturnStatus(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, true);
-	}
+    }
 
 	void RESTAPI_oauth2_handler::DoPost() {
 
