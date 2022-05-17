@@ -33,6 +33,7 @@ namespace OpenWifi {
 		}
 	}
 
+
 	int AuthService::AccessTypeToInt(ACCESS_TYPE T) {
 		switch (T) {
 		case USERNAME: return 1;
