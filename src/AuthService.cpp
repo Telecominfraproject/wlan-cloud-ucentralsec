@@ -42,6 +42,8 @@ namespace OpenWifi {
 		return 1;	// some compilers complain...
 	}
 
+    static const std::string DefaultPassword_8_u_l_n_1{"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\\{\\}\\(\\)~_\\+\\|\\\\\\[\\]\\;\\:\\<\\>\\.\\,\\/\\?\\\"\\'\\`\\=#?!@$%^&*-]).{8,}$"};
+
     int AuthService::Start() {
 		Logger().notice("Starting...");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
@@ -50,9 +52,9 @@ namespace OpenWifi {
 
         AccessPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.access", "/wwwassets/access_policy.html");
         PasswordPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.password", "/wwwassets/password_policy.html");
-        PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression",DefaultPassword_8_u_l_n_1);
 
-        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroService::instance().ConfigGetString("subscriber.validation.expression","^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroService::instance().ConfigGetString("subscriber.validation.expression",DefaultPassword_8_u_l_n_1);
         SubAccessPolicy_ = MicroService::instance().ConfigPath("subscriber.policy.access", "/wwwassets/access_policy.html");
         SubPasswordPolicy_ = MicroService::instance().ConfigPath("subscriber.policy.password", "/wwwassets/password_policy.html");
 
