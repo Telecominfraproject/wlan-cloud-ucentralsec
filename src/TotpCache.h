@@ -116,7 +116,7 @@ namespace OpenWifi {
                      .Verifications = 0,
                      .Secret = Secret,
                      .QRCode = QRCode,
-                     .LastCode = 0
+                     .LastCode = ""
                      };
             Cache_[User.id] = E;
             std::cout << __LINE__ << std::endl;
