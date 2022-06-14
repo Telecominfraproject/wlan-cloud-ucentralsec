@@ -31,24 +31,32 @@ namespace OpenWifi {
         }
 
         static std::string GenerateSecret(uint Size, std::string & Base32Secret) {
+            std::cout << __LINE__ << std::endl;
             std::string R;
 
+            std::cout << __LINE__ << std::endl;
             for(;Size;Size--) {
                 R += (char) MicroService::instance().Random(33,127);
             }
+            std::cout << __LINE__ << std::endl;
             Base32Secret = CppTotp::Bytes::toBase32( CppTotp::Bytes::ByteString{ (const u_char *)R.c_str()});
+            std::cout << __LINE__ << std::endl;
             return R;
         }
 
         std::string GenerateQRCode(const std::string &Secret, const std::string &email) {
+            std::cout << __LINE__ << std::endl;
 
             std::string uri{
                 "otpauth://totp/" + Issuer_ + ":" +
                 email + "?secret=" + Secret + "&issuer=" + Issuer_
             };
+            std::cout << __LINE__ << std::endl;
 
             qrcodegen::QrCode qr0 = qrcodegen::QrCode::encodeText(uri.c_str(), qrcodegen::QrCode::Ecc::MEDIUM);
+            std::cout << __LINE__ << std::endl;
             std::string svg = qrcodegen::toSvgString(qr0, 4);  // See QrCodeGeneratorDemo
+            std::cout << __LINE__ << std::endl;
             return svg;
         }
 
@@ -71,9 +79,13 @@ namespace OpenWifi {
         };
 
         inline bool StartValidation(const SecurityObjects::UserInfo &User, bool Subscriber, std::string & QRCode, bool Reset) {
+            std::cout << __LINE__ << std::endl;
             auto Hint = Cache_.find(User.id);
+            std::cout << __LINE__ << std::endl;
             if(Hint!=Cache_.end() && Hint->second.Subscriber==Subscriber) {
+                std::cout << __LINE__ << std::endl;
                 if(Reset) {
+                    std::cout << __LINE__ << std::endl;
                     std::string Base32Secret;
                     Hint->second.Subscriber = Subscriber;
                     Hint->second.Start = OpenWifi::Now();
@@ -82,15 +94,21 @@ namespace OpenWifi {
                     Hint->second.Secret = GenerateSecret(20,Base32Secret);
                     Hint->second.QRCode = QRCode = GenerateQRCode(Base32Secret, User.email);
                     Hint->second.LastCode.clear();
+                    std::cout << __LINE__ << std::endl;
                 } else {
+                    std::cout << __LINE__ << std::endl;
                     QRCode = Hint->second.QRCode;
                 }
                 return true;
             }
 
+            std::cout << __LINE__ << std::endl;
             std::string Base32Secret;
+            std::cout << __LINE__ << std::endl;
             auto Secret = GenerateSecret(20, Base32Secret);
+            std::cout << __LINE__ << std::endl;
             QRCode = GenerateQRCode(Base32Secret, User.email);
+            std::cout << __LINE__ << std::endl;
 
             Entry E{ .Subscriber = Subscriber,
                      .Start = OpenWifi::Now(),
@@ -101,6 +119,7 @@ namespace OpenWifi {
                      .LastCode = 0
                      };
             Cache_[User.id] = E;
+            std::cout << __LINE__ << std::endl;
             return true;
         }
 
