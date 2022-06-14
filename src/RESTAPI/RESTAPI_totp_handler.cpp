@@ -11,7 +11,6 @@ namespace OpenWifi {
 
         auto Reset = GetBoolParameter("reset",false);
         std::string QRCode;
-
         if(TotpCache()->StartValidation(UserInfo_.userinfo,false,QRCode,Reset)) {
             return SendFileContent(QRCode, "image/svg+xml","qrcode.svg");
         }
