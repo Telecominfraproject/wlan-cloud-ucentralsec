@@ -55,10 +55,10 @@ namespace OpenWifi {
         static bool ValidateCode( const std::string &Secret, const std::string &Code, std::string & Expecting) {
             uint64_t Now = OpenWifi::Now();
             uint32_t p = CppTotp::totp(CppTotp::Bytes::ByteString{ (const u_char *)Secret.c_str()}, Now, 0, 30, 6);
-            char buffer[16];
+            char buffer[16]{0};
             sprintf(buffer,"%06u",p);
-            Expecting = buffer;
-            return Code == buffer;
+            Expecting = std::string(buffer);
+            return Code == Expecting;
         }
 
         int Start() override {
@@ -91,19 +91,6 @@ namespace OpenWifi {
             std::string Base32Secret;
             auto Secret = GenerateSecret(20, Base32Secret);
             QRCode = GenerateQRCode(Base32Secret, User.email);
-
-/*
-        struct Entry {
-            bool        Subscriber=false;
-            uint64_t    Start = 0;
-            uint64_t    Done = 0 ;
-            uint64_t    Verifications = 0 ;
-            std::string Secret;
-            std::string QRCode;
-            std::string LastCode;
-        };
-
- */
 
             Entry E{ .Subscriber = Subscriber,
                      .Start = OpenWifi::Now(),
