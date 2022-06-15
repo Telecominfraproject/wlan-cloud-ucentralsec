@@ -123,6 +123,7 @@ COPY docker-entrypoint.sh /
 COPY wait-for-postgres.sh /
 RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi-ca.pem \
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
+RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentral-deploy/main/docker-compose/certs/restapi.pem
 
 COPY --from=owsec-build /owsec/cmake-build/owsec /openwifi/owsec
 COPY --from=cppkafka-build /cppkafka/cmake-build/src/lib/* /usr/local/lib
@@ -130,7 +131,6 @@ COPY --from=poco-build /poco/cmake-build/lib/* /usr/local/lib
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-core/libaws-cpp-sdk-core.so /usr/local/lib
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-s3/libaws-cpp-sdk-s3.so /usr/local/lib
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-sns/libaws-cpp-sdk-sns.so /usr/local/lib
-COPY test /test
 
 EXPOSE 16001 17001 16101
 
