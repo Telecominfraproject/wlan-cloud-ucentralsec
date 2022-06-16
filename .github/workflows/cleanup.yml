@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - 'release/*'
     types: [ closed ]
 
 defaults:
@@ -16,4 +17,9 @@ jobs:
     steps:
       - run: |
           export PR_BRANCH_TAG=$(echo ${GITHUB_HEAD_REF#refs/heads/} | tr '/' '-')
-          curl -uucentral:${{ secrets.DOCKER_REGISTRY_PASSWORD }} -X DELETE "https://tip.jfrog.io/artifactory/tip-wlan-cloud-ucentral/owsec/$PR_BRANCH_TAG"
+
+          if [[ $PR_BRANCH_TAG =~ (main|master|release/*) ]]; then
+            curl -uucentral:${{ secrets.DOCKER_REGISTRY_PASSWORD }} -X DELETE "https://tip.jfrog.io/artifactory/tip-wlan-cloud-ucentral/owsec/$PR_BRANCH_TAG"
+          else
+            echo "PR branch is $PR_BRANCH_TAG, not deleting image."
+          fi
