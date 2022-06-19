@@ -65,7 +65,7 @@ namespace OpenWifi {
 
     void SMTPMailerService::run() {
         Running_ = true;
-
+        Utils::SetThreadName("smtp-mailer");
         while(Running_) {
 
             Poco::Thread::trySleep(10000);
