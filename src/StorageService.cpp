@@ -63,6 +63,7 @@ namespace OpenWifi {
     }
 
     void Archiver::onTimer([[maybe_unused]] Poco::Timer &timer) {
+        Utils::SetThreadName("archiver");
         Poco::Logger &logger = Poco::Logger::get("STORAGE-ARCHIVER");
         logger.information("Squiggy the DB: removing old tokens.");
         StorageService()->SubTokenDB().CleanExpiredTokens();
