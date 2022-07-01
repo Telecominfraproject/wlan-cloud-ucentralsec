@@ -24,6 +24,7 @@ namespace OpenWifi {
 
     void ActionLinkManager::run() {
         Running_ = true ;
+        Utils::SetThreadName("action-mgr");
 
         while(Running_) {
             Poco::Thread::trySleep(2000);
