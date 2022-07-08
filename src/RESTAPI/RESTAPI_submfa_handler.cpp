@@ -76,12 +76,21 @@ namespace OpenWifi {
                         return BadRequest(RESTAPI::Errors::SMSMissingPhoneNumber);
                     }
 
+                    if(!SMSSender()->Enabled()) {
+                        return BadRequest(RESTAPI::Errors::SMSMFANotEnabled);
+                    }
+
                     if (SMSSender()->StartValidation(MFC.sms, UserInfo_.userinfo.email)) {
                         return OK();
                     } else {
                         return InternalError(RESTAPI::Errors::SMSTryLater);
                     }
                 } else if (GetBoolParameter("completeValidation", false)) {
+
+                    if(!SMSSender()->Enabled()) {
+                        return BadRequest(RESTAPI::Errors::SMSMFANotEnabled);
+                    }
+
                     auto ChallengeCode = GetParameter("challengeCode", "");
                     if (ChallengeCode.empty()) {
                         return BadRequest(RESTAPI::Errors::SMSMissingChallenge);
