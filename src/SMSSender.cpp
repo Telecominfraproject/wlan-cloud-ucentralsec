@@ -45,6 +45,8 @@ namespace OpenWifi {
 
     bool SMSSender::StartValidation(const std::string &Number, const std::string &UserName) {
         std::lock_guard     G(Mutex_);
+        if(!Enabled_)
+            return false;
         CleanCache();
         uint64_t Now=OpenWifi::Now();
         auto Challenge = MFAServer::MakeChallenge();
@@ -56,6 +58,9 @@ namespace OpenWifi {
     bool SMSSender::IsNumberValid(const std::string &Number, const std::string &UserName) {
         std::lock_guard     G(Mutex_);
 
+        if(!Enabled_)
+            return false;
+
         for(const auto &i:Cache_) {
             if(i.Number==Number && i.UserName==UserName)
                 return i.Validated;
@@ -65,6 +70,9 @@ namespace OpenWifi {
 
     bool SMSSender::CompleteValidation(const std::string &Number, const std::string &Code, const std::string &UserName) {
         std::lock_guard     G(Mutex_);
+
+        if(!Enabled_)
+            return false;
 
         for(auto &i:Cache_) {
             if(i.Code==Code && i.Number==Number && i.UserName==UserName) {

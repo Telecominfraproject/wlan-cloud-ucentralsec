@@ -12,6 +12,10 @@ namespace OpenWifi {
     void OpenWifi::RESTAPI_sms_handler::DoPost() {
         const auto &Obj = ParsedBody_;
 
+        if(!SMSSender()->Enabled()) {
+            return BadRequest(RESTAPI::Errors::SMSMFANotEnabled);
+        }
+
         std::string Arg;
         if(HasParameter("validateNumber",Arg) && Arg=="true" && Obj->has("to")) {
             auto Number = Obj->get("to").toString();
