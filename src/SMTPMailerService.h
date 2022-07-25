@@ -73,7 +73,7 @@ namespace OpenWifi {
                uint64_t             Posted=0;
                uint64_t             LastTry=0;
                uint64_t             Sent=0;
-               Poco::File           File;
+               std::string          TemplateName;
                MessageAttributes    Attrs;
             };
 

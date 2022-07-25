@@ -61,7 +61,7 @@ namespace OpenWifi {
         PendingMessages_.push_back(MessageEvent{.Posted= OpenWifi::Now(),
                                             .LastTry=0,
                                             .Sent=0,
-                                            .File=Poco::File(TemplateDir_ + "/" + Name + (UseHTML_ ? ".html" : ".txt")),
+                                            .TemplateName=Name,
                                             .Attrs=Attrs});
         return true;
     }
@@ -144,11 +144,14 @@ namespace OpenWifi {
                 std::string Content = Msg.Attrs.find(TEXT)->second;
                 Message->addContent(new Poco::Net::StringPartSource(Content));
             } else {
-                std::string Content = Utils::LoadFile(Msg.File);
-                Types::StringPairVec    Variables;
-                FillVariables(Msg.Attrs, Variables);
-                Utils::ReplaceVariables(Content, Variables);
-                Message->addContent(new Poco::Net::StringPartSource(Content, UseHTML_ ? "text/html" : "text/plain"));
+                for(const auto &format:{"html","txt"}) {
+                    std::string Content = Utils::LoadFile(TemplateDir_ + Msg.TemplateName + "." + format );
+                    Types::StringPairVec Variables;
+                    FillVariables(Msg.Attrs, Variables);
+                    Utils::ReplaceVariables(Content, Variables);
+                    Message->addContent(
+                            new Poco::Net::StringPartSource(Content, (strcmp(format,"html") == 0 ? "text/html" : "text/plain") ));
+                }
             }
 
             auto Logo = Msg.Attrs.find(LOGO);

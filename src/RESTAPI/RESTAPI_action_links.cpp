@@ -240,7 +240,8 @@ namespace OpenWifi {
             return SendHTMLFileBack(FormFile, FormVars);
         }
 
-        Logger_.information(fmt::format("EMAIL-VERIFICATION(%s): For ID={}", Request->clientAddress().toString(), UInfo.email));
+        Logger_.information(fmt::format("EMAIL-VERIFICATION(%s): For ID={}", Request->clientAddress().toString(),
+                                        UInfo.email));
         UInfo.waitingForEmailCheck = false;
         UInfo.validated = true;
         UInfo.lastEmailCheck = OpenWifi::Now();

@@ -53,7 +53,7 @@ namespace OpenWifi {
                             i.action==OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP ) && !StorageService()->SubDB().GetUserById(i.userId,UInfo)) {
                     StorageService()->ActionLinksDB().CancelAction(i.id);
                     continue;
-                } else if((i.action=OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION) &&
+                } else if((i.action==OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION) &&
                         (OpenWifi::Now()-i.created)>(24*60*60)) {
                     StorageService()->ActionLinksDB().CancelAction(i.id);
                     continue;
