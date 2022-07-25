@@ -56,6 +56,12 @@ namespace OpenWifi {
     }
     typedef std::map<MESSAGE_ATTRIBUTES, std::string>   MessageAttributes;
 
+    enum class MessageSendStatus {
+        msg_sent,
+        msg_not_sent_but_resend,
+        msg_not_sent_but_do_not_resend
+    };
+
     class SMTPMailerService : public SubSystemServer, Poco::Runnable {
         public:
            static SMTPMailerService *instance() {
@@ -76,7 +82,7 @@ namespace OpenWifi {
             void Stop() override;
 
             bool SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs);
-            bool SendIt(const MessageEvent &Msg);
+            MessageSendStatus SendIt(const MessageEvent &Msg);
             void LoadMyConfig();
             void reinitialize(Poco::Util::Application &self) override;
             bool Enabled() const { return Enabled_; }

@@ -12,6 +12,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Context.h"
+#include "Poco/Net/NetException.h"
 
 #include "SMTPMailerService.h"
 #include "framework/MicroService.h"
@@ -83,12 +84,20 @@ namespace OpenWifi {
                 auto Recipient = i->Attrs.find(RECIPIENT_EMAIL)->second;
                 uint64_t now = OpenWifi::Now();
                 if((i->LastTry==0 || (now-i->LastTry)>MailRetry_)) {
-                    if (SendIt(*i)) {
-                        Logger().information(fmt::format("Attempting to deliver for mail '{}'.", Recipient));
-                        i = Messages_.erase(i);
-                    } else {
-                        i->LastTry = now;
-                        ++i;
+                    switch(SendIt(*i)) {
+                        case MessageSendStatus::msg_sent: {
+                            Logger().information(fmt::format("Attempting to deliver for mail '{}'.", Recipient));
+                            i = Messages_.erase(i);
+                        } break;
+                        case MessageSendStatus::msg_not_sent_but_resend: {
+                            Logger().information(fmt::format("Mail for '{}' was not. We will retry later.", Recipient));
+                            i->LastTry = now;
+                            ++i;
+                        } break;
+                        case MessageSendStatus::msg_not_sent_but_do_not_resend: {
+                            Logger().information(fmt::format("Mail for '{}' will not be sent. Check email address", Recipient));
+                            i = Messages_.erase(i);
+                        } break;
                     }
                 } else if ((now-i->Posted)>MailAbandon_) {
                     Logger().information(fmt::format("Mail for '{}' has timed out and will not be sent.", Recipient));
@@ -106,7 +115,7 @@ namespace OpenWifi {
         }
     }
 
-    bool SMTPMailerService::SendIt(const MessageEvent &Msg) {
+    MessageSendStatus SMTPMailerService::SendIt(const MessageEvent &Msg) {
         std::string             Recipient;
 
         try
@@ -171,16 +180,21 @@ namespace OpenWifi {
             );
             session.sendMessage(Message);
             session.close();
-            return true;
+            return MessageSendStatus::msg_sent;
+        }
+        catch (const Poco::Net::SMTPException &S) {
+            Logger().log(S);
+            return MessageSendStatus::msg_not_sent_but_do_not_resend;
         }
         catch (const Poco::Exception& E)
         {
             Logger().log(E);
+            return MessageSendStatus::msg_not_sent_but_resend;
         }
         catch (const std::exception &E) {
             Logger().warning(fmt::format("Cannot send message to:{}, error: {}",Recipient, E.what()));
+            return MessageSendStatus::msg_not_sent_but_do_not_resend;
         }
-        return false;
     }
 
 }
