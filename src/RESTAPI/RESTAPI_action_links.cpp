@@ -38,6 +38,8 @@ namespace OpenWifi {
             return CompleteResetPassword();
         else if(Action=="signup_completion")
             return CompleteSubVerification();
+        else if(Action=="email_invitation")
+            return CompleteEmailInvitation();
         else
             return DoReturnA404();
     }
@@ -260,6 +262,10 @@ namespace OpenWifi {
         Types::StringPairVec FormVars;
         Poco::File FormFile{Daemon()->AssetDir() + "/404_error.html"};
         SendHTMLFileBack(FormFile, FormVars);
+    }
+
+    void RESTAPI_action_links::CompleteEmailInvitation() {
+        /// TODO:
     }
 
 }

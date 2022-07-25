@@ -102,6 +102,8 @@ namespace OpenWifi {
             Poco::Thread            SenderThr_;
             std::atomic_bool        Running_=false;
             bool                    Enabled_=false;
+            bool                    UseHTML_=false;
+            std::string             EmailLogo_{"logo.jpg"};
 
             SMTPMailerService() noexcept:
                 SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer")

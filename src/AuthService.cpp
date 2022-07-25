@@ -23,6 +23,11 @@
 
 namespace OpenWifi {
 
+    inline const static std::vector<std::string>  EmailTemplateNames = {  "password_reset" ,
+                                                                          "email_verification",
+                                                                          "signuo_verification",
+                                                                          "email_invitation" };
+
     AuthService::ACCESS_TYPE AuthService::IntToAccessType(int C) {
 		switch (C) {
 		case 1: return USERNAME;
@@ -576,7 +581,7 @@ namespace OpenWifi {
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "Password reset link";
                         Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
-                        SMTPMailerService()->SendMessage(UInfo.email, "password_reset.txt", Attrs);
+                        SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[FORGOT_PASSWORD], Attrs);
                     }
                     break;
 
@@ -586,8 +591,19 @@ namespace OpenWifi {
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "e-mail Address Verification";
                         Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
-                        SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
+                        SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[EMAIL_VERIFICATION], Attrs);
                         UInfo.waitingForEmailCheck = true;
+                    }
+                    break;
+
+                case EMAIL_INVITATION: {
+                    MessageAttributes Attrs;
+                    Attrs[RECIPIENT_EMAIL] = UInfo.email;
+                    Attrs[LOGO] = GetLogoAssetURI();
+                    Attrs[SUBJECT] = "e-mail Invitation";
+                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_invitation&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[EMAIL_INVITATION], Attrs);
+                    UInfo.waitingForEmailCheck = true;
                     }
                     break;
 
@@ -611,7 +627,7 @@ namespace OpenWifi {
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "Password reset link";
                     Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, "password_reset.txt", Attrs);
+                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[FORGOT_PASSWORD], Attrs);
                 }
                 break;
 
@@ -621,7 +637,7 @@ namespace OpenWifi {
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, "email_verification.txt", Attrs);
+                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[EMAIL_VERIFICATION], Attrs);
                     UInfo.waitingForEmailCheck = true;
                 }
                 break;
@@ -632,7 +648,7 @@ namespace OpenWifi {
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "Signup e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, "signup_verification.txt", Attrs);
+                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[SIGNUP_VERIFICATION], Attrs);
                     UInfo.waitingForEmailCheck = true;
                 }
                 break;

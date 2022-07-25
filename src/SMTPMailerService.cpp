@@ -32,7 +32,9 @@ namespace OpenWifi {
             TemplateDir_ = MicroService::instance().ConfigPath("mailer.templates", MicroService::instance().DataDir());
             MailRetry_ = MicroService::instance().ConfigGetInt("mailer.retry",2*60);
             MailAbandon_ = MicroService::instance().ConfigGetInt("mailer.abandon",2*60*60);
+            UseHTML_ = MicroService::instance().ConfigGetBool("mailer.html",false);
             Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
+            EmailLogo_ = TemplateDir_ + "/" + MicroService::instance().ConfigGetString("mailer.logo","logo.jpg");
         }
     }
 
@@ -59,7 +61,7 @@ namespace OpenWifi {
         PendingMessages_.push_back(MessageEvent{.Posted= OpenWifi::Now(),
                                             .LastTry=0,
                                             .Sent=0,
-                                            .File=Poco::File(TemplateDir_ + "/" +Name),
+                                            .File=Poco::File(TemplateDir_ + "/" + Name + (UseHTML_ ? ".html" : ".txt")),
                                             .Attrs=Attrs});
         return true;
     }
@@ -116,13 +118,11 @@ namespace OpenWifi {
     }
 
     MessageSendStatus SMTPMailerService::SendIt(const MessageEvent &Msg) {
+
         std::string             Recipient;
 
         try
         {
-            Poco::Net::MailMessage  Message;
-            Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
-
             auto H1 = Msg.Attrs.find(SENDER);
             std::string TheSender;
             if(H1!=Msg.Attrs.end()) {
@@ -130,32 +130,35 @@ namespace OpenWifi {
             } else {
                 TheSender = Sender_ ;
             }
-            Message.setSender( TheSender );
+
+            auto Message = std::make_unique<Poco::Net::MailMessage>();
+
+            Recipient = Msg.Attrs.find(RECIPIENT_EMAIL)->second;
+            Message->setSender( TheSender );
+            Message->addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
+            Message->setSubject(Msg.Attrs.find(SUBJECT)->second);
+
             Logger().information(fmt::format("Sending message to:{} from {}",Recipient,TheSender));
-            Message.addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
-            Message.setSubject(Msg.Attrs.find(SUBJECT)->second);
 
             if(Msg.Attrs.find(TEXT) != Msg.Attrs.end()) {
                 std::string Content = Msg.Attrs.find(TEXT)->second;
-                Message.addContent(new Poco::Net::StringPartSource(Content));
+                Message->addContent(new Poco::Net::StringPartSource(Content));
             } else {
                 std::string Content = Utils::LoadFile(Msg.File);
-                // std::cout << "Mailing " << Content << std::endl;
                 Types::StringPairVec    Variables;
                 FillVariables(Msg.Attrs, Variables);
                 Utils::ReplaceVariables(Content, Variables);
-                // std::cout << "Mailing " << Content << std::endl;
-                Message.addContent(new Poco::Net::StringPartSource(Content));
+                Message->addContent(new Poco::Net::StringPartSource(Content, UseHTML_ ? "text/html" : "text/plain"));
             }
 
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
                 try {
-                    Poco::File          LogoFile(AuthService::GetLogoAssetFileName());
+                    Poco::File          LogoFile(EmailLogo_);
                     std::ifstream       IF(LogoFile.path());
                     std::ostringstream  OS;
                     Poco::StreamCopier::copyStream(IF, OS);
-                    Message.addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
+                    Message->addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
                 } catch (...) {
                     Logger().warning(fmt::format("Cannot add '{}' logo in email",AuthService::GetLogoAssetFileName()));
                 }
@@ -178,7 +181,7 @@ namespace OpenWifi {
                           SenderLoginUserName_,
                           SenderLoginPassword_
             );
-            session.sendMessage(Message);
+            session.sendMessage(*Message);
             session.close();
             return MessageSendStatus::msg_sent;
         }

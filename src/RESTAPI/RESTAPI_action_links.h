@@ -27,6 +27,7 @@ namespace OpenWifi {
         void DoEmailVerification(SecurityObjects::ActionLink &Link);
         void DoReturnA404();
         void DoNewSubVerification(SecurityObjects::ActionLink &Link);
+        void CompleteEmailInvitation();
 
         void DoGet() final;
         void DoPost() final;

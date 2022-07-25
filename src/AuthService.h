@@ -37,9 +37,10 @@ namespace OpenWifi{
         };
 
         enum EMAIL_REASON {
-            FORGOT_PASSWORD,
+            FORGOT_PASSWORD = 0,
             EMAIL_VERIFICATION,
-            SIGNUP_VERIFICATION
+            SIGNUP_VERIFICATION,
+            EMAIL_INVITATION
         };
 
         static ACCESS_TYPE IntToAccessType(int C);

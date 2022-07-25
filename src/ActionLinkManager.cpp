@@ -53,6 +53,10 @@ namespace OpenWifi {
                             i.action==OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP ) && !StorageService()->SubDB().GetUserById(i.userId,UInfo)) {
                     StorageService()->ActionLinksDB().CancelAction(i.id);
                     continue;
+                } else if((i.action=OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION) &&
+                        (OpenWifi::Now()-i.created)>(24*60*60)) {
+                    StorageService()->ActionLinksDB().CancelAction(i.id);
+                    continue;
                 }
 
                 switch(i.action) {
@@ -94,6 +98,14 @@ namespace OpenWifi {
                         }
                         StorageService()->ActionLinksDB().SentAction(i.id);
                         }
+                        break;
+
+                    case OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION: {
+                        if(AuthService::SendEmailToSubUser(i.id, UInfo.email, AuthService::EMAIL_INVITATION)) {
+                            Logger().information(fmt::format("Send new subscriber email invitation link to {}",UInfo.email));
+                        }
+                        StorageService()->ActionLinksDB().SentAction(i.id);
+                    }
                         break;
 
                     default: {
