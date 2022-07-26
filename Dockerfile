@@ -77,7 +77,9 @@ COPY --from=aws-sdk-cpp-build /usr/local/lib /usr/local/lib
 WORKDIR /owsec
 RUN mkdir cmake-build
 WORKDIR /owsec/cmake-build
-RUN cmake ..
+RUN cmake .. \
+          -Dcrypto_LIBRARY=/usr/lib/libcrypto.so \
+          -DBUILD_SHARED_LIBS=ON
 RUN cmake --build . --config Release -j8
 
 FROM alpine:3.15
@@ -108,8 +110,8 @@ RUN wget https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentr
     -O /usr/local/share/ca-certificates/restapi-ca-selfsigned.pem
 
 COPY --from=owsec-build /owsec/cmake-build/owsec /openwifi/owsec
-COPY --from=cppkafka-build /cppkafka/cmake-build/src/lib/* /usr/local/lib
-COPY --from=poco-build /poco/cmake-build/lib/* /usr/local/lib
+COPY --from=cppkafka-build /cppkafka/cmake-build/src/lib/* /usr/local/lib/
+COPY --from=poco-build /poco/cmake-build/lib/* /usr/local/lib/
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-core/libaws-cpp-sdk-core.so /usr/local/lib
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-s3/libaws-cpp-sdk-s3.so /usr/local/lib
 COPY --from=aws-sdk-cpp-build /aws-sdk-cpp/cmake-build/aws-cpp-sdk-sns/libaws-cpp-sdk-sns.so /usr/local/lib
