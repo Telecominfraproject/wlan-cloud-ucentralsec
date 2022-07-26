@@ -23,8 +23,12 @@ namespace OpenWifi {
 
         if(Action=="password_reset")
             return RequestResetPassword(Link);
+        else if(Action=="sub_password_reset")
+            return RequestSubResetPassword(Link);
         else if(Action=="email_verification")
             return DoEmailVerification(Link);
+        else if(Action=="sub_email_verification")
+            return DoSubEmailVerification(Link);
         else if(Action=="signup_verification")
             return DoNewSubVerification(Link);
         else
@@ -35,6 +39,8 @@ namespace OpenWifi {
         auto Action = GetParameter("action","");
 
         if(Action=="password_reset")
+            return CompleteResetPassword();
+        else if(Action=="sub_password_reset")
             return CompleteResetPassword();
         else if(Action=="signup_completion")
             return CompleteSubVerification();
@@ -201,10 +207,11 @@ namespace OpenWifi {
 
             //  Send the update to the provisioning service
             Poco::JSON::Object  Body;
-            Body.set("signupUUID", UInfo.signingUp);
+            auto RawSignup = Poco::StringTokenizer(UInfo.signingUp,":");
+            Body.set("signupUUID", RawSignup.count()==1 ? UInfo.signingUp : RawSignup[1]);
             OpenAPIRequestPut   ProvRequest(uSERVICE_PROVISIONING,"/api/v1/signup",
                                             {
-                                                {"signupUUID", UInfo.signingUp} ,
+                                                {"signupUUID", RawSignup.count()==1 ? UInfo.signingUp : RawSignup[1]} ,
                                                 {"operation", "emailVerified"}
                                             },
                                             Body,30000);
@@ -267,6 +274,14 @@ namespace OpenWifi {
 
     void RESTAPI_action_links::CompleteEmailInvitation() {
         /// TODO:
+    }
+
+    void RESTAPI_action_links::RequestSubResetPassword(SecurityObjects::ActionLink &Link) {
+
+    }
+
+    void RESTAPI_action_links::DoSubEmailVerification(SecurityObjects::ActionLink &Link) {
+
     }
 
 }

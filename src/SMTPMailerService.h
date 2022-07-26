@@ -27,7 +27,8 @@ namespace OpenWifi {
         LOGO,
         TEXT,
         CHALLENGE_CODE,
-        SENDER
+        SENDER,
+        ACTION_LINK_HTML
     };
 
     static const std::map<MESSAGE_ATTRIBUTES,const std::string>
@@ -44,7 +45,8 @@ namespace OpenWifi {
                                  {  LOGO, "LOGO"},
                                  {  TEXT, "TEXT"},
                                  {  CHALLENGE_CODE, "CHALLENGE_CODE"},
-                                 {  SENDER, "SENDER"}
+                                 {  SENDER, "SENDER"},
+                                 {  ACTION_LINK_HTML, "ACTION_LINK_HTML"},
                                  };
 
     inline const std::string & MessageAttributeToVar(MESSAGE_ATTRIBUTES Attr) {

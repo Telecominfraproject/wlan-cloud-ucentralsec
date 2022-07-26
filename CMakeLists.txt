@@ -124,7 +124,7 @@ add_executable( owsec
         src/storage/orm_actionLinks.cpp src/storage/orm_actionLinks.h
         src/storage/orm_avatar.cpp src/storage/orm_avatar.h
         src/SpecialUserHelpers.h
-        src/RESTAPI/RESTAPI_db_helpers.h src/storage/orm_logins.cpp src/storage/orm_logins.h src/RESTAPI/RESTAPI_totp_handler.cpp src/RESTAPI/RESTAPI_totp_handler.h src/TotpCache.h src/RESTAPI/RESTAPI_subtotp_handler.cpp src/RESTAPI/RESTAPI_subtotp_handler.h src/RESTAPI/RESTAPI_signup_handler.cpp src/RESTAPI/RESTAPI_signup_handler.h)
+        src/RESTAPI/RESTAPI_db_helpers.h src/storage/orm_logins.cpp src/storage/orm_logins.h src/RESTAPI/RESTAPI_totp_handler.cpp src/RESTAPI/RESTAPI_totp_handler.h src/TotpCache.h src/RESTAPI/RESTAPI_subtotp_handler.cpp src/RESTAPI/RESTAPI_subtotp_handler.h src/RESTAPI/RESTAPI_signup_handler.cpp src/RESTAPI/RESTAPI_signup_handler.h src/MessagingTemplates.cpp src/MessagingTemplates.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

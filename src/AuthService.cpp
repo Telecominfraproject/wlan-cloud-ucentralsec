@@ -20,13 +20,9 @@
 
 #include "SMTPMailerService.h"
 #include "MFAServer.h"
+#include "MessagingTemplates.h"
 
 namespace OpenWifi {
-
-    inline const static std::vector<std::string>  EmailTemplateNames = {  "password_reset" ,
-                                                                          "email_verification",
-                                                                          "signuo_verification",
-                                                                          "email_invitation" };
 
     AuthService::ACCESS_TYPE AuthService::IntToAccessType(int C) {
 		switch (C) {
@@ -37,7 +33,6 @@ namespace OpenWifi {
 			return USERNAME;
 		}
 	}
-
 
 	int AuthService::AccessTypeToInt(ACCESS_TYPE T) {
 		switch (T) {
@@ -519,7 +514,6 @@ namespace OpenWifi {
 
             return SUCCESS;
         }
-
         return INVALID_CREDENTIALS;
     }
 
@@ -569,40 +563,62 @@ namespace OpenWifi {
         return INVALID_CREDENTIALS;
     }
 
-    bool AuthService::SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
+    bool AuthService::SendEmailChallengeCode(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Challenge) {
+        auto OperatorParts = Poco::StringTokenizer(UInfo.userinfo.signingUp,":");
+        if(UInfo.userinfo.signingUp.empty() || OperatorParts.count()!=2) {
+            MessageAttributes Attrs;
+            Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
+            Attrs[LOGO] = AuthService::GetLogoAssetURI();
+            Attrs[SUBJECT] = "Login validation code";
+            Attrs[CHALLENGE_CODE] = Challenge;
+            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::VERIFICATION_CODE), Attrs);
+        } else {
+            MessageAttributes Attrs;
+            Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
+            Attrs[LOGO] = AuthService::GetLogoAssetURI();
+            Attrs[SUBJECT] = "Login validation code";
+            Attrs[CHALLENGE_CODE] = Challenge;
+            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_VERIFICATION_CODE,OperatorParts[0]), Attrs);
+        }
+    }
+
+    bool AuthService::SendEmailToUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason) {
         SecurityObjects::UserInfo   UInfo;
 
         if(StorageService()->UserDB().GetUserByEmail(Email,UInfo)) {
             switch (Reason) {
 
-                case FORGOT_PASSWORD: {
+                case MessagingTemplates::FORGOT_PASSWORD: {
                         MessageAttributes Attrs;
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "Password reset link";
                         Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
-                        SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[FORGOT_PASSWORD], Attrs);
+                        Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=password_reset&id=" + LinkId ;
+                        SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::FORGOT_PASSWORD), Attrs);
                     }
                     break;
 
-                case EMAIL_VERIFICATION: {
+                case MessagingTemplates::EMAIL_VERIFICATION: {
                         MessageAttributes Attrs;
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "e-mail Address Verification";
                         Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
-                        SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[EMAIL_VERIFICATION], Attrs);
+                        Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_verification&id=" + LinkId ;
+                        SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_VERIFICATION), Attrs);
                         UInfo.waitingForEmailCheck = true;
                     }
                     break;
 
-                case EMAIL_INVITATION: {
+                case MessagingTemplates::EMAIL_INVITATION: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "e-mail Invitation";
                     Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_invitation&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[EMAIL_INVITATION], Attrs);
+                    Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_invitation&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_INVITATION), Attrs);
                     UInfo.waitingForEmailCheck = true;
                     }
                     break;
@@ -615,40 +631,43 @@ namespace OpenWifi {
         return false;
     }
 
-    bool AuthService::SendEmailToSubUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason) {
+    bool AuthService::SendEmailToSubUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason, const std::string &OperatorName ) {
         SecurityObjects::UserInfo   UInfo;
 
         if(StorageService()->SubDB().GetUserByEmail(Email,UInfo)) {
             switch (Reason) {
 
-                case FORGOT_PASSWORD: {
+                case MessagingTemplates::SUB_FORGOT_PASSWORD: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "Password reset link";
-                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[FORGOT_PASSWORD], Attrs);
+                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=sub_password_reset&id=" + LinkId ;
+                    Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_password_reset&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_FORGOT_PASSWORD, OperatorName), Attrs);
                 }
                 break;
 
-                case EMAIL_VERIFICATION: {
+                case MessagingTemplates::SUB_EMAIL_VERIFICATION: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "e-mail Address Verification";
-                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[EMAIL_VERIFICATION], Attrs);
+                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=sub_email_verification&id=" + LinkId ;
+                    Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_email_verification&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_EMAIL_VERIFICATION, OperatorName), Attrs);
                     UInfo.waitingForEmailCheck = true;
                 }
                 break;
 
-                case SIGNUP_VERIFICATION: {
+                case MessagingTemplates::SIGNUP_VERIFICATION: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "Signup e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, EmailTemplateNames[SIGNUP_VERIFICATION], Attrs);
+                    Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=signup_verification&id=" + LinkId ;
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SIGNUP_VERIFICATION, OperatorName), Attrs);
                     UInfo.waitingForEmailCheck = true;
                 }
                 break;

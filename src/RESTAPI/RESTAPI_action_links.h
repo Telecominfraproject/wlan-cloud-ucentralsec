@@ -22,9 +22,11 @@ namespace OpenWifi {
                                         true, RateLimit{.Interval=1000,.MaxCalls=10}) {}
         static auto PathName() { return std::list<std::string>{"/api/v1/actionLink"}; };
         void RequestResetPassword(SecurityObjects::ActionLink &Link);
+        void RequestSubResetPassword(SecurityObjects::ActionLink &Link);
         void CompleteResetPassword();
         void CompleteSubVerification();
         void DoEmailVerification(SecurityObjects::ActionLink &Link);
+        void DoSubEmailVerification(SecurityObjects::ActionLink &Link);
         void DoReturnA404();
         void DoNewSubVerification(SecurityObjects::ActionLink &Link);
         void CompleteEmailInvitation();

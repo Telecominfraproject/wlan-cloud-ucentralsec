@@ -44,12 +44,7 @@ namespace OpenWifi {
             std::string Message = "This is your login code: " + Challenge + " Please enter this in your login screen.";
             return SMSSender()->Send(UInfo.userinfo.userTypeProprietaryInfo.mobiles[0].number, Message);
         } else if(Method==MFAMETHODS::EMAIL && SMTPMailerService()->Enabled() && !UInfo.userinfo.email.empty()) {
-            MessageAttributes Attrs;
-            Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
-            Attrs[LOGO] = AuthService::GetLogoAssetURI();
-            Attrs[SUBJECT] = "Login validation code";
-            Attrs[CHALLENGE_CODE] = Challenge;
-            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, "verification_code.txt", Attrs);
+            return AuthService()->SendEmailChallengeCode(UInfo,Challenge);
         } else if(Method==MFAMETHODS::AUTHENTICATOR && !UInfo.userinfo.userTypeProprietaryInfo.authenticatorSecret.empty()) {
             return true;
         }
