@@ -1,0 +1,7 @@
+Dear ${RECIPIENT_EMAIL},
+
+    You have been invited to join the OpenWifi system. Please click below and follow the instructions
+
+        ${ACTION_LINK}
+
+Thank you!

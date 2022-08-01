@@ -13,8 +13,9 @@ namespace OpenWifi {
         auto UserName = GetParameter("email");
         auto signupUUID = GetParameter("signupUUID");
         auto owner = GetParameter("owner");
-        if(UserName.empty() || signupUUID.empty() || owner.empty()) {
-            Logger().error("Signup requires: email, signupUUID, and owner.");
+        auto operatorName = GetParameter("operatorName");
+        if(UserName.empty() || signupUUID.empty() || owner.empty() || operatorName.empty()) {
+            Logger().error("Signup requires: email, signupUUID, operatorName, and owner.");
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
         }
 
@@ -37,7 +38,7 @@ namespace OpenWifi {
         }
 
         SecurityObjects::UserInfo   NewSub;
-        NewSub.signingUp = signupUUID;
+        NewSub.signingUp = operatorName + ":" + signupUUID;
         NewSub.waitingForEmailCheck = true;
         NewSub.name = UserName;
         NewSub.modified = OpenWifi::Now();

@@ -27,7 +27,8 @@ namespace OpenWifi {
         LOGO,
         TEXT,
         CHALLENGE_CODE,
-        SENDER
+        SENDER,
+        ACTION_LINK_HTML
     };
 
     static const std::map<MESSAGE_ATTRIBUTES,const std::string>
@@ -44,7 +45,8 @@ namespace OpenWifi {
                                  {  LOGO, "LOGO"},
                                  {  TEXT, "TEXT"},
                                  {  CHALLENGE_CODE, "CHALLENGE_CODE"},
-                                 {  SENDER, "SENDER"}
+                                 {  SENDER, "SENDER"},
+                                 {  ACTION_LINK_HTML, "ACTION_LINK_HTML"},
                                  };
 
     inline const std::string & MessageAttributeToVar(MESSAGE_ATTRIBUTES Attr) {
@@ -55,6 +57,12 @@ namespace OpenWifi {
         return E->second;
     }
     typedef std::map<MESSAGE_ATTRIBUTES, std::string>   MessageAttributes;
+
+    enum class MessageSendStatus {
+        msg_sent,
+        msg_not_sent_but_resend,
+        msg_not_sent_but_do_not_resend
+    };
 
     class SMTPMailerService : public SubSystemServer, Poco::Runnable {
         public:
@@ -67,7 +75,7 @@ namespace OpenWifi {
                uint64_t             Posted=0;
                uint64_t             LastTry=0;
                uint64_t             Sent=0;
-               Poco::File           File;
+               std::string          TemplateName;
                MessageAttributes    Attrs;
             };
 
@@ -76,7 +84,7 @@ namespace OpenWifi {
             void Stop() override;
 
             bool SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs);
-            bool SendIt(const MessageEvent &Msg);
+            MessageSendStatus SendIt(const MessageEvent &Msg);
             void LoadMyConfig();
             void reinitialize(Poco::Util::Application &self) override;
             bool Enabled() const { return Enabled_; }
@@ -96,6 +104,8 @@ namespace OpenWifi {
             Poco::Thread            SenderThr_;
             std::atomic_bool        Running_=false;
             bool                    Enabled_=false;
+            bool                    UseHTML_=false;
+            std::string             EmailLogo_{"logo.jpg"};
 
             SMTPMailerService() noexcept:
                 SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer")

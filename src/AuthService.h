@@ -22,6 +22,7 @@
 
 #include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "MessagingTemplates.h"
 
 namespace OpenWifi{
 
@@ -34,12 +35,6 @@ namespace OpenWifi{
             USERNAME,
             SERVER,
             CUSTOM
-        };
-
-        enum EMAIL_REASON {
-            FORGOT_PASSWORD,
-            EMAIL_VERIFICATION,
-            SIGNUP_VERIFICATION
         };
 
         static ACCESS_TYPE IntToAccessType(int C);
@@ -90,9 +85,11 @@ namespace OpenWifi{
         [[nodiscard]] static bool VerifyEmail(SecurityObjects::UserInfo &UInfo);
         [[nodiscard]] static bool VerifySubEmail(SecurityObjects::UserInfo &UInfo);
 
-        [[nodiscard]] static bool SendEmailToUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
-        [[nodiscard]] static bool SendEmailToSubUser(const std::string &LinkId, std::string &Email, EMAIL_REASON Reason);
+        [[nodiscard]] static bool SendEmailToUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason);
+        [[nodiscard]] static bool SendEmailToSubUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason, const std::string &OperatorName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
+
+        [[nodiscard]] bool SendEmailChallengeCode(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &code);
 
         bool DeleteUserFromCache(const std::string &UserName);
         bool DeleteSubUserFromCache(const std::string &UserName);
