@@ -29,7 +29,7 @@ namespace OpenWifi {
     }
 
     static std::string MakeSessionId(const std::string & token) {
-        return MicroService::instance().CreateHash(token);
+        return Utils::ComputeHash(token);
     }
 
     void LoginDB::AddLogin( const std::string & userId, const std::string & email, const std::string &token) {
