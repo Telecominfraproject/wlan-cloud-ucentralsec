@@ -276,11 +276,11 @@ namespace OpenWifi {
         /// TODO:
     }
 
-    void RESTAPI_action_links::RequestSubResetPassword(SecurityObjects::ActionLink &Link) {
+    void RESTAPI_action_links::RequestSubResetPassword([[maybe_unused]] SecurityObjects::ActionLink &Link) {
 
     }
 
-    void RESTAPI_action_links::DoSubEmailVerification(SecurityObjects::ActionLink &Link) {
+    void RESTAPI_action_links::DoSubEmailVerification([[maybe_unused]] SecurityObjects::ActionLink &Link) {
 
     }
 
