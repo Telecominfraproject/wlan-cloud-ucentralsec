@@ -4,14 +4,13 @@ RUN apk add --update --no-cache \
     openssl openssh \
     ncurses-libs \
     bash util-linux coreutils curl libcurl \
-    make cmake gcc g++ libstdc++ libgcc git zlib-dev \
+    make cmake gcc g++ libstdc++ libgcc git zlib-dev nlohmann-json \
     openssl-dev boost-dev curl-dev unixodbc-dev postgresql-dev mariadb-dev \
     apache2-utils yaml-dev apr-util-dev \
     librdkafka-dev
 
 RUN git clone https://github.com/stephb9959/poco /poco
 RUN git clone https://github.com/stephb9959/cppkafka /cppkafka
-RUN git clone https://github.com/nlohmann/json /json
 RUN git clone https://github.com/pboettch/json-schema-validator /json-schema-validator
 RUN git clone --recurse-submodules https://github.com/aws/aws-sdk-cpp /aws-sdk-cpp
 
@@ -39,13 +38,6 @@ RUN cmake ..
 RUN cmake --build . --config Release -j8
 RUN cmake --build . --target install
 
-WORKDIR /json
-RUN mkdir cmake-build
-WORKDIR cmake-build
-RUN cmake ..
-RUN make
-RUN make install
-
 WORKDIR /json-schema-validator
 RUN mkdir cmake-build
 WORKDIR cmake-build
@@ -63,7 +55,9 @@ ADD .git /owsec/.git
 WORKDIR /owsec
 RUN mkdir cmake-build
 WORKDIR /owsec/cmake-build
-RUN cmake ..
+RUN cmake .. \
+          -Dcrypto_LIBRARY=/usr/lib/libcrypto.so \
+          -DBUILD_SHARED_LIBS=ON
 RUN cmake --build . --config Release -j8
 
 FROM alpine
