@@ -1,10 +1,11 @@
+ARG ALPINE_VERSION=3.16.2
 ARG POCO_VERSION=poco-tip-v1
 ARG FMTLIB_VERSION=9.0.0
 ARG CPPKAFKA_VERSION=tip-v1
 ARG JSON_VALIDATOR_VERSION=2.1.0
 ARG AWS_SDK_VERSION=1.9.315
 
-FROM alpine:3.15 AS build-base
+FROM alpine:$ALPINE_VERSION AS build-base
 
 RUN apk add --update --no-cache \
     make cmake g++ git \
@@ -113,7 +114,7 @@ RUN cmake .. \
           -DBUILD_SHARED_LIBS=ON
 RUN cmake --build . --config Release -j8
 
-FROM alpine:3.15
+FROM alpine:$ALPINE_VERSION
 
 ENV OWSEC_USER=owsec \
     OWSEC_ROOT=/owsec-data \
