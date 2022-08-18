@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 if [ "$SELFSIGNED_CERTS" = 'true' ]; then
@@ -84,7 +84,7 @@ if [ "$1" = '/openwifi/owsec' -a "$(id -u)" = '0' ]; then
     if [ "$RUN_CHOWN" = 'true' ]; then
       chown -R "$OWSEC_USER": "$OWSEC_ROOT" "$OWSEC_CONFIG"
     fi
-    exec su-exec "$OWSEC_USER" "$@"
+    exec gosu "$OWSEC_USER" "$@"
 fi
 
 exec "$@"
