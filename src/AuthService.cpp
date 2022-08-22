@@ -51,13 +51,13 @@ namespace OpenWifi {
         RefreshTokenLifeSpan_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.refresh_token.lifespan", 90 * 24 * 60 * 600);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
 
-        AccessPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.access", "/wwwassets/access_policy.html");
-        PasswordPolicy_ = MicroService::instance().ConfigPath("openwifi.document.policy.password", "/wwwassets/password_policy.html");
+        AccessPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
+        PasswordPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
         PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression",DefaultPassword_8_u_l_n_1);
 
         SubPasswordValidation_ = SubPasswordValidationStr_ = MicroService::instance().ConfigGetString("subscriber.validation.expression",DefaultPassword_8_u_l_n_1);
-        SubAccessPolicy_ = MicroService::instance().ConfigPath("subscriber.policy.access", "/wwwassets/access_policy.html");
-        SubPasswordPolicy_ = MicroService::instance().ConfigPath("subscriber.policy.password", "/wwwassets/password_policy.html");
+        SubAccessPolicy_ = MicroService::instance().ConfigGetString("subscriber.policy.access", "/wwwassets/access_policy.html");
+        SubPasswordPolicy_ = MicroService::instance().ConfigGetString("subscriber.policy.password", "/wwwassets/password_policy.html");
 
         return 0;
     }
