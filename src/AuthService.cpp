@@ -8,15 +8,17 @@
 
 #include <ctime>
 
+#include "framework/MicroService.h"
+#include "framework/KafkaTopics.h"
+
 #include "Poco/Net/OAuth20Credentials.h"
 #include "Poco/JWT/Token.h"
 #include "Poco/JWT/Signer.h"
 #include "Poco/StringTokenizer.h"
 
-#include "framework/MicroService.h"
 #include "StorageService.h"
 #include "AuthService.h"
-#include "framework/KafkaTopics.h"
+
 
 #include "SMTPMailerService.h"
 #include "MFAServer.h"
@@ -142,18 +144,20 @@ namespace OpenWifi {
         return false;
     }
 
-    bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
+    bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired )
     {
-        std::lock_guard	Guard(Mutex_);
+        // std::lock_guard	Guard(Mutex_);
+        std::string CallToken;
         Expired = false;
+
 		try {
-		    std::string CallToken;
 		    Poco::Net::OAuth20Credentials Auth(Request);
 		    if (Auth.getScheme() == "Bearer") {
 		        CallToken = Auth.getBearerToken();
 		    }
 
             if(CallToken.empty()) {
+                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
                 return false;
             }
 
@@ -161,35 +165,40 @@ namespace OpenWifi {
             uint64_t                    RevocationDate=0;
             std::string                 UserId;
             if(StorageService()->UserTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
-                if(RevocationDate!=0)
+                if(RevocationDate!=0) {
+                    poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
                     return false;
+                }
                 auto now=OpenWifi::Now();
                 Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->UserDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
                     SessionToken = CallToken;
+                    poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}", TID, CallToken));
                     return true;
                 }
             }
-            return false;
 		} catch(const Poco::Exception &E) {
 		    Logger().log(E);
 		}
+        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
 		return false;
     }
 
-    bool AuthService::IsSubAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired )
+    bool AuthService::IsSubAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired )
     {
-        std::lock_guard	Guard(Mutex_);
+        // std::lock_guard	Guard(Mutex_);
+
+        std::string CallToken;
         Expired = false;
         try {
-            std::string CallToken;
             Poco::Net::OAuth20Credentials Auth(Request);
             if (Auth.getScheme() == "Bearer") {
                 CallToken = Auth.getBearerToken();
             }
 
             if(CallToken.empty()) {
+                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
                 return false;
             }
 
@@ -197,20 +206,23 @@ namespace OpenWifi {
             uint64_t                    RevocationDate=0;
             std::string                 UserId;
             if(StorageService()->SubTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
-                if(RevocationDate!=0)
+                if(RevocationDate!=0) {
+                    poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
                     return false;
+                }
                 auto now=OpenWifi::Now();
                 Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->SubDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
                     SessionToken = CallToken;
+                    poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}", TID, CallToken));
                     return true;
                 }
             }
-            return false;
         } catch(const Poco::Exception &E) {
             Logger().log(E);
         }
+        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
         return false;
     }
 

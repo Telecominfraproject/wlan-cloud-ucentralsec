@@ -57,9 +57,10 @@ namespace OpenWifi {
     }
 
     void StorageService::Stop() {
-        Logger().notice("Stopping.");
+        Logger().notice("Stopping...");
         Timer_.stop();
         StorageClass::Stop();
+        Logger().notice("Stopped...");
     }
 
     void Archiver::onTimer([[maybe_unused]] Poco::Timer &timer) {

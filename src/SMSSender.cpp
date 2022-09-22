@@ -2,16 +2,14 @@
 // Created by stephane bourque on 2021-10-09.
 //
 
-#include <aws/sns/SNSClient.h>
-#include <aws/sns/model/PublishRequest.h>
 #include <aws/sns/model/PublishResult.h>
-#include <aws/sns/model/GetSMSAttributesRequest.h>
+
+#include "framework/MicroService.h"
 
 #include "MFAServer.h"
 #include "SMS_provider_aws.h"
 #include "SMS_provider_twilio.h"
 #include "SMSSender.h"
-#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
