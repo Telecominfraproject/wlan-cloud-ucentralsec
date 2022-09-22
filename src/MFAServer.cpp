@@ -2,10 +2,11 @@
 // Created by stephane bourque on 2021-10-11.
 //
 
+#include "framework/MicroService.h"
+
 #include "MFAServer.h"
 #include "SMSSender.h"
 #include "SMTPMailerService.h"
-#include "framework/MicroService.h"
 #include "AuthService.h"
 #include "TotpCache.h"
 

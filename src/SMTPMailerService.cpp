@@ -2,7 +2,8 @@
 // Created by stephane bourque on 2021-06-17.
 //
 #include <iostream>
-#include <fstream>
+
+#include "framework/MicroService.h"
 
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
@@ -15,7 +16,6 @@
 #include "Poco/Net/NetException.h"
 
 #include "SMTPMailerService.h"
-#include "framework/MicroService.h"
 #include "AuthService.h"
 
 namespace OpenWifi {

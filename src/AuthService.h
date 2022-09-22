@@ -11,6 +11,8 @@
 
 #include <regex>
 
+#include "framework/MicroService.h"
+
 #include "Poco/JSON/Object.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
@@ -20,7 +22,6 @@
 #include "Poco/HMACEngine.h"
 #include "Poco/ExpireLRUCache.h"
 
-#include "framework/MicroService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "MessagingTemplates.h"
 
@@ -48,14 +49,14 @@ namespace OpenWifi{
         int Start() override;
         void Stop() override;
 
-        [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired);
+        [[nodiscard]] bool IsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired);
         [[nodiscard]] UNAUTHORIZED_REASON Authorize( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired );
         void CreateToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool SetPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
         [[nodiscard]] const std:: string & PasswordValidationExpression() const { return PasswordValidationStr_;};
         void Logout(const std::string &token, bool EraseFromCache=true);
 
-        [[nodiscard]] bool IsSubAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired);
+        [[nodiscard]] bool IsSubAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired);
         [[nodiscard]] UNAUTHORIZED_REASON AuthorizeSub( std::string & UserName, const std::string & Password, const std::string & NewPassword, SecurityObjects::UserInfoAndPolicy & UInfo, bool & Expired );
         void CreateSubToken(const std::string & UserName, SecurityObjects::UserInfoAndPolicy &UInfo);
         [[nodiscard]] bool SetSubPassword(const std::string &Password, SecurityObjects::UserInfo & UInfo);
@@ -155,11 +156,11 @@ namespace OpenWifi{
 
     inline auto AuthService() { return AuthService::instance(); }
 
-    [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo , bool & Expired, bool Sub ) {
+    [[nodiscard]] inline bool AuthServiceIsAuthorized(Poco::Net::HTTPServerRequest & Request,std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo , std::uint64_t TID, bool & Expired, bool Sub ) {
         if(Sub)
-            return AuthService()->IsSubAuthorized(Request, SessionToken, UInfo, Expired );
+            return AuthService()->IsSubAuthorized(Request, SessionToken, UInfo, TID, Expired );
         else
-            return AuthService()->IsAuthorized(Request, SessionToken, UInfo, Expired );
+            return AuthService()->IsAuthorized(Request, SessionToken, UInfo, TID, Expired );
     }
 
 } // end of namespace
