@@ -19,7 +19,7 @@ namespace OpenWifi {
         PhoneNumber_ = MicroService::instance().ConfigGetString("smssender.twilio.phonenumber","");
 
         if(Sid_.empty() || Token_.empty() || PhoneNumber_.empty()) {
-            Logger().debug("SMSSender is disabled. Please provide SID, TOKEN, and PHONE NUMBER.");
+            poco_debug(Logger(),"SMSSender is disabled. Please provide SID, TOKEN, and PHONE NUMBER.");
             return false;
         }
         Running_=true;
@@ -65,12 +65,12 @@ namespace OpenWifi {
         std::istream& rs = session.receiveResponse(res);
 
         if(res.getStatus()==Poco::Net::HTTPResponse::HTTP_OK) {
-            Logger().information(fmt::format("Message sent to {}", PhoneNumber));
+            poco_information(Logger(),fmt::format("Message sent to {}", PhoneNumber));
             return true;
         } else {
             std::ostringstream os;
             Poco::StreamCopier::copyStream(rs,os);
-            Logger().information(fmt::format("Message was not to {}: Error:{}", PhoneNumber, os.str()));
+            poco_information(Logger(),fmt::format("Message was not to {}: Error:{}", PhoneNumber, os.str()));
             return false;
         }
     }
