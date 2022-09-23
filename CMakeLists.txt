@@ -47,6 +47,7 @@ add_definitions(-DAWS_CUSTOM_MEMORY_MANAGEMENT)
 set(BUILD_SHARED_LIBS 1)
 
 add_definitions(-DTIP_SECURITY_SERVICE="1")
+add_definitions(-DPOCO_LOG_DEBUG="1")
 
 add_compile_options(-Wall -Wextra)
 if(ASAN)
