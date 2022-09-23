@@ -83,7 +83,7 @@ namespace OpenWifi {
 
     bool SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
         if(!Enabled_) {
-            Logger().information("SMS has not been enabled. Messages cannot be sent.");
+            poco_information(Logger(),"SMS has not been enabled. Messages cannot be sent.");
             return false;
         }
         return ProviderImpl_->Send(PhoneNumber,Message);

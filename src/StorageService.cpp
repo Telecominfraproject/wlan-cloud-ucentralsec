@@ -13,6 +13,7 @@ namespace OpenWifi {
 
     int StorageService::Start() {
 		std::lock_guard		Guard(Mutex_);
+        poco_information(Logger(),"Starting...");
 
 		StorageClass::Start();
 
@@ -57,10 +58,10 @@ namespace OpenWifi {
     }
 
     void StorageService::Stop() {
-        Logger().notice("Stopping...");
+        poco_information(Logger(),"Stopping...");
         Timer_.stop();
         StorageClass::Stop();
-        Logger().notice("Stopped...");
+        poco_information(Logger(),"Stopped...");
     }
 
     void Archiver::onTimer([[maybe_unused]] Poco::Timer &timer) {

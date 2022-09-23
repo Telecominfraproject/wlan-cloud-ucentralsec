@@ -48,7 +48,7 @@ namespace OpenWifi {
     static const std::string DefaultPassword_8_u_l_n_1{"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\\{\\}\\(\\)~_\\+\\|\\\\\\[\\]\\;\\:\\<\\>\\.\\,\\/\\?\\\"\\'\\`\\=#?!@$%^&*-]).{8,}$"};
 
     int AuthService::Start() {
-		Logger().notice("Starting...");
+        poco_information(Logger(),"Starting...");
         TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
         RefreshTokenLifeSpan_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.refresh_token.lifespan", 90 * 24 * 60 * 600);
         HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
@@ -65,7 +65,8 @@ namespace OpenWifi {
     }
 
     void AuthService::Stop() {
-		Logger().notice("Stopping...");
+        poco_information(Logger(),"Stopping...");
+        poco_information(Logger(),"Stopped...");
     }
 
     bool AuthService::RefreshUserToken(Poco::Net::HTTPServerRequest & Request, const std::string & RefreshToken, SecurityObjects::UserInfoAndPolicy & UI) {
