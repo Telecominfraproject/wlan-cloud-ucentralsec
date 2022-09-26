@@ -741,7 +741,8 @@ namespace OpenWifi {
             }
             return false;
         }
-        return IsValidSubToken(Token, WebToken, UserInfo, Expired);
+        // return IsValidSubToken(Token, WebToken, UserInfo, Expired);
+        return false;
     }
 
     bool AuthService::IsValidSubToken(const std::string &Token, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired) {
