@@ -23,6 +23,7 @@ if [[ "$TEMPLATE_CONFIG" = 'true' ]]; then
   SYSTEM_URI_PRIVATE=${SYSTEM_URI_PRIVATE:-"https://localhost:17001"} \
   SYSTEM_URI_PUBLIC=${SYSTEM_URI_PUBLIC:-"https://localhost:16001"} \
   SYSTEM_URI_UI=${SYSTEM_URI_UI:-"http://localhost"} \
+  SECURITY_RESTAPI_DISABLE=${SECURITY_RESTAPI_DISABLE:-"false"} \
   SERVICE_KEY=${SERVICE_KEY:-"\$OWSEC_ROOT/certs/restapi-key.pem"} \
   SERVICE_KEY_PASSWORD=${SERVICE_KEY_PASSWORD:-"mypassword"} \
   SMSSENDER_ENABLED=${SMSSENDER_ENABLED:-"false"} \
