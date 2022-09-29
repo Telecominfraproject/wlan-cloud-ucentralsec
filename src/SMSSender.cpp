@@ -2,16 +2,14 @@
 // Created by stephane bourque on 2021-10-09.
 //
 
-#include <aws/sns/SNSClient.h>
-#include <aws/sns/model/PublishRequest.h>
 #include <aws/sns/model/PublishResult.h>
-#include <aws/sns/model/GetSMSAttributesRequest.h>
+
+#include "framework/MicroService.h"
 
 #include "MFAServer.h"
 #include "SMS_provider_aws.h"
 #include "SMS_provider_twilio.h"
 #include "SMSSender.h"
-#include "framework/MicroService.h"
 
 namespace OpenWifi {
 
@@ -85,7 +83,7 @@ namespace OpenWifi {
 
     bool SMSSender::Send(const std::string &PhoneNumber, const std::string &Message) {
         if(!Enabled_) {
-            Logger().information("SMS has not been enabled. Messages cannot be sent.");
+            poco_information(Logger(),"SMS has not been enabled. Messages cannot be sent.");
             return false;
         }
         return ProviderImpl_->Send(PhoneNumber,Message);

@@ -10,17 +10,20 @@
 namespace OpenWifi {
 
     int ActionLinkManager::Start() {
+        poco_information(Logger(),"Starting...");
         if(!Running_)
             Thr_.start(*this);
         return 0;
     }
 
     void ActionLinkManager::Stop() {
+        poco_information(Logger(),"Stopping...");
         if(Running_) {
             Running_ = false;
             Thr_.wakeUp();
             Thr_.join();
         }
+        poco_information(Logger(),"Stopped...");
     }
 
     void ActionLinkManager::run() {
@@ -63,7 +66,7 @@ namespace OpenWifi {
                 switch(i.action) {
                     case OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, MessagingTemplates::FORGOT_PASSWORD)) {
-                                Logger().information(fmt::format("Send password reset link to {}",UInfo.email));
+                                poco_information(Logger(),fmt::format("Send password reset link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -71,7 +74,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, MessagingTemplates::EMAIL_VERIFICATION)) {
-                                Logger().information(fmt::format("Send email verification link to {}",UInfo.email));
+                                poco_information(Logger(),fmt::format("Send email verification link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -79,7 +82,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION: {
                             if(AuthService::SendEmailToUser(i.id, UInfo.email, MessagingTemplates::EMAIL_INVITATION)) {
-                                Logger().information(fmt::format("Send new subscriber email invitation link to {}",UInfo.email));
+                                poco_information(Logger(),fmt::format("Send new subscriber email invitation link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -88,7 +91,7 @@ namespace OpenWifi {
                     case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
                             auto Signup = Poco::StringTokenizer(UInfo.signingUp,":");
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email,MessagingTemplates::SUB_FORGOT_PASSWORD, Signup.count()==1 ? "" : Signup[0])) {
-                                Logger().information(fmt::format("Send subscriber password reset link to {}",UInfo.email));
+                                poco_information(Logger(),fmt::format("Send subscriber password reset link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -97,7 +100,7 @@ namespace OpenWifi {
                     case OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL: {
                             auto Signup = Poco::StringTokenizer(UInfo.signingUp,":");
                             if(AuthService::SendEmailToSubUser(i.id, UInfo.email, MessagingTemplates::SUB_EMAIL_VERIFICATION, Signup.count()==1 ? "" : Signup[0])) {
-                                Logger().information(fmt::format("Send subscriber email verification link to {}",UInfo.email));
+                                poco_information(Logger(),fmt::format("Send subscriber email verification link to {}",UInfo.email));
                             }
                             StorageService()->ActionLinksDB().SentAction(i.id);
                         }
@@ -106,7 +109,7 @@ namespace OpenWifi {
                     case OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP: {
                         auto Signup = Poco::StringTokenizer(UInfo.signingUp,":");
                         if(AuthService::SendEmailToSubUser(i.id, UInfo.email, MessagingTemplates::SIGNUP_VERIFICATION, Signup.count()==1 ? "" : Signup[0])) {
-                            Logger().information(fmt::format("Send new subscriber email verification link to {}",UInfo.email));
+                            poco_information(Logger(),fmt::format("Send new subscriber email verification link to {}",UInfo.email));
                         }
                         StorageService()->ActionLinksDB().SentAction(i.id);
                         }

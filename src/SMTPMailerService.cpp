@@ -2,7 +2,8 @@
 // Created by stephane bourque on 2021-06-17.
 //
 #include <iostream>
-#include <fstream>
+
+#include "framework/MicroService.h"
 
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
@@ -15,7 +16,6 @@
 #include "Poco/Net/NetException.h"
 
 #include "SMTPMailerService.h"
-#include "framework/MicroService.h"
 #include "AuthService.h"
 
 namespace OpenWifi {
@@ -52,7 +52,7 @@ namespace OpenWifi {
 
     void SMTPMailerService::reinitialize([[maybe_unused]] Poco::Util::Application &self) {
         MicroService::instance().LoadConfigurationFile();
-        Logger().information("Reinitializing.");
+        poco_information(Logger(),"Reinitializing.");
         LoadMyConfig();
     }
 
@@ -88,21 +88,21 @@ namespace OpenWifi {
                 if((i->LastTry==0 || (now-i->LastTry)>MailRetry_)) {
                     switch(SendIt(*i)) {
                         case MessageSendStatus::msg_sent: {
-                            Logger().information(fmt::format("Attempting to deliver for mail '{}'.", Recipient));
+                            poco_information(Logger(),fmt::format("Attempting to deliver for mail '{}'.", Recipient));
                             i = Messages_.erase(i);
                         } break;
                         case MessageSendStatus::msg_not_sent_but_resend: {
-                            Logger().information(fmt::format("Mail for '{}' was not. We will retry later.", Recipient));
+                            poco_information(Logger(),fmt::format("Mail for '{}' was not. We will retry later.", Recipient));
                             i->LastTry = now;
                             ++i;
                         } break;
                         case MessageSendStatus::msg_not_sent_but_do_not_resend: {
-                            Logger().information(fmt::format("Mail for '{}' will not be sent. Check email address", Recipient));
+                            poco_information(Logger(),fmt::format("Mail for '{}' will not be sent. Check email address", Recipient));
                             i = Messages_.erase(i);
                         } break;
                     }
                 } else if ((now-i->Posted)>MailAbandon_) {
-                    Logger().information(fmt::format("Mail for '{}' has timed out and will not be sent.", Recipient));
+                    poco_information(Logger(),fmt::format("Mail for '{}' has timed out and will not be sent.", Recipient));
                     i = Messages_.erase(i);
                 } else {
                     ++i;
@@ -138,7 +138,7 @@ namespace OpenWifi {
             Message->addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message->setSubject(Msg.Attrs.find(SUBJECT)->second);
 
-            Logger().information(fmt::format("Sending message to:{} from {}",Recipient,TheSender));
+            poco_information(Logger(),fmt::format("Sending message to:{} from {}",Recipient,TheSender));
 
             if(Msg.Attrs.find(TEXT) != Msg.Attrs.end()) {
                 std::string Content = Msg.Attrs.find(TEXT)->second;
@@ -163,7 +163,7 @@ namespace OpenWifi {
                     Poco::StreamCopier::copyStream(IF, OS);
                     Message->addAttachment("logo", new Poco::Net::StringPartSource(OS.str(), "image/png"));
                 } catch (...) {
-                    Logger().warning(fmt::format("Cannot add '{}' logo in email",AuthService::GetLogoAssetFileName()));
+                    poco_warning(Logger(),fmt::format("Cannot add '{}' logo in email",AuthService::GetLogoAssetFileName()));
                 }
             }
 
@@ -198,7 +198,7 @@ namespace OpenWifi {
             return MessageSendStatus::msg_not_sent_but_resend;
         }
         catch (const std::exception &E) {
-            Logger().warning(fmt::format("Cannot send message to:{}, error: {}",Recipient, E.what()));
+            poco_warning(Logger(),fmt::format("Cannot send message to:{}, error: {}",Recipient, E.what()));
             return MessageSendStatus::msg_not_sent_but_do_not_resend;
         }
     }
