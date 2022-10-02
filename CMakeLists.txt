@@ -78,6 +78,7 @@ add_executable( owsec
         src/framework/orm.h
         src/framework/StorageClass.h
         src/framework/ow_constants.h
+        src/framework/MicroServiceErrorHandler.h
         src/framework/WebSocketClientNotifications.h
         src/seclibs/qrcode/qrcodegen.hpp src/seclibs/qrcode/qrcodegen.cpp
         src/seclibs/cpptotp/bytes.cpp src/seclibs/cpptotp/bytes.h

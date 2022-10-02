@@ -93,6 +93,8 @@ ADD cmake /owsec/cmake
 ADD src /owsec/src
 ADD .git /owsec/.git
 
+RUN ldconfig
+
 COPY --from=poco-build /usr/local/include /usr/local/include
 COPY --from=poco-build /usr/local/lib /usr/local/lib
 COPY --from=cppkafka-build /usr/local/include /usr/local/include
