@@ -79,7 +79,7 @@ RUN git clone --recurse-submodules https://github.com/aws/aws-sdk-cpp --branch $
 WORKDIR /aws-sdk-cpp
 RUN mkdir cmake-build
 WORKDIR cmake-build
-RUN cmake .. -DBUILD_ONLY="crypto;sns;s3" \
+RUN cmake .. -DBUILD_ONLY="sns;s3" \
              -DCMAKE_BUILD_TYPE=Release \
              -DUSE_OPENSSL=ON \
              -DCPP_STANDARD=17 \
@@ -111,9 +111,10 @@ COPY --from=fmtlib-build /usr/local/lib /usr/local/lib
 WORKDIR /owsec
 RUN mkdir cmake-build
 WORKDIR /owsec/cmake-build
-RUN cmake .. \
-          -Dcrypto_LIBRARY=/usr/lib/libcrypto.so \
-          -DBUILD_SHARED_LIBS=ON
+#RUN cmake .. \
+#          -Dcrypto_LIBRARY=/usr/lib/libcrypto.so \
+#          -DBUILD_SHARED_LIBS=ON
+RUN cmkae ..
 RUN cmake --build . --config Release -j8
 
 FROM debian:$DEBIAN_VERSION
