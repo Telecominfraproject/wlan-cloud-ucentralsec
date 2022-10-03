@@ -81,6 +81,9 @@ RUN mkdir cmake-build
 WORKDIR cmake-build
 RUN cmake .. -DBUILD_ONLY="sns;s3" \
              -DCMAKE_BUILD_TYPE=Release \
+             -DUSE_OPENSSL=ON \
+             -DCPP_STANDARD=17 \
+             -DBUILD_SHARED_LIBS=ON \
              -DCMAKE_CXX_FLAGS="-Wno-error=stringop-overflow -Wno-error=uninitialized" \
              -DAUTORUN_UNIT_TESTS=OFF
 RUN cmake --build . --config Release -j8
