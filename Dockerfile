@@ -114,7 +114,7 @@ WORKDIR /owsec/cmake-build
 #RUN cmake .. \
 #          -Dcrypto_LIBRARY=/usr/lib/libcrypto.so \
 #          -DBUILD_SHARED_LIBS=ON
-RUN cmkae ..
+RUN cmake ..
 RUN cmake --build . --config Release -j8
 
 FROM debian:$DEBIAN_VERSION
