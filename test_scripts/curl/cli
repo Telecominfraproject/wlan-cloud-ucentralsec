@@ -179,13 +179,19 @@ getlogo() {
 }
 
 createuser() {
-    payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
-    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0" \
-        -H "Accept: application/json" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${token}" \
-        -d "$payload"  > ${result_file}
-    jq < ${result_file}
+case $3 in
+    root|admin|subscriber|csr|system|installer|noc|accounting)
+        payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true, \"userRole\" : \"$3\" }"
+        curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"  > ${result_file}
+        jq < ${result_file} ;;
+    *)
+        echo "Error: userRole has to be one of root|admin|subscriber|csr|system|installer|noc|accounting"
+	exit 1 ;;
+esac
 }
 
 createsub() {
@@ -199,13 +205,19 @@ createsub() {
 }
 
 createuser_v() {
-    payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true}"
-    curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0?email_verification=true" \
-        -H "Accept: application/json" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${token}" \
-        -d "$payload"  > ${result_file}
-    jq < ${result_file}
+case $3 in
+    root|admin|subscriber|csr|system|installer|noc|accounting)
+        payload="{ \"id\": \"0\", \"email\" : \"$1\", \"currentPassword\" : \"$2\", \"changePassword\" : true, \"userRole\" : \"$3\" }"
+        curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/user/0?email_verification=true" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${token}" \
+            -d "$payload"  > ${result_file}
+        jq < ${result_file} ;;
+    *)
+        echo "Error: userRole has to be one of root|admin|subscriber|csr|system|installer|noc|accounting"
+	exit 1 ;;
+esac
 }
 
 deleteuser() {
@@ -447,7 +459,7 @@ test_service() {
 	echo "----------------"
 	echo "Create test user"
 	echo "----------------"
-	createuser testuser@mail.telecominfraproject.com 'Test123!'
+	createuser testuser@mail.telecominfraproject.com 'Test123!' accounting
 	check_response $result_file
 	USER_ID="$(jq -r '.id' < $result_file)"
 
@@ -481,35 +493,35 @@ help() {
     echo
     echo    "Usage: cli <cmd> [args]"
     echo
-    echo    "listendpoints                          Get all the system endpoints."
-    echo    "emailtest                              Generate a forgot Password e-amil to the logged in user."
-    echo    "me                                     Show information about the logged user."
-    echo    "createuser <email> <password>          Create a user with an initial password and force the user to change password."
-    echo    "createuser_v <email> <password>        Same as create user but also force an e-mail verification."
-    echo    "deleteuser <user UUID>                 Delete the user."
-    echo    "getuser <user UUID>                    Get the user information."
-    echo    "listusers                              List users."
-    echo    "policies                               List the login and access policies."
-    echo    "setavatar <user UUID> <filename>       Sets the avatar for user to the image in filename."
-    echo    "getavatar <user UUID>                  Get the avatar for the user."
-    echo    "deleteavatar <user UUID>               Remove the avatar for a user."
-    echo    "sendemail <recipient> <from>           Sends a test email to see if the e-mail system is working."
-    echo    "setloglevel <subsystem> <loglevel>     Set the log level for s specific subsystem."
-    echo    "getloglevels                           Get the current log levels for all subsystems."
-    echo    "getloglevelnames                       Get the log level names available."
-    echo    "getsubsystemnames                      Get the list of subsystems."
-    echo    "systeminfo                             Get basic system information."
-    echo    "reloadsubsystem <subsystem name>       Reload the configuration for a subsystem."
-    echo    "test_service                           Run a set of CLI commands for testing purposes"
+    echo    "listendpoints                              Get all the system endpoints."
+    echo    "emailtest                                  Generate a forgot Password e-amil to the logged in user."
+    echo    "me                                         Show information about the logged user."
+    echo    "createuser <email> <password> <userrole>   Create a user with an initial password and force the user to change password."
+    echo    "createuser_v <email> <password> <userrole> Same as create user but also force an e-mail verification."
+    echo    "deleteuser <user UUID>                     Delete the user."
+    echo    "getuser <user UUID>                        Get the user information."
+    echo    "listusers                                  List users."
+    echo    "policies                                   List the login and access policies."
+    echo    "setavatar <user UUID> <filename>           Sets the avatar for user to the image in filename."
+    echo    "getavatar <user UUID>                      Get the avatar for the user."
+    echo    "deleteavatar <user UUID>                   Remove the avatar for a user."
+    echo    "sendemail <recipient> <from>               Sends a test email to see if the e-mail system is working."
+    echo    "setloglevel <subsystem> <loglevel>         Set the log level for s specific subsystem."
+    echo    "getloglevels                               Get the current log levels for all subsystems."
+    echo    "getloglevelnames                           Get the log level names available."
+    echo    "getsubsystemnames                          Get the list of subsystems."
+    echo    "systeminfo                                 Get basic system information."
+    echo    "reloadsubsystem <subsystem name>           Reload the configuration for a subsystem."
+    echo    "test_service                               Run a set of CLI commands for testing purposes"
     echo
 }
 
 shopt -s nocasematch
 
 case "$1" in
-    "createuser") login; createuser "$2" "$3"; logout;;
+    "createuser") login; createuser "$2" "$3" "$4"; logout;;
     "createsub") login; createsub "$2" "$3"; logout;;
-    "createuser_v") login; createuser_v "$2" "$3"; logout;;
+    "createuser_v") login; createuser_v "$2" "$3" "$4"; logout;;
     "createsub_v") login; createsub_v "$2" "$3"; logout;;
     "deleteuser") login; deleteuser "$2" ; logout;;
     "deletesub") login; deletesub "$2" ; logout;;
