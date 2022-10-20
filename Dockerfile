@@ -50,7 +50,7 @@ RUN git clone https://github.com/microsoft/vcpkg && \
     mkdir /vcpkg/custom-triplets && \
     cp /vcpkg/triplets/x64-linux.cmake /vcpkg/custom-triplets/x64-linux.cmake && \
     sed -i 's/set(VCPKG_LIBRARY.*/set(VCPKG_LIBRARY_LINKAGE dynamic)/g' /vcpkg/custom-triplets/x64-linux.cmake && \
-    ./vcpkg/vcpkg install aws-sdk-cpp[s3]:x64-linux json-schema-validator:x64-linux --overlay-triplets=/vcpkg/custom-triplets --overlay-ports=/owsec/overlays
+    ./vcpkg/vcpkg install aws-sdk-cpp[sns]:x64-linux json-schema-validator:x64-linux --overlay-triplets=/vcpkg/custom-triplets --overlay-ports=/owsec/overlays
 
 COPY --from=poco-build /usr/local/include /usr/local/include
 COPY --from=poco-build /usr/local/lib /usr/local/lib
