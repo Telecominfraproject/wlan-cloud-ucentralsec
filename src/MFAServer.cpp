@@ -2,13 +2,14 @@
 // Created by stephane bourque on 2021-10-11.
 //
 
-#include "framework/MicroService.h"
-
 #include "MFAServer.h"
 #include "SMSSender.h"
 #include "SMTPMailerService.h"
 #include "AuthService.h"
 #include "TotpCache.h"
+
+#include "framework/MicroServiceFuncs.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -28,8 +29,8 @@ namespace OpenWifi {
             return false;
 
         std::string Challenge = MakeChallenge();
-        std::string uuid = MicroService::CreateUUID();
-        uint64_t Created = OpenWifi::Now();
+        std::string uuid = MicroServiceCreateUUID();
+        uint64_t Created = Utils::Now();
 
         ChallengeStart.set("uuid",uuid);
         ChallengeStart.set("created", Created);
@@ -103,7 +104,7 @@ namespace OpenWifi {
 
     void MFAServer::CleanCache() {
         // it is assumed that you have locked Cache_ at this point.
-        uint64_t Now = OpenWifi::Now();
+        uint64_t Now = Utils::Now();
         for(auto i=begin(Cache_);i!=end(Cache_);) {
             if((Now-i->second.Created)>300) {
                 i = Cache_.erase(i);

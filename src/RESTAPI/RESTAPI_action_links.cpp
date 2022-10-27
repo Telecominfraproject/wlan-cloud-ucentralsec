@@ -7,7 +7,9 @@
 
 #include "RESTAPI_action_links.h"
 #include "StorageService.h"
-#include "framework/MicroService.h"
+#include "framework/RESTAPI_PartHandler.h"
+#include "framework/OpenAPIRequests.h"
+
 #include "Daemon.h"
 
 namespace OpenWifi {

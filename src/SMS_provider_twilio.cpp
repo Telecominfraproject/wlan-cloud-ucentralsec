@@ -4,19 +4,20 @@
 
 #include "SMS_provider_twilio.h"
 
-#include "framework/MicroService.h"
-
 #include "Poco/Net/HTTPBasicCredentials.h"
 #include "Poco/URI.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPResponse.h"
 
+#include "framework/MicroServiceFuncs.h"
+#include "fmt/format.h"
+
 namespace OpenWifi {
     bool SMS_provider_twilio::Initialize() {
-        Sid_ = MicroService::instance().ConfigGetString("smssender.twilio.sid","");
-        Token_ = MicroService::instance().ConfigGetString("smssender.twilio.token","");
-        PhoneNumber_ = MicroService::instance().ConfigGetString("smssender.twilio.phonenumber","");
+        Sid_ = MicroServiceConfigGetString("smssender.twilio.sid","");
+        Token_ = MicroServiceConfigGetString("smssender.twilio.token","");
+        PhoneNumber_ = MicroServiceConfigGetString("smssender.twilio.phonenumber","");
 
         if(Sid_.empty() || Token_.empty() || PhoneNumber_.empty()) {
             poco_debug(Logger(),"SMSSender is disabled. Please provide SID, TOKEN, and PHONE NUMBER.");

@@ -2,14 +2,13 @@
 // Created by stephane bourque on 2022-01-31.
 //
 
-#ifndef OWSEC_TOTPCACHE_H
-#define OWSEC_TOTPCACHE_H
-
-#include "framework/MicroService.h"
+#pragma once
 
 #include "seclibs/cpptotp/bytes.h"
 #include "seclibs/qrcode/qrcodegen.hpp"
 #include "seclibs/cpptotp/otp.h"
+
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
@@ -35,7 +34,7 @@ namespace OpenWifi {
             std::string R;
 
             for(;Size;Size--) {
-                R += (char) MicroService::instance().Random(33,127);
+                R += (char) MicroServiceRandom(33,127);
             }
             Base32Secret = CppTotp::Bytes::toBase32( CppTotp::Bytes::ByteString{ (const u_char *)R.c_str()});
             return R;
@@ -62,7 +61,7 @@ namespace OpenWifi {
         }
 
         int Start() override {
-            Issuer_ = MicroService::instance().ConfigGetString("totp.issuer","OpenWiFi");
+            Issuer_ = MicroServiceConfigGetString("totp.issuer","OpenWiFi");
             return 0;
         };
 
@@ -164,5 +163,3 @@ namespace OpenWifi {
 
     inline auto TotpCache() { return TotpCache::instance(); }
 }
-
-#endif //OWSEC_TOTPCACHE_H

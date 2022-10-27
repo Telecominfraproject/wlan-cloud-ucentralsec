@@ -2,8 +2,7 @@
 // Created by stephane bourque on 2021-10-15.
 //
 
-#ifndef OWSEC_SMS_PROVIDER_AWS_H
-#define OWSEC_SMS_PROVIDER_AWS_H
+#pragma once
 
 #include <aws/core/Aws.h>
 #include <aws/s3/S3Client.h>
@@ -32,5 +31,3 @@ namespace OpenWifi {
         Aws::Auth::AWSCredentials           AwsCreds_;
     };
 }
-
-#endif //OWSEC_SMS_PROVIDER_AWS_H

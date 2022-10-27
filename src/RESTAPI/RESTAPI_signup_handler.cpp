@@ -5,6 +5,7 @@
 #include "RESTAPI_signup_handler.h"
 #include "StorageService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "framework/MicroServiceFuncs.h"
 
 #define __DBG__ std::cout << __LINE__ << std::endl;
 namespace OpenWifi {
@@ -43,7 +44,7 @@ namespace OpenWifi {
         NewSub.name = UserName;
         NewSub.modified = OpenWifi::Now();
         NewSub.creationDate = OpenWifi::Now();
-        NewSub.id = MicroService::instance().CreateUUID();
+        NewSub.id = MicroServiceCreateUUID();
         NewSub.email = UserName;
         NewSub.userRole = SecurityObjects::SUBSCRIBER;
         NewSub.changePassword = true;
@@ -55,7 +56,7 @@ namespace OpenWifi {
         SecurityObjects::ActionLink NewLink;
 
         NewLink.action = OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP;
-        NewLink.id = MicroService::CreateUUID();
+        NewLink.id = MicroServiceCreateUUID();
         NewLink.userId = NewSub.id;
         NewLink.created = OpenWifi::Now();
         NewLink.expires = NewLink.created + (1*60*60);  // 1 hour

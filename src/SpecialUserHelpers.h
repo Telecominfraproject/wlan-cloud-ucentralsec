@@ -5,6 +5,8 @@
 #pragma once
 
 #include "StorageService.h"
+#include "framework/AppServiceRegistry.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
@@ -17,9 +19,9 @@ namespace OpenWifi {
 
             AppServiceRegistry().Get("defaultusercreated", DefaultUserCreated);
             if (!StorageService()->UserDB().GetUserById(NewDefaultUseridStockUUID, U) && !DefaultUserCreated) {
-                U.currentPassword = MicroService::instance().ConfigGetString("authentication.default.password", "");
+                U.currentPassword = MicroServiceConfigGetString("authentication.default.password", "");
                 U.lastPasswords.push_back(U.currentPassword);
-                U.email = MicroService::instance().ConfigGetString("authentication.default.username", "");
+                U.email = MicroServiceConfigGetString("authentication.default.username", "");
                 U.id = NewDefaultUseridStockUUID;
                 U.userRole = SecurityObjects::ROOT;
                 U.creationDate = OpenWifi::Now();

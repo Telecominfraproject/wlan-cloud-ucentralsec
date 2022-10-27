@@ -5,6 +5,7 @@
 #include "RESTAPI_subtotp_handler.h"
 
 #include "TotpCache.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 

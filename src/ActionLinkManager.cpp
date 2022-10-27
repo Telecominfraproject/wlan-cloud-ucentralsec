@@ -6,6 +6,8 @@
 #include "StorageService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "MessagingTemplates.h"
+#include "framework/utils.h"
+#include "fmt/format.h"
 
 namespace OpenWifi {
 

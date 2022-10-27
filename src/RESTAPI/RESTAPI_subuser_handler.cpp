@@ -13,6 +13,8 @@
 #include "MFAServer.h"
 #include "TotpCache.h"
 
+#include "framework/MicroServiceFuncs.h"
+
 namespace OpenWifi {
 
     void RESTAPI_subuser_handler::DoGet() {
@@ -183,7 +185,7 @@ namespace OpenWifi {
 
             SecurityObjects::ActionLink NewLink;
             NewLink.action = OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD;
-            NewLink.id = MicroService::CreateUUID();
+            NewLink.id = MicroServiceCreateUUID();
             NewLink.userId = Existing.id;
             NewLink.created = OpenWifi::Now();
             NewLink.expires = NewLink.created + (24*60*60);

@@ -2,19 +2,20 @@
 // Created by stephane bourque on 2021-10-15.
 //
 
+#include "SMS_provider_aws.h"
 
 #include <aws/sns/SNSClient.h>
 #include <aws/sns/model/PublishRequest.h>
 #include <aws/sns/model/PublishResult.h>
 
-#include "framework/MicroService.h"
-#include "SMS_provider_aws.h"
+#include "framework/MicroServiceFuncs.h"
+#include "fmt/format.h"
 
 namespace OpenWifi {
     bool SMS_provider_aws::Initialize() {
-        SecretKey_ = MicroService::instance().ConfigGetString("smssender.aws.secretkey","");
-        AccessKey_ = MicroService::instance().ConfigGetString("smssender.aws.accesskey","");
-        Region_ = MicroService::instance().ConfigGetString("smssender.aws.region","");
+        SecretKey_ = MicroServiceConfigGetString("smssender.aws.secretkey","");
+        AccessKey_ = MicroServiceConfigGetString("smssender.aws.accesskey","");
+        Region_ = MicroServiceConfigGetString("smssender.aws.region","");
 
         if(SecretKey_.empty() || AccessKey_.empty() || Region_.empty()) {
             poco_debug(Logger(),"SMSSender is disabled. Please provide key, secret, and region.");

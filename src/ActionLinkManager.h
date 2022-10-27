@@ -2,10 +2,9 @@
 // Created by stephane bourque on 2021-11-08.
 //
 
-#ifndef OWSEC_ACTIONLINKMANAGER_H
-#define OWSEC_ACTIONLINKMANAGER_H
+#pragma once
 
-#include "framework/MicroService.h"
+#include "framework/SubSystemServer.h"
 
 namespace OpenWifi {
 
@@ -33,4 +32,3 @@ namespace OpenWifi {
     inline ActionLinkManager * ActionLinkManager() { return ActionLinkManager::instance(); }
 }
 
-#endif //OWSEC_ACTIONLINKMANAGER_H
