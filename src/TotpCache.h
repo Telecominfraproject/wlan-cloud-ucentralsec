@@ -55,7 +55,7 @@ namespace OpenWifi {
             uint64_t Now = OpenWifi::Now();
             uint32_t p = CppTotp::totp(CppTotp::Bytes::ByteString{ (const u_char *)Secret.c_str()}, Now, 0, 30, 6);
             char buffer[16]{0};
-            sprintf(buffer,"%06u",p);
+            snprintf(buffer,7,"%06u",p);
             Expecting = std::string(buffer);
             return Code == Expecting;
         }
