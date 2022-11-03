@@ -27,6 +27,7 @@
 #include "ActionLinkManager.h"
 #include "TotpCache.h"
 #include "framework/RESTAPI_RateLimiter.h"
+#include "framework/UI_WebSocketClientServer.h"
 
 namespace OpenWifi {
     class Daemon *Daemon::instance_ = nullptr;
@@ -45,7 +46,8 @@ namespace OpenWifi {
                                            SMTPMailerService(),
                                            RESTAPI_RateLimiter(),
                                            TotpCache(),
-                                           AuthService()
+                                           AuthService(),
+                                           UI_WebSocketClientServer()
                                    });
         }
         return instance_;
