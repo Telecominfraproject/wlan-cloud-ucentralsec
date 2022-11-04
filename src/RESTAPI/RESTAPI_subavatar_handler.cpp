@@ -8,7 +8,8 @@
 #include "RESTAPI_subavatar_handler.h"
 #include "StorageService.h"
 #include "Poco/Net/HTMLForm.h"
-#include "framework/MicroService.h"
+#include "Poco/CountingStream.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
@@ -34,7 +35,7 @@ namespace OpenWifi {
         Poco::Net::HTMLForm form(*Request, Request->stream(), partHandler);
         Poco::JSON::Object Answer;
 
-        if (!partHandler.Name().empty() && partHandler.Length()< MicroService::instance().ConfigGetInt("openwifi.avatar.maxsize",2000000)) {
+        if (!partHandler.Name().empty() && partHandler.Length()< MicroServiceConfigGetInt("openwifi.avatar.maxsize",2000000)) {
             Answer.set(RESTAPI::Protocol::AVATARID, Id);
             Answer.set(RESTAPI::Protocol::ERRORCODE, 0);
             Logger_.information(fmt::format("Uploaded avatar: {} Type: {}", partHandler.Name(), partHandler.ContentType()));

@@ -2,14 +2,13 @@
 // Created by stephane bourque on 2021-06-17.
 //
 
-#ifndef UCENTRALSEC_SMTPMAILERSERVICE_H
-#define UCENTRALSEC_SMTPMAILERSERVICE_H
-
-#include "framework/MicroService.h"
+#pragma once
 
 #include "Poco/File.h"
 #include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
+
+#include "framework/SubSystemServer.h"
 
 namespace OpenWifi {
 
@@ -116,4 +115,3 @@ namespace OpenWifi {
     inline SMTPMailerService * SMTPMailerService() { return SMTPMailerService::instance(); }
 }
 
-#endif //UCENTRALSEC_SMTPMAILERSERVICE_H

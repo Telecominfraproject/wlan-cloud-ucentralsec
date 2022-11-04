@@ -2,14 +2,13 @@
 // Created by stephane bourque on 2021-10-09.
 //
 
-#ifndef OWSEC_SMSSENDER_H
-#define OWSEC_SMSSENDER_H
+#pragma once
 
 #include <aws/core/Aws.h>
 #include <aws/s3/S3Client.h>
 #include <aws/core/auth/AWSCredentials.h>
 
-#include "framework/MicroService.h"
+#include "framework/SubSystemServer.h"
 #include "SMS_provider.h"
 
 namespace OpenWifi {
@@ -54,6 +53,3 @@ namespace OpenWifi {
     inline SMSSender * SMSSender() { return SMSSender::instance(); }
 
 }
-
-
-#endif //OWSEC_SMSSENDER_H

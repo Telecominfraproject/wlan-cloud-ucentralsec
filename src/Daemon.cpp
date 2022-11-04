@@ -26,6 +26,8 @@
 #include "SMSSender.h"
 #include "ActionLinkManager.h"
 #include "TotpCache.h"
+#include "framework/RESTAPI_RateLimiter.h"
+#include "framework/UI_WebSocketClientServer.h"
 
 namespace OpenWifi {
     class Daemon *Daemon::instance_ = nullptr;
@@ -44,7 +46,8 @@ namespace OpenWifi {
                                            SMTPMailerService(),
                                            RESTAPI_RateLimiter(),
                                            TotpCache(),
-                                           AuthService()
+                                           AuthService(),
+                                           UI_WebSocketClientServer()
                                    });
         }
         return instance_;
@@ -52,6 +55,10 @@ namespace OpenWifi {
 
     void Daemon::PostInitialization([[maybe_unused]] Poco::Util::Application &self) {
         AssetDir_ = MicroService::instance().ConfigPath("openwifi.restapi.wwwassets");
+    }
+
+    void DaemonPostInitialization(Poco::Util::Application &self) {
+        Daemon()->PostInitialization(self);
     }
 }
 

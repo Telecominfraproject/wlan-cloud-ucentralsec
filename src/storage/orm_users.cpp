@@ -6,6 +6,8 @@
 #include "AuthService.h"
 #include "RESTObjects/RESTAPI_CertObjects.h"
 #include "StorageService.h"
+#include "framework/RESTAPI_utils.h"
+#include "framework/MicroServiceFuncs.h"
 
 /*
             std::string,    // Id = 0;
@@ -117,7 +119,7 @@ namespace OpenWifi {
             Poco::Data::Session Sess = Pool_.get();
 
             if(!PasswordHashedAlready) {
-                NewUser.id = MicroService::CreateUUID();
+                NewUser.id = MicroServiceCreateUUID();
                 NewUser.creationDate = OpenWifi::Now();
             }
 

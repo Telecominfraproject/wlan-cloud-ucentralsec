@@ -6,13 +6,11 @@
 //	Arilia Wireless Inc.
 //
 
-#ifndef UCENTRAL_UAUTHSERVICE_H
-#define UCENTRAL_UAUTHSERVICE_H
+#pragma once
 
 #include <regex>
 
-#include "framework/MicroService.h"
-
+#include "framework/SubSystemServer.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
@@ -21,6 +19,9 @@
 #include "Poco/Crypto/DigestEngine.h"
 #include "Poco/HMACEngine.h"
 #include "Poco/ExpireLRUCache.h"
+
+#include "framework/MicroServiceFuncs.h"
+#include "framework/ow_constants.h"
 
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "MessagingTemplates.h"
@@ -98,11 +99,11 @@ namespace OpenWifi{
         void RevokeSubToken(std::string & Token);
 
         [[nodiscard]] static inline const std::string GetLogoAssetURI() {
-            return MicroService::instance().PublicEndPoint() + "/wwwassets/the_logo.png";
+            return MicroServicePublicEndPoint() + "/wwwassets/the_logo.png";
         }
 
         [[nodiscard]] static inline const std::string GetLogoAssetFileName() {
-            return MicroService::instance().WWWAssetsDir() + "/the_logo.png";
+            return MicroServiceWWWAssetsDir() + "/the_logo.png";
         }
 
         inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }
@@ -165,4 +166,3 @@ namespace OpenWifi{
 
 } // end of namespace
 
-#endif //UCENTRAL_UAUTHSERVICE_H

@@ -3,6 +3,7 @@
 //
 
 #include "orm_preferences.h"
+#include "framework/RESTAPI_utils.h"
 
 /*
         "Id          varchar(36) UNIQUE PRIMARY KEY,"

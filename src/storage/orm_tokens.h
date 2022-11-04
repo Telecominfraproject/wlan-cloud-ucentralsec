@@ -6,6 +6,7 @@
 
 #include "framework/orm.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "Poco/ExpireLRUCache.h"
 
 namespace OpenWifi {
 

@@ -2,14 +2,14 @@
 // Created by stephane bourque on 2021-06-10.
 //
 
-#ifndef UCENTRALSEC_DAEMON_H
-#define UCENTRALSEC_DAEMON_H
+#pragma once
 
 #include <iostream>
 #include <cstdlib>
 #include <vector>
 #include <set>
 
+#include "framework/MicroServiceNames.h"
 #include "framework/MicroService.h"
 
 #include "Poco/Util/Application.h"
@@ -50,9 +50,6 @@ namespace OpenWifi {
     };
 
     inline Daemon * Daemon() { return Daemon::instance(); }
-    inline void DaemonPostInitialization(Poco::Util::Application &self) {
-        Daemon()->PostInitialization(self);
-    }
+    void DaemonPostInitialization(Poco::Util::Application &self);
 }
 
-#endif //UCENTRALSEC_DAEMON_H

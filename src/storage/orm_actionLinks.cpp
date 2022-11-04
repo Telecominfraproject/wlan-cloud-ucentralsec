@@ -3,6 +3,7 @@
 //
 
 #include "orm_actionLinks.h"
+#include "framework/RESTAPI_utils.h"
 
 /*
 "Id             varchar(36),"

@@ -4,9 +4,12 @@
 
 #pragma once
 
-#include "framework/MicroService.h"
 #include "Poco/JSON/Object.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "framework/SubSystemServer.h"
+#include "framework/MicroServiceFuncs.h"
+
+#include "fmt/format.h"
 
 namespace OpenWifi {
 
@@ -46,7 +49,7 @@ namespace OpenWifi {
         static bool SendChallenge(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Method, const std::string &Challenge);
 
         static inline std::string MakeChallenge() {
-            return fmt::format("{0:06}" , MicroService::instance().Random(1,999999) );
+            return fmt::format("{0:06}" , MicroServiceRandom(1,999999) );
         }
 
     private:

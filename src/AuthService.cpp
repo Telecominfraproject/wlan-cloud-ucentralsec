@@ -8,7 +8,7 @@
 
 #include <ctime>
 
-#include "framework/MicroService.h"
+#include "framework/KafkaManager.h"
 #include "framework/KafkaTopics.h"
 
 #include "Poco/Net/OAuth20Credentials.h"
@@ -18,7 +18,7 @@
 
 #include "StorageService.h"
 #include "AuthService.h"
-
+#include "framework/MicroServiceFuncs.h"
 
 #include "SMTPMailerService.h"
 #include "MFAServer.h"
@@ -49,17 +49,17 @@ namespace OpenWifi {
 
     int AuthService::Start() {
         poco_information(Logger(),"Starting...");
-        TokenAging_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
-        RefreshTokenLifeSpan_ = (uint64_t) MicroService::instance().ConfigGetInt("authentication.refresh_token.lifespan", 90 * 24 * 60 * 600);
-        HowManyOldPassword_ = MicroService::instance().ConfigGetInt("authentication.oldpasswords", 5);
+        TokenAging_ = (uint64_t) MicroServiceConfigGetInt("authentication.token.ageing", 30 * 24 * 60 * 60);
+        RefreshTokenLifeSpan_ = (uint64_t) MicroServiceConfigGetInt("authentication.refresh_token.lifespan", 90 * 24 * 60 * 600);
+        HowManyOldPassword_ = MicroServiceConfigGetInt("authentication.oldpasswords", 5);
 
-        AccessPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
-        PasswordPolicy_ = MicroService::instance().ConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
-        PasswordValidation_ = PasswordValidationStr_ = MicroService::instance().ConfigGetString("authentication.validation.expression",DefaultPassword_8_u_l_n_1);
+        AccessPolicy_ = MicroServiceConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
+        PasswordPolicy_ = MicroServiceConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
+        PasswordValidation_ = PasswordValidationStr_ = MicroServiceConfigGetString("authentication.validation.expression",DefaultPassword_8_u_l_n_1);
 
-        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroService::instance().ConfigGetString("subscriber.validation.expression",DefaultPassword_8_u_l_n_1);
-        SubAccessPolicy_ = MicroService::instance().ConfigGetString("subscriber.policy.access", "/wwwassets/access_policy.html");
-        SubPasswordPolicy_ = MicroService::instance().ConfigGetString("subscriber.policy.password", "/wwwassets/password_policy.html");
+        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroServiceConfigGetString("subscriber.validation.expression",DefaultPassword_8_u_l_n_1);
+        SubAccessPolicy_ = MicroServiceConfigGetString("subscriber.policy.access", "/wwwassets/access_policy.html");
+        SubPasswordPolicy_ = MicroServiceConfigGetString("subscriber.policy.password", "/wwwassets/password_policy.html");
 
         return 0;
     }
@@ -260,11 +260,11 @@ namespace OpenWifi {
             if(KafkaManager()->Enabled()) {
                 Poco::JSON::Object Obj;
                 Obj.set("event", "remove-token");
-                Obj.set("id", MicroService::instance().ID());
+                Obj.set("id", MicroServiceID());
                 Obj.set("token", token);
                 std::stringstream ResultText;
                 Poco::JSON::Stringifier::stringify(Obj, ResultText);
-                KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroService::instance().PrivateEndPoint(),
+                KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS, MicroServicePrivateEndPoint(),
                                             ResultText.str(),
                                             false);
             }
@@ -318,7 +318,7 @@ namespace OpenWifi {
 		T.payload().set("identity", Identity);
 		T.setIssuedAt(Poco::Timestamp());
 		T.setExpiration(Poco::Timestamp() + (long long)TokenAging_);
-		std::string JWT = MicroService::instance().Sign(T,Poco::JWT::Signer::ALGO_RS256);
+		std::string JWT = MicroServiceSign(T,Poco::JWT::Signer::ALGO_RS256);
 
 		return JWT;
     }
@@ -606,7 +606,7 @@ namespace OpenWifi {
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "Password reset link";
-                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
+                        Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
                         Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=password_reset&id=" + LinkId ;
                         SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::FORGOT_PASSWORD), Attrs);
                     }
@@ -617,7 +617,7 @@ namespace OpenWifi {
                         Attrs[RECIPIENT_EMAIL] = UInfo.email;
                         Attrs[LOGO] = GetLogoAssetURI();
                         Attrs[SUBJECT] = "e-mail Address Verification";
-                        Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
+                        Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
                         Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_verification&id=" + LinkId ;
                         SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_VERIFICATION), Attrs);
                         UInfo.waitingForEmailCheck = true;
@@ -629,7 +629,7 @@ namespace OpenWifi {
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "e-mail Invitation";
-                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=email_invitation&id=" + LinkId ;
+                    Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=email_invitation&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_invitation&id=" + LinkId ;
                     SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_INVITATION), Attrs);
                     UInfo.waitingForEmailCheck = true;
@@ -655,7 +655,7 @@ namespace OpenWifi {
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "Password reset link";
-                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=sub_password_reset&id=" + LinkId ;
+                    Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_password_reset&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_password_reset&id=" + LinkId ;
                     SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_FORGOT_PASSWORD, OperatorName), Attrs);
                 }
@@ -666,7 +666,7 @@ namespace OpenWifi {
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "e-mail Address Verification";
-                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=sub_email_verification&id=" + LinkId ;
+                    Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_email_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_email_verification&id=" + LinkId ;
                     SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_EMAIL_VERIFICATION, OperatorName), Attrs);
                     UInfo.waitingForEmailCheck = true;
@@ -678,7 +678,7 @@ namespace OpenWifi {
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetLogoAssetURI();
                     Attrs[SUBJECT] = "Signup e-mail Address Verification";
-                    Attrs[ACTION_LINK] = MicroService::instance().GetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
+                    Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=signup_verification&id=" + LinkId ;
                     SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SIGNUP_VERIFICATION, OperatorName), Attrs);
                     UInfo.waitingForEmailCheck = true;
@@ -698,7 +698,7 @@ namespace OpenWifi {
 
         A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
         A.userId = UInfo.id;
-        A.id = MicroService::CreateUUID();
+        A.id = MicroServiceCreateUUID();
         A.created = OpenWifi::Now();
         A.expires = A.created + 24*60*60;
         A.userAction = true;
@@ -713,7 +713,7 @@ namespace OpenWifi {
 
         A.action = OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL;
         A.userId = UInfo.id;
-        A.id = MicroService::CreateUUID();
+        A.id = MicroServiceCreateUUID();
         A.created = OpenWifi::Now();
         A.expires = A.created + 24*60*60;
         A.userAction = false;

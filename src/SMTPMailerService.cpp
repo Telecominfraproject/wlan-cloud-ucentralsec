@@ -1,9 +1,6 @@
 //
 // Created by stephane bourque on 2021-06-17.
 //
-#include <iostream>
-
-#include "framework/MicroService.h"
 
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
@@ -18,23 +15,27 @@
 #include "SMTPMailerService.h"
 #include "AuthService.h"
 
+#include "framework/MicroServiceFuncs.h"
+#include "framework/utils.h"
+#include "fmt/format.h"
+
 namespace OpenWifi {
 
     void SMTPMailerService::LoadMyConfig() {
-        Enabled_ = MicroService::instance().ConfigGetBool("mailer.enabled",false);
+        Enabled_ = MicroServiceConfigGetBool("mailer.enabled",false);
         if(Enabled_) {
-            MailHost_ = MicroService::instance().ConfigGetString("mailer.hostname");
-            SenderLoginUserName_ = MicroService::instance().ConfigGetString("mailer.username");
-            SenderLoginPassword_ = MicroService::instance().ConfigGetString("mailer.password");
-            Sender_ = MicroService::instance().ConfigGetString("mailer.sender");
-            LoginMethod_ = MicroService::instance().ConfigGetString("mailer.loginmethod");
-            MailHostPort_ = MicroService::instance().ConfigGetInt("mailer.port");
-            TemplateDir_ = MicroService::instance().ConfigPath("mailer.templates", MicroService::instance().DataDir());
-            MailRetry_ = MicroService::instance().ConfigGetInt("mailer.retry",2*60);
-            MailAbandon_ = MicroService::instance().ConfigGetInt("mailer.abandon",2*60*60);
-            UseHTML_ = MicroService::instance().ConfigGetBool("mailer.html",false);
+            MailHost_ = MicroServiceConfigGetString("mailer.hostname","");
+            SenderLoginUserName_ = MicroServiceConfigGetString("mailer.username","");
+            SenderLoginPassword_ = MicroServiceConfigGetString("mailer.password","");
+            Sender_ = MicroServiceConfigGetString("mailer.sender","");
+            LoginMethod_ = MicroServiceConfigGetString("mailer.loginmethod","");
+            MailHostPort_ = MicroServiceConfigGetInt("mailer.port", 587);
+            TemplateDir_ = MicroServiceConfigPath("mailer.templates", MicroServiceDataDirectory());
+            MailRetry_ = MicroServiceConfigGetInt("mailer.retry",2*60);
+            MailAbandon_ = MicroServiceConfigGetInt("mailer.abandon",2*60*60);
+            UseHTML_ = MicroServiceConfigGetBool("mailer.html",false);
             Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
-            EmailLogo_ = TemplateDir_ + "/" + MicroService::instance().ConfigGetString("mailer.logo","logo.jpg");
+            EmailLogo_ = TemplateDir_ + "/" + MicroServiceConfigGetString("mailer.logo","logo.jpg");
         }
     }
 
@@ -51,7 +52,7 @@ namespace OpenWifi {
     }
 
     void SMTPMailerService::reinitialize([[maybe_unused]] Poco::Util::Application &self) {
-        MicroService::instance().LoadConfigurationFile();
+        MicroServiceLoadConfigurationFile();
         poco_information(Logger(),"Reinitializing.");
         LoadMyConfig();
     }

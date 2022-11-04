@@ -5,6 +5,7 @@
 #include "RESTAPI_submfa_handler.h"
 #include "StorageService.h"
 #include "SMSSender.h"
+#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
@@ -64,7 +65,7 @@ namespace OpenWifi {
                 MFC.sms = MFC.sms;
                 MFC.type = "email";
                 MFC.email = UserInfo_.userinfo.email;
-                MFC.id = MicroService::instance().CreateUUID();
+                MFC.id = MicroServiceCreateUUID();
 
                 Poco::JSON::Object Answer;
                 MFC.to_json(Answer);
@@ -116,7 +117,7 @@ namespace OpenWifi {
                         MFC.sms = MFC.sms;
                         MFC.type = "sms";
                         MFC.email = UserInfo_.userinfo.email;
-                        MFC.id = MicroService::instance().CreateUUID();
+                        MFC.id = MicroServiceCreateUUID();
 
                         Poco::JSON::Object Answer;
                         MFC.to_json(Answer);

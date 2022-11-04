@@ -2,21 +2,18 @@
 // Created by stephane bourque on 2021-10-09.
 //
 
-#include <aws/sns/model/PublishResult.h>
-
-#include "framework/MicroService.h"
-
 #include "MFAServer.h"
 #include "SMS_provider_aws.h"
 #include "SMS_provider_twilio.h"
 #include "SMSSender.h"
 
+#include "framework/MicroServiceFuncs.h"
 namespace OpenWifi {
 
     int SMSSender::Start() {
-        Enabled_ = MicroService::instance().ConfigGetBool("smssender.enabled",false);
+        Enabled_ = MicroServiceConfigGetBool("smssender.enabled",false);
         if(Enabled_) {
-            Provider_ = MicroService::instance().ConfigGetString("smssender.provider","aws");
+            Provider_ = MicroServiceConfigGetString("smssender.provider","aws");
             if(Provider_=="aws") {
                 ProviderImpl_ = std::make_unique<SMS_provider_aws>(Logger());
             } else if(Provider_=="twilio") {

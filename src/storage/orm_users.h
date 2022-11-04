@@ -5,6 +5,8 @@
 #pragma once
 
 #include "framework/orm.h"
+#include "Poco/ExpireLRUCache.h"
+
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 
 namespace OpenWifi {

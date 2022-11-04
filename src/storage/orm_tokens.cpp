@@ -5,6 +5,7 @@
 #include "orm_tokens.h"
 #include "AuthService.h"
 #include "StorageService.h"
+#include "framework/RESTAPI_utils.h"
 
 /*
     "Token			    TEXT PRIMARY KEY, "

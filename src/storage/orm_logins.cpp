@@ -3,6 +3,7 @@
 //
 
 #include "orm_logins.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 

@@ -8,6 +8,8 @@
 
 #include "StorageService.h"
 #include "SpecialUserHelpers.h"
+#include "framework/MicroServiceFuncs.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -52,7 +54,7 @@ namespace OpenWifi {
 		Archivercallback_ = std::make_unique<Poco::TimerCallback<Archiver>>(Archiver_,&Archiver::onTimer);
 		Timer_.setStartInterval( 5 * 60 * 1000);  // first run in 5 minutes
 		Timer_.setPeriodicInterval(1 * 60 * 60 * 1000); // 1 hours
-		Timer_.start(*Archivercallback_, MicroService::instance().TimerPool());
+		Timer_.start(*Archivercallback_, MicroServiceTimerPool());
 
 		return 0;
     }
