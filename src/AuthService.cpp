@@ -145,23 +145,11 @@ namespace OpenWifi {
         return false;
     }
 
-    bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired )
-    {
+    [[nodiscard]] bool AuthService::IsAuthorized(const std::string &SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired) {
         // std::lock_guard	Guard(Mutex_);
-        std::string CallToken;
+        std::string CallToken{SessionToken};
         Expired = false;
-
-		try {
-		    Poco::Net::OAuth20Credentials Auth(Request);
-		    if (Auth.getScheme() == "Bearer") {
-		        CallToken = Auth.getBearerToken();
-		    }
-
-            if(CallToken.empty()) {
-                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
-                return false;
-            }
-
+        try {
             SecurityObjects::WebToken   WT;
             uint64_t                    RevocationDate=0;
             std::string                 UserId;
@@ -174,16 +162,40 @@ namespace OpenWifi {
                 Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->UserDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
-                    SessionToken = CallToken;
                     poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}", TID, CallToken));
                     return true;
                 }
             }
-		} catch(const Poco::Exception &E) {
-		    Logger().log(E);
-		}
+        } catch(const Poco::Exception &E) {
+            Logger().log(E);
+        }
         poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
-		return false;
+        return false;
+    }
+
+    bool AuthService::IsAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired )
+    {
+        // std::lock_guard	Guard(Mutex_);
+        std::string CallToken;
+        Expired = false;
+
+		try {
+            Poco::Net::OAuth20Credentials Auth(Request);
+            if (Auth.getScheme() == "Bearer") {
+                CallToken = Auth.getBearerToken();
+            }
+
+            if (CallToken.empty()) {
+                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+                return false;
+            }
+            SessionToken = CallToken;
+            return IsAuthorized(SessionToken, UInfo, TID, Expired);
+        } catch(const Poco::Exception &E) {
+            Logger().log(E);
+        }
+        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+        return false;
     }
 
     bool AuthService::IsSubAuthorized(Poco::Net::HTTPServerRequest & Request, std::string & SessionToken, SecurityObjects::UserInfoAndPolicy & UInfo, std::uint64_t TID, bool & Expired )
