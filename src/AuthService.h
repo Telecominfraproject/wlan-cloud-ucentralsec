@@ -77,6 +77,7 @@ namespace OpenWifi{
         [[nodiscard]] std::string GenerateTokenJWT(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] std::string GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type);
 
+        [[nodiscard]] bool IsValidApiKey(const std::string &ApiKey, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired, std::uint64_t & expiresOn);
         [[nodiscard]] std::string ComputeNewPasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool ValidatePasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword);
         [[nodiscard]] bool ValidateSubPasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword);

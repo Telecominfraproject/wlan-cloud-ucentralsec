@@ -36,6 +36,7 @@ namespace OpenWifi {
         SubAvatarDB_ = std::make_unique<OpenWifi::AvatarDB>("SubAvatars", "avs", dbType_,*Pool_, Logger());
         LoginDB_ = std::make_unique<OpenWifi::LoginDB>("Logins", "lin", dbType_,*Pool_, Logger());
         SubLoginDB_ = std::make_unique<OpenWifi::LoginDB>("SubLogins", "lis", dbType_,*Pool_, Logger());
+        ApiKeyDB_ = std::make_unique<OpenWifi::ApiKeyDB>("ApiKeys", "api", dbType_,*Pool_, Logger());
 
         UserDB_->Create();
         SubDB_->Create();
@@ -47,6 +48,7 @@ namespace OpenWifi {
         AvatarDB_->Create();
         SubAvatarDB_->Create();
         LoginDB_->Create();
+        ApiKeyDB_->Create();
         SubLoginDB_->Create();
 
 		OpenWifi::SpecialUserHelpers::InitializeDefaultUser();

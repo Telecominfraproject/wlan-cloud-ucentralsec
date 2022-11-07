@@ -17,6 +17,7 @@ servers:
 security:
   - bearerAuth: []
   - ApiKeyAuth: []
+  - ApiToken: []
 
 components:
   securitySchemes:
@@ -28,6 +29,10 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    ApiToken:
+      type: apiKey
+      in: header
+      name: X-API-TOKEN
 
   responses:
     NotFound:
@@ -164,18 +169,61 @@ components:
         aclTemplate:
           $ref: '#/components/schemas/AclTemplate'
 
-    ApiKeyCreationRequest:
+    ApiKeyAccessRight:
       type: object
       properties:
+        service:
+          type: string
+        access:
+          type: string
+          enum:
+            - read
+            - modify
+            - create
+            - delete
+            - noaccess
+
+    ApiKeyAccessRightList:
+      type: object
+      properties:
+        acls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiKeyAccessRight'
+
+    ApiKeyEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userUuid:
+          type: string
+          format: uuid
         name:
           type: string
         description:
           type: string
+        apiKey:
+          type: string
+        salt:
+          type: string
         expiresOn:
           type: integer
           format: int64
+        lastUse:
+          type: integer
+          format: int64
         rights:
-          $ref: '#/components/schemas/AclTemplate'
+          $ref: '#/components/schemas/ApiKeyAccessRightList'
+
+    ApiKeyEntryList:
+      type: object
+      properties:
+        apiKeys:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiKeyEntry'
 
     ApiKeyCreationAnswer:
       type: object
@@ -194,7 +242,7 @@ components:
         apiKey:
           type: string
         rights:
-          $ref: '#/components/schemas/AclTemplate'
+          $ref: '#/components/schemas/ApiKeyAccessRights'
 
     AclTemplate:
       type: object
@@ -1634,7 +1682,103 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-
+  /apiKey/{uuid}:
+    get:
+      tags:
+        - API Tokens
+      summary: Retrieve all the APIKeys for a given user UUID
+      operationId: getApiKeyList
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/ApiKeyEntryList'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - API Tokens
+      summary: Retrieve all the APIKeys for a given user UUID
+      operationId: deleteApiKey
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: keyUuid
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - API Tokens
+      summary: Retrieve all the APIKeys for a given user UUID
+      operationId: createApiKey
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyEntry'
+      responses:
+        200:
+          $ref: '#/components/schemas/ApiKeyEntry'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - API Tokens
+      summary: Retrieve all the APIKeys for a given user UUID
+      operationId: modifyApiKey
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyEntry'
+      responses:
+        200:
+          $ref: '#/components/schemas/ApiKeyEntry'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   #########################################################################################
   ##
@@ -1718,6 +1862,26 @@ paths:
         - Subscribers
       summary: Allows any microservice to validate a token and get security policy for a specific user.
       operationId: validateSubToken
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/TokenValidationResult'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /validateApiKey:
+    get:
+      tags:
+        - Security
+      summary: Allows an application to validate an API Key.
+      operationId: validateApiKey
       parameters:
         - in: query
           name: token

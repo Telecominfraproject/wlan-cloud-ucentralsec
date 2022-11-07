@@ -6,8 +6,7 @@
 //	Arilia Wireless Inc.
 //
 
-#ifndef UCENTRAL_USTORAGESERVICE_H
-#define UCENTRAL_USTORAGESERVICE_H
+#pragma once
 
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "framework/StorageClass.h"
@@ -21,6 +20,7 @@
 #include "storage/orm_actionLinks.h"
 #include "storage/orm_avatar.h"
 #include "storage/orm_logins.h"
+#include "storage/orm_apikeys.h"
 
 namespace OpenWifi {
 
@@ -52,6 +52,7 @@ namespace OpenWifi {
         OpenWifi::AvatarDB & SubAvatarDB() { return *SubAvatarDB_; }
         OpenWifi::LoginDB & LoginDB() { return *LoginDB_; }
         OpenWifi::LoginDB & SubLoginDB() { return *SubLoginDB_; }
+        OpenWifi::ApiKeyDB & ApiKeyDB() { return *ApiKeyDB_; }
 
 	  private:
 
@@ -66,6 +67,7 @@ namespace OpenWifi {
         std::unique_ptr<OpenWifi::AvatarDB>             SubAvatarDB_;
         std::unique_ptr<OpenWifi::LoginDB>              LoginDB_;
         std::unique_ptr<OpenWifi::LoginDB>              SubLoginDB_;
+        std::unique_ptr<OpenWifi::ApiKeyDB>             ApiKeyDB_;
 
         std::unique_ptr<OpenWifi::UserCache>            UserCache_;
         std::unique_ptr<OpenWifi::UserCache>            SubCache_;
@@ -80,5 +82,3 @@ namespace OpenWifi {
     inline auto StorageService() { return StorageService::instance(); };
 
 }  // namespace
-
-#endif //UCENTRAL_USTORAGESERVICE_H

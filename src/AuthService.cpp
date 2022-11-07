@@ -751,9 +751,7 @@ namespace OpenWifi {
                 WebToken = WT;
                 return true;
             }
-            return false;
         }
-        // return IsValidSubToken(Token, WebToken, UserInfo, Expired);
         return false;
     }
 
@@ -772,7 +770,27 @@ namespace OpenWifi {
                 WebToken = WT;
                 return true;
             }
-            return false;
+        }
+        return false;
+    }
+
+    bool AuthService::IsValidApiKey(const std::string &ApiKey, SecurityObjects::WebToken &WebToken,
+                                    SecurityObjects::UserInfo &UserInfo, bool &Expired, std::uint64_t &expiresOn) {
+
+        std::lock_guard G(Mutex_);
+
+        std::string UserId;
+        SecurityObjects::WebToken   WT;
+        SecurityObjects::ApiKeyEntry    ApiKeyEntry;
+        if(StorageService()->ApiKeyDB().GetRecord("apiKey", ApiKey, ApiKeyEntry)) {
+            expiresOn = ApiKeyEntry.expiresOn;
+            Expired = ApiKeyEntry.expiresOn < Utils::Now();
+            if(Expired)
+                return false;
+            if(StorageService()->UserDB().GetUserById(ApiKeyEntry.userUuid,UserInfo)) {
+                WebToken = WT;
+                return true;
+            }
         }
         return false;
     }

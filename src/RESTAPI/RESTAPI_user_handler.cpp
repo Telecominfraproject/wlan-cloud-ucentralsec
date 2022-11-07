@@ -66,6 +66,7 @@ namespace OpenWifi {
         StorageService()->AvatarDB().DeleteAvatar(UserInfo_.userinfo.email,Id);
         StorageService()->PreferencesDB().DeletePreferences(UserInfo_.userinfo.email,Id);
         StorageService()->UserTokenDB().RevokeAllTokens(Id);
+        StorageService()->ApiKeyDB().RemoveAllApiKeys(Id);
         Logger_.information(fmt::format("User '{}' deleted by '{}'.",Id,UserInfo_.userinfo.email));
         OK();
     }
