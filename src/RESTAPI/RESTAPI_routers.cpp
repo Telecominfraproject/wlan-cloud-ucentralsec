@@ -88,6 +88,7 @@ namespace OpenWifi {
             RESTAPI_subtotp_handler,
             RESTAPI_validate_sub_token_handler,
             RESTAPI_validate_token_handler,
+            RESTAPI_validate_apikey,
             RESTAPI_signup_handler
         >(Path, Bindings, L, S, TransactionId);
     }
