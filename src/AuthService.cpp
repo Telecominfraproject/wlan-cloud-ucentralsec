@@ -789,6 +789,8 @@ namespace OpenWifi {
                 return false;
             if(StorageService()->UserDB().GetUserById(ApiKeyEntry.userUuid,UserInfo)) {
                 WebToken = WT;
+                ApiKeyEntry.lastUse = Utils::Now();
+                StorageService()->ApiKeyDB().UpdateRecord("id", ApiKeyEntry.id, ApiKeyEntry);
                 return true;
             }
         }

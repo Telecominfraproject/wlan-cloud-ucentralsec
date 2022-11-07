@@ -14,4 +14,7 @@ namespace OpenWifi {
         U.oauthType.clear();
     }
 
+    inline void Sanitize([[maybe_unused]] const SecurityObjects::UserInfoAndPolicy &User, SecurityObjects::ApiKeyEntry & U) {
+        U.salt.clear();
+    }
 }

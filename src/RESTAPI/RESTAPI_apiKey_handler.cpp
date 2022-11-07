@@ -18,6 +18,9 @@ namespace OpenWifi {
 
         SecurityObjects::ApiKeyEntryList    List;
         if(DB_.GetRecords(0,500, List.apiKeys, fmt::format(" userUuid='{}' ", user_uuid))) {
+            for(auto &key:List.apiKeys) {
+                Sanitize(UserInfo_, key);
+            }
             Poco::JSON::Object  Answer;
             List.to_json(Answer);
             return ReturnObject(Answer);
