@@ -447,6 +447,33 @@ check_response() {
     fi
 }
 
+createapikey() {
+    payload="{ \"name\" : \"test1\" , \"expiresOn\" : 1699393386 }"
+    curl ${FLAGS} -X POST "https://${OWSEC}/api/v1/apiKey/$1" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" \
+		-d "$payload" > ${result_file}
+    jq < ${result_file}
+}
+
+deleteapikey() {
+    curl ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/apiKey/$1?keyUuid=$2" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
+getapikey() {
+    curl ${FLAGS} -X GET "https://${OWSEC}/api/v1/apiKey/$1" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
+
 test_service() {
 	echo
 	echo "----------------------"
@@ -553,6 +580,9 @@ case "$1" in
     "getpreferences") login; getpreferences ; logout;;
     "getauthqrcode") login; getauthqrcode; logout;;
     "test_service") login; test_service; logout;;
+    "createapikey") login; createapikey "$2" ; logout;;
+    "deleteapikey") login; deleteapikey "$2" "$3"; logout;;
+    "getapikey") login; getapikey "$2" ; logout;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
