@@ -24,6 +24,7 @@
 #include "RESTAPI/RESTAPI_subtotp_handler.h"
 #include "RESTAPI/RESTAPI_signup_handler.h"
 #include "RESTAPI/RESTAPI_apiKey_handler.h"
+#include "RESTAPI/RESTAPI_validate_apikey.h"
 
 #include "framework/RESTAPI_SystemCommand.h"
 #include "framework/RESTAPI_WebSocketServer.h"
@@ -56,6 +57,7 @@ namespace OpenWifi {
             RESTAPI_signup_handler,
             RESTAPI_validate_sub_token_handler,
             RESTAPI_validate_token_handler,
+            RESTAPI_validate_apikey,
             RESTAPI_webSocketServer,
             RESTAPI_apiKey_handler
         >(Path, Bindings, L, S,TransactionId);
