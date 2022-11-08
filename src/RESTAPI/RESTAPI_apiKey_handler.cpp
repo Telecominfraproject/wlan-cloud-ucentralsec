@@ -145,14 +145,6 @@ namespace OpenWifi {
             return BadRequest(RESTAPI::Errors::MissingUserID);
         }
 
-        //  You can only change the description and the expiration
-/*        if(ParsedBody_->has("expiresOn")) {
-            if(NewKey.expiresOn < Utils::Now()) {
-                return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
-            }
-            ExistingKey.expiresOn = NewKey.expiresOn;
-        }
-*/
         AssignIfPresent(ParsedBody_,"description",ExistingKey.description);
 
         if(DB_.UpdateRecord("id",ExistingKey.id,ExistingKey)) {
