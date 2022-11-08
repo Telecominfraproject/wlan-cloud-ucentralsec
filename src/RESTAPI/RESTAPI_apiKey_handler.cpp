@@ -105,6 +105,10 @@ namespace OpenWifi {
             }
         }
 
+        if(ExistingList.apiKeys.size()>=10) {
+            return BadRequest(RESTAPI::Errors::TooManyApiKeys);
+        }
+
         NewKey.id = MicroServiceCreateUUID();
         NewKey.userUuid = user_uuid;
         NewKey.salt = std::to_string(Utils::Now());
