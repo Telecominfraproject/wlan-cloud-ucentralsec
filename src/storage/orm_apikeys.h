@@ -33,6 +33,7 @@ namespace OpenWifi {
 
         bool Upgrade(uint32_t from, uint32_t &to) override;
         bool RemoveAllApiKeys(const std::string & user_uuid);
+        bool RemoveExpiredAPIKeys();
 
     };
 

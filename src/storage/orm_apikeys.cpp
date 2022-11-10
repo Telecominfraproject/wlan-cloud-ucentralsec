@@ -72,6 +72,12 @@ namespace OpenWifi {
         return true;
     }
 
+    bool ApiKeyDB::RemoveExpiredAPIKeys() {
+        std::string WhereClause{" expiresOn <= " + std::to_string(OpenWifi::Now())};
+        DeleteRecords( WhereClause );
+        return true;
+    }
+
 } // OpenWifi
 
 template<> void ORM::DB<OpenWifi::ApiKeyRecordTuple, OpenWifi::SecurityObjects::ApiKeyEntry>::Convert(const OpenWifi::ApiKeyRecordTuple &In, OpenWifi::SecurityObjects::ApiKeyEntry &Out) {

@@ -76,6 +76,8 @@ namespace OpenWifi {
         StorageService()->UserTokenDB().CleanExpiredTokens();
         logger.information("Squiggy the DB: removing old actionLinks.");
         StorageService()->ActionLinksDB().CleanOldActionLinks();
+        logger.information("Squiggy the DB: removing old expired API Keys.");
+        StorageService()->ActionLinksDB().CleanOldActionLinks();
     }
 
 }
