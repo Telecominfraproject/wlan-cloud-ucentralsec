@@ -942,7 +942,7 @@ paths:
   /systemEndpoints:
     get:
       tags:
-        - Authentication
+        - System Commands
       summary: Retrieve the system layout.
       operationId: getSystemInfo
       responses:
@@ -1396,7 +1396,7 @@ paths:
   /email:
     post:
       tags:
-        - Email
+        - Messaging
       summary: Send test email with the system.
       operationId: Send a test email
       requestBody:
@@ -1427,7 +1427,7 @@ paths:
   /sms:
     post:
       tags:
-        - Email
+        - Messaging
       summary: Send test email with the system.
       operationId: Send a test SMS
       parameters:
