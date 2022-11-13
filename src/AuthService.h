@@ -103,11 +103,19 @@ namespace OpenWifi{
         void RevokeSubToken(std::string & Token);
 
         [[nodiscard]] static inline const std::string GetLogoAssetURI() {
-            return MicroServicePublicEndPoint() + "/wwwassets/the_logo.png";
+            return MicroServicePublicEndPoint() + "/wwwassets/logo.png";
         }
 
         [[nodiscard]] static inline const std::string GetLogoAssetFileName() {
-            return MicroServiceWWWAssetsDir() + "/the_logo.png";
+            return MicroServiceWWWAssetsDir() + "/logo.png";
+        }
+
+        [[nodiscard]] static inline const std::string GetSubLogoAssetURI() {
+            return MicroServicePublicEndPoint() + "/wwwassets/sub_logo.png";
+        }
+
+        [[nodiscard]] static inline const std::string GetSubLogoAssetFileName() {
+            return MicroServiceWWWAssetsDir() + "/sub_logo.png";
         }
 
         inline const std::string & GetPasswordPolicy() const { return PasswordPolicy_; }

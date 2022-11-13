@@ -600,7 +600,7 @@ namespace OpenWifi {
         } else {
             MessageAttributes Attrs;
             Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
-            Attrs[LOGO] = AuthService::GetLogoAssetURI();
+            Attrs[LOGO] = AuthService::GetSubLogoAssetURI();
             Attrs[SUBJECT] = "Login validation code";
             Attrs[CHALLENGE_CODE] = Challenge;
             return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_VERIFICATION_CODE,OperatorParts[0]), Attrs);
@@ -665,7 +665,7 @@ namespace OpenWifi {
                 case MessagingTemplates::SUB_FORGOT_PASSWORD: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
-                    Attrs[LOGO] = GetLogoAssetURI();
+                    Attrs[LOGO] = GetSubLogoAssetURI();
                     Attrs[SUBJECT] = "Password reset link";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_password_reset&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_password_reset&id=" + LinkId ;
@@ -676,7 +676,7 @@ namespace OpenWifi {
                 case MessagingTemplates::SUB_EMAIL_VERIFICATION: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
-                    Attrs[LOGO] = GetLogoAssetURI();
+                    Attrs[LOGO] = GetSubLogoAssetURI();
                     Attrs[SUBJECT] = "e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_email_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_email_verification&id=" + LinkId ;
@@ -688,7 +688,7 @@ namespace OpenWifi {
                 case MessagingTemplates::SIGNUP_VERIFICATION: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
-                    Attrs[LOGO] = GetLogoAssetURI();
+                    Attrs[LOGO] = GetSubLogoAssetURI();
                     Attrs[SUBJECT] = "Signup e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=signup_verification&id=" + LinkId ;

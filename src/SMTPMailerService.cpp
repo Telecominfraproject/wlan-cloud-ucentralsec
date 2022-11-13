@@ -35,7 +35,7 @@ namespace OpenWifi {
             MailAbandon_ = MicroServiceConfigGetInt("mailer.abandon",2*60*60);
             UseHTML_ = MicroServiceConfigGetBool("mailer.html",false);
             Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
-            EmailLogo_ = TemplateDir_ + "/" + MicroServiceConfigGetString("mailer.logo","logo.jpg");
+            EmailLogo_ = TemplateDir_ + "/" + MicroServiceConfigGetString("mailer.logo","logo.png");
         }
     }
 
