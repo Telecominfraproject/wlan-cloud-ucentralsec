@@ -596,14 +596,14 @@ namespace OpenWifi {
             Attrs[LOGO] = AuthService::GetLogoAssetURI();
             Attrs[SUBJECT] = "Login validation code";
             Attrs[CHALLENGE_CODE] = Challenge;
-            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::VERIFICATION_CODE), Attrs);
+            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::VERIFICATION_CODE), Attrs, false);
         } else {
             MessageAttributes Attrs;
             Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
             Attrs[LOGO] = AuthService::GetSubLogoAssetURI();
             Attrs[SUBJECT] = "Login validation code";
             Attrs[CHALLENGE_CODE] = Challenge;
-            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_VERIFICATION_CODE,OperatorParts[0]), Attrs);
+            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_VERIFICATION_CODE,OperatorParts[0]), Attrs, true );
         }
     }
 
@@ -620,7 +620,7 @@ namespace OpenWifi {
                         Attrs[SUBJECT] = "Password reset link";
                         Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
                         Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=password_reset&id=" + LinkId ;
-                        SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::FORGOT_PASSWORD), Attrs);
+                        SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::FORGOT_PASSWORD), Attrs, false);
                     }
                     break;
 
@@ -631,7 +631,7 @@ namespace OpenWifi {
                         Attrs[SUBJECT] = "e-mail Address Verification";
                         Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
                         Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_verification&id=" + LinkId ;
-                        SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_VERIFICATION), Attrs);
+                        SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_VERIFICATION), Attrs, false);
                         UInfo.waitingForEmailCheck = true;
                     }
                     break;
@@ -643,7 +643,7 @@ namespace OpenWifi {
                     Attrs[SUBJECT] = "e-mail Invitation";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=email_invitation&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_invitation&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_INVITATION), Attrs);
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_INVITATION), Attrs, false);
                     UInfo.waitingForEmailCheck = true;
                     }
                     break;
@@ -669,7 +669,7 @@ namespace OpenWifi {
                     Attrs[SUBJECT] = "Password reset link";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_password_reset&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_password_reset&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_FORGOT_PASSWORD, OperatorName), Attrs);
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_FORGOT_PASSWORD, OperatorName), Attrs, true);
                 }
                 break;
 
@@ -680,7 +680,7 @@ namespace OpenWifi {
                     Attrs[SUBJECT] = "e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_email_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_email_verification&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_EMAIL_VERIFICATION, OperatorName), Attrs);
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_EMAIL_VERIFICATION, OperatorName), Attrs, true);
                     UInfo.waitingForEmailCheck = true;
                 }
                 break;
@@ -692,7 +692,7 @@ namespace OpenWifi {
                     Attrs[SUBJECT] = "Signup e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=signup_verification&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SIGNUP_VERIFICATION, OperatorName), Attrs);
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SIGNUP_VERIFICATION, OperatorName), Attrs, true);
                     UInfo.waitingForEmailCheck = true;
                 }
                 break;

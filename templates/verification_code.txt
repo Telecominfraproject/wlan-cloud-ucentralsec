@@ -4,7 +4,7 @@ Dear ${RECIPIENT_EMAIL},
 
         ${CHALLENGE_CODE}
 
-    If you are not trying to login, please login and change your password. Someone maybe trying to
+    If you are not trying to login, please login and change your password. Someone may be trying to
     access your account illegally.
 
 Thank you!

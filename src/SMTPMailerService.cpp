@@ -57,13 +57,14 @@ namespace OpenWifi {
         LoadMyConfig();
     }
 
-    bool SMTPMailerService::SendMessage([[maybe_unused]] const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs) {
+    bool SMTPMailerService::SendMessage([[maybe_unused]] const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs, bool Subscriber) {
         std::lock_guard G(Mutex_);
         PendingMessages_.push_back(MessageEvent{.Posted= OpenWifi::Now(),
                                             .LastTry=0,
                                             .Sent=0,
                                             .TemplateName=Name,
-                                            .Attrs=Attrs});
+                                            .Attrs=Attrs,
+                                            .Subscriber=Subscriber});
         return true;
     }
 
@@ -158,7 +159,7 @@ namespace OpenWifi {
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
                 try {
-                    Poco::File          LogoFile(EmailLogo_);
+                    Poco::File          LogoFile( Msg.Subscriber ? AuthService::GetSubLogoAssetFileName() :  AuthService::GetLogoAssetFileName ());
                     std::ifstream       IF(LogoFile.path());
                     std::ostringstream  OS;
                     Poco::StreamCopier::copyStream(IF, OS);

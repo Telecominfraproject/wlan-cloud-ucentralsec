@@ -76,13 +76,14 @@ namespace OpenWifi {
                uint64_t             Sent=0;
                std::string          TemplateName;
                MessageAttributes    Attrs;
+               bool                 Subscriber=false;
             };
 
             void run() override;
             int Start() override;
             void Stop() override;
 
-            bool SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs);
+            bool SendMessage(const std::string &Recipient, const std::string &Name, const MessageAttributes &Attrs, bool Subscriber);
             MessageSendStatus SendIt(const MessageEvent &Msg);
             void LoadMyConfig();
             void reinitialize(Poco::Util::Application &self) override;
@@ -104,7 +105,7 @@ namespace OpenWifi {
             std::atomic_bool        Running_=false;
             bool                    Enabled_=false;
             bool                    UseHTML_=false;
-            std::string             EmailLogo_{"logo.jpg"};
+            std::string             EmailLogo_{"logo.png"};
 
             SMTPMailerService() noexcept:
                 SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer")

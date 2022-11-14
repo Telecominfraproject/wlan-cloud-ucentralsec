@@ -175,7 +175,7 @@ listendpoints() {
 }
 
 getlogo() {
-	curl ${FLAGS} -X GET "https://${OWSEC}/wwwassets/open-wifi.svg"
+	curl ${FLAGS} -X GET "https://${OWSEC}/wwwassets/logo.png"
 }
 
 createuser() {

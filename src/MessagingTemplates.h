@@ -49,11 +49,11 @@ namespace OpenWifi {
         }
 
         static std::string Logo(const std::string &OperatorName = "" ) {
-            return AddOperator("logo.jpg", OperatorName);
+            return AddOperator("logo.png", OperatorName);
         }
 
         static std::string SubLogo(const std::string &OperatorName = "" ) {
-            return AddOperator("sub_logo.jpg", OperatorName);
+            return AddOperator("sub_logo.png", OperatorName);
         }
 
     private:
