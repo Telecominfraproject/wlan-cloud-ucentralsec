@@ -19,7 +19,7 @@ namespace OpenWifi {
         enum EMAIL_REASON {
             FORGOT_PASSWORD = 0,
             EMAIL_VERIFICATION,
-            SIGNUP_VERIFICATION,
+            SUB_SIGNUP_VERIFICATION,
             EMAIL_INVITATION,
             VERIFICATION_CODE,
             SUB_FORGOT_PASSWORD,
@@ -37,7 +37,7 @@ namespace OpenWifi {
             switch (r) {
                 case FORGOT_PASSWORD: return AddOperator(EmailTemplateNames[FORGOT_PASSWORD],OperatorName);
                 case EMAIL_VERIFICATION: return AddOperator(EmailTemplateNames[EMAIL_VERIFICATION],OperatorName);
-                case SIGNUP_VERIFICATION: return AddOperator(EmailTemplateNames[SIGNUP_VERIFICATION],OperatorName);
+                case SUB_SIGNUP_VERIFICATION: return AddOperator(EmailTemplateNames[SUB_SIGNUP_VERIFICATION],OperatorName);
                 case EMAIL_INVITATION: return AddOperator(EmailTemplateNames[EMAIL_INVITATION],OperatorName);
                 case VERIFICATION_CODE: return AddOperator(EmailTemplateNames[VERIFICATION_CODE],OperatorName);
                 case SUB_FORGOT_PASSWORD: return AddOperator(EmailTemplateNames[SUB_FORGOT_PASSWORD],OperatorName);
@@ -60,7 +60,7 @@ namespace OpenWifi {
         inline const static std::vector<std::string>  EmailTemplateNames = {
                 "password_reset",
                 "email_verification",
-                "signup_verification",
+                "sub_signup_verification",
                 "email_invitation",
                 "verification_code",
                 "sub_password_reset",

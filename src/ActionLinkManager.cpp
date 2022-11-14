@@ -110,7 +110,7 @@ namespace OpenWifi {
 
                     case OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP: {
                         auto Signup = Poco::StringTokenizer(UInfo.signingUp,":");
-                        if(AuthService::SendEmailToSubUser(i.id, UInfo.email, MessagingTemplates::SIGNUP_VERIFICATION, Signup.count()==1 ? "" : Signup[0])) {
+                        if(AuthService::SendEmailToSubUser(i.id, UInfo.email, MessagingTemplates::SUB_SIGNUP_VERIFICATION, Signup.count()==1 ? "" : Signup[0])) {
                             poco_information(Logger(),fmt::format("Send new subscriber email verification link to {}",UInfo.email));
                         }
                         StorageService()->ActionLinksDB().SentAction(i.id);

@@ -689,14 +689,14 @@ namespace OpenWifi {
                 }
                 break;
 
-                case MessagingTemplates::SIGNUP_VERIFICATION: {
+                case MessagingTemplates::SUB_SIGNUP_VERIFICATION: {
                     MessageAttributes Attrs;
                     Attrs[RECIPIENT_EMAIL] = UInfo.email;
                     Attrs[LOGO] = GetSubLogoAssetURI();
                     Attrs[SUBJECT] = "Signup e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=signup_verification&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SIGNUP_VERIFICATION, OperatorName), Attrs, true);
+                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_SIGNUP_VERIFICATION, OperatorName), Attrs, true);
                     UInfo.waitingForEmailCheck = true;
                 }
                 break;

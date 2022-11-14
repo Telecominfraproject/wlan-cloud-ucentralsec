@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Reset Password</title>
+    <title>Signup Completion</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./common.css">
 </head>
@@ -14,8 +14,8 @@
 </div>
 
 <div class="info-card">
-    <h2 class="info-title">Reset Password</h2>
-    <form action="/api/v1/actionLink?action=password_reset" method="post" onsubmit="return validatePassword()" class="form-container">
+    <h2 class="info-title">Signup Completion</h2>
+    <form action="/api/v1/actionLink?action=signup_completion" method="post" onsubmit="return validatePassword()" class="form-container">
         <div class="form-control">
             <label class="form-label" for="password1" ><b>New Password</b></label>
             <input class="form-input" id="password1" type="password" placeholder="New password" name="password1" pattern="${PASSWORD_VALIDATION}" required>
@@ -25,7 +25,7 @@
             <input class="form-input" id="password2" type="password" placeholder="Enter new password again" name="password2" pattern="${PASSWORD_VALIDATION}" required>
         </div>
         <div class="form-control">
-            <button type="submit" class="form-submit-btn"><b>Reset Password</b></button>
+            <button type="submit" class="form-submit-btn"><b>Complete Signup</b></button>
         </div>
     </form>
     <ul class="info-list">
@@ -46,7 +46,7 @@
     if(password1 === password2) {
         return true;
     } else {
-        alert("The 2 passwords did not match. The passwords must match to reset your new password.");
+        alert("The 2 passwords did not match. The passwords must match to complete your signup");
         return false;
     }
 }

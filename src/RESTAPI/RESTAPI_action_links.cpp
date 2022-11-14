@@ -62,7 +62,7 @@ namespace OpenWifi {
 
     void RESTAPI_action_links::DoNewSubVerification(SecurityObjects::ActionLink &Link) {
         Logger_.information(fmt::format("REQUEST-SUB-SIGNUP({}): For ID={}", Request->clientAddress().toString(), Link.userId));
-        Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification.html"};
+        Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification.html"};
         Types::StringPairVec    FormVars{ {"UUID", Link.id},
                                           {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
         SendHTMLFileBack(FormFile,FormVars);
@@ -161,7 +161,7 @@ namespace OpenWifi {
             }
 
             if(Password1!=Password2 || !AuthService()->ValidateSubPassword(Password1)) {
-                Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "For some reason, the passwords entered do not match or they do not comply with"
                                                                  " accepted password creation restrictions. Please consult our on-line help"
@@ -173,14 +173,14 @@ namespace OpenWifi {
             SecurityObjects::UserInfo   UInfo;
             bool Found = StorageService()->SubDB().GetUserById(Link.userId,UInfo);
             if(!Found) {
-                Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_error.html"};
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
             if(UInfo.blackListed || UInfo.suspended) {
-                Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_error.html"};
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "Please contact our system administrators. We have identified an error in your account that must be resolved first."}};
                 return SendHTMLFileBack(FormFile,FormVars);
@@ -188,7 +188,7 @@ namespace OpenWifi {
 
             bool GoodPassword = AuthService()->SetSubPassword(Password1,UInfo);
             if(!GoodPassword) {
-                Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_error.html"};
+                Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
                 return SendHTMLFileBack(FormFile,FormVars);
@@ -202,7 +202,7 @@ namespace OpenWifi {
 
             StorageService()->SubDB().UpdateUserInfo(UInfo.email,Link.userId,UInfo);
 
-            Poco::File  FormFile{ Daemon()->AssetDir() + "/signup_verification_success.html"};
+            Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification_success.html"};
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email} };
             StorageService()->ActionLinksDB().CompleteAction(Id);
