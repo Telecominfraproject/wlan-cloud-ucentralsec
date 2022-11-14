@@ -45,7 +45,11 @@ namespace OpenWifi {
 		return 1;	// some compilers complain...
 	}
 
-    static const std::string DefaultPassword_8_u_l_n_1{"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\\{\\}\\(\\)~_\\+\\|\\\\\\[\\]\\;\\:\\<\\>\\.\\,\\/\\?\\\"\\'\\`\\=#?!@$%^&*-]).{8,}$"};
+#if defined(TIP_CERT_SERVICE)
+    static const std::string DefaultPasswordRule{"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\\{\\}\\(\\)~_\\+\\|\\\\\\[\\]\\;\\:\\<\\>\\.\\,\\/\\?\\\"\\'\\`\\=#?!@$%^&*-]).{12,}$"};
+#else
+    static const std::string DefaultPasswordRule{"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\\{\\}\\(\\)~_\\+\\|\\\\\\[\\]\\;\\:\\<\\>\\.\\,\\/\\?\\\"\\'\\`\\=#?!@$%^&*-]).{8,}$"};
+#endif
 
     int AuthService::Start() {
         poco_information(Logger(),"Starting...");
@@ -55,9 +59,9 @@ namespace OpenWifi {
 
         AccessPolicy_ = MicroServiceConfigGetString("openwifi.document.policy.access", "/wwwassets/access_policy.html");
         PasswordPolicy_ = MicroServiceConfigGetString("openwifi.document.policy.password", "/wwwassets/password_policy.html");
-        PasswordValidation_ = PasswordValidationStr_ = MicroServiceConfigGetString("authentication.validation.expression",DefaultPassword_8_u_l_n_1);
+        PasswordValidation_ = PasswordValidationStr_ = MicroServiceConfigGetString("authentication.validation.expression",DefaultPasswordRule);
 
-        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroServiceConfigGetString("subscriber.validation.expression",DefaultPassword_8_u_l_n_1);
+        SubPasswordValidation_ = SubPasswordValidationStr_ = MicroServiceConfigGetString("subscriber.validation.expression",DefaultPasswordRule);
         SubAccessPolicy_ = MicroServiceConfigGetString("subscriber.policy.access", "/wwwassets/access_policy.html");
         SubPasswordPolicy_ = MicroServiceConfigGetString("subscriber.policy.password", "/wwwassets/password_policy.html");
 
@@ -155,21 +159,21 @@ namespace OpenWifi {
             std::string                 UserId;
             if(StorageService()->UserTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
                 if(RevocationDate!=0) {
-                    poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+                    poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                     return false;
                 }
                 auto now=OpenWifi::Now();
                 Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->UserDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
-                    poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}", TID, CallToken));
+                    poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                     return true;
                 }
             }
         } catch(const Poco::Exception &E) {
             Logger().log(E);
         }
-        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
         return false;
     }
 
@@ -186,7 +190,7 @@ namespace OpenWifi {
             }
 
             if (CallToken.empty()) {
-                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                 return false;
             }
             SessionToken = CallToken;
@@ -194,7 +198,7 @@ namespace OpenWifi {
         } catch(const Poco::Exception &E) {
             Logger().log(E);
         }
-        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
         return false;
     }
 
@@ -211,7 +215,7 @@ namespace OpenWifi {
             }
 
             if(CallToken.empty()) {
-                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+                poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                 return false;
             }
 
@@ -220,7 +224,7 @@ namespace OpenWifi {
             std::string                 UserId;
             if(StorageService()->SubTokenDB().GetToken(CallToken, WT, UserId, RevocationDate)) {
                 if(RevocationDate!=0) {
-                    poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+                    poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                     return false;
                 }
                 auto now=OpenWifi::Now();
@@ -228,14 +232,14 @@ namespace OpenWifi {
                 if(StorageService()->SubDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
                     SessionToken = CallToken;
-                    poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}", TID, CallToken));
+                    poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                     return true;
                 }
             }
         } catch(const Poco::Exception &E) {
             Logger().log(E);
         }
-        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, CallToken));
+        poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
         return false;
     }
 
