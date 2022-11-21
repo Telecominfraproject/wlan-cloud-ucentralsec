@@ -88,7 +88,7 @@ namespace OpenWifi {
             uint64_t                    RevocationDate=0;
             std::string                 UserId;
             if(StorageService()->UserTokenDB().GetToken(CallToken, UI.webtoken, UserId, RevocationDate) && UI.webtoken.refresh_token_==RefreshToken) {
-                auto now = OpenWifi::Now();
+                auto now = Utils::Now();
 
                 //  Create a new token
                 auto NewToken = GenerateTokenHMAC( UI.webtoken.access_token_, CUSTOM);
@@ -126,7 +126,7 @@ namespace OpenWifi {
             uint64_t                    RevocationDate=0;
             std::string                 UserId;
             if(StorageService()->SubTokenDB().GetToken(CallToken, UI.webtoken, UserId, RevocationDate) && UI.webtoken.refresh_token_==RefreshToken) {
-                auto now = OpenWifi::Now();
+                auto now = Utils::Now();
 
                 //  Create a new token
                 auto NewToken = GenerateTokenHMAC( UI.webtoken.access_token_, CUSTOM);
@@ -162,7 +162,7 @@ namespace OpenWifi {
                     poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                     return false;
                 }
-                auto now=OpenWifi::Now();
+                auto now=Utils::Now();
                 Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->UserDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
@@ -227,7 +227,7 @@ namespace OpenWifi {
                     poco_debug(Logger(), fmt::format("TokenValidation failed for TID={} Token={}", TID, Utils::SanitizeToken(CallToken)));
                     return false;
                 }
-                auto now=OpenWifi::Now();
+                auto now=Utils::Now();
                 Expired = (WT.created_ + WT.expires_in_) < now;
                 if(StorageService()->SubDB().GetUserById(UserId,UInfo.userinfo)) {
                     UInfo.webtoken = WT;
@@ -314,7 +314,7 @@ namespace OpenWifi {
     }
 
     [[nodiscard]] std::string AuthService::GenerateTokenHMAC(const std::string & UserName, [[maybe_unused]] ACCESS_TYPE Type) {
-        std::string Identity(UserName + ":" + fmt::format("{}",OpenWifi::Now()) + ":" + std::to_string(rand()));
+        std::string Identity(UserName + ":" + fmt::format("{}",Utils::Now()) + ":" + std::to_string(rand()));
         HMAC_.update(Identity);
         return Poco::DigestEngine::digestToHex(HMAC_.digest());
     }
@@ -530,14 +530,14 @@ namespace OpenWifi {
                     UInfo.webtoken.errorCode = 1;
                     return PASSWORD_ALREADY_USED;
                 }
-                UInfo.userinfo.lastPasswordChange = OpenWifi::Now();
+                UInfo.userinfo.lastPasswordChange = Utils::Now();
                 UInfo.userinfo.changePassword = false;
-                UInfo.userinfo.modified = OpenWifi::Now();
+                UInfo.userinfo.modified = Utils::Now();
                 StorageService()->UserDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
             //  so we have a good password, password up date has taken place if need be, now generate the token.
-            UInfo.userinfo.lastLogin=OpenWifi::Now();
+            UInfo.userinfo.lastLogin=Utils::Now();
             StorageService()->UserDB().SetLastLogin(UInfo.userinfo.id);
             CreateToken(UserName, UInfo );
 
@@ -575,14 +575,14 @@ namespace OpenWifi {
                     UInfo.webtoken.errorCode = 1;
                     return PASSWORD_ALREADY_USED;
                 }
-                UInfo.userinfo.lastPasswordChange = OpenWifi::Now();
+                UInfo.userinfo.lastPasswordChange = Utils::Now();
                 UInfo.userinfo.changePassword = false;
-                UInfo.userinfo.modified = OpenWifi::Now();
+                UInfo.userinfo.modified = Utils::Now();
                 StorageService()->SubDB().UpdateUserInfo(AUTHENTICATION_SYSTEM, UInfo.userinfo.id,UInfo.userinfo);
             }
 
             //  so we have a good password, password update has taken place if need be, now generate the token.
-            UInfo.userinfo.lastLogin=OpenWifi::Now();
+            UInfo.userinfo.lastLogin=Utils::Now();
             StorageService()->SubDB().SetLastLogin(UInfo.userinfo.id);
             CreateSubToken(UserName, UInfo );
 
@@ -715,7 +715,7 @@ namespace OpenWifi {
         A.action = OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL;
         A.userId = UInfo.id;
         A.id = MicroServiceCreateUUID();
-        A.created = OpenWifi::Now();
+        A.created = Utils::Now();
         A.expires = A.created + 24*60*60;
         A.userAction = true;
         StorageService()->ActionLinksDB().CreateAction(A);
@@ -730,7 +730,7 @@ namespace OpenWifi {
         A.action = OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL;
         A.userId = UInfo.id;
         A.id = MicroServiceCreateUUID();
-        A.created = OpenWifi::Now();
+        A.created = Utils::Now();
         A.expires = A.created + 24*60*60;
         A.userAction = false;
         StorageService()->ActionLinksDB().CreateAction(A);
@@ -750,7 +750,7 @@ namespace OpenWifi {
         if(StorageService()->UserTokenDB().GetToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
-            Expired = (WT.created_ + WT.expires_in_) < OpenWifi::Now();
+            Expired = (WT.created_ + WT.expires_in_) < Utils::Now();
             if(StorageService()->UserDB().GetUserById(UserId,UserInfo)) {
                 WebToken = WT;
                 return true;
@@ -769,7 +769,7 @@ namespace OpenWifi {
         if(StorageService()->SubTokenDB().GetToken(TToken, WT, UserId, RevocationDate)) {
             if(RevocationDate!=0)
                 return false;
-            Expired = (WT.created_ + WT.expires_in_) < OpenWifi::Now();
+            Expired = (WT.created_ + WT.expires_in_) < Utils::Now();
             if(StorageService()->SubDB().GetUserById(UserId,UserInfo)) {
                 WebToken = WT;
                 return true;
