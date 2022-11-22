@@ -45,7 +45,8 @@ ADD overlays /owsec/overlays
 ADD cmake /owsec/cmake
 ADD src /owsec/src
 ADD .git /owsec/.git
-RUN git clone https://github.com/microsoft/vcpkg && \
+ARG VCPKG_VERSION=2022.11.14
+RUN git clone --depth 1 --branch ${VCPKG_VERSION} https://github.com/microsoft/vcpkg && \
     ./vcpkg/bootstrap-vcpkg.sh && \
     mkdir /vcpkg/custom-triplets && \
     cp /vcpkg/triplets/x64-linux.cmake /vcpkg/custom-triplets/x64-linux.cmake && \
