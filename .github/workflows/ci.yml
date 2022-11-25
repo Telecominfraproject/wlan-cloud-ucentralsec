@@ -59,7 +59,7 @@ jobs:
       id: get_base_branch
       run: |
         echo "branch=$(echo ${GITHUB_BASE_REF##*/})" >> $GITHUB_OUTPUT
-        echo "owgw_branch::$(echo ${GITHUB_BASE_REF##*/} | sed 's/main/master/g')" >> $GITHUB_OUTPUT
+        echo "owgw_branch=$(echo ${GITHUB_BASE_REF##*/} | sed 's/main/master/g')" >> $GITHUB_OUTPUT
 
     - name: Checkout actions repo
       uses: actions/checkout@v3
