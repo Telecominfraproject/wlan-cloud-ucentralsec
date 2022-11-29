@@ -24,8 +24,6 @@ jobs:
 
       - name: Update OpenAPI docs
         run: |
-          mkdir tmp-docs
-          mv index.html tmp-docs/index.html
           mkdir -p ~/.ssh
           ssh-keyscan -H github.com >> ~/.ssh/known_hosts
           echo https://tip-automation:${{ secrets.GIT_PUSH_PAT }}@github.com > ~/.git-credentials
@@ -34,7 +32,7 @@ jobs:
           git config --global user.name "TIP Automation User"
           git pull
           git checkout gh-pages || git checkout -b gh-pages
-          mv tmp-docs docs
+          mv index.html docs/index.html
           git add docs
           git commit -m'Update OpenAPI docs for GitHub pages'
           git push --set-upstream origin gh-pages
