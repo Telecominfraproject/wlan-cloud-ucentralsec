@@ -32,53 +32,102 @@ namespace OpenWifi {
  */
         static inline bool Can( const SecurityObjects::UserInfo & User, const SecurityObjects::UserInfo & Target, ACL_OPS Op) {
 
-            // rule 0
-            if(User.id == Target.id && User.userRole == SecurityObjects::SUBSCRIBER && Op == DELETE)
-                return true;
+            switch(Op) {
+                case DELETE: {
+                    //  can a user delete themselves - yes - only if not root. We do not want a system to end up rootless
+                    if(User.id==Target.id) {
+                        return User.userRole != SecurityObjects::ROOT;
+                    }
+                    //  Root can delete anyone
+                    switch (User.userRole) {
+                        case SecurityObjects::ROOT:
+                            return true;
+                        case SecurityObjects::ADMIN:
+                            return Target.userRole!=SecurityObjects::ROOT && Target.userRole!=SecurityObjects::PARTNER;
+                        case SecurityObjects::SUBSCRIBER:
+                            return User.id==Target.id;
+                        case SecurityObjects::CSR:
+                            return false;
+                        case SecurityObjects::SYSTEM:
+                            return Target.userRole!=SecurityObjects::ROOT && Target.userRole!=SecurityObjects::PARTNER;
+                        case SecurityObjects::INSTALLER:
+                            return User.id==Target.id;
+                        case SecurityObjects::NOC:
+                            return Target.userRole==SecurityObjects::NOC;
+                        case SecurityObjects::ACCOUNTING:
+                            return Target.userRole==SecurityObjects::ACCOUNTING;
+                        case SecurityObjects::PARTNER:
+                            return Target.userRole!=SecurityObjects::ROOT;
+                        default:
+                            return false;
+                    }
+                }
+                break;
 
-            //  rule 1
-            if(User.id == Target.id && Op==DELETE)
-                return false;
+                case READ: {
+                    return  User.userRole == SecurityObjects::ROOT ||
+                            User.userRole == SecurityObjects::ADMIN ||
+                            User.userRole == SecurityObjects::PARTNER;
+                }
+                break;
 
-            //  rule 2
-            if(User.userRole==SecurityObjects::ROOT)
-                return true;
+                case CREATE: {
+                    switch(User.userRole) {
+                        case SecurityObjects::ROOT:
+                            return true;
+                        case SecurityObjects::ADMIN:
+                            return  Target.userRole!=SecurityObjects::ROOT &&
+                                    Target.userRole!=SecurityObjects::PARTNER;
+                        case SecurityObjects::SUBSCRIBER:
+                            return false;
+                        case SecurityObjects::CSR:
+                            return Target.userRole==SecurityObjects::CSR;
+                        case SecurityObjects::SYSTEM:
+                            return Target.userRole!=SecurityObjects::ROOT && Target.userRole!=SecurityObjects::PARTNER;
+                        case SecurityObjects::INSTALLER:
+                            return Target.userRole==SecurityObjects::INSTALLER;
+                        case SecurityObjects::NOC:
+                            return Target.userRole==SecurityObjects::NOC;
+                        case SecurityObjects::ACCOUNTING:
+                            return Target.userRole==SecurityObjects::ACCOUNTING;
+                        case SecurityObjects::PARTNER:
+                            return Target.userRole!=SecurityObjects::ROOT;
+                        default:
+                            return false;
+                    }
+                }
+                break;
 
-            //  rule 3
-            if(User.id == Target.id)
-                return true;
-
-            //  rule 4
-            if(Target.userRole==SecurityObjects::ROOT && Op!=READ)
-                return false;
-
-            if(Op==CREATE) {
-                if(User.userRole==SecurityObjects::ROOT)
-                    return true;
-                if(User.userRole==SecurityObjects::PARTNER && (Target.userRole==SecurityObjects::ADMIN ||
-                    Target.userRole==SecurityObjects::SUBSCRIBER ||
-                    Target.userRole==SecurityObjects::CSR ||
-                    Target.userRole==SecurityObjects::INSTALLER ||
-                    Target.userRole==SecurityObjects::NOC ||
-                    Target.userRole==SecurityObjects::ACCOUNTING))
-                    return true;
-                if(User.userRole==SecurityObjects::ADMIN &&
-                    (Target.userRole==SecurityObjects::ADMIN ||
-                    Target.userRole==SecurityObjects::SUBSCRIBER ||
-                    Target.userRole==SecurityObjects::CSR ||
-                    Target.userRole==SecurityObjects::INSTALLER ||
-                    Target.userRole==SecurityObjects::NOC ||
-                    Target.userRole==SecurityObjects::ACCOUNTING))
-                    return true;
-                if(User.userRole==SecurityObjects::ACCOUNTING &&
-                    (Target.userRole==SecurityObjects::SUBSCRIBER ||
-                    Target.userRole==SecurityObjects::INSTALLER ||
-                    Target.userRole==SecurityObjects::CSR))
-                    return true;
-                return false;
+                case MODIFY: {
+                    switch(User.userRole) {
+                        case SecurityObjects::ROOT:
+                            return true;
+                        case SecurityObjects::ADMIN:
+                            return  Target.userRole!=SecurityObjects::ROOT &&
+                                    Target.userRole!=SecurityObjects::PARTNER;
+                        case SecurityObjects::SUBSCRIBER:
+                            return  User.id==Target.id;
+                        case SecurityObjects::CSR:
+                            return  Target.userRole==SecurityObjects::CSR;
+                        case SecurityObjects::SYSTEM:
+                            return  Target.userRole!=SecurityObjects::ROOT &&
+                                    Target.userRole!=SecurityObjects::PARTNER;
+                        case SecurityObjects::INSTALLER:
+                            return  Target.userRole==SecurityObjects::INSTALLER;
+                        case SecurityObjects::NOC:
+                            return  Target.userRole==SecurityObjects::NOC;
+                        case SecurityObjects::ACCOUNTING:
+                            return  Target.userRole==SecurityObjects::ACCOUNTING;
+                        case SecurityObjects::PARTNER:
+                            return  Target.userRole!=SecurityObjects::ROOT;
+                        default:
+                            return false;
+                    }
+                }
+                    break;
+                default:
+                    return false;
             }
-
-            return true;
         }
     private:
 
