@@ -48,7 +48,7 @@ namespace OpenWifi {
 
     bool ApiKeyDB::RemoveAllApiKeys(const std::string & user_uuid) {
         SecurityObjects::ApiKeyEntryList    Keys;
-        if(StorageService()->ApiKeyDB().GetRecords(0,500,Keys.apiKeys,fmt::format(" userUuid='{} ", user_uuid))) {
+        if(StorageService()->ApiKeyDB().GetRecords(0,500,Keys.apiKeys,fmt::format(" userUuid='{}' ", user_uuid))) {
             for(const auto &key:Keys.apiKeys) {
                 AuthService()->RemoveTokenSystemWide(key.apiKey);
             }
