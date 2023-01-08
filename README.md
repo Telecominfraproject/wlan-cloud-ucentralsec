@@ -16,6 +16,10 @@ into your own systems. If all you need it to access the uCentralGW for example (
 The CLI for the [uCentralGW](https://github.com/telecominfraproject/wlan-cloud-ucentralgw/blob/main/test_scripts/curl/cli) has a very good example of this. 
 Look for the `setgateway` function.
 
+You may get static page with OpenAPI docs generated from the definition on [GitHub Page](https://telecominfraproject.github.io/wlan-cloud-ucentralsec/).
+
+Also you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentralsec/main/openpapi/owsec.yaml)) to get interactive docs page.
+
 ## Firewall Considerations
 The entire uCentral systems uses several MicroServices. In order for the whole system to work, you should provide the following port
 access:
