@@ -233,6 +233,14 @@ namespace OpenWifi::RESTAPI::Errors {
 	static const struct msg InvalidScriptSelection{1153,"Only script or scriptId must be specified. Not both."};
 
 	static const struct msg NoDeviceStatisticsYet{1154,"Device statistics not available yet."};
+    static const struct msg AccountSuspended{1155,"You account was suspended. You can only use this site in read-only mode for now."};
+    static const struct msg BatchNameAlreadyExists{1156,"Batch name must be unique."};
+    static const struct msg RedirectorNameIsInvalid{1157,"Redirector name is invalid."};
+    static const struct msg CertificateAlreadyBelongsToYou{1158,"The serial number already belongs to you. Please use the certificate modification API to change the redirector."};
+    static const struct msg RelocationDisabledForThisDevice{1159,"Relocation disabled for this device."};
+    static const struct msg CannotModifyServerCertificates{1160,"Server certificates cannot be modified."};
+
+
 	}
 
 

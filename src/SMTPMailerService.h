@@ -105,7 +105,8 @@ namespace OpenWifi {
             std::atomic_bool        Running_=false;
             bool                    Enabled_=false;
             bool                    UseHTML_=false;
-            std::string             EmailLogo_{"logo.png"};
+            std::string             LogoFilename;
+            std::string             SubLogoFilename;
 
             SMTPMailerService() noexcept:
                 SubSystemServer("SMTPMailer", "MAILER-SVR", "smtpmailer")

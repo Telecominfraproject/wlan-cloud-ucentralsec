@@ -35,7 +35,8 @@ namespace OpenWifi {
             MailAbandon_ = MicroServiceConfigGetInt("mailer.abandon",2*60*60);
             UseHTML_ = MicroServiceConfigGetBool("mailer.html",false);
             Enabled_ = (!MailHost_.empty() && !SenderLoginPassword_.empty() && !SenderLoginUserName_.empty());
-            EmailLogo_ = TemplateDir_ + "/" + MicroServiceConfigGetString("mailer.logo","logo.png");
+            LogoFilename = AuthService()->GetLogoAssetURI();
+            SubLogoFilename = AuthService()->GetSubLogoAssetURI();
         }
     }
 
@@ -76,7 +77,6 @@ namespace OpenWifi {
             Poco::Thread::trySleep(10000);
             if(!Running_)
                 break;
-
             {
                 std::lock_guard G(Mutex_);
                 Messages_.splice(Messages_.end(),PendingMessages_);
@@ -139,6 +139,7 @@ namespace OpenWifi {
             Message->setSender( TheSender );
             Message->addRecipient(Poco::Net::MailRecipient(Poco::Net::MailRecipient::PRIMARY_RECIPIENT, Recipient));
             Message->setSubject(Msg.Attrs.find(SUBJECT)->second);
+            Message->setContentType("multipart/alternative");
 
             poco_information(Logger(),fmt::format("Sending message to:{} from {}",Recipient,TheSender));
 
@@ -146,7 +147,7 @@ namespace OpenWifi {
                 std::string Content = Msg.Attrs.find(TEXT)->second;
                 Message->addContent(new Poco::Net::StringPartSource(Content));
             } else {
-                for(const auto &format:{"html","txt"}) {
+                for(const auto &format:{"txt","html"}) {
                     std::string Content = Utils::LoadFile(TemplateDir_ + Msg.TemplateName + "." + format );
                     Types::StringPairVec Variables;
                     FillVariables(Msg.Attrs, Variables);
@@ -156,8 +157,10 @@ namespace OpenWifi {
                 }
             }
 
+            /*
             auto Logo = Msg.Attrs.find(LOGO);
             if(Logo!=Msg.Attrs.end()) {
+                std::cout << "... >" << Logo->second << std::endl;
                 try {
                     Poco::File          LogoFile( Msg.Subscriber ? AuthService::GetSubLogoAssetFileName() :  AuthService::GetLogoAssetFileName ());
                     std::ifstream       IF(LogoFile.path());
@@ -168,6 +171,7 @@ namespace OpenWifi {
                     poco_warning(Logger(),fmt::format("Cannot add '{}' logo in email",AuthService::GetLogoAssetFileName()));
                 }
             }
+            */
 
             Poco::SharedPtr<Poco::Net::AcceptCertificateHandler>  ptrHandler_ = new Poco::Net::AcceptCertificateHandler(false);
 
@@ -186,6 +190,10 @@ namespace OpenWifi {
                           SenderLoginUserName_,
                           SenderLoginPassword_
             );
+/*            std::ofstream of(MicroServiceDataDirectory()+"/message.txt",std::ios_base::out|std::ios_base::trunc);
+            Message->write(of);
+            of.close();
+*/
             session.sendMessage(*Message);
             session.close();
             return MessageSendStatus::msg_sent;
