@@ -77,7 +77,7 @@ namespace OpenWifi{
         [[nodiscard]] std::string GenerateTokenJWT(const std::string & UserName, ACCESS_TYPE Type);
         [[nodiscard]] std::string GenerateTokenHMAC(const std::string & UserName, ACCESS_TYPE Type);
 
-        [[nodiscard]] bool IsValidApiKey(const std::string &ApiKey, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired, std::uint64_t & expiresOn);
+        [[nodiscard]] bool IsValidApiKey(const std::string &ApiKey, SecurityObjects::WebToken &WebToken, SecurityObjects::UserInfo &UserInfo, bool & Expired, std::uint64_t & expiresOn, bool & Suspended);
         [[nodiscard]] std::string ComputeNewPasswordHash(const std::string &UserName, const std::string &Password);
         [[nodiscard]] bool ValidatePasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword);
         [[nodiscard]] bool ValidateSubPasswordHash(const std::string & UserName, const std::string & Password, const std::string &StoredPassword);
@@ -91,8 +91,8 @@ namespace OpenWifi{
         [[nodiscard]] static bool VerifyEmail(SecurityObjects::UserInfo &UInfo);
         [[nodiscard]] static bool VerifySubEmail(SecurityObjects::UserInfo &UInfo);
 
-        [[nodiscard]] static bool SendEmailToUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason);
-        [[nodiscard]] static bool SendEmailToSubUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason, const std::string &OperatorName);
+        [[nodiscard]] bool SendEmailToUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason);
+        [[nodiscard]] bool SendEmailToSubUser(const std::string &LinkId, std::string &Email, MessagingTemplates::EMAIL_REASON Reason, const std::string &OperatorName);
         [[nodiscard]] bool RequiresMFA(const SecurityObjects::UserInfoAndPolicy &UInfo);
 
         [[nodiscard]] bool SendEmailChallengeCode(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &code);
@@ -127,6 +127,17 @@ namespace OpenWifi{
         bool RefreshUserToken(Poco::Net::HTTPServerRequest & Request, const std::string & RefreshToken, SecurityObjects::UserInfoAndPolicy & UI);
         bool RefreshSubToken(Poco::Net::HTTPServerRequest & Request, const std::string & RefreshToken, SecurityObjects::UserInfoAndPolicy & UI);
 
+        [[nodiscard]] inline auto HelperEmail() const { return HelperEmail_; };
+        [[nodiscard]] inline auto SubHelperEmail() const { return SubHelperEmail_; };
+        [[nodiscard]] inline auto GlobalHelperEmail() const { return GlobalHelperEmail_; };
+        [[nodiscard]] inline auto GlobalSubHelperEmail() const { return GlobalSubHelperEmail_; };
+        [[nodiscard]] inline auto HelperSite() const { return HelperSite_; };
+        [[nodiscard]] inline auto SubHelperSite() const { return SubHelperSite_;};
+        [[nodiscard]] inline auto SystemLoginSite() const { return SystemLoginSite_;};
+        [[nodiscard]] inline auto SubSystemLoginSite() const { return SubSystemLoginSite_; };
+        [[nodiscard]] inline auto UserSignature() const { return UserSignature_;};
+        [[nodiscard]] inline auto SubSignature() const { return SubSignature_; };
+
     private:
 		Poco::SHA2Engine	SHA2_;
 
@@ -142,6 +153,17 @@ namespace OpenWifi{
         uint64_t            TokenAging_ = 15 * 24 * 60 * 60;
         uint64_t            HowManyOldPassword_=5;
         uint64_t            RefreshTokenLifeSpan_ = 90 * 24 * 60 * 60 ;
+
+        std::string         HelperEmail_;
+        std::string         SubHelperEmail_;
+        std::string         GlobalHelperEmail_;
+        std::string         GlobalSubHelperEmail_;
+        std::string         HelperSite_;
+        std::string         SubHelperSite_;
+        std::string         SystemLoginSite_;
+        std::string         SubSystemLoginSite_;
+        std::string         UserSignature_;
+        std::string         SubSignature_;
 
         class SHA256Engine : public Poco::Crypto::DigestEngine
                 {

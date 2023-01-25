@@ -133,32 +133,33 @@ namespace OpenWifi {
         SecurityObjects::UserInfoAndPolicy UInfo;
         bool Expired=false;
         auto Code=AuthService()->AuthorizeSub(userId, password, newPassword, UInfo, Expired);
-        if (Code==SUCCESS) {
-            Poco::JSON::Object ReturnObj;
-            if(AuthService()->RequiresMFA(UInfo)) {
-                if(MFAServer()->StartMFAChallenge(UInfo, ReturnObj)) {
-                    return ReturnObject(ReturnObj);
+        switch(Code) {
+            case SUCCESS:
+            {
+                Poco::JSON::Object ReturnObj;
+                if(AuthService()->RequiresMFA(UInfo)) {
+                    if(MFAServer()->StartMFAChallenge(UInfo, ReturnObj)) {
+                        return ReturnObject(ReturnObj);
+                    }
+                    Logger_.warning("MFA Seems to be broken. Please fix. Disabling MFA checking for now.");
                 }
-                Logger_.warning("MFA Seems to be broken. Please fix. Disabling MFA checking for now.");
+                UInfo.webtoken.to_json(ReturnObj);
+                return ReturnObject(ReturnObj);
             }
-            UInfo.webtoken.to_json(ReturnObj);
-            return ReturnObject(ReturnObj);
-        } else {
-            switch(Code) {
-                case INVALID_CREDENTIALS:
-                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
-                case PASSWORD_INVALID:
-                    return UnAuthorized(RESTAPI::Errors::PASSWORD_INVALID);
-                case PASSWORD_ALREADY_USED:
-                    return UnAuthorized(RESTAPI::Errors::PASSWORD_ALREADY_USED);
-                case USERNAME_PENDING_VERIFICATION:
-                    return UnAuthorized(RESTAPI::Errors::USERNAME_PENDING_VERIFICATION);
-                case PASSWORD_CHANGE_REQUIRED:
-                    return UnAuthorized(RESTAPI::Errors::PASSWORD_CHANGE_REQUIRED);
-                default:
-                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS); break;
-            }
-            return;
+            case INVALID_CREDENTIALS:
+                return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
+            case PASSWORD_INVALID:
+                return UnAuthorized(RESTAPI::Errors::PASSWORD_INVALID);
+            case PASSWORD_ALREADY_USED:
+                return UnAuthorized(RESTAPI::Errors::PASSWORD_ALREADY_USED);
+            case USERNAME_PENDING_VERIFICATION:
+                return UnAuthorized(RESTAPI::Errors::USERNAME_PENDING_VERIFICATION);
+            case PASSWORD_CHANGE_REQUIRED:
+                return UnAuthorized(RESTAPI::Errors::PASSWORD_CHANGE_REQUIRED);
+            case ACCOUNT_SUSPENDED:
+                return UnAuthorized(RESTAPI::Errors::ACCOUNT_SUSPENDED);
+            default:
+                return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
         }
     }
 }

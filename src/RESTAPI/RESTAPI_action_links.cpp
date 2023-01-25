@@ -14,10 +14,20 @@
 
 namespace OpenWifi {
 
+#if defined(TIP_CERT_SERVICE)
+    bool ProcessExternalActionLinks(RESTAPIHandler &handler,const std::string &Id, const std::string &Action);
+#endif
+
     void RESTAPI_action_links::DoGet() {
 
         auto Action = GetParameter("action","");
         auto Id = GetParameter("id","");
+
+#if defined(TIP_CERT_SERVICE)
+        if(!OpenWifi::ProcessExternalActionLinks(*this,Id,Action)) {
+            return;
+        }
+#endif
 
         SecurityObjects::ActionLink Link;
         if(!StorageService()->ActionLinksDB().GetActionLink(Id,Link))
@@ -52,11 +62,25 @@ namespace OpenWifi {
             return DoReturnA404();
     }
 
+    void RESTAPI_action_links::AddGlobalVars(Types::StringPairVec & Vars) {
+        Vars.push_back(std::make_pair("USER_HELPER_EMAIL",AuthService()->HelperEmail()));
+        Vars.push_back(std::make_pair("SUB_HELPER_EMAIL",AuthService()->SubHelperEmail()));
+        Vars.push_back(std::make_pair("GLOBAL_USER_HELPER_EMAIL",AuthService()->GlobalHelperEmail()));
+        Vars.push_back(std::make_pair("GLOBAL_SUB_HELPER_EMAIL",AuthService()->GlobalSubHelperEmail()));
+        Vars.push_back(std::make_pair("USER_HELPER_SITE",AuthService()->HelperSite()));
+        Vars.push_back(std::make_pair("SUB_HELPER_SITE",AuthService()->SubHelperSite()));
+        Vars.push_back(std::make_pair("USER_SYSTEM_LOGIN",AuthService()->SystemLoginSite()));
+        Vars.push_back(std::make_pair("SUB_SYSTEM_LOGIN",AuthService()->SubSystemLoginSite()));
+        Vars.push_back(std::make_pair("USER_SIGNATURE",AuthService()->UserSignature()));
+        Vars.push_back(std::make_pair("SUB_SIGNATURE",AuthService()->SubSignature()));
+    }
+
     void RESTAPI_action_links::RequestResetPassword(SecurityObjects::ActionLink &Link) {
         Logger_.information(fmt::format("REQUEST-PASSWORD-RESET({}): For ID={}", Request->clientAddress().toString(), Link.userId));
         Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset.html"};
         Types::StringPairVec    FormVars{ {"UUID", Link.id},
                                           {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
+        AddGlobalVars(FormVars);
         SendHTMLFileBack(FormFile,FormVars);
     }
 
@@ -65,6 +89,7 @@ namespace OpenWifi {
         Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification.html"};
         Types::StringPairVec    FormVars{ {"UUID", Link.id},
                                           {"PASSWORD_VALIDATION", AuthService()->PasswordValidationExpression()}};
+        AddGlobalVars(FormVars);
         SendHTMLFileBack(FormFile,FormVars);
     }
 
@@ -95,6 +120,7 @@ namespace OpenWifi {
                                                                  " accepted password creation restrictions. Please consult our on-line help"
                                                                  " to look at the our password policy. If you would like to contact us, please mention"
                                                                  " id(" + Id + ")"}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -105,6 +131,7 @@ namespace OpenWifi {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -112,6 +139,7 @@ namespace OpenWifi {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "Please contact our system administrators. We have identified an error in your account that must be resolved first."}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -120,6 +148,7 @@ namespace OpenWifi {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/password_reset_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -133,6 +162,7 @@ namespace OpenWifi {
             Types::StringPairVec    FormVars{ {"UUID", Id},
                                               {"USERNAME", UInfo.email},
                                               {"ACTION_LINK",MicroService::instance().GetUIURI()}};
+            AddGlobalVars(FormVars);
             StorageService()->ActionLinksDB().CompleteAction(Id);
             SendHTMLFileBack(FormFile,FormVars);
         } else {
@@ -167,6 +197,7 @@ namespace OpenWifi {
                                                                  " accepted password creation restrictions. Please consult our on-line help"
                                                                  " to look at the our password policy. If you would like to contact us, please mention"
                                                                  " id(" + Id + ")"}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -176,6 +207,7 @@ namespace OpenWifi {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "This request does not contain a valid user ID. Please contact your system administrator."}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -183,6 +215,7 @@ namespace OpenWifi {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "Please contact our system administrators. We have identified an error in your account that must be resolved first."}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -191,6 +224,7 @@ namespace OpenWifi {
                 Poco::File  FormFile{ Daemon()->AssetDir() + "/sub_signup_verification_error.html"};
                 Types::StringPairVec    FormVars{ {"UUID", Id},
                                                   {"ERROR_TEXT", "You cannot reuse one of your recent passwords."}};
+                AddGlobalVars(FormVars);
                 return SendHTMLFileBack(FormFile,FormVars);
             }
 
@@ -225,6 +259,7 @@ namespace OpenWifi {
                 Response->stringify(ooo);
             Logger().information(fmt::format("({}): Completed subscriber e-mail verification. Provisioning notified, Error={}.",
                                              UInfo.email, Status));
+            AddGlobalVars(FormVars);
             SendHTMLFileBack(FormFile,FormVars);
             Logger().information(fmt::format("({}): Completed subscriber e-mail verification. FORM notified.",UInfo.email));
         } else {
@@ -246,6 +281,7 @@ namespace OpenWifi {
             Types::StringPairVec FormVars{{"UUID",       Link.id},
                                           {"ERROR_TEXT", "This does not appear to be a valid email verification link.."}};
             Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_error.html"};
+            AddGlobalVars(FormVars);
             return SendHTMLFileBack(FormFile, FormVars);
         }
 
@@ -264,6 +300,7 @@ namespace OpenWifi {
                                       {"USERNAME", UInfo.email},
                                       {"ACTION_LINK",MicroService::instance().GetUIURI()}};
         Poco::File FormFile{Daemon()->AssetDir() + "/email_verification_success.html"};
+        AddGlobalVars(FormVars);
         StorageService()->ActionLinksDB().CompleteAction(Link.id);
         SendHTMLFileBack(FormFile, FormVars);
     }
@@ -271,6 +308,7 @@ namespace OpenWifi {
     void RESTAPI_action_links::DoReturnA404() {
         Types::StringPairVec FormVars;
         Poco::File FormFile{Daemon()->AssetDir() + "/404_error.html"};
+        AddGlobalVars(FormVars);
         SendHTMLFileBack(FormFile, FormVars);
     }
 

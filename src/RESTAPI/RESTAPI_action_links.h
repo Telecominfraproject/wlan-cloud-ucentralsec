@@ -30,6 +30,7 @@ namespace OpenWifi {
         void DoReturnA404();
         void DoNewSubVerification(SecurityObjects::ActionLink &Link);
         void CompleteEmailInvitation();
+        static void AddGlobalVars(Types::StringPairVec & Vars);
 
         void DoGet() final;
         void DoPost() final;

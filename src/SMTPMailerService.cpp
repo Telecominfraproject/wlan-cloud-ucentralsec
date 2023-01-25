@@ -40,6 +40,22 @@ namespace OpenWifi {
         }
     }
 
+    void SMTPMailerService::AddUserVars(MessageAttributes & Attrs) {
+        Attrs[USER_HELPER_EMAIL] = AuthService()->HelperEmail();
+        Attrs[USER_SYSTEM_LOGIN] = AuthService()->SystemLoginSite();
+        Attrs[USER_HELPER_SITE] = AuthService()->HelperSite();
+        Attrs[GLOBAL_USER_HELPER_EMAIL] = AuthService()->GlobalHelperEmail();
+        Attrs[USER_SIGNATURE] = AuthService()->UserSignature();
+    }
+
+    void SMTPMailerService::AddSubVars(MessageAttributes & Attrs) {
+        Attrs[SUB_HELPER_EMAIL] = AuthService()->SubHelperEmail();
+        Attrs[SUB_SYSTEM_LOGIN] = AuthService()->SubSystemLoginSite();
+        Attrs[SUB_HELPER_SITE] = AuthService()->SubHelperSite();
+        Attrs[GLOBAL_SUB_HELPER_EMAIL] = AuthService()->GlobalSubHelperEmail();
+        Attrs[SUB_SIGNATURE] = AuthService()->SubSignature();
+    }
+
     int SMTPMailerService::Start() {
         LoadMyConfig();
         SenderThr_.start(*this);

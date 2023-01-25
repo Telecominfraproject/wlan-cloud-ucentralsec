@@ -12,10 +12,9 @@
 #include "RESTAPI_oauth2_handler.h"
 #include "MFAServer.h"
 #include "framework/ow_constants.h"
+#include "framework/MicroService.h"
 #include "StorageService.h"
 #include "RESTAPI_db_helpers.h"
-
-#include "framework/MicroServiceFuncs.h"
 
 namespace OpenWifi {
 
@@ -100,7 +99,7 @@ namespace OpenWifi {
                 SecurityObjects::ActionLink NewLink;
 
                 NewLink.action = OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD;
-                NewLink.id = MicroServiceCreateUUID();
+                NewLink.id = MicroService::CreateUUID();
                 NewLink.userId = UInfo1.id;
                 NewLink.created = OpenWifi::Now();
                 NewLink.expires = NewLink.created + (24*60*60);
@@ -147,33 +146,33 @@ namespace OpenWifi {
         SecurityObjects::UserInfoAndPolicy UInfo;
         bool Expired=false;
         auto Code=AuthService()->Authorize(userId, password, newPassword, UInfo, Expired);
-        if (Code==SUCCESS) {
-            Poco::JSON::Object ReturnObj;
-            if(AuthService()->RequiresMFA(UInfo)) {
-                if(MFAServer()->StartMFAChallenge(UInfo, ReturnObj)) {
+        switch(Code) {
+            case SUCCESS:
+                {
+                    Poco::JSON::Object ReturnObj;
+                    if(AuthService()->RequiresMFA(UInfo)) {
+                        if(MFAServer()->StartMFAChallenge(UInfo, ReturnObj)) {
+                            return ReturnObject(ReturnObj);
+                        }
+                        Logger_.warning("MFA Seems to be broken. Please fix. Disabling MFA checking for now.");
+                    }
+                    UInfo.webtoken.to_json(ReturnObj);
                     return ReturnObject(ReturnObj);
                 }
-                Logger_.warning("MFA Seems to be broken. Please fix. Disabling MFA checking for now.");
-            }
-            UInfo.webtoken.to_json(ReturnObj);
-            return ReturnObject(ReturnObj);
-        } else {
-
-            switch(Code) {
-                case INVALID_CREDENTIALS:
-                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
-                case PASSWORD_INVALID:
-                    return UnAuthorized(RESTAPI::Errors::PASSWORD_INVALID);
-                case PASSWORD_ALREADY_USED:
-                    return UnAuthorized(RESTAPI::Errors::PASSWORD_ALREADY_USED);
-                case USERNAME_PENDING_VERIFICATION:
-                    return UnAuthorized(RESTAPI::Errors::USERNAME_PENDING_VERIFICATION);
-                case PASSWORD_CHANGE_REQUIRED:
-                    return UnAuthorized(RESTAPI::Errors::PASSWORD_CHANGE_REQUIRED);
-                default:
-                    return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
-            }
-            return;
+            case INVALID_CREDENTIALS:
+                return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
+            case PASSWORD_INVALID:
+                return UnAuthorized(RESTAPI::Errors::PASSWORD_INVALID);
+            case PASSWORD_ALREADY_USED:
+                return UnAuthorized(RESTAPI::Errors::PASSWORD_ALREADY_USED);
+            case USERNAME_PENDING_VERIFICATION:
+                return UnAuthorized(RESTAPI::Errors::USERNAME_PENDING_VERIFICATION);
+            case PASSWORD_CHANGE_REQUIRED:
+                return UnAuthorized(RESTAPI::Errors::PASSWORD_CHANGE_REQUIRED);
+            case ACCOUNT_SUSPENDED:
+                return UnAuthorized(RESTAPI::Errors::ACCOUNT_SUSPENDED);
+            default:
+                return UnAuthorized(RESTAPI::Errors::INVALID_CREDENTIALS);
         }
 	}
 }

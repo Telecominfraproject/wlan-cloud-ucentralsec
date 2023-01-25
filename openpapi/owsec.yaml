@@ -71,7 +71,8 @@ components:
                   - 11    # BAD_MFA_TRANSACTION
                   - 12    # MFA_FAILURE
                   - 13    # SECURITY_SERVICE_UNREACHABLE
-                  - 14    # CANNOT REFRESH TOKEN
+                  - 14    # CANNOT_REFRESH_TOKEN
+                  - 15    # ACCOUNT_SUSPENDED
               ErrorDetails:
                 type: string
               ErrorDescription:

@@ -65,6 +65,21 @@ namespace OpenWifi {
         SubAccessPolicy_ = MicroServiceConfigGetString("subscriber.policy.access", "/wwwassets/access_policy.html");
         SubPasswordPolicy_ = MicroServiceConfigGetString("subscriber.policy.password", "/wwwassets/password_policy.html");
 
+        HelperEmail_ = MicroServiceConfigGetString("helper.user.email", "openwifi@telecominfraproject.com");
+        SubHelperEmail_ = MicroServiceConfigGetString("helper.sub.email", "openwifi@telecominfraproject.com");
+
+        GlobalHelperEmail_ = MicroServiceConfigGetString("helper.user.global.email", "openwifi@telecominfraproject.com");
+        GlobalSubHelperEmail_ = MicroServiceConfigGetString("helper.sub.global.email", "openwifi@telecominfraproject.com");
+
+        HelperSite_ = MicroServiceConfigGetString("helper.user.site", "telecominfraproject.com");
+        SubHelperSite_ = MicroServiceConfigGetString("helper.sub.site", "telecominfraproject.com");
+
+        SystemLoginSite_ = MicroServiceConfigGetString("helper.user.login", "telecominfraproject.com");
+        SubSystemLoginSite_ = MicroServiceConfigGetString("helper.sub.login", "telecominfraproject.com");
+
+        UserSignature_ = MicroServiceConfigGetString("helper.user.signature", "Telecom Infra Project");
+        SubSignature_ = MicroServiceConfigGetString("helper.sub.signature", "Telecom Infra Project");
+
         return 0;
     }
 
@@ -508,6 +523,11 @@ namespace OpenWifi {
         Poco::toLowerInPlace(UserName);
 
         if(StorageService()->UserDB().GetUserByEmail(UserName,UInfo.userinfo)) {
+
+            if(UInfo.userinfo.suspended) {
+                return ACCOUNT_SUSPENDED;
+            }
+
             if(UInfo.userinfo.waitingForEmailCheck) {
                 return USERNAME_PENDING_VERIFICATION;
             }
@@ -553,6 +573,11 @@ namespace OpenWifi {
         Poco::toLowerInPlace(UserName);
 
         if(StorageService()->SubDB().GetUserByEmail(UserName,UInfo.userinfo)) {
+
+            if(UInfo.userinfo.suspended) {
+                return ACCOUNT_SUSPENDED;
+            }
+
             if(UInfo.userinfo.waitingForEmailCheck) {
                 return USERNAME_PENDING_VERIFICATION;
             }
@@ -594,19 +619,33 @@ namespace OpenWifi {
 
     bool AuthService::SendEmailChallengeCode(const SecurityObjects::UserInfoAndPolicy &UInfo, const std::string &Challenge) {
         auto OperatorParts = Poco::StringTokenizer(UInfo.userinfo.signingUp,":");
+
+        bool IsSub = UInfo.userinfo.userRole==SecurityObjects::SUBSCRIBER;
+
         if(UInfo.userinfo.signingUp.empty() || OperatorParts.count()!=2) {
             MessageAttributes Attrs;
             Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
             Attrs[LOGO] = AuthService::GetLogoAssetURI();
             Attrs[SUBJECT] = "Login validation code";
             Attrs[CHALLENGE_CODE] = Challenge;
-            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::VERIFICATION_CODE), Attrs, false);
+            if(!IsSub) {
+                SMTPMailerService()->AddUserVars(Attrs);
+            } else {
+                SMTPMailerService()->AddSubVars(Attrs);
+            }
+            return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(
+                    MessagingTemplates::VERIFICATION_CODE), Attrs, false);
         } else {
             MessageAttributes Attrs;
             Attrs[RECIPIENT_EMAIL] = UInfo.userinfo.email;
             Attrs[LOGO] = AuthService::GetSubLogoAssetURI();
             Attrs[SUBJECT] = "Login validation code";
             Attrs[CHALLENGE_CODE] = Challenge;
+            if(!IsSub) {
+                SMTPMailerService()->AddUserVars(Attrs);
+            } else {
+                SMTPMailerService()->AddSubVars(Attrs);
+            }
             return SMTPMailerService()->SendMessage(UInfo.userinfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_VERIFICATION_CODE,OperatorParts[0]), Attrs, true );
         }
     }
@@ -624,6 +663,7 @@ namespace OpenWifi {
                         Attrs[SUBJECT] = "Password reset link";
                         Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=password_reset&id=" + LinkId ;
                         Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=password_reset&id=" + LinkId ;
+                        SMTPMailerService()->AddUserVars(Attrs);
                         SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::FORGOT_PASSWORD), Attrs, false);
                     }
                     break;
@@ -635,20 +675,22 @@ namespace OpenWifi {
                         Attrs[SUBJECT] = "e-mail Address Verification";
                         Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=email_verification&id=" + LinkId ;
                         Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_verification&id=" + LinkId ;
+                        SMTPMailerService()->AddUserVars(Attrs);
                         SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_VERIFICATION), Attrs, false);
                         UInfo.waitingForEmailCheck = true;
                     }
                     break;
 
                 case MessagingTemplates::EMAIL_INVITATION: {
-                    MessageAttributes Attrs;
-                    Attrs[RECIPIENT_EMAIL] = UInfo.email;
-                    Attrs[LOGO] = GetLogoAssetURI();
-                    Attrs[SUBJECT] = "e-mail Invitation";
-                    Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=email_invitation&id=" + LinkId ;
-                    Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_invitation&id=" + LinkId ;
-                    SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_INVITATION), Attrs, false);
-                    UInfo.waitingForEmailCheck = true;
+                        MessageAttributes Attrs;
+                        Attrs[RECIPIENT_EMAIL] = UInfo.email;
+                        Attrs[LOGO] = GetLogoAssetURI();
+                        Attrs[SUBJECT] = "e-mail Invitation";
+                        Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=email_invitation&id=" + LinkId ;
+                        Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=email_invitation&id=" + LinkId ;
+                        SMTPMailerService()->AddUserVars(Attrs);
+                        SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::EMAIL_INVITATION), Attrs, false);
+                        UInfo.waitingForEmailCheck = true;
                     }
                     break;
 
@@ -673,6 +715,7 @@ namespace OpenWifi {
                     Attrs[SUBJECT] = "Password reset link";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_password_reset&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_password_reset&id=" + LinkId ;
+                    SMTPMailerService()->AddSubVars(Attrs);
                     SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_FORGOT_PASSWORD, OperatorName), Attrs, true);
                 }
                 break;
@@ -684,6 +727,7 @@ namespace OpenWifi {
                     Attrs[SUBJECT] = "e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=sub_email_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=sub_email_verification&id=" + LinkId ;
+                    SMTPMailerService()->AddSubVars(Attrs);
                     SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_EMAIL_VERIFICATION, OperatorName), Attrs, true);
                     UInfo.waitingForEmailCheck = true;
                 }
@@ -696,6 +740,7 @@ namespace OpenWifi {
                     Attrs[SUBJECT] = "Signup e-mail Address Verification";
                     Attrs[ACTION_LINK] = MicroServiceGetPublicAPIEndPoint() + "/actionLink?action=signup_verification&id=" + LinkId ;
                     Attrs[ACTION_LINK_HTML] = "/api/v1/actionLink?action=signup_verification&id=" + LinkId ;
+                    SMTPMailerService()->AddSubVars(Attrs);
                     SMTPMailerService()->SendMessage(UInfo.email, MessagingTemplates::TemplateName(MessagingTemplates::SUB_SIGNUP_VERIFICATION, OperatorName), Attrs, true);
                     UInfo.waitingForEmailCheck = true;
                 }
@@ -779,10 +824,12 @@ namespace OpenWifi {
     }
 
     bool AuthService::IsValidApiKey(const std::string &ApiKey, SecurityObjects::WebToken &WebToken,
-                                    SecurityObjects::UserInfo &UserInfo, bool &Expired, std::uint64_t &expiresOn) {
+                                    SecurityObjects::UserInfo &UserInfo, bool &Expired, std::uint64_t &expiresOn,
+                                    bool & Suspended) {
 
         std::lock_guard G(Mutex_);
 
+        Suspended = false;
         std::string UserId;
         SecurityObjects::WebToken   WT;
         SecurityObjects::ApiKeyEntry    ApiKeyEntry;
@@ -792,6 +839,10 @@ namespace OpenWifi {
             if(Expired)
                 return false;
             if(StorageService()->UserDB().GetUserById(ApiKeyEntry.userUuid,UserInfo)) {
+                if(UserInfo.suspended) {
+                    Suspended=true;
+                    return false;
+                }
                 WebToken = WT;
                 ApiKeyEntry.lastUse = Utils::Now();
                 StorageService()->ApiKeyDB().UpdateRecord("id", ApiKeyEntry.id, ApiKeyEntry);

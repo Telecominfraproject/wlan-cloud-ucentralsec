@@ -24,7 +24,14 @@ namespace OpenWifi {
             VERIFICATION_CODE,
             SUB_FORGOT_PASSWORD,
             SUB_EMAIL_VERIFICATION,
-            SUB_VERIFICATION_CODE
+            SUB_VERIFICATION_CODE,
+            CERTIFICATE_TRANSFER_NOTIFICATION,
+            CERTIFICATE_TRANSFER_AUTHORIZATION,
+            CERTIFICATE_DISPUTE_SUCCESS,
+            CERTIFICATE_DISPUTE_REJECTED,
+            CERTIFICATE_TRANSFER_CANCELED,
+            CERTIFICATE_TRANSFER_ACCEPTED,
+            CERTIFICATE_TRANSFER_REJECTED
         };
 
         static std::string AddOperator(const std::string & filename, const std::string &OperatorName) {
@@ -43,6 +50,13 @@ namespace OpenWifi {
                 case SUB_FORGOT_PASSWORD: return AddOperator(EmailTemplateNames[SUB_FORGOT_PASSWORD],OperatorName);
                 case SUB_EMAIL_VERIFICATION: return AddOperator(EmailTemplateNames[SUB_EMAIL_VERIFICATION],OperatorName);
                 case SUB_VERIFICATION_CODE: return AddOperator(EmailTemplateNames[SUB_VERIFICATION_CODE],OperatorName);
+                case CERTIFICATE_TRANSFER_NOTIFICATION: return AddOperator(EmailTemplateNames[CERTIFICATE_TRANSFER_NOTIFICATION],OperatorName);
+                case CERTIFICATE_TRANSFER_AUTHORIZATION: return AddOperator(EmailTemplateNames[CERTIFICATE_TRANSFER_AUTHORIZATION],OperatorName);
+                case CERTIFICATE_DISPUTE_SUCCESS: return AddOperator(EmailTemplateNames[CERTIFICATE_DISPUTE_SUCCESS],OperatorName);
+                case CERTIFICATE_DISPUTE_REJECTED: return AddOperator(EmailTemplateNames[CERTIFICATE_DISPUTE_REJECTED],OperatorName);
+                case CERTIFICATE_TRANSFER_CANCELED: return AddOperator(EmailTemplateNames[CERTIFICATE_TRANSFER_CANCELED],OperatorName);
+                case CERTIFICATE_TRANSFER_ACCEPTED: return AddOperator(EmailTemplateNames[CERTIFICATE_TRANSFER_ACCEPTED],OperatorName);
+                case CERTIFICATE_TRANSFER_REJECTED: return AddOperator(EmailTemplateNames[CERTIFICATE_TRANSFER_REJECTED],OperatorName);
                 default:
                     return "";
             }
@@ -65,7 +79,14 @@ namespace OpenWifi {
                 "verification_code",
                 "sub_password_reset",
                 "sub_email_verification",
-                "sub_verification_code"
+                "sub_verification_code",
+                "certificate_transfer_notification",
+                "certificate_transfer_authorization",
+                "certificate_dispute_success",
+                "certificate_dispute_rejected",
+                "certificate_transfer_canceled",
+                "certificate_transfer_accepted",
+                "certificate_transfer_rejected"
         };
     };
 
