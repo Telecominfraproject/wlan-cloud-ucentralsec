@@ -175,7 +175,7 @@ add_executable( owsec
         src/TotpCache.h
         src/RESTAPI/RESTAPI_subtotp_handler.cpp src/RESTAPI/RESTAPI_subtotp_handler.h
         src/RESTAPI/RESTAPI_signup_handler.cpp src/RESTAPI/RESTAPI_signup_handler.h
-        src/MessagingTemplates.h src/RESTAPI/RESTAPI_apiKey_handler.cpp src/RESTAPI/RESTAPI_apiKey_handler.h src/storage/orm_apikeys.cpp src/storage/orm_apikeys.h src/RESTAPI/RESTAPI_validate_apikey.cpp src/RESTAPI/RESTAPI_validate_apikey.h)
+        src/MessagingTemplates.h src/RESTAPI/RESTAPI_apiKey_handler.cpp src/RESTAPI/RESTAPI_apiKey_handler.h src/storage/orm_apikeys.cpp src/storage/orm_apikeys.h src/RESTAPI/RESTAPI_validate_apikey.cpp src/RESTAPI/RESTAPI_validate_apikey.h src/RESTAPI/RESTAPI_systemSecret_handler.cpp src/RESTAPI/RESTAPI_systemSecret_handler.h src/SecretStore.cpp src/SecretStore.h)
 
 if(NOT SMALL_BUILD)
     target_link_libraries(owsec PUBLIC

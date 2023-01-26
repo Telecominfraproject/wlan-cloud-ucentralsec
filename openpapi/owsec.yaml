@@ -243,7 +243,7 @@ components:
         apiKey:
           type: string
         rights:
-          $ref: '#/components/schemas/ApiKeyAccessRights'
+          $ref: '#/components/schemas/ApiKeyAccessRightList'
 
     AclTemplate:
       type: object
@@ -752,6 +752,23 @@ components:
                 type: string
               value:
                 type: string
+
+    SystemSecretEntry:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+
+    SystemSecretEntryList:
+      type: object
+      properties:
+        secrets:
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemSecretEntry'
+
 
     #########################################################################################
     ##
@@ -1956,6 +1973,62 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /systemSecret/{secret}:
+    get:
+      description: Retrieve a specific secret
+      operationId: getSecret
+      parameters:
+        - in: path
+          name: secret
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/SystemSecretEntry'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      description: Modify a specific secret
+      operationId: modifySecret
+      parameters:
+        - in: path
+          name: secret
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: value
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/schemas/SystemSecretEntry'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      description: Remove a specific secret
+      operationId: deleteSecret
+      parameters:
+        - in: path
+          name: secret
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        403:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
 
 #########################################################################################
 ##

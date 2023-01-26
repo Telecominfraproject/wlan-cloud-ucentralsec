@@ -28,6 +28,7 @@
 
 #include "framework/RESTAPI_SystemCommand.h"
 #include "framework/RESTAPI_WebSocketServer.h"
+#include "RESTAPI_systemSecret_handler.h"
 
 namespace OpenWifi {
 
@@ -59,7 +60,8 @@ namespace OpenWifi {
             RESTAPI_validate_token_handler,
             RESTAPI_validate_apikey,
             RESTAPI_webSocketServer,
-            RESTAPI_apiKey_handler
+            RESTAPI_apiKey_handler,
+            RESTAPI_systemSecret_handler
         >(Path, Bindings, L, S,TransactionId);
     }
 
@@ -89,7 +91,8 @@ namespace OpenWifi {
             RESTAPI_validate_sub_token_handler,
             RESTAPI_validate_token_handler,
             RESTAPI_validate_apikey,
-            RESTAPI_signup_handler
+            RESTAPI_signup_handler,
+            RESTAPI_systemSecret_handler
         >(Path, Bindings, L, S, TransactionId);
     }
 }

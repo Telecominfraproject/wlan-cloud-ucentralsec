@@ -17,15 +17,15 @@ namespace OpenWifi {
         std::string baseQuery;
         if(!nameSearch.empty() || !emailSearch.empty()) {
             if(!nameSearch.empty())
-                baseQuery = fmt::format(" Lower(name) like('%{}%') ", Poco::toLower(nameSearch) );
+                baseQuery = fmt::format(" Lower(name) like('%{}%') ", ORM::Escape(Poco::toLower(nameSearch)) );
             if(!emailSearch.empty())
-                baseQuery += baseQuery.empty() ? fmt::format(" Lower(email) like('%{}%') ", Poco::toLower(emailSearch))
-                : fmt::format(" and Lower(email) like('%{}%') ", Poco::toLower(emailSearch));
+                baseQuery += baseQuery.empty() ? fmt::format(" Lower(email) like('%{}%') ", ORM::Escape(Poco::toLower(emailSearch)))
+                : fmt::format(" and Lower(email) like('%{}%') ", ORM::Escape(Poco::toLower(emailSearch)));
         }
 
         if(QB_.CountOnly) {
             std::string whereClause;
-            if(!operatorId.empty()) {
+            if(!operatorId.empty() && Utils::ValidUUID(operatorId)) {
                 whereClause = baseQuery.empty() ? fmt::format(" owner='{}' ", operatorId) :
                               fmt::format(" owner='{}' and {} ", operatorId, baseQuery);
                 auto count = StorageService()->SubDB().Count(whereClause);
@@ -35,7 +35,7 @@ namespace OpenWifi {
             return ReturnCountOnly(count);
         } else if(QB_.Select.empty()) {
             std::string whereClause;
-            if(!operatorId.empty()) {
+            if(!operatorId.empty() && Utils::ValidUUID(operatorId)) {
                 whereClause = baseQuery.empty() ? fmt::format(" owner='{}' ", operatorId) :
                               fmt::format(" owner='{}' and {} ", operatorId, baseQuery);
             }
