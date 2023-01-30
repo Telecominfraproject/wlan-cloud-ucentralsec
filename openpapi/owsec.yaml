@@ -1983,9 +1983,19 @@ paths:
           schema:
             type: string
           required: true
+        - in: query
+          name: all
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
-          $ref: '#/components/schemas/SystemSecretEntry'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SystemSecretEntry'
+                  - $ref: '#/components/schemas/SystemSecretEntryList'
         403:
           $ref: '#/components/responses/Unauthorized'
         404:
