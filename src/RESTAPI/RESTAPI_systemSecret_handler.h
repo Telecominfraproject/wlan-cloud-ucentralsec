@@ -21,7 +21,7 @@ namespace OpenWifi {
                                  Server,
                                  TransactionId,
                                  Internal) {}
-        static auto PathName() { return std::list<std::string>{"/systemSecret/{secret}"}; };
+        static auto PathName() { return std::list<std::string>{"/api/v1/systemSecret/{secret}"}; };
         void DoGet() final;
         void DoPost() final {};
         void DoDelete() final;

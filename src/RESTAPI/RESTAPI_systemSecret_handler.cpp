@@ -54,7 +54,6 @@ namespace OpenWifi {
 
         SecretStore()->Remove(Key);
         return OK();
-
     }
 
     void RESTAPI_systemSecret_handler::DoPut() {

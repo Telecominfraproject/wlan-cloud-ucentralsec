@@ -417,6 +417,38 @@ systeminfo() {
     jq < ${result_file}
 }
 
+getsecret() {
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemSecret/${1}" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
+getallsecrets() {
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemSecret/0?all=true" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
+setsecret() {
+    curl  ${FLAGS} -X PUT "https://${OWSEC}/api/v1/systemSecret/${1}?value=${2}" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
+deletesecret() {
+    curl  ${FLAGS} -X DELETE "https://${OWSEC}/api/v1/systemSecret/${1}" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
 reloadsubsystem() {
     payload="{ \"command\" : \"reload\", \"subsystems\" : [ \"$1\" ] }"
     curl  ${FLAGS} -X POST "https://${OWSEC}/api/v1/system" \
@@ -578,6 +610,10 @@ case "$1" in
     "createapikey") login; createapikey "$2" ; logout;;
     "deleteapikey") login; deleteapikey "$2" "$3"; logout;;
     "getapikey") login; getapikey "$2" ; logout;;
+    "getsecret") login; getsecret "$2" ; logout;;
+    "getallsecrets") login; getallsecrets ; logout;;
+    "setsecret") login; setsecret "$2" "$3" ; logout;;
+    "deletesecret") login; deletesecret "$2" ; logout;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
