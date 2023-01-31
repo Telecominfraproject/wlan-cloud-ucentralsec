@@ -27,6 +27,27 @@ namespace OpenWifi {
             return ReturnObject(List);
         }
 
+        if(GetBoolParameter("dictionary")) {
+            static std::vector<std::pair<std::string,std::string>> KnownKeys =
+                    {
+                            { "google.maps.apikey" , "A Google Key specific for the Google MAPS API."},
+                            { "iptocountry.ipinfo.token", "IPInfo.io service token."},
+                            { "iptocountry.ipdata.apikey", "IPData.co API Key."},
+                            { "iptocountry.ip2location.apikey", "IP2Location.com API Key"}
+                    };
+
+            Poco::JSON::Object  Answer;
+            Poco::JSON::Array   Entries;
+            for(const auto &[key,description]:KnownKeys) {
+                Poco::JSON::Object  E;
+                E.set("key",key);
+                E.set("description",description);
+                Entries.add(E);
+            }
+            Answer.set("knownKeys", Entries);
+            return ReturnObject(Answer);
+        }
+
         auto Key = GetBinding("secret");
         if(Key.empty()) {
             return BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);

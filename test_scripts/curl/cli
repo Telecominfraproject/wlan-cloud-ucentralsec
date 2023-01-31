@@ -425,6 +425,14 @@ getsecret() {
     jq < ${result_file}
 }
 
+getsecretdictionary() {
+    curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemSecret/0?dictionary=true" \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer ${token}" > ${result_file}
+    jq < ${result_file}
+}
+
 getallsecrets() {
     curl  ${FLAGS} -X GET "https://${OWSEC}/api/v1/systemSecret/0?all=true" \
 		-H "Content-Type: application/json" \

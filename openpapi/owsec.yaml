@@ -1988,12 +1988,29 @@ paths:
           schema:
             type: boolean
           required: false
+        - in: query
+          name: dictionary
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
+          description: Successfull retrieval
           content:
             application/json:
               schema:
                 oneOf:
+                  - type: object
+                    properties:
+                      knownKeys:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            helper:
+                              type: string
                   - $ref: '#/components/schemas/SystemSecretEntry'
                   - $ref: '#/components/schemas/SystemSecretEntryList'
         403:
