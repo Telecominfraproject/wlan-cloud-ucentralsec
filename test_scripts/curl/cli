@@ -622,6 +622,7 @@ case "$1" in
     "getallsecrets") login; getallsecrets ; logout;;
     "setsecret") login; setsecret "$2" "$3" ; logout;;
     "deletesecret") login; deletesecret "$2" ; logout;;
+    "getsecretdictionary") login; getsecretdictionary ; logout;;
     "help") login; help  ; logout ;;
     *) help ;;
 esac
