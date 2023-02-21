@@ -7,30 +7,30 @@
 
 namespace OpenWifi {
 
-    void RESTAPI_preferences::DoGet() {
-        SecurityObjects::Preferences    P;
-        Poco::JSON::Object  Answer;
-        StorageService()->PreferencesDB().GetPreferences(UserInfo_.userinfo.id, P);
-        P.to_json(Answer);
-        ReturnObject(Answer);
-    }
+	void RESTAPI_preferences::DoGet() {
+		SecurityObjects::Preferences P;
+		Poco::JSON::Object Answer;
+		StorageService()->PreferencesDB().GetPreferences(UserInfo_.userinfo.id, P);
+		P.to_json(Answer);
+		ReturnObject(Answer);
+	}
 
-    void RESTAPI_preferences::DoPut() {
+	void RESTAPI_preferences::DoPut() {
 
-        SecurityObjects::Preferences    P;
+		SecurityObjects::Preferences P;
 
-        const auto & RawObject = ParsedBody_;
-        if(!P.from_json(RawObject)) {
-            return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
-        }
+		const auto &RawObject = ParsedBody_;
+		if (!P.from_json(RawObject)) {
+			return BadRequest(RESTAPI::Errors::InvalidJSONDocument);
+		}
 
-        P.id = UserInfo_.userinfo.id;
-        P.modified = OpenWifi::Now();
-        StorageService()->PreferencesDB().SetPreferences(P);
+		P.id = UserInfo_.userinfo.id;
+		P.modified = OpenWifi::Now();
+		StorageService()->PreferencesDB().SetPreferences(P);
 
-        Poco::JSON::Object  Answer;
-        P.to_json(Answer);
-        ReturnObject(Answer);
-    }
+		Poco::JSON::Object Answer;
+		P.to_json(Answer);
+		ReturnObject(Answer);
+	}
 
-}
+} // namespace OpenWifi

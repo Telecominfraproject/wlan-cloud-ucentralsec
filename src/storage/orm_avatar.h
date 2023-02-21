@@ -4,38 +4,40 @@
 
 #pragma once
 
-#include "framework/orm.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
+#include "framework/orm.h"
 
 namespace OpenWifi {
 
-/*
-    std::string             id;
-    std::string             type;
-    uint64_t                created=0;
-    std::string             name;
-    Poco::Data::LOB<char>   avatar;
-*/
+	/*
+		std::string             id;
+		std::string             type;
+		uint64_t                created=0;
+		std::string             name;
+		Poco::Data::LOB<char>   avatar;
+	*/
 
-    typedef Poco::Tuple <
-            std::string,            // id
-            std::string,            // type
-            uint64_t,               // created
-            std::string,            // name
-            Poco::Data::BLOB        // avatar
-    > AvatarRecordTuple;
-    typedef std::vector <AvatarRecordTuple> AvatarRecordTupleList;
+	typedef Poco::Tuple<std::string,	 // id
+						std::string,	 // type
+						uint64_t,		 // created
+						std::string,	 // name
+						Poco::Data::BLOB // avatar
+						>
+		AvatarRecordTuple;
+	typedef std::vector<AvatarRecordTuple> AvatarRecordTupleList;
 
-    class AvatarDB : public ORM::DB<AvatarRecordTuple, SecurityObjects::Avatar> {
-    public:
-        AvatarDB( const std::string &name, const std::string &shortname, OpenWifi::DBType T, Poco::Data::SessionPool & P, Poco::Logger &L);
-        virtual ~AvatarDB() {}
+	class AvatarDB : public ORM::DB<AvatarRecordTuple, SecurityObjects::Avatar> {
+	  public:
+		AvatarDB(const std::string &name, const std::string &shortname, OpenWifi::DBType T,
+				 Poco::Data::SessionPool &P, Poco::Logger &L);
+		virtual ~AvatarDB() {}
 
-        bool SetAvatar(const std::string & Admin, std::string &Id, const std::string & AvatarContent, std::string &Type, std::string & Name);
-        bool GetAvatar(const std::string & Admin, std::string &Id, std::string & AvatarContent, std::string &Type, std::string & Name);
-        bool DeleteAvatar(const std::string & Admin, std::string &Id);
+		bool SetAvatar(const std::string &Admin, std::string &Id, const std::string &AvatarContent,
+					   std::string &Type, std::string &Name);
+		bool GetAvatar(const std::string &Admin, std::string &Id, std::string &AvatarContent,
+					   std::string &Type, std::string &Name);
+		bool DeleteAvatar(const std::string &Admin, std::string &Id);
 
-    private:
-
-    };
-}
+	  private:
+	};
+} // namespace OpenWifi

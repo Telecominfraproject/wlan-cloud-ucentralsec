@@ -8,13 +8,15 @@
 
 namespace OpenWifi {
 
-    inline void Sanitize([[maybe_unused]] const SecurityObjects::UserInfoAndPolicy &User, SecurityObjects::UserInfo & U) {
-        U.currentPassword.clear();
-        U.lastPasswords.clear();
-        U.oauthType.clear();
-    }
+	inline void Sanitize([[maybe_unused]] const SecurityObjects::UserInfoAndPolicy &User,
+						 SecurityObjects::UserInfo &U) {
+		U.currentPassword.clear();
+		U.lastPasswords.clear();
+		U.oauthType.clear();
+	}
 
-    inline void Sanitize([[maybe_unused]] const SecurityObjects::UserInfoAndPolicy &User, SecurityObjects::ApiKeyEntry & U) {
-        U.salt.clear();
-    }
-}
+	inline void Sanitize([[maybe_unused]] const SecurityObjects::UserInfoAndPolicy &User,
+						 SecurityObjects::ApiKeyEntry &U) {
+		U.salt.clear();
+	}
+} // namespace OpenWifi

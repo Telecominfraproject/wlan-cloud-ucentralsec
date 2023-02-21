@@ -8,24 +8,25 @@
 #include "SMS_provider.h"
 
 namespace OpenWifi {
-    class SMS_provider_twilio : public SMS_provider {
-    public:
-        explicit SMS_provider_twilio(Poco::Logger &L) : Logger_(L) {}
-        ~SMS_provider_twilio() {};
-        bool Initialize() final ;
-        bool Start() final ;
-        bool Stop() final ;
-        bool Send(const std::string &Number, const std::string &Message) final;
-        bool Running() final;
-        inline Poco::Logger & Logger() { return Logger_; }
-    private:
-        bool                                Running_=false;
-        Poco::Logger                        &Logger_;
-        std::string                         Sid_;
-        std::string                         Token_;
-        std::string                         PhoneNumber_;
-        std::string                         Uri_;
-    };
-}
+	class SMS_provider_twilio : public SMS_provider {
+	  public:
+		explicit SMS_provider_twilio(Poco::Logger &L) : Logger_(L) {}
+		~SMS_provider_twilio(){};
+		bool Initialize() final;
+		bool Start() final;
+		bool Stop() final;
+		bool Send(const std::string &Number, const std::string &Message) final;
+		bool Running() final;
+		inline Poco::Logger &Logger() { return Logger_; }
 
-#endif //OWSEC_SMS_PROVIDER_TWILIO_H
+	  private:
+		bool Running_ = false;
+		Poco::Logger &Logger_;
+		std::string Sid_;
+		std::string Token_;
+		std::string PhoneNumber_;
+		std::string Uri_;
+	};
+} // namespace OpenWifi
+
+#endif // OWSEC_SMS_PROVIDER_TWILIO_H

@@ -9,26 +9,23 @@
 #include "framework/ow_constants.h"
 
 namespace OpenWifi {
-    void RESTAPI_email_handler::DoPost() {
-        const auto & Obj = ParsedBody_;
-        if (Obj->has("subject") &&
-            Obj->has("from") &&
-            Obj->has("text") &&
-            Obj->has("recipients") &&
-            Obj->isArray("recipients")) {
+	void RESTAPI_email_handler::DoPost() {
+		const auto &Obj = ParsedBody_;
+		if (Obj->has("subject") && Obj->has("from") && Obj->has("text") && Obj->has("recipients") &&
+			Obj->isArray("recipients")) {
 
-            Poco::JSON::Array::Ptr Recipients = Obj->getArray("recipients");
-            auto Recipient = Recipients->get(0).toString();
-            MessageAttributes Attrs;
-            Attrs[RECIPIENT_EMAIL] = Recipient;
-            Attrs[SUBJECT] = Obj->get("subject").toString();
-            Attrs[TEXT] = Obj->get("text").toString();
-            Attrs[SENDER] = Obj->get("from").toString();
-            if(SMTPMailerService()->SendMessage(Recipient, "password_reset.txt", Attrs, false)) {
-                return OK();
-            }
-            return ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
-        }
-        BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
-    }
-}
+			Poco::JSON::Array::Ptr Recipients = Obj->getArray("recipients");
+			auto Recipient = Recipients->get(0).toString();
+			MessageAttributes Attrs;
+			Attrs[RECIPIENT_EMAIL] = Recipient;
+			Attrs[SUBJECT] = Obj->get("subject").toString();
+			Attrs[TEXT] = Obj->get("text").toString();
+			Attrs[SENDER] = Obj->get("from").toString();
+			if (SMTPMailerService()->SendMessage(Recipient, "password_reset.txt", Attrs, false)) {
+				return OK();
+			}
+			return ReturnStatus(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
+		}
+		BadRequest(RESTAPI::Errors::MissingOrInvalidParameters);
+	}
+} // namespace OpenWifi

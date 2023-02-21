@@ -8,27 +8,23 @@
 
 namespace OpenWifi {
 
-    class ActionLinkManager : public SubSystemServer, Poco::Runnable {
-    public:
+	class ActionLinkManager : public SubSystemServer, Poco::Runnable {
+	  public:
+		static ActionLinkManager *instance() {
+			static auto instance_ = new ActionLinkManager;
+			return instance_;
+		}
 
-        static ActionLinkManager * instance() {
-            static auto instance_ = new ActionLinkManager;
-            return instance_;
-        }
+		int Start() final;
+		void Stop() final;
+		void run() final;
 
-        int Start() final;
-        void Stop() final;
-        void run() final;
+	  private:
+		Poco::Thread Thr_;
+		std::atomic_bool Running_ = false;
 
-    private:
-        Poco::Thread        Thr_;
-        std::atomic_bool    Running_ = false;
-
-        ActionLinkManager() noexcept:
-            SubSystemServer("ActionLinkManager", "ACTION-SVR", "action.server")
-                {
-                }
-    };
-    inline ActionLinkManager * ActionLinkManager() { return ActionLinkManager::instance(); }
-}
-
+		ActionLinkManager() noexcept
+			: SubSystemServer("ActionLinkManager", "ACTION-SVR", "action.server") {}
+	};
+	inline ActionLinkManager *ActionLinkManager() { return ActionLinkManager::instance(); }
+} // namespace OpenWifi

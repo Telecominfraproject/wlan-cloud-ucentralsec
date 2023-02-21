@@ -8,77 +8,76 @@
 
 #pragma once
 
+#include "AuthService.h"
 #include "RESTObjects/RESTAPI_SecurityObjects.h"
 #include "framework/StorageClass.h"
-#include "AuthService.h"
 
 #include "Poco/Timer.h"
 
-#include "storage/orm_users.h"
-#include "storage/orm_tokens.h"
-#include "storage/orm_preferences.h"
 #include "storage/orm_actionLinks.h"
+#include "storage/orm_apikeys.h"
 #include "storage/orm_avatar.h"
 #include "storage/orm_logins.h"
-#include "storage/orm_apikeys.h"
+#include "storage/orm_preferences.h"
+#include "storage/orm_tokens.h"
+#include "storage/orm_users.h"
 
 namespace OpenWifi {
 
-    class Archiver {
-    public:
-        void onTimer(Poco::Timer & timer);
-    private:
-    };
-
-    class StorageService : public StorageClass {
-    public:
-
-        static auto instance() {
-            static auto instance_ = new StorageService;
-            return instance_;
-        }
-
-        int 	Start() override;
-        void 	Stop() override;
-
-        OpenWifi::BaseUserDB & UserDB() { return *UserDB_; }
-        OpenWifi::BaseUserDB & SubDB() { return *SubDB_; }
-        OpenWifi::BaseTokenDB & UserTokenDB() { return *UserTokenDB_; }
-        OpenWifi::BaseTokenDB & SubTokenDB() { return *SubTokenDB_; }
-        OpenWifi::PreferencesDB & PreferencesDB() { return *PreferencesDB_; }
-        OpenWifi::PreferencesDB & SubPreferencesDB() { return *SubPreferencesDB_; }
-        OpenWifi::ActionLinkDB & ActionLinksDB() { return *ActionLinksDB_; }
-        OpenWifi::AvatarDB & AvatarDB() { return *AvatarDB_; }
-        OpenWifi::AvatarDB & SubAvatarDB() { return *SubAvatarDB_; }
-        OpenWifi::LoginDB & LoginDB() { return *LoginDB_; }
-        OpenWifi::LoginDB & SubLoginDB() { return *SubLoginDB_; }
-        OpenWifi::ApiKeyDB & ApiKeyDB() { return *ApiKeyDB_; }
+	class Archiver {
+	  public:
+		void onTimer(Poco::Timer &timer);
 
 	  private:
+	};
 
-        std::unique_ptr<OpenWifi::BaseUserDB>           UserDB_;
-        std::unique_ptr<OpenWifi::BaseUserDB>           SubDB_;
-        std::unique_ptr<OpenWifi::BaseTokenDB>          UserTokenDB_;
-        std::unique_ptr<OpenWifi::BaseTokenDB>          SubTokenDB_;
-        std::unique_ptr<OpenWifi::PreferencesDB>        PreferencesDB_;
-        std::unique_ptr<OpenWifi::PreferencesDB>        SubPreferencesDB_;
-        std::unique_ptr<OpenWifi::ActionLinkDB>         ActionLinksDB_;
-        std::unique_ptr<OpenWifi::AvatarDB>             AvatarDB_;
-        std::unique_ptr<OpenWifi::AvatarDB>             SubAvatarDB_;
-        std::unique_ptr<OpenWifi::LoginDB>              LoginDB_;
-        std::unique_ptr<OpenWifi::LoginDB>              SubLoginDB_;
-        std::unique_ptr<OpenWifi::ApiKeyDB>             ApiKeyDB_;
+	class StorageService : public StorageClass {
+	  public:
+		static auto instance() {
+			static auto instance_ = new StorageService;
+			return instance_;
+		}
 
-        std::unique_ptr<OpenWifi::UserCache>            UserCache_;
-        std::unique_ptr<OpenWifi::UserCache>            SubCache_;
-        std::unique_ptr<OpenWifi::TokenCache>           UserTokenCache_;
-        std::unique_ptr<OpenWifi::TokenCache>           SubTokenCache_;
+		int Start() override;
+		void Stop() override;
 
-        Poco::Timer                     Timer_;
-        Archiver                        Archiver_;
-        std::unique_ptr<Poco::TimerCallback<Archiver>>   Archivercallback_;
-   };
+		OpenWifi::BaseUserDB &UserDB() { return *UserDB_; }
+		OpenWifi::BaseUserDB &SubDB() { return *SubDB_; }
+		OpenWifi::BaseTokenDB &UserTokenDB() { return *UserTokenDB_; }
+		OpenWifi::BaseTokenDB &SubTokenDB() { return *SubTokenDB_; }
+		OpenWifi::PreferencesDB &PreferencesDB() { return *PreferencesDB_; }
+		OpenWifi::PreferencesDB &SubPreferencesDB() { return *SubPreferencesDB_; }
+		OpenWifi::ActionLinkDB &ActionLinksDB() { return *ActionLinksDB_; }
+		OpenWifi::AvatarDB &AvatarDB() { return *AvatarDB_; }
+		OpenWifi::AvatarDB &SubAvatarDB() { return *SubAvatarDB_; }
+		OpenWifi::LoginDB &LoginDB() { return *LoginDB_; }
+		OpenWifi::LoginDB &SubLoginDB() { return *SubLoginDB_; }
+		OpenWifi::ApiKeyDB &ApiKeyDB() { return *ApiKeyDB_; }
 
-    inline auto StorageService() { return StorageService::instance(); };
+	  private:
+		std::unique_ptr<OpenWifi::BaseUserDB> UserDB_;
+		std::unique_ptr<OpenWifi::BaseUserDB> SubDB_;
+		std::unique_ptr<OpenWifi::BaseTokenDB> UserTokenDB_;
+		std::unique_ptr<OpenWifi::BaseTokenDB> SubTokenDB_;
+		std::unique_ptr<OpenWifi::PreferencesDB> PreferencesDB_;
+		std::unique_ptr<OpenWifi::PreferencesDB> SubPreferencesDB_;
+		std::unique_ptr<OpenWifi::ActionLinkDB> ActionLinksDB_;
+		std::unique_ptr<OpenWifi::AvatarDB> AvatarDB_;
+		std::unique_ptr<OpenWifi::AvatarDB> SubAvatarDB_;
+		std::unique_ptr<OpenWifi::LoginDB> LoginDB_;
+		std::unique_ptr<OpenWifi::LoginDB> SubLoginDB_;
+		std::unique_ptr<OpenWifi::ApiKeyDB> ApiKeyDB_;
 
-}  // namespace
+		std::unique_ptr<OpenWifi::UserCache> UserCache_;
+		std::unique_ptr<OpenWifi::UserCache> SubCache_;
+		std::unique_ptr<OpenWifi::TokenCache> UserTokenCache_;
+		std::unique_ptr<OpenWifi::TokenCache> SubTokenCache_;
+
+		Poco::Timer Timer_;
+		Archiver Archiver_;
+		std::unique_ptr<Poco::TimerCallback<Archiver>> Archivercallback_;
+	};
+
+	inline auto StorageService() { return StorageService::instance(); };
+
+} // namespace OpenWifi
