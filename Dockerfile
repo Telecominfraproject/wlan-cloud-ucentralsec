@@ -1,6 +1,7 @@
 ARG DEBIAN_VERSION=11.5-slim
 ARG POCO_VERSION=poco-tip-v2
 ARG CPPKAFKA_VERSION=tip-v1
+ARG VALIJASON_VERSION=tip-v1
 
 FROM debian:$DEBIAN_VERSION AS build-base
 
@@ -32,6 +33,20 @@ ADD https://api.github.com/repos/AriliaWireless/cppkafka/git/refs/tags/${CPPKAFK
 RUN git clone https://github.com/AriliaWireless/cppkafka --branch ${CPPKAFKA_VERSION} /cppkafka
 
 WORKDIR /cppkafka
+RUN mkdir cmake-build
+WORKDIR cmake-build
+RUN cmake ..
+RUN cmake --build . --config Release -j8
+RUN cmake --build . --target install
+
+FROM build-base AS valijson-build
+
+ARG VALIJASON_VERSION
+
+ADD https://api.github.com/repos/AriliaWireless/valijson/git/refs/tags/${VALIJASON_VERSION} version.json
+RUN git clone https://github.com/AriliaWireless/valijson --branch ${VALIJASON_VERSION} /valijson
+
+WORKDIR /valijson
 RUN mkdir cmake-build
 WORKDIR cmake-build
 RUN cmake ..
@@ -95,6 +110,7 @@ COPY --from=owsec-build /owsec/cmake-build/owsec /openwifi/owsec
 COPY --from=owsec-build /vcpkg/installed/x64-linux/lib/ /usr/local/lib/
 COPY --from=cppkafka-build /cppkafka/cmake-build/src/lib/ /usr/local/lib/
 COPY --from=poco-build /poco/cmake-build/lib/ /usr/local/lib/
+COPY --from=valijson-build /usr/local/include /usr/local/include
 
 RUN ldconfig
 
