@@ -10,6 +10,7 @@
 
 #include "SMS_provider.h"
 #include "framework/SubSystemServer.h"
+#include "framework/utils.h"
 
 namespace OpenWifi {
 
@@ -17,7 +18,7 @@ namespace OpenWifi {
 		std::string Number;
 		std::string Code;
 		std::string UserName;
-		uint64_t Created = OpenWifi::Now();
+		uint64_t Created = Utils::Now();
 		bool Validated = false;
 	};
 
