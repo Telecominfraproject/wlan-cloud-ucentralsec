@@ -1,6 +1,8 @@
-# ucentralsec
+<p align=center><img src=images/project/logo.svg?sanitize=true/ width="200px" height="200px"></p>
 
-uCentralSec is the Authentication & Resource Policy Access service for the uCentral system. In order to use the uCentral system
+# OpenWiFi Security 
+
+The OpenWiFi Security Service (a.k.a uCentralSec) is the Authentication & Resource Policy Access service for the uCentral system. In order to use the uCentral system
 you must have at least 1 uCentralSec. uCentralSec is the first point of contact for the entire architecture. We strongly recommend using Docker 
 to deploy all the uCentral services. If you would like to develop and play with the source, please do.
 
