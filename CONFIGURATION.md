@@ -44,7 +44,7 @@ totp.issuer: Arilia
 mailer.enabled: true
 mailer.hostname: email-smtp.us-west-2.amazonaws.com
 mailer.loginmethod: login
-mailer.password: BD3a3eFtXszOFz+Eauuw8lA2QcnpS8PxXdC4PqE0aVc4
+mailer.password: ***********************************************
 mailer.port: 587
 mailer.sender: no-reply@arilia.com
 mailer.templates: $OWSEC_ROOT/templates
@@ -60,9 +60,9 @@ openwifi.document.policy.password: /wwwassets/password_policy.html
 
 ### SMS Sender
 ```properties
-smssender.aws.accesskey: AKIATXEXGKF37VR5WEVK
+smssender.aws.accesskey: ***********************
 smssender.aws.region: us-west-2
-smssender.aws.secretkey: 08E5kFyiaGc9boV4yT5K4REikQVFBdk50rByGw+X
+smssender.aws.secretkey: ******************************************+X
 smssender.enabled: true
 smssender.provider: aws
 ```
