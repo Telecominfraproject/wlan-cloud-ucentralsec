@@ -1,26 +1,30 @@
 <p align=center><img src=images/project/logo.svg?sanitize=true/ width="200px" height="200px"></p>
 
-# OpenWiFi Security 
+# OpenWiFi Security  (OWSEC)
 
-The OpenWiFi Security Service (a.k.a uCentralSec) is the Authentication & Resource Policy Access service for the uCentral system. In order to use the uCentral system
-you must have at least 1 uCentralSec. uCentralSec is the first point of contact for the entire architecture. We strongly recommend using Docker 
-to deploy all the uCentral services. If you would like to develop and play with the source, please do.
+The OpenWiFi Security Service (a.k.a. OWSEC) is the Authentication and Resource Policy Access service for the TIP 
+OpenWiFi Cloud SDK (OWSDK). In order to use the Cloud SDK you must have at least 1 OWSEC. OWSEC is the first point of contact 
+for the entire architecture. We strongly recommend using Docker to deploy all the OWSDK. If you would like to develop 
+and play with the source, please do.
 
 ## OpenAPI
-Like all other uCentral services, uCentralSec is defined through an OpenAPI. You can use this API to build your own applications or integration modules
-into your own systems. If all you need it to access the uCentralGW for example (the service that manages the APs), you will need to:
+Like all other OWSDK services, OWSEC is defined through an OpenAPI. You can use this API to build your own 
+applications or integration modules into your own systems. If all you need it to access the OWGW for 
+example (the service that manages the APs), you will need to:
 
 - get a token (`/oauth2`)
 - find the endpoints on the system (`/systemEndpoints`) 
-- choose one to manage (pick an endpoint that matches what you are trying to do by looking at its `type`. For the gateway, type = ucentrtalgw)
-- make your calls (use the PublicEndPoint of the corresponding entry to make your calls, do not forget to add `/api/v1` as the root os the call)
+- choose a microservice to manage (pick an endpoint that matches what you are trying to do by looking at its 
+`type`. For the Cloud SDK Controller, type = owgw)
+- make your calls (use the PublicEndPoint of the corresponding entry to make your calls, 
+do not forget to add `/api/v1` as the root os the call)
 
-The CLI for the [uCentralGW](https://github.com/telecominfraproject/wlan-cloud-ucentralgw/blob/main/test_scripts/curl/cli) has a very good example of this. 
-Look for the `setgateway` function.
+The CLI for the [OWGW](https://github.com/telecominfraproject/wlan-cloud-ucentralgw/blob/main/test_scripts/curl/cli) has 
+a very good example of this. Look for the `setgateway` function.
 
 You may get static page with OpenAPI docs generated from the definition on [GitHub Page](https://telecominfraproject.github.io/wlan-cloud-ucentralsec/).
 
-Also you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentralsec/main/openpapi/owsec.yaml)) to get interactive docs page.
+Also, you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentralsec/main/openpapi/owsec.yaml)) to get interactive docs page.
 
 ## Firewall Considerations
 The entire uCentral systems uses several MicroServices. In order for the whole system to work, you should provide the following port
@@ -54,19 +58,13 @@ access:
     - Private: 17004
     - ALB: 16104
 
-## Security Configuration
-The service relies on a properties configuration file called `owsec.properties`. In this file, you should configure several entries. Many values are optional 
-and you can rely on the defaults. Here are some values of note:
-
-### `authentication.default.password`
-Set the hash of the default username and password. Please look below on how to do this. 
-
-### `authentication.default.username`
-Set the default username to use to login.
+### OWSEC Service Configuration
+The configuration is kept in a file called `owsec.properties`. To understand the content of this file,
+please look [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/CONFIGURATION.md)
 
 ### Default username and password
 The default username and password are set in `owsec.properties` file. The following entries manage the username and password
-```text
+```properties
 authentication.default.username = tip@ucentral.com
 authentication.default.password = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
@@ -81,36 +79,17 @@ echo -n "weLoveWifiroot@system.com" | shasum -a 256
 b5bfed31e2a272e52973a57b95042ab842db3999475f3d79f1ce0f45f465e34c  -
 ```
 Then you need to modify your properties file like this
-```text
+```properties
 authentication.default.username = root@system.com
 authentication.default.password = b5bfed31e2a272e52973a57b95042ab842db3999475f3d79f1ce0f45f465e34c
 ```
 Remember, when you login, use `root@system.com` with the password `weLoveWifi`, not this monster digit sequence.
 
-#### Is this safe?
-Is this safe to show the hash in a text file? Let me put it this way, if you can find a way to break this encryption, you
-would have control over the entire internet. It's incredibly safe. If you love math, you can find a lot of videos explaining
-how hashes work and why they are safe.
-
-### `authentication.validation.expression`
-This is a regular expression (regex) to verify the incoming password. You can find many examples on the internet on how to create these expressions. I suggest 
-that using Google is your friend. Someone has figured out what you want to do already. Click [here](https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a)
-to get a sample. The default is
-
-```
-^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$
-```
-
-### `authentication.oldpasswords`
-The number of older passwords to keep. Default is 5.
-
 ### Changing default password
-
 On the first startup of the service new user will be created with the default credentials from properties `authentication.default.username` and `authentication.default.password`, but **you will have to change the password** before making any real requests.
-
 You can this using [owgw-ui](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw-ui/) on first login or using the following script:
 
-```
+```bash
 export OWSEC=openwifi.wlan.local:16001 # endpoint to your owsec RESTAPI endpoint
 #export FLAGS="-k" # uncomment and add curl flags that you would like to pass for the request (for example '-k' may be used to pass errors with self-signed certificates)
 export OWSEC_DEFAULT_USERNAME=root@system.com # default username that you've set in property 'authentication.default.username'
@@ -121,7 +100,7 @@ test_scripts/curl/cli testlogin $OWSEC_DEFAULT_USERNAME $OWSEC_DEFAULT_PASSWORD 
 
 CLI is also included in Docker image if you want to run it this way:
 
-```
+```bash
 export OWSEC=openwifi.wlan.local:16001
 #export FLAGS="-k"
 export OWSEC_DEFAULT_USERNAME=root@system.com
@@ -142,7 +121,7 @@ docker run --rm -ti \
 This security service uses Kafka to coordinate security with other services that are part of the system. You must have a Kafka service running
 in order to use this. You can find several examples of Kafka services available with Docker. Here are the values you need to configure.
 
-```
+```properties
 openwifi.kafka.group.id = security
 openwifi.kafka.client.id = security1
 openwifi.kafka.enable = true
@@ -160,7 +139,7 @@ Every service on the Kafka bux must have a unique value (at least in our case). 
 function provided. In this case, security.
 
 ### Certificates
-Of course we need certificates. In our case, we already have existing certificates we have. You should find out how your file name correspond
+Of course, we need certificates. In our case, we already have existing certificates we have. You should find out how your file name correspond
 to our names. We suggest reusing the same names we use so it is easier to use our default configuration files. We suggest using proper certificates 
 for the publicly visible interfaces. For private interfaces, self-signed certificates are OK. We will not describe how to use/create private certificates 
 here.
@@ -172,7 +151,7 @@ Here are the parameters for the public interface. The important files are:
 - `restapi-key.pem` : the key associated with this certificate
 - `openwifi.restapi.host.0.key.password` : if you key is password protected, you may supply that password here.
 
-```
+```properties
 openwifi.restapi.host.0.backlog = 100
 openwifi.restapi.host.0.security = relaxed
 openwifi.restapi.host.0.rootca = $OWSEC_ROOT/certs/restapi-ca.pem
@@ -187,7 +166,7 @@ openwifi.restapi.host.0.key.password = mypassword
 The private interface is used for service-to-service communication. You can use self-signed certificates here or letsencrypt. The file names are similar 
 to the filenames used in the previous section.
 
-```
+```properties
 openwifi.internal.restapi.host.0.backlog = 100
 openwifi.internal.restapi.host.0.security = relaxed
 openwifi.internal.restapi.host.0.rootca = $OWSEC_ROOT/certs/restapi-ca.pem
@@ -202,7 +181,7 @@ openwifi.internal.restapi.host.0.key.password = mypassword
 Here are other important values you must set.
 
 
-```
+```properties
 openwifi.system.data = $OWSEC_ROOT/data
 openwifi.system.uri.private = https://localhost:17001
 openwifi.system.uri.public = https://openwifi.dpaas.arilia.com:16001
@@ -227,7 +206,7 @@ an SMS provider must be configured. At present time, 2 providers are supported: 
 #### AWS SMS
 For SNS you must create an IAM ID that has sns:sendmessage rights.  
 
-```
+```properties
 smssender.enabled = true
 smssender.provider = aws
 smssender.aws.secretkey = ***************************************
@@ -238,7 +217,7 @@ smssender.aws.region = **************
 #### Twilio
 For Twilio, you must provide the following
 
-```
+```properties
 smssender.enabled = true
 smssender.provider = twilio
 smssender.twilio.sid = ***********************
@@ -251,7 +230,7 @@ smssender.twilio.phonenumber = +18888888888
 with GMail and AWS SES. For each, you must obtain the proper credentials and insert them in this configuration as well
 as the proper mail host.
 
-```
+```properties
 mailer.enabled = true
 mailer.hostname = smtp.gmail.com
 mailer.username = ************************
@@ -266,8 +245,34 @@ mailer.templates = $OWSEC_ROOT/templates
 In order to use the Google Time-based One-Time Password (TOTP), the user must download the Google Authenticator 
 on any other app that support the TOTP protocol. You should include the following in your configuration
 
-```
+```properties
 totp.issuer = OrgName
 ```
 
+## Firewall Considerations
+| Port  | Description                                   | Configurable |
+|:------|:----------------------------------------------|:------------:|
+| 16001 | Default port for REST API Access to the OWSEC |     yes      |
+
 It is very important that you not use spaces in your OrgName.
+## Kafka topics
+Toe read more about Kafka, follow the [document](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/main/KAFKA.md)
+
+## Contributions
+We need more contributors. Should you wish to contribute,
+please follow the [contributions](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/CONTRIBUTING.md) document.
+
+## Pull Requests
+Please create a branch with the Jira addressing the issue you are fixing or the feature you are implementing.
+Create a pull-request from the branch into master.
+
+## Additional OWSDK Microservices
+Here is a list of additional OWSDK microservices
+| Name | Description | Link | OpenAPI |
+| :--- | :--- | :---: | :---: |
+| OWSEC | Security Service | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralsec) | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralsec/blob/main/openpapi/owsec.yaml) |
+| OWGW | Controller Service | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw) | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralgw/blob/master/openapi/owgw.yaml) |
+| OWFMS | Firmware Management Service | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralfms) | [here](https://github.com/Telecominfraproject/wlan-cloud-ucentralfms/blob/main/openapi/owfms.yaml) |
+| OWPROV | Provisioning Service | [here](https://github.com/Telecominfraproject/wlan-cloud-owprov) | [here](https://github.com/Telecominfraproject/wlan-cloud-owprov/blob/main/openapi/owprov.yaml) |
+| OWANALYTICS | Analytics Service | [here](https://github.com/Telecominfraproject/wlan-cloud-analytics) | [here](https://github.com/Telecominfraproject/wlan-cloud-analytics/blob/main/openapi/owanalytics.yaml) |
+
