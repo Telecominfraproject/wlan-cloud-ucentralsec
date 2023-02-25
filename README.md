@@ -4,16 +4,28 @@
 
 # OpenWiFi Security  (OWSEC)
 
-The OpenWiFi Security Service (a.k.a. OWSEC) is the Authentication and Resource Policy Access service for the TIP 
-OpenWiFi Cloud SDK (OWSDK). In order to use the Cloud SDK you must have at least 1 OWSEC. OWSEC is the first point of contact 
-for the entire architecture. We strongly recommend using Docker to deploy all the OWSDK. If you would like to develop 
-and play with the source, please do.
+## What is it?
+The OWSEC is a service for the TIP OpenWiFi CloudSDK (OWSDK).
+OWSEC is the Authentication and Resource Policy Access service for the TIP
+OpenWiFi Cloud SDK (OWSDK). OWSEC,
+like all other OWSDK microservices, is defined using an OpenAPI definition and uses the ucentral communication
+protocol to interact with Access Points. To use the OWSUB, you either need to [build it](#building) or use the
+[Docker version](#docker).
+
+## Building
+To build the microservice from source, please follow the instructions in [here](./BUILDING.md)
+
+## Docker
+To use the CLoudSDK deployment please follow [here](https://github.com/Telecominfraproject/wlan-cloud-ucentral-deploy)
 
 ## OpenAPI
+You may get static page with OpenAPI docs generated from the definition on [GitHub Page](https://telecominfraproject.github.io/wlan-cloud-ucentralsec/).
+Also, you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentralsec/main/openapi/owsec.yaml)) to get interactive docs page.
+
+## Usage
 Like all other OWSDK services, OWSEC is defined through an OpenAPI. You can use this API to build your own 
 applications or integration modules into your own systems. If all you need it to access the OWGW for 
 example (the service that manages the APs), you will need to:
-
 - get a token (`/oauth2`)
 - find the endpoints on the system (`/systemEndpoints`) 
 - choose a microservice to manage (pick an endpoint that matches what you are trying to do by looking at its 
@@ -21,7 +33,7 @@ example (the service that manages the APs), you will need to:
 - make your calls (use the PublicEndPoint of the corresponding entry to make your calls, 
 do not forget to add `/api/v1` as the root os the call)
 
-The CLI for the [OWGW](https://github.com/telecominfraproject/wlan-cloud-ucentralgw/blob/main/test_scripts/curl/cli) has 
+The CLI for the [OWGW](https://github.com/telecominfraproject/wlan-cloud-ucentralsec/blob/main/test_scripts/curl/cli) has 
 a very good example of this. Look for the `setgateway` function.
 
 You may get static page with OpenAPI docs generated from the definition on [GitHub Page](https://telecominfraproject.github.io/wlan-cloud-ucentralsec/).
