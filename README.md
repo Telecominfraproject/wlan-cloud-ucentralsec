@@ -41,36 +41,9 @@ You may get static page with OpenAPI docs generated from the definition on [GitH
 Also, you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentralsec/main/openpapi/owsec.yaml)) to get interactive docs page.
 
 ## Firewall Considerations
-The entire uCentral systems uses several MicroServices. In order for the whole system to work, you should provide the following port
-access:
-
-- Security
-  - Properties file: owsec.properties
-  - Ports
-    - Public: 16001
-    - Private: 17001
-    - ALB: 16101
-
-- Gateway:
-  - Properties file: owgw.properties
-  - Ports
-    - Public: 16002
-    - Private: 17002
-    - ALB: 16102
-
-- Firmware:
-  - Properties file: owfms.properties
-  - Ports
-    - Public: 16004
-    - Private: 17004
-    - ALB: 16104
-
-- Provisioning:
-  - Properties file: owprov.properties
-  - Ports
-    - Public: 16004
-    - Private: 17004
-    - ALB: 16104
+| Port  | Description                                | Configurable |
+|:------|:-------------------------------------------|:------------:|
+| 16001 | Default port from the devices to the OWSEC |     yes      |
 
 ### Environment variables
 The following environment variables should be set from the root directory of the service. They tell the OWGW process where to find
