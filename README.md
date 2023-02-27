@@ -40,6 +40,40 @@ You may get static page with OpenAPI docs generated from the definition on [GitH
 
 Also, you may use [Swagger UI](https://petstore.swagger.io/#/) with OpenAPI definition file raw link (i.e. [latest version file](https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Telecominfraproject/wlan-cloud-ucentralsec/main/openpapi/owsec.yaml)) to get interactive docs page.
 
+#### Expected directory layout
+From the directory where your cloned source is, you will need to create the `certs`, `logs`, and `uploads` directories.
+```bash
+mkdir certs
+mkdir certs/cas
+mkdir logs
+mkdir uploads
+```
+You should now have the following:
+```text
+--+-- certs
+  |   +--- cas
+  +-- cmake
+  +-- cmake-build
+  +-- logs
+  +-- src
+  +-- test_scripts
+  +-- openapi
+  +-- uploads
+  +-- owsec.properties
+```
+
+### Certificate
+The OWSEC uses a certificate to provide security for the REST API Certificate to secure the Northbound API.
+
+#### The `certs` directory
+For all deployments, you will need the following `certs` directory, populated with the proper files.
+
+```text
+certs ---+--- restapi-ca.pem
+         +--- restapi-cert.pem
+         +--- restapi-key.pem
+```
+
 ## Firewall Considerations
 | Port  | Description                                | Configurable |
 |:------|:-------------------------------------------|:------------:|
@@ -112,11 +146,6 @@ docker run --rm -ti \
   tip-tip-wlan-cloud-ucentral.jfrog.io/owsec:main \
   /cli testlogin $OWSEC_DEFAULT_USERNAME $OWSEC_DEFAULT_PASSWORD $OWSEC_NEW_PASSWORD
 ```
-
-## Firewall Considerations
-| Port  | Description                                   | Configurable |
-|:------|:----------------------------------------------|:------------:|
-| 16001 | Default port for REST API Access to the OWSEC |     yes      |
 
 It is very important that you not use spaces in your OrgName.
 ## Kafka topics
