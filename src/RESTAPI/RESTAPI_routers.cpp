@@ -29,6 +29,7 @@
 #include "RESTAPI_systemSecret_handler.h"
 #include "framework/RESTAPI_SystemCommand.h"
 #include "framework/RESTAPI_WebSocketServer.h"
+#include "framework/RESTAPI_SystemConfiguration.h"
 
 namespace OpenWifi {
 
@@ -37,7 +38,7 @@ namespace OpenWifi {
 					  Poco::Logger &L, RESTAPI_GenericServerAccounting &S, uint64_t TransactionId) {
 		return RESTAPI_Router<
 			RESTAPI_oauth2_handler, RESTAPI_user_handler, RESTAPI_users_handler,
-			RESTAPI_system_command, RESTAPI_asset_server, RESTAPI_system_endpoints_handler,
+			RESTAPI_system_command, RESTAPI_system_configuration, RESTAPI_asset_server, RESTAPI_system_endpoints_handler,
 			RESTAPI_action_links, RESTAPI_avatar_handler, RESTAPI_subavatar_handler,
 			RESTAPI_email_handler, RESTAPI_sms_handler, RESTAPI_preferences, RESTAPI_subpreferences,
 			RESTAPI_suboauth2_handler, RESTAPI_subuser_handler, RESTAPI_subusers_handler,
@@ -54,7 +55,7 @@ namespace OpenWifi {
 
 		return RESTAPI_Router_I<
 			RESTAPI_oauth2_handler, RESTAPI_user_handler, RESTAPI_users_handler,
-			RESTAPI_system_command, RESTAPI_asset_server, RESTAPI_system_endpoints_handler,
+			RESTAPI_system_command, RESTAPI_system_configuration, RESTAPI_asset_server, RESTAPI_system_endpoints_handler,
 			RESTAPI_action_links, RESTAPI_avatar_handler, RESTAPI_subavatar_handler,
 			RESTAPI_email_handler, RESTAPI_sms_handler, RESTAPI_preferences, RESTAPI_subpreferences,
 			RESTAPI_suboauth2_handler, RESTAPI_subuser_handler, RESTAPI_subusers_handler,
