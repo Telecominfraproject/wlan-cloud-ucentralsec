@@ -60,6 +60,16 @@ if [[ "$TEMPLATE_CONFIG" = 'true' ]]; then
   STORAGE_TYPE_MYSQL_PASSWORD=${STORAGE_TYPE_MYSQL_PASSWORD:-"owsec"} \
   STORAGE_TYPE_MYSQL_DATABASE=${STORAGE_TYPE_MYSQL_DATABASE:-"owsec"} \
   STORAGE_TYPE_MYSQL_PORT=${STORAGE_TYPE_MYSQL_PORT:-"3306"} \
+  USER_HELPER_EMAIL=${USER_HELPER_EMAIL:-"openwifi@telecominfraproject.com"} \
+  SUB_HELPER_EMAIL=${SUB_HELPER_EMAIL:-"openwifi@telecominfraproject.com"} \
+  GLOBAL_USER_HELPER_EMAIL=${GLOBAL_USER_HELPER_EMAIL:-"openwifi@telecominfraproject.com"} \
+  GLOBAL_SUB_HELPER_EMAIL=${GLOBAL_SUB_HELPER_EMAIL:-"openwifi@telecominfraproject.com"} \
+  USER_HELPER_SITE=${USER_HELPER_SITE:-"https://openwifi.telecominfraproject.com"} \
+  SUB_HELPER_SITE=${SUB_HELPER_SITE:-"https://openwifi.telecominfraproject.com"} \
+  USER_SYSTEM_LOGIN=${USER_SYSTEM_LOGIN:-"https://openwifi.telecominfraproject.com"} \
+  SUB_SYSTEM_LOGIN=${SUB_SYSTEM_LOGIN:-"https://openwifi.telecominfraproject.com"} \
+  USER_SIGNATURE=${USER_SIGNATURE:-"Telecom Infra Project"} \
+  SUB_SIGNATURE=${SUB_SIGNATURE:-"Telecom Infra Project"} \
   envsubst < /owsec.properties.tmpl > $OWSEC_CONFIG/owsec.properties
 fi
 
