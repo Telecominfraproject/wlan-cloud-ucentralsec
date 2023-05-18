@@ -345,7 +345,7 @@ namespace OpenWifi {
 				std::stringstream ResultText;
 				Poco::JSON::Stringifier::stringify(Obj, ResultText);
 				KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS,
-											MicroServicePrivateEndPoint(), ResultText.str(), false);
+											MicroServicePrivateEndPoint(), std::make_shared<std::string>(ResultText.str()), false);
 			}
 		} catch (const Poco::Exception &E) {
 			Logger().log(E);
