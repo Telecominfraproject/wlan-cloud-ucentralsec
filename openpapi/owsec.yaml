@@ -1110,6 +1110,12 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          description: When used, signifies the the id is actually the email address of the user, and not its uuid
+          name: byEmail
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
           $ref: '#/components/schemas/UserInfo'
@@ -1972,6 +1978,8 @@ paths:
 
   /systemSecret/{secret}:
     get:
+      tags:
+        - System Secrets
       description: Retrieve a specific secret
       operationId: getSecret
       parameters:
@@ -2016,6 +2024,8 @@ paths:
           $ref: '#/components/responses/NotFound'
 
     put:
+      tags:
+        - System Secrets
       description: Modify a specific secret
       operationId: modifySecret
       parameters:
