@@ -1232,6 +1232,12 @@ paths:
             type: string
             format: uuid
           required: true
+        - in: query
+          description: When used, signifies the the id is actually the email address of the user, and not its uuid
+          name: byEmail
+          schema:
+            type: boolean
+          required: false
       responses:
         200:
           $ref: '#/components/schemas/UserInfo'
