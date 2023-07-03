@@ -34,7 +34,9 @@ namespace OpenWifi {
 			return BadRequest(RESTAPI::Errors::SMSCouldNotValidate);
 		}
 
-		if (UserInfo_.userinfo.userRole != SecurityObjects::ROOT &&
+        if(Internal_) {
+            poco_information(Logger(),fmt::format("Internal SMS request: TID={}", TransactionId_));
+        } else if (UserInfo_.userinfo.userRole != SecurityObjects::ROOT &&
 			UserInfo_.userinfo.userRole != SecurityObjects::PARTNER &&
 			UserInfo_.userinfo.userRole != SecurityObjects::ADMIN) {
 			return UnAuthorized(RESTAPI::Errors::ACCESS_DENIED);
