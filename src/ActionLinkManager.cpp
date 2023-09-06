@@ -80,6 +80,7 @@ namespace OpenWifi {
 					continue;
 				}
 
+                DBG
 				switch (i.action) {
 				case OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD: {
                     DBG
@@ -121,44 +122,61 @@ namespace OpenWifi {
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
+                    DBG
 					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
+                    DBG
 					if (AuthService()->SendEmailToSubUser(i.id, UInfo.email,
 														  MessagingTemplates::SUB_FORGOT_PASSWORD,
 														  Signup.count() == 1 ? "" : Signup[0])) {
+                        DBG
 						poco_information(
 							Logger(),
 							fmt::format("Send subscriber password reset link to {}", UInfo.email));
 					}
+                    DBG
 					StorageService()->ActionLinksDB().SentAction(i.id);
+                    DBG
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL: {
+                    DBG
 					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
+                    DBG
 					if (AuthService()->SendEmailToSubUser(
 							i.id, UInfo.email, MessagingTemplates::SUB_EMAIL_VERIFICATION,
 							Signup.count() == 1 ? "" : Signup[0])) {
+                        DBG
 						poco_information(
 							Logger(), fmt::format("Send subscriber email verification link to {}",
 												  UInfo.email));
 					}
+                    DBG
 					StorageService()->ActionLinksDB().SentAction(i.id);
+                    DBG
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP: {
+                    DBG
 					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
+                    DBG
 					if (AuthService()->SendEmailToSubUser(
 							i.id, UInfo.email, MessagingTemplates::SUB_SIGNUP_VERIFICATION,
 							Signup.count() == 1 ? "" : Signup[0])) {
+                        DBG
 						poco_information(
 							Logger(),
 							fmt::format("Send new subscriber email verification link to {}",
 										UInfo.email));
 					}
+                    DBG
 					StorageService()->ActionLinksDB().SentAction(i.id);
+                    DBG
 				} break;
 
 				default: {
+                    DBG
 					StorageService()->ActionLinksDB().SentAction(i.id);
+                    DBG
 				}
 				}
 			}
