@@ -798,12 +798,9 @@ namespace OpenWifi {
 										 const std::string &OperatorName) {
 		SecurityObjects::UserInfo UInfo;
 
-        DBGLINE
 		if (StorageService()->SubDB().GetUserByEmail(Email, UInfo)) {
 			switch (Reason) {
-DBGLINE
 			case MessagingTemplates::SUB_FORGOT_PASSWORD: {
-                DBGLINE
 				MessageAttributes Attrs;
 				Attrs[RECIPIENT_EMAIL] = UInfo.email;
 				Attrs[LOGO] = GetSubLogoAssetURI();
@@ -812,19 +809,15 @@ DBGLINE
 									 "/actionLink?action=sub_password_reset&id=" + LinkId;
 				Attrs[ACTION_LINK_HTML] =
 					"/api/v1/actionLink?action=sub_password_reset&id=" + LinkId;
-                DBGLINE
 				SMTPMailerService()->AddSubVars(Attrs);
-                DBGLINE
 				SMTPMailerService()->SendMessage(
 					UInfo.email,
 					MessagingTemplates::TemplateName(MessagingTemplates::SUB_FORGOT_PASSWORD,
 													 OperatorName),
 					Attrs, true);
-                DBGLINE
 			} break;
 
 			case MessagingTemplates::SUB_EMAIL_VERIFICATION: {
-                DBGLINE
 				MessageAttributes Attrs;
 				Attrs[RECIPIENT_EMAIL] = UInfo.email;
 				Attrs[LOGO] = GetSubLogoAssetURI();
@@ -833,20 +826,16 @@ DBGLINE
 									 "/actionLink?action=sub_email_verification&id=" + LinkId;
 				Attrs[ACTION_LINK_HTML] =
 					"/api/v1/actionLink?action=sub_email_verification&id=" + LinkId;
-                DBGLINE
 				SMTPMailerService()->AddSubVars(Attrs);
-                DBGLINE
 				SMTPMailerService()->SendMessage(
 					UInfo.email,
 					MessagingTemplates::TemplateName(MessagingTemplates::SUB_EMAIL_VERIFICATION,
 													 OperatorName),
 					Attrs, true);
 				UInfo.waitingForEmailCheck = true;
-                DBGLINE
 			} break;
 
 			case MessagingTemplates::SUB_SIGNUP_VERIFICATION: {
-                DBGLINE
 				MessageAttributes Attrs;
 				Attrs[RECIPIENT_EMAIL] = UInfo.email;
 				Attrs[LOGO] = GetSubLogoAssetURI();
@@ -855,25 +844,20 @@ DBGLINE
 									 "/actionLink?action=signup_verification&id=" + LinkId;
 				Attrs[ACTION_LINK_HTML] =
 					"/api/v1/actionLink?action=signup_verification&id=" + LinkId;
-                DBGLINE
 				SMTPMailerService()->AddSubVars(Attrs);
-                DBGLINE
 				SMTPMailerService()->SendMessage(
 					UInfo.email,
 					MessagingTemplates::TemplateName(MessagingTemplates::SUB_SIGNUP_VERIFICATION,
 													 OperatorName),
 					Attrs, true);
 				UInfo.waitingForEmailCheck = true;
-                DBGLINE
 			} break;
 
 			default:
-                DBGLINE
 				break;
 			}
 			return true;
 		}
-        DBGLINE
 		return false;
 	}
 
