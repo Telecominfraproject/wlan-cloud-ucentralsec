@@ -110,8 +110,8 @@ namespace OpenWifi {
                     DBG
 					if (AuthService()->SendEmailToUser(i.id, UInfo.email,
 													   MessagingTemplates::EMAIL_INVITATION)) {
+                        DBG
 						poco_information(
-                                DBG
 							Logger(), fmt::format("Send new subscriber email invitation link to {}",
 												  UInfo.email));
 					}
