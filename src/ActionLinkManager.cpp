@@ -33,6 +33,8 @@ namespace OpenWifi {
 		Running_ = true;
 		Utils::SetThreadName("action-mgr");
 
+        Poco::Thread::trySleep(10000);
+
 		while (Running_) {
 			Poco::Thread::trySleep(2000);
             DBGLINE
