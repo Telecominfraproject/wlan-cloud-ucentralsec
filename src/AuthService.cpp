@@ -798,6 +798,7 @@ namespace OpenWifi {
 										 const std::string &OperatorName) {
 		SecurityObjects::UserInfo UInfo;
 
+        DBGLINE
 		if (StorageService()->SubDB().GetUserByEmail(Email, UInfo)) {
 			switch (Reason) {
 DBGLINE
