@@ -28,18 +28,23 @@ namespace OpenWifi {
 		poco_information(Logger(), "Stopped...");
 	}
 
-	void ActionLinkManager::run() {
+#define DBG         std::cout << __LINE__ << std::endl;
+
+    void ActionLinkManager::run() {
 		Running_ = true;
 		Utils::SetThreadName("action-mgr");
 
 		while (Running_) {
 			Poco::Thread::trySleep(2000);
+            DBG
 			if (!Running_)
 				break;
 			std::vector<SecurityObjects::ActionLink> Links;
 			{
 				std::lock_guard G(Mutex_);
+                DBG
 				StorageService()->ActionLinksDB().GetActions(Links);
+                DBG
 			}
 
 			if (Links.empty())
@@ -50,51 +55,69 @@ namespace OpenWifi {
 					break;
 
 				SecurityObjects::UserInfo UInfo;
+                DBG
 				if ((i.action == OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD ||
 					 i.action == OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) &&
 					!StorageService()->UserDB().GetUserById(i.userId, UInfo)) {
+                    DBG
 					StorageService()->ActionLinksDB().CancelAction(i.id);
+                    DBG
 					continue;
 				} else if ((i.action ==
 								OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD ||
 							i.action == OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL ||
 							i.action == OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP) &&
 						   !StorageService()->SubDB().GetUserById(i.userId, UInfo)) {
+                    DBG
 					StorageService()->ActionLinksDB().CancelAction(i.id);
+                    DBG
 					continue;
 				} else if ((i.action == OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION) &&
 						   (OpenWifi::Now() - i.created) > (24 * 60 * 60)) {
+                    DBG
 					StorageService()->ActionLinksDB().CancelAction(i.id);
+                    DBG
 					continue;
 				}
 
 				switch (i.action) {
 				case OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD: {
+                    DBG
 					if (AuthService()->SendEmailToUser(i.id, UInfo.email,
 													   MessagingTemplates::FORGOT_PASSWORD)) {
 						poco_information(
 							Logger(), fmt::format("Send password reset link to {}", UInfo.email));
 					}
+                    DBG
 					StorageService()->ActionLinksDB().SentAction(i.id);
+                    DBG
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL: {
+                    DBG
 					if (AuthService()->SendEmailToUser(i.id, UInfo.email,
 													   MessagingTemplates::EMAIL_VERIFICATION)) {
+                        DBG
 						poco_information(Logger(), fmt::format("Send email verification link to {}",
 															   UInfo.email));
 					}
+                    DBG
 					StorageService()->ActionLinksDB().SentAction(i.id);
+                    DBG
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION: {
+                    DBG
 					if (AuthService()->SendEmailToUser(i.id, UInfo.email,
 													   MessagingTemplates::EMAIL_INVITATION)) {
 						poco_information(
+                                DBG
 							Logger(), fmt::format("Send new subscriber email invitation link to {}",
 												  UInfo.email));
 					}
+                    DBG
 					StorageService()->ActionLinksDB().SentAction(i.id);
+                    DBG
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
