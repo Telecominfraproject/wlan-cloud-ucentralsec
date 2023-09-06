@@ -101,7 +101,6 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_action_links::CompleteResetPassword() {
-		//  form has been posted...
 		RESTAPI_PartHandler PartHandler;
 		Poco::Net::HTMLForm Form(*Request, Request->stream(), PartHandler);
 		if (!Form.empty()) {
