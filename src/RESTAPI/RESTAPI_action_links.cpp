@@ -37,7 +37,7 @@ namespace OpenWifi {
 		if (Action == "password_reset")
 			return RequestResetPassword(Link);
 		else if (Action == "sub_password_reset")
-			return RequestSubResetPassword(Link);
+			return RequestResetPassword(Link);
 		else if (Action == "email_verification")
 			return DoEmailVerification(Link);
 		else if (Action == "sub_email_verification")
