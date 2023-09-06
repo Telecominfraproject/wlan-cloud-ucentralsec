@@ -37,9 +37,9 @@ namespace OpenWifi {
 			instance_ =
 				new Daemon(vDAEMON_PROPERTIES_FILENAME, vDAEMON_ROOT_ENV_VAR,
 						   vDAEMON_CONFIG_ENV_VAR, vDAEMON_APP_NAME, vDAEMON_BUS_TIMER,
-						   SubSystemVec{StorageService(), SMSSender(), ActionLinkManager(),
+						   SubSystemVec{StorageService(), SMSSender(), AuthService(), ActionLinkManager(),
 										SMTPMailerService(), RESTAPI_RateLimiter(), TotpCache(),
-										AuthService(), UI_WebSocketClientServer(), SecretStore()});
+										UI_WebSocketClientServer(), SecretStore()});
 		}
 		return instance_;
 	}
