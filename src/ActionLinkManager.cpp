@@ -28,7 +28,6 @@ namespace OpenWifi {
 		poco_information(Logger(), "Stopped...");
 	}
 
-#define DBG         std::cout << __LINE__ << std::endl;
 
     void ActionLinkManager::run() {
 		Running_ = true;
@@ -36,15 +35,15 @@ namespace OpenWifi {
 
 		while (Running_) {
 			Poco::Thread::trySleep(2000);
-            DBG
+            DBGLINE
 			if (!Running_)
 				break;
 			std::vector<SecurityObjects::ActionLink> Links;
 			{
 				std::lock_guard G(Mutex_);
-                DBG
+                DBGLINE
 				StorageService()->ActionLinksDB().GetActions(Links);
-                DBG
+                DBGLINE
 			}
 
 			if (Links.empty())
@@ -55,128 +54,128 @@ namespace OpenWifi {
 					break;
 
 				SecurityObjects::UserInfo UInfo;
-                DBG
+                DBGLINE
 				if ((i.action == OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD ||
 					 i.action == OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL) &&
 					!StorageService()->UserDB().GetUserById(i.userId, UInfo)) {
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().CancelAction(i.id);
-                    DBG
+                    DBGLINE
 					continue;
 				} else if ((i.action ==
 								OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD ||
 							i.action == OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL ||
 							i.action == OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP) &&
 						   !StorageService()->SubDB().GetUserById(i.userId, UInfo)) {
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().CancelAction(i.id);
-                    DBG
+                    DBGLINE
 					continue;
 				} else if ((i.action == OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION) &&
 						   (OpenWifi::Now() - i.created) > (24 * 60 * 60)) {
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().CancelAction(i.id);
-                    DBG
+                    DBGLINE
 					continue;
 				}
 
-                DBG
+                DBGLINE
 				switch (i.action) {
 				case OpenWifi::SecurityObjects::LinkActions::FORGOT_PASSWORD: {
-                    DBG
+                    DBGLINE
 					if (AuthService()->SendEmailToUser(i.id, UInfo.email,
 													   MessagingTemplates::FORGOT_PASSWORD)) {
 						poco_information(
 							Logger(), fmt::format("Send password reset link to {}", UInfo.email));
 					}
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().SentAction(i.id);
-                    DBG
+                    DBGLINE
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::VERIFY_EMAIL: {
-                    DBG
+                    DBGLINE
 					if (AuthService()->SendEmailToUser(i.id, UInfo.email,
 													   MessagingTemplates::EMAIL_VERIFICATION)) {
-                        DBG
+                        DBGLINE
 						poco_information(Logger(), fmt::format("Send email verification link to {}",
 															   UInfo.email));
 					}
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().SentAction(i.id);
-                    DBG
+                    DBGLINE
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::EMAIL_INVITATION: {
-                    DBG
+                    DBGLINE
 					if (AuthService()->SendEmailToUser(i.id, UInfo.email,
 													   MessagingTemplates::EMAIL_INVITATION)) {
-                        DBG
+                        DBGLINE
 						poco_information(
 							Logger(), fmt::format("Send new subscriber email invitation link to {}",
 												  UInfo.email));
 					}
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().SentAction(i.id);
-                    DBG
+                    DBGLINE
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
-                    DBG
+                    DBGLINE
 					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
-                    DBG
+                    DBGLINE
 					if (AuthService()->SendEmailToSubUser(i.id, UInfo.email,
 														  MessagingTemplates::SUB_FORGOT_PASSWORD,
 														  Signup.count() == 1 ? "" : Signup[0])) {
-                        DBG
+                        DBGLINE
 						poco_information(
 							Logger(),
 							fmt::format("Send subscriber password reset link to {}", UInfo.email));
 					}
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().SentAction(i.id);
-                    DBG
+                    DBGLINE
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL: {
-                    DBG
+                    DBGLINE
 					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
-                    DBG
+                    DBGLINE
 					if (AuthService()->SendEmailToSubUser(
 							i.id, UInfo.email, MessagingTemplates::SUB_EMAIL_VERIFICATION,
 							Signup.count() == 1 ? "" : Signup[0])) {
-                        DBG
+                        DBGLINE
 						poco_information(
 							Logger(), fmt::format("Send subscriber email verification link to {}",
 												  UInfo.email));
 					}
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().SentAction(i.id);
-                    DBG
+                    DBGLINE
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_SIGNUP: {
-                    DBG
+                    DBGLINE
 					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
-                    DBG
+                    DBGLINE
 					if (AuthService()->SendEmailToSubUser(
 							i.id, UInfo.email, MessagingTemplates::SUB_SIGNUP_VERIFICATION,
 							Signup.count() == 1 ? "" : Signup[0])) {
-                        DBG
+                        DBGLINE
 						poco_information(
 							Logger(),
 							fmt::format("Send new subscriber email verification link to {}",
 										UInfo.email));
 					}
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().SentAction(i.id);
-                    DBG
+                    DBGLINE
 				} break;
 
 				default: {
-                    DBG
+                    DBGLINE
 					StorageService()->ActionLinksDB().SentAction(i.id);
-                    DBG
+                    DBGLINE
 				}
 				}
 			}
