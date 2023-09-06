@@ -123,12 +123,8 @@ namespace OpenWifi {
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
-                    DBGLINE
-					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
-                    DBGLINE
 					if (AuthService()->SendEmailToSubUser(i.id, UInfo.email,
-														  MessagingTemplates::SUB_FORGOT_PASSWORD,
-														  Signup.count() == 1 ? "" : Signup[0])) {
+														  MessagingTemplates::SUB_FORGOT_PASSWORD,"")) {
                         DBGLINE
 						poco_information(
 							Logger(),
@@ -140,12 +136,8 @@ namespace OpenWifi {
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL: {
-                    DBGLINE
-					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
-                    DBGLINE
 					if (AuthService()->SendEmailToSubUser(
-							i.id, UInfo.email, MessagingTemplates::SUB_EMAIL_VERIFICATION,
-							Signup.count() == 1 ? "" : Signup[0])) {
+							i.id, UInfo.email, MessagingTemplates::SUB_EMAIL_VERIFICATION,"")) {
                         DBGLINE
 						poco_information(
 							Logger(), fmt::format("Send subscriber email verification link to {}",
