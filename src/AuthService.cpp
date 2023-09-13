@@ -342,10 +342,8 @@ namespace OpenWifi {
 				Obj.set("event", "remove-token");
 				Obj.set("id", MicroServiceID());
 				Obj.set("token", token);
-				std::stringstream ResultText;
-				Poco::JSON::Stringifier::stringify(Obj, ResultText);
 				KafkaManager()->PostMessage(KafkaTopics::SERVICE_EVENTS,
-											MicroServicePrivateEndPoint(), std::make_shared<std::string>(ResultText.str()), false);
+											MicroServicePrivateEndPoint(), Obj, false);
 			}
 		} catch (const Poco::Exception &E) {
 			Logger().log(E);
