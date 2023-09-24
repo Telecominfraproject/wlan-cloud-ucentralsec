@@ -28,9 +28,12 @@ namespace OpenWifi {
 		poco_information(Logger(), "Stopped...");
 	}
 
-	void ActionLinkManager::run() {
+
+    void ActionLinkManager::run() {
 		Running_ = true;
 		Utils::SetThreadName("action-mgr");
+
+        Poco::Thread::trySleep(10000);
 
 		while (Running_) {
 			Poco::Thread::trySleep(2000);
@@ -98,10 +101,8 @@ namespace OpenWifi {
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_FORGOT_PASSWORD: {
-					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
 					if (AuthService()->SendEmailToSubUser(i.id, UInfo.email,
-														  MessagingTemplates::SUB_FORGOT_PASSWORD,
-														  Signup.count() == 1 ? "" : Signup[0])) {
+														  MessagingTemplates::SUB_FORGOT_PASSWORD,"")) {
 						poco_information(
 							Logger(),
 							fmt::format("Send subscriber password reset link to {}", UInfo.email));
@@ -110,10 +111,8 @@ namespace OpenWifi {
 				} break;
 
 				case OpenWifi::SecurityObjects::LinkActions::SUB_VERIFY_EMAIL: {
-					auto Signup = Poco::StringTokenizer(UInfo.signingUp, ":");
 					if (AuthService()->SendEmailToSubUser(
-							i.id, UInfo.email, MessagingTemplates::SUB_EMAIL_VERIFICATION,
-							Signup.count() == 1 ? "" : Signup[0])) {
+							i.id, UInfo.email, MessagingTemplates::SUB_EMAIL_VERIFICATION,"")) {
 						poco_information(
 							Logger(), fmt::format("Send subscriber email verification link to {}",
 												  UInfo.email));

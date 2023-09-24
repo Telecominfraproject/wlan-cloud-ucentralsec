@@ -185,7 +185,7 @@ namespace OpenWifi {
 			}
 		}
 
-		if (GetBoolParameter("forgotPassword")) {
+		if (GetBoolParameter("forgotPassword") || GetBoolParameter("resetPassword")) {
 			Existing.changePassword = true;
 			Logger_.information(fmt::format("FORGOTTEN-PASSWORD({}): Request for {}",
 											Request->clientAddress().toString(), Existing.email));

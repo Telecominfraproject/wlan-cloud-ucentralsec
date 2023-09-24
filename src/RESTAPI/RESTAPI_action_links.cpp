@@ -37,11 +37,11 @@ namespace OpenWifi {
 		if (Action == "password_reset")
 			return RequestResetPassword(Link);
 		else if (Action == "sub_password_reset")
-			return RequestSubResetPassword(Link);
+			return RequestResetPassword(Link);
 		else if (Action == "email_verification")
 			return DoEmailVerification(Link);
 		else if (Action == "sub_email_verification")
-			return DoSubEmailVerification(Link);
+			return DoEmailVerification(Link);
 		else if (Action == "signup_verification")
 			return DoNewSubVerification(Link);
 		else
@@ -101,7 +101,6 @@ namespace OpenWifi {
 	}
 
 	void RESTAPI_action_links::CompleteResetPassword() {
-		//  form has been posted...
 		RESTAPI_PartHandler PartHandler;
 		Poco::Net::HTMLForm Form(*Request, Request->stream(), PartHandler);
 		if (!Form.empty()) {
