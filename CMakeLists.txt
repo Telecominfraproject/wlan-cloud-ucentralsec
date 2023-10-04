@@ -185,6 +185,7 @@ if(NOT SMALL_BUILD)
             CppKafka::cppkafka
             ${AWSSDK_LINK_LIBRARIES}
             fmt::fmt
+            resolv
             )
     if(UNIX AND NOT APPLE)
         target_link_libraries(owsec PUBLIC PocoJSON)
