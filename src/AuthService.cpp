@@ -218,7 +218,7 @@ namespace OpenWifi {
 				Expired = (WT.created_ + WT.expires_in_) < now;
 				if (StorageService()->UserDB().GetUserById(UserId, UInfo.userinfo)) {
 					UInfo.webtoken = WT;
-					poco_debug(Logger(), fmt::format("TokenValidation success for TID={} Token={}",
+					poco_trace(Logger(), fmt::format("TokenValidation success for TID={} Token={}",
 													 TID, Utils::SanitizeToken(CallToken)));
 					return true;
 				}
